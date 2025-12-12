@@ -1,0 +1,35 @@
+{
+  "name": "triple-j-auto-investment",
+  "type": "docker",
+  "buildType": "dockerfile",
+  "dockerfile": "Dockerfile",
+  "ports": [
+    {
+      "published": 80,
+      "target": 80,
+      "protocol": "tcp"
+    }
+  ],
+  "env": [
+    {
+      "key": "NODE_ENV",
+      "value": "production"
+    }
+  ],
+  "volumes": [],
+  "healthCheck": {
+    "enabled": true,
+    "test": "wget --quiet --tries=1 --spider http://localhost/health || exit 1",
+    "interval": 30,
+    "timeout": 10,
+    "retries": 3,
+    "startPeriod": 40
+  },
+  "domains": [],
+  "source": {
+    "type": "github",
+    "repository": "whoisjaso/triple-j-auto-investment",
+    "branch": "main"
+  },
+  "autoDeploy": true
+}
