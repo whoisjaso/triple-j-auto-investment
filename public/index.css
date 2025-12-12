@@ -1,0 +1,15 @@
+/* Triple J Auto Investment - Global Styles */
+
+/* Additional custom styles beyond Tailwind */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar styles already defined in index.html */

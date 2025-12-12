@@ -1,0 +1,24 @@
+# Triple J Auto Investment - Houston, TX
+# Optimized for search engine crawling
+
+User-agent: *
+Allow: /
+Allow: /inventory
+Allow: /about
+Allow: /contact
+Allow: /services
+Allow: /finance
+Allow: /faq
+Allow: /policies
+Allow: /payment-options
+Allow: /vin
+
+# Block admin pages from search engines
+Disallow: /admin/
+Disallow: /login
+
+# Sitemap location
+Sitemap: https://triplejautoinvestment.com/sitemap.xml
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 1
