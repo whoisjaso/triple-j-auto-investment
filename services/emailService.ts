@@ -33,8 +33,13 @@ export const sendLeadNotification = async (lead: {
   }
 
   try {
+    // Send to both email addresses
+    const primaryEmail = 'triplejautoinvestment@gmail.com';
+    const secondaryEmail = 'jobawems@gmail.com';
+
     const templateParams = {
-      to_email: import.meta.env.VITE_ADMIN_EMAIL || 'jobawems@gmail.com',
+      to_email: primaryEmail,
+      cc_email: secondaryEmail,
       customer_name: lead.name,
       customer_email: lead.email,
       customer_phone: lead.phone,
@@ -47,7 +52,7 @@ export const sendLeadNotification = async (lead: {
     };
 
     await emailjs.send(serviceId, templateId, templateParams);
-    console.log('Lead notification email sent successfully');
+    console.log(`Lead notification sent to ${primaryEmail} and ${secondaryEmail}`);
     return true;
   } catch (error) {
     console.error('Failed to send lead notification email:', error);
@@ -62,6 +67,9 @@ export const EMAIL_TEMPLATE_GUIDE = `
 1. Go to https://www.emailjs.com/ and create a free account
 2. Create a new Email Service (Gmail, Outlook, etc.)
 3. Create a new Email Template with this content:
+
+TO: {{to_email}}
+CC: {{cc_email}}
 
 SUBJECT: 🚨 NEW LEAD - Triple J Auto Investment
 
@@ -85,6 +93,10 @@ BODY:
 This lead was captured via TripleJAutoInvestment.com
 
 Action Required: Contact within 60 minutes for maximum conversion.
+
+IMPORTANT:
+- Emails will be sent to: triplejautoinvestment@gmail.com
+- CC'd to: jobawems@gmail.com
 
 4. Copy your Service ID, Template ID, and Public Key to .env.local
 `;
