@@ -1,0 +1,16 @@
+#!/bin/sh
+# Generate .env.production from environment variables for Vite build
+
+cat > .env.production << EOF
+VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+VITE_SUPABASE_ANON_KEY=${VITE_SUPABASE_ANON_KEY}
+VITE_ADMIN_EMAIL=${VITE_ADMIN_EMAIL}
+VITE_ADMIN_PASSWORD=${VITE_ADMIN_PASSWORD}
+VITE_GEMINI_API_KEY=${VITE_GEMINI_API_KEY}
+VITE_EMAILJS_SERVICE_ID=${VITE_EMAILJS_SERVICE_ID}
+VITE_EMAILJS_TEMPLATE_ID=${VITE_EMAILJS_TEMPLATE_ID}
+VITE_EMAILJS_PUBLIC_KEY=${VITE_EMAILJS_PUBLIC_KEY}
+EOF
+
+echo "✅ Generated .env.production with environment variables"
+cat .env.production

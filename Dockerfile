@@ -33,7 +33,10 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the application (env vars now available to Vite)
+# Generate .env.production from environment variables
+RUN chmod +x scripts/generate-env.sh && ./scripts/generate-env.sh
+
+# Build the application (Vite will read .env.production)
 RUN npm run build
 
 # Production stage
