@@ -1,9 +1,10 @@
 
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
 import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { AnimatePresence, motion } from 'framer-motion';
 
 // Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
@@ -79,7 +80,8 @@ const Navbar = () => {
       <span className={`text-[10px] uppercase tracking-[0.3em] font-display ${location.pathname === to ? 'text-tj-gold' : 'text-white'} group-hover:text-tj-gold transition-colors`}>
         {label}
       </span>
-      <span className={`absolute bottom-2 w-1 h-1 bg-tj-gold rotate-45 transition-all duration-500 ${location.pathname === to ? 'scale-100 opacity-100' : 'scale-0 opacity-0 group-hover:scale-75 group-hover:opacity-50'}`}></span>
+      {/* Clean, sophisticated active indicator - Underline instead of floating dot */}
+      <span className={`absolute bottom-3 w-full h-[1px] bg-tj-gold transition-all duration-500 ${location.pathname === to ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0 group-hover:scale-x-50 group-hover:opacity-50'}`}></span>
     </Link>
   );
 
@@ -94,7 +96,7 @@ const Navbar = () => {
             {/* Left Axis: Operational */}
             <div className="hidden md:flex flex-1 items-center justify-start space-x-10 pl-12">
               <NavLink to="/inventory" label={t.nav.inventory} />
-              <NavLink to="/vin" label="Intel" />
+              <NavLink to="/vin" label="INTEL" />
             </div>
 
             {/* CENTER AXIS: OFFICIAL LOGO */}
@@ -166,48 +168,70 @@ const Navbar = () => {
       </div>
 
       {/* --- PSYCHOLOGICAL PORTAL (MOBILE MENU) --- */}
-      <div
-        className={`fixed inset-0 z-[60] bg-[#020202] flex flex-col justify-center items-center md:hidden transition-all duration-[800ms] ease-[cubic-bezier(0.22,1,0.36,1)] transform-gpu ${isOpen ? 'opacity-100 visible clip-circle-full' : 'opacity-0 invisible pointer-events-none'}`}
-        style={{ clipPath: isOpen ? 'circle(150% at 90% 5%)' : 'circle(0% at 90% 5%)' }}
-      >
-        <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] pointer-events-none mix-blend-overlay"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-tj-gold/5 via-black to-black pointer-events-none animate-subtle-zoom"></div>
+      {/* --- PSYCHOLOGICAL PORTAL (MOBILE MENU) --- */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(20px)" }}
+            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            transition={{ duration: 0.5 }}
+            className="fixed inset-0 z-[60] bg-black/80 flex flex-col justify-center items-center md:hidden"
+          >
+            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none mix-blend-overlay"></div>
 
-        <div className="flex flex-col items-center gap-10 z-10 w-full px-6 perspective-1000">
-          {[
-            { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT", delay: 100 },
-            { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "ACQUIRE ASSETS", delay: 150 },
-            { to: "/vin", label: "INTEL", sub: "DEEP DATA ANALYSIS", delay: 200 },
-            { to: "/about", label: t.nav.about.toUpperCase(), sub: "THE PHILOSOPHY", delay: 250 }
-          ].map((link, idx) => (
-            <Link
-              key={link.to}
-              to={link.to}
-              onClick={() => setIsOpen(false)}
-              className={`group relative text-center transition-all duration-[800ms] ease-[cubic-bezier(0.215,0.61,0.355,1)] transform-gpu`}
-              style={{
-                transitionDelay: `${isOpen ? link.delay : 0}ms`,
-                transform: isOpen ? 'translateY(0)' : 'translateY(20px)',
-                opacity: isOpen ? 1 : 0,
-                filter: isOpen ? 'blur(0px)' : 'blur(10px)'
+            <motion.div
+              className="flex flex-col items-center gap-8 z-10 w-full px-6"
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              variants={{
+                visible: { transition: { staggerChildren: 0.1 } },
+                hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
               }}
             >
-              <span className="block font-display text-5xl text-white tracking-[0.05em] group-hover:text-tj-gold transition-colors duration-500 font-bold mix-blend-difference leading-none">
-                {link.label}
-              </span>
-            </Link>
-          ))}
-        </div>
+              {[
+                { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT" },
+                { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "ACQUIRE ASSETS" },
+                { to: "/vin", label: "INTEL", sub: "DEEP DATA ANALYSIS" },
+                { to: "/about", label: t.nav.about.toUpperCase(), sub: "THE PHILOSOPHY" }
+              ].map((link) => (
+                <motion.div
+                  key={link.to}
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+                  }}
+                  className="w-full text-center"
+                >
+                  <Link
+                    to={link.to}
+                    onClick={() => setIsOpen(false)}
+                    className="block font-display text-4xl md:text-5xl text-white tracking-widest hover:text-tj-gold transition-colors duration-300"
+                  >
+                    {link.label}
+                  </Link>
+                  <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-2">{link.sub}</p>
+                </motion.div>
+              ))}
+            </motion.div>
 
-        <div className={`absolute bottom-16 transition-all duration-1000 delay-[400ms] ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`}>
-          <button
-            onClick={toggleLang}
-            className="mb-8 block mx-auto text-tj-gold border border-tj-gold/30 px-6 py-2 rounded-full text-[10px] uppercase tracking-widest"
-          >
-            Language: {lang === 'en' ? 'ENGLISH' : 'ESPAÑOL'}
-          </button>
-        </div>
-      </div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="absolute bottom-16"
+            >
+              <button
+                onClick={toggleLang}
+                className="text-tj-gold border border-tj-gold/30 px-6 py-2 rounded-none text-[10px] uppercase tracking-widest hover:bg-tj-gold hover:text-black transition-colors"
+              >
+                {lang === 'en' ? 'SWITCH TO ESPAÑOL' : 'SWITCH TO ENGLISH'}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
@@ -286,7 +310,7 @@ const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-import { AnimatePresence } from 'framer-motion';
+// AnimatePresence is already imported at top from 'framer-motion'
 
 const AppContent = () => {
   const location = useLocation();

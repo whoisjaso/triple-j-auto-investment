@@ -217,13 +217,17 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         .order('date_added', { ascending: false });
 
       if (error) {
-        console.error('Failed to load vehicles:', error);
-        // Load fallback if empty
+        console.error('❌ Failed to load vehicles from Supabase:', error);
+        console.error('Error Details:', error.message, error.details, error.hint);
+        // Only load fallback if we really can't connect
         if (vehicles.length === 0) {
+          console.warn('⚠️ Using FALLBACK assets due to fetch error.');
           setVehicles(FALLBACK_ASSETS);
         }
         return;
       }
+
+      console.log(`📡 Supabase Fetch Complete. Found ${data?.length || 0} vehicles.`);
 
       // Transform snake_case DB fields to camelCase
       const transformed = (data || []).map((v: any) => ({
@@ -251,10 +255,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         dateAdded: v.date_added,
       }));
 
-      setVehicles(transformed);
-      console.log(`✅ Loaded ${transformed.length} vehicles from Supabase`);
+      if (transformed.length === 0) {
+        console.warn('⚠️ Supabase returned 0 vehicles. Check RLS policies or if database is empty.');
+        // Do NOT load fallback here, transparency is key. If empty, show empty.
+      } else {
+        setVehicles(transformed);
+        console.log(`✅ Loaded ${transformed.length} vehicles into Store.`);
+      }
     } catch (error) {
-      console.error('Unexpected error loading vehicles:', error);
+      console.error('❌ Unexpected error loading vehicles:', error);
+      // Keep existing fallback for catastrophic failure
       if (vehicles.length === 0) {
         setVehicles(FALLBACK_ASSETS);
       }
