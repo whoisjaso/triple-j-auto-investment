@@ -144,6 +144,7 @@ const Navbar = () => {
               <button
                 onClick={toggleLang}
                 className="text-tj-gold p-2"
+                aria-label={lang === 'en' ? 'Switch to Spanish' : 'Cambiar a Inglés'}
               >
                 <span className="text-[10px] font-bold">{lang === 'en' ? 'ES' : 'EN'}</span>
               </button>
@@ -151,6 +152,8 @@ const Navbar = () => {
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`group relative p-3 border transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden ${isOpen ? 'border-tj-gold text-tj-gold bg-black' : 'border-white/10 text-white bg-black/50 backdrop-blur'}`}
+                aria-label={isOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isOpen}
               >
                 <div className={`absolute inset-0 bg-tj-gold/10 transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}></div>
                 <div className={`relative z-10 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isOpen ? 'rotate-90 scale-110' : 'rotate-0'}`}>
