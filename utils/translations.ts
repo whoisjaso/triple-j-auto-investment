@@ -154,6 +154,21 @@ export const t = {
                 sunday: "Sunday",
                 closed: "CLOSED"
             }
+        },
+        login: {
+            title: "RESTRICTED ACCESS",
+            subtitle: "Triple J Sovereign Domain",
+            emailLabel: "Identity Key (Email)",
+            emailPlaceholder: "ENTER DESIGNATION",
+            passwordLabel: "Access Cipher (Password)",
+            passwordPlaceholder: "ENTER SEQUENCE",
+            authenticate: "Authenticate",
+            forgotAccess: "Lost Access Sequence?",
+            errorTitle: "Access Denied",
+            errorMessage: "Security breach detected. A verification protocol has been dispatched to the owner's secure channel.",
+            recoveryTitle: "Recovery Initiated",
+            recoveryMessage: "Secure link transmission dispatched. Check your primary frequency.",
+            secureNote: "Secure connection established. Unauthorized attempts are logged."
         }
     },
     es: {
@@ -309,6 +324,21 @@ export const t = {
                 sunday: "Domingo",
                 closed: "CERRADO"
             }
+        },
+        login: {
+            title: "ACCESO RESTRINGIDO",
+            subtitle: "Dominio Soberano Triple J",
+            emailLabel: "Clave de Identidad (Correo)",
+            emailPlaceholder: "INGRESE DESIGNACIÓN",
+            passwordLabel: "Cifrado de Acceso (Contraseña)",
+            passwordPlaceholder: "INGRESE SECUENCIA",
+            authenticate: "Autenticar",
+            forgotAccess: "¿Perdiste la Secuencia de Acceso?",
+            errorTitle: "Acceso Denegado",
+            errorMessage: "Violación de seguridad detectada. Se ha enviado un protocolo de verificación al canal seguro del propietario.",
+            recoveryTitle: "Recuperación Iniciada",
+            recoveryMessage: "Transmisión de enlace seguro enviada. Revisa tu frecuencia principal.",
+            secureNote: "Conexión segura establecida. Intentos no autorizados son registrados."
         }
     }
 };
