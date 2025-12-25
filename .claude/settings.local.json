@@ -34,7 +34,9 @@
       "WebSearch",
       "Bash(ssh:*)",
       "Bash(npx tailwindcss:*)",
-      "Bash(timeout /t 5 /nobreak)"
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(npm uninstall:*)",
+      "Bash(ping:*)"
     ],
     "deny": [],
     "ask": []
