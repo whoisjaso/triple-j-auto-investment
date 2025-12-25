@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Triple J Debug Page</title>
+    <style>
+        body {
+            background: #000;
+            color: #0f0;
+            font-family: monospace;
+            padding: 20px;
+        }
+        .test {
+            border: 1px solid #0f0;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .pass { color: #0f0; }
+        .fail { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>🔍 TRIPLE J DEBUG PAGE</h1>
+    <p>If you can see this, the deployment is working.</p>
+
+    <div class="test">
+        <h2>Test 1: Basic HTML</h2>
+        <p class="pass">✅ PASS - HTML rendering works</p>
+    </div>
+
+    <div class="test">
+        <h2>Test 2: Environment Variables</h2>
+        <p id="env-test">Testing...</p>
+        <script>
+            const envTest = document.getElementById('env-test');
+            // These won't work because env vars are only in build, but we can test if JS runs
+            envTest.innerHTML = '<span class="pass">✅ PASS - JavaScript executing</span>';
+        </script>
+    </div>
+
+    <div class="test">
+        <h2>Test 3: Supabase Connection</h2>
+        <p id="supabase-test">Testing...</p>
+        <script>
+            const supabaseTest = document.getElementById('supabase-test');
+            fetch('https://scgmpliwlfabnpygvbsy.supabase.co/rest/v1/', {
+                headers: {
+                    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjZ21wbGl3bGZhYm5weWd2YnN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MDg0NjQsImV4cCI6MjA4MDk4NDQ2NH0.o8jvtDPVJ6DGwDy6QPuG_3XzmHPuR_hZ82DZsdeDisM'
+                }
+            })
+            .then(r => {
+                if (r.ok) {
+                    supabaseTest.innerHTML = '<span class="pass">✅ PASS - Supabase API reachable</span>';
+                } else {
+                    supabaseTest.innerHTML = '<span class="fail">❌ FAIL - Supabase returned: ' + r.status + '</span>';
+                }
+            })
+            .catch(err => {
+                supabaseTest.innerHTML = '<span class="fail">❌ FAIL - Cannot connect to Supabase: ' + err.message + '</span><br><span class="fail">This means CSP is still blocking or network issue</span>';
+            });
+        </script>
+    </div>
+
+    <div class="test">
+        <h2>Test 4: WebSocket Connection</h2>
+        <p id="ws-test">Testing...</p>
+        <script>
+            const wsTest = document.getElementById('ws-test');
+            try {
+                const ws = new WebSocket('wss://scgmpliwlfabnpygvbsy.supabase.co/realtime/v1/websocket?apikey=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjZ21wbGl3bGZhYm5weWd2YnN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MDg0NjQsImV4cCI6MjA4MDk4NDQ2NH0.o8jvtDPVJ6DGwDy6QPuG_3XzmHPuR_hZ82DZsdeDisM&vsn=1.0.0');
+                ws.onopen = () => {
+                    wsTest.innerHTML = '<span class="pass">✅ PASS - WebSocket connection successful!</span>';
+                    ws.close();
+                };
+                ws.onerror = (err) => {
+                    wsTest.innerHTML = '<span class="fail">❌ FAIL - WebSocket error (CSP likely blocking)</span>';
+                };
+            } catch (err) {
+                wsTest.innerHTML = '<span class="fail">❌ FAIL - WebSocket blocked: ' + err.message + '</span>';
+            }
+        </script>
+    </div>
+
+    <div class="test">
+        <h2>Instructions</h2>
+        <p>1. If Test 1-2 PASS but Test 3-4 FAIL → CSP still blocking</p>
+        <p>2. If all FAIL → Deployment didn't work</p>
+        <p>3. If all PASS → App should work (check main site)</p>
+    </div>
+
+    <div class="test">
+        <h2>Next Steps</h2>
+        <p>Open browser console (F12) and look for errors</p>
+        <p>Take screenshot and send to developer</p>
+    </div>
+</body>
+</html>
