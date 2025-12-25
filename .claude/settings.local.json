@@ -22,7 +22,19 @@
       "Bash(gh repo create:*)",
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(curl:*)",
+      "Bash(sshpass -p \"F9s9tuRRx3cdRqAnTFa7\" ssh -o StrictHostKeyChecking=no root@178.156.146.106 \"curl -sSL https://dokploy.com/install.sh | sh\")",
+      "Bash(where:*)",
+      "Bash(ssh -o StrictHostKeyChecking=no -o PubkeyAuthentication=no root@178.156.146.106 \"curl -sSL https://dokploy.com/install.sh | sh\")",
+      "Bash(powershell -Command \"\n$password = ''F9s9tuRRx3cdRqAnTFa7''\n$newPassword = ''TripleJAuto2025!Secure''\n$commands = @(\n    $password\n    $newPassword\n    $newPassword\n    ''curl -sSL https://dokploy.com/install.sh | sh''\n    ''exit''\n)\n$commands | ssh -o StrictHostKeyChecking=no -o PubkeyAuthentication=no root@178.156.146.106\n\")",
+      "Bash(nslookup:*)",
+      "Bash(ssh -o StrictHostKeyChecking=no root@178.156.146.106 \"docker ps | grep triple\")",
+      "Bash(sshpass:*)",
+      "WebSearch",
+      "Bash(ssh:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(timeout /t 5 /nobreak)"
     ],
     "deny": [],
     "ask": []

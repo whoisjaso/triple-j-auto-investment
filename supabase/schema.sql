@@ -80,8 +80,10 @@ CREATE TABLE public.leads (
 CREATE INDEX idx_vehicles_status ON public.vehicles(status);
 CREATE INDEX idx_vehicles_vin ON public.vehicles(vin);
 CREATE INDEX idx_vehicles_date_added ON public.vehicles(date_added DESC);
+CREATE INDEX idx_vehicles_registration_status ON public.vehicles(registration_status);
 CREATE INDEX idx_leads_status ON public.leads(status);
 CREATE INDEX idx_leads_date ON public.leads(date DESC);
+CREATE INDEX idx_profiles_is_admin ON public.profiles(is_admin) WHERE is_admin = true;
 
 -- ================================================================
 -- UPDATED_AT TRIGGER
@@ -111,13 +113,31 @@ ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Public can view available vehicles" ON public.vehicles
   FOR SELECT USING (status IN ('Available', 'Pending'));
 
--- Admins can do everything with vehicles
-CREATE POLICY "Admins can manage vehicles" ON public.vehicles
-  USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+-- Admins can do everything with vehicles (SELECT, INSERT, UPDATE, DELETE)
+CREATE POLICY "Admins can select vehicles" ON public.vehicles
+  FOR SELECT USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
 
--- Admins can manage leads
-CREATE POLICY "Admins can manage leads" ON public.leads
-  USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+CREATE POLICY "Admins can insert vehicles" ON public.vehicles
+  FOR INSERT WITH CHECK (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+
+CREATE POLICY "Admins can update vehicles" ON public.vehicles
+  FOR UPDATE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+
+CREATE POLICY "Admins can delete vehicles" ON public.vehicles
+  FOR DELETE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+
+-- Admins can manage leads (SELECT, INSERT, UPDATE, DELETE)
+CREATE POLICY "Admins can select leads" ON public.leads
+  FOR SELECT USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+
+CREATE POLICY "Admins can insert leads" ON public.leads
+  FOR INSERT WITH CHECK (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+
+CREATE POLICY "Admins can update leads" ON public.leads
+  FOR UPDATE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
+
+CREATE POLICY "Admins can delete leads" ON public.leads
+  FOR DELETE USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
 
 -- Anyone can insert leads (public contact form)
 CREATE POLICY "Anyone can create leads" ON public.leads
@@ -126,6 +146,14 @@ CREATE POLICY "Anyone can create leads" ON public.leads
 -- Users can view their own profile
 CREATE POLICY "Users can view own profile" ON public.profiles
   FOR SELECT USING (auth.uid() = id);
+
+-- Users can update their own profile (for last_login updates)
+CREATE POLICY "Users can update own profile" ON public.profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+-- Admins can manage all profiles
+CREATE POLICY "Admins can manage profiles" ON public.profiles
+  FOR ALL USING (auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true));
 
 -- ================================================================
 -- HELPER FUNCTION: Auto-create profile on user signup

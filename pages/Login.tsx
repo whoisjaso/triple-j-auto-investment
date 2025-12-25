@@ -10,10 +10,12 @@ const Login = () => {
   const { login, triggerRecovery } = useStore();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(email, password);
-    
+    setStatus('idle'); // Reset status while loading
+
+    const success = await login(email, password);
+
     if (success) {
       navigate('/admin/dashboard');
     } else {
