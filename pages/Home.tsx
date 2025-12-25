@@ -122,7 +122,7 @@ const Home = () => {
 
    const itemVariants = {
       hidden: { opacity: 0, y: 30 },
-      visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50 } }
+      visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } }
    };
 
    return (
@@ -155,28 +155,6 @@ const Home = () => {
                style={{ y: y1, opacity }}
                className="relative z-10 text-center px-6 w-full max-w-[1920px]"
             >
-               {/* Status Bar */}
-               <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5 }}
-                  className="flex justify-between items-center w-full max-w-5xl mx-auto mb-16 border-t border-b border-white/5 py-3 backdrop-blur-sm"
-               >
-                  <div className="flex items-center gap-4">
-                     <div className="flex gap-1">
-                        <div className="w-1 h-3 bg-tj-gold/50 animate-pulse"></div>
-                        <div className="w-1 h-3 bg-tj-gold/80 animate-pulse delay-75"></div>
-                        <div className="w-1 h-3 bg-tj-gold animate-pulse delay-150"></div>
-                     </div>
-                     <span className="text-[9px] uppercase tracking-[0.3em] text-gray-400 font-mono">
-                        {t.home.hero.status}
-                     </span>
-                  </div>
-                  <div className="hidden md:flex items-center gap-2 text-[9px] uppercase tracking-[0.3em] text-tj-gold font-mono">
-                     <Wifi size={12} className="animate-pulse" />
-                     <DecryptText text={t.home.hero.uplink} delay={200} />
-                  </div>
-               </motion.div>
 
                {/* Main Typography */}
                <h1 className="font-display text-[13vw] md:text-[11vw] leading-[0.8] text-white tracking-tighter mix-blend-difference mb-12 select-none perspective-1000">

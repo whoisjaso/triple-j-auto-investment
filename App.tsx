@@ -1,27 +1,31 @@
 
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
 import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 
-// Pages
+// Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
 import Inventory from './pages/Inventory';
-import VinLookup from './pages/VinLookup';
 import Contact from './pages/Contact';
-import Services from './pages/Services';
-import Finance from './pages/Finance';
-import FAQ from './pages/FAQ';
-import Policies from './pages/Policies';
-import PaymentOptions from './pages/PaymentOptions';
-import NotFound from './pages/NotFound';
-import AdminDashboard from './pages/admin/Dashboard';
-import AdminInventory from './pages/admin/Inventory';
-import AdminRegistrations from './pages/admin/Registrations';
-import Login from './pages/Login';
-import About from './pages/About';
-import Legal from './pages/Legal';
+
+// Non-Critical Pages (Lazy Loaded)
+const VinLookup = lazy(() => import('./pages/VinLookup'));
+const Services = lazy(() => import('./pages/Services'));
+const Finance = lazy(() => import('./pages/Finance'));
+const FAQ = lazy(() => import('./pages/FAQ'));
+const Policies = lazy(() => import('./pages/Policies'));
+const PaymentOptions = lazy(() => import('./pages/PaymentOptions'));
+const NotFound = lazy(() => import('./pages/NotFound'));
+const Login = lazy(() => import('./pages/Login'));
+const About = lazy(() => import('./pages/About'));
+const Legal = lazy(() => import('./pages/Legal'));
+
+// Admin Pages (Lazy Loaded)
+const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
+const AdminInventory = lazy(() => import('./pages/admin/Inventory'));
+const AdminRegistrations = lazy(() => import('./pages/admin/Registrations'));
 
 // Utility for Map Routing
 export const openSmartMap = () => {
@@ -291,33 +295,35 @@ const AppContent = () => {
       <main className="flex-grow pt-32">
         {/* Global Page Transition Wrapper */}
         <AnimatePresence mode="wait">
-          <div key={location.pathname} className="min-h-full origin-top">
-            <Routes location={location}>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/inventory" element={<Inventory />} />
-              <Route path="/vin" element={<VinLookup />} />
-              <Route path="/vin/free-check" element={<VinLookup />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/finance" element={<Finance />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/policies" element={<Policies />} />
-              <Route path="/terms" element={<Policies />} />
-              <Route path="/payment-options" element={<PaymentOptions />} />
-              <Route path="/commercial-wholesale" element={<Contact />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/legal/:section" element={<Legal />} />
+          <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="w-8 h-8 border-2 border-tj-gold border-t-transparent rounded-full animate-spin"></div></div>}>
+            <div key={location.pathname} className="min-h-full origin-top">
+              <Routes location={location}>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/inventory" element={<Inventory />} />
+                <Route path="/vin" element={<VinLookup />} />
+                <Route path="/vin/free-check" element={<VinLookup />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/services" element={<Services />} />
+                <Route path="/finance" element={<Finance />} />
+                <Route path="/faq" element={<FAQ />} />
+                <Route path="/policies" element={<Policies />} />
+                <Route path="/terms" element={<Policies />} />
+                <Route path="/payment-options" element={<PaymentOptions />} />
+                <Route path="/commercial-wholesale" element={<Contact />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/legal/:section" element={<Legal />} />
 
-              {/* Admin Routes */}
-              <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-              <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventory /></ProtectedRoute>} />
-              <Route path="/admin/registrations" element={<ProtectedRoute><AdminRegistrations /></ProtectedRoute>} />
+                {/* Admin Routes */}
+                <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+                <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventory /></ProtectedRoute>} />
+                <Route path="/admin/registrations" element={<ProtectedRoute><AdminRegistrations /></ProtectedRoute>} />
 
-              {/* 404 Catch-All */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
+                {/* 404 Catch-All */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </Suspense>
         </AnimatePresence>
       </main>
       <Footer />
