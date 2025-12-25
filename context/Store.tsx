@@ -6,7 +6,7 @@ import { supabase } from '../supabase/config';
 import { authService } from '../lib/auth';
 
 // --- CONFIGURATION ---
-const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHeta2U3ATyxE4hlQC3-kVCV8Iu-hnJYQIij68ptCBZYVw4C4vxIiu2fli5ltWXdsb7uVKxXco9WE3/pub?output=csv"; 
+const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHeta2U3ATyxE4hlQC3-kVCV8Iu-hnJYQIij68ptCBZYVw4C4vxIiu2fli5ltWXdsb7uVKxXco9WE3/pub?output=csv";
 
 interface StoreContextType {
   vehicles: Vehicle[];
@@ -72,27 +72,27 @@ const FALLBACK_ASSETS: Vehicle[] = [
     dateAdded: '2024-02-01'
   },
   {
-     id: 'backup-3',
-     make: 'Lamborghini',
-     model: 'Huracan Evo',
-     year: 2022,
-     price: 265000,
-     cost: 220000,
-     costTowing: 2000, // Enclosed transport
-     costMechanical: 4500, // Service
-     costCosmetic: 0,
-     costOther: 1500, // Fees
-     soldPrice: 260000,
-     soldDate: '2023-11-15',
-     mileage: 6800,
-     vin: 'LB-EVO-GRY-003',
-     status: VehicleStatus.SOLD,
-     imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=2874&auto=format&fit=crop',
-     description: 'Kinetic violence tailored for the disciplined mind. 6,800 miles of aggressive dominance. This asset does not ask for attention; it demands submission.',
-     gallery: [],
-     diagnostics: ['Rear tires at 40% life', 'Interior carbon trim perfect'],
-     registrationStatus: 'Completed',
-     dateAdded: '2023-10-01'
+    id: 'backup-3',
+    make: 'Lamborghini',
+    model: 'Huracan Evo',
+    year: 2022,
+    price: 265000,
+    cost: 220000,
+    costTowing: 2000, // Enclosed transport
+    costMechanical: 4500, // Service
+    costCosmetic: 0,
+    costOther: 1500, // Fees
+    soldPrice: 260000,
+    soldDate: '2023-11-15',
+    mileage: 6800,
+    vin: 'LB-EVO-GRY-003',
+    status: VehicleStatus.SOLD,
+    imageUrl: 'https://images.unsplash.com/photo-1544636331-e26879cd4d9b?q=80&w=2874&auto=format&fit=crop',
+    description: 'Kinetic violence tailored for the disciplined mind. 6,800 miles of aggressive dominance. This asset does not ask for attention; it demands submission.',
+    gallery: [],
+    diagnostics: ['Rear tires at 40% life', 'Interior carbon trim perfect'],
+    registrationStatus: 'Completed',
+    dateAdded: '2023-10-01'
   },
   {
     id: 'backup-4',
@@ -116,7 +116,7 @@ const FALLBACK_ASSETS: Vehicle[] = [
     diagnostics: ['Suspension compressor slow', 'Rear screen intermittent failure'],
     registrationStatus: 'Completed',
     dateAdded: '2023-09-15'
- }
+  }
 ];
 
 // --- SOVEREIGN CAPTION GENERATOR ---
@@ -139,7 +139,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [leads, setLeads] = useState<Lead[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
-  
+
   const isSyncingRef = useRef(false);
   const isInitializedRef = useRef(false);
 
@@ -169,12 +169,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     // 3. Load data from Supabase and sync from Google Sheets
     const initializeData = async () => {
+      // Priority 1: Instant Load from DB
       await loadVehicles();
       await loadLeads();
 
-      // Auto-sync from Google Sheets on startup
-      console.log("🔄 Auto-syncing from Google Sheets...");
-      syncWithGoogleSheets(true);
+      // Priority 2: Background Sync (Fire & Forget) - Don't await this
+      console.log("🔄 Background Sync Initiated...");
+      // Wrap in timeout to push to next tick, ensuring UI renders first
+      setTimeout(() => {
+        syncWithGoogleSheets(true).catch(err => console.error("Create Background Sync Failed:", err));
+      }, 100);
     };
 
     initializeData();
@@ -424,9 +428,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     let quote = false;
     let col = "";
     for (let c of str) {
-        if (c === '"') { quote = !quote; continue; }
-        if (c === ',' && !quote) { arr.push(col); col = ""; continue; }
-        col += c;
+      if (c === '"') { quote = !quote; continue; }
+      if (c === ',' && !quote) { arr.push(col); col = ""; continue; }
+      col += c;
     }
     arr.push(col);
     return arr;
@@ -435,23 +439,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // REAL Automated Sync with "Source of Truth" Logic
   const syncWithGoogleSheets = async (silent: boolean = false): Promise<string> => {
     if (!GOOGLE_SHEET_URL) return "ERROR: Config Missing";
-    
+
     if (isSyncingRef.current) return "Sync in progress...";
     isSyncingRef.current = true;
 
     try {
       const response = await fetch(GOOGLE_SHEET_URL + '&t=' + Date.now()); // Cache buster
       if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
-      
+
       const text = await response.text();
       const lines = text.split('\n').filter(line => line.trim() !== '');
-      
+
       if (lines.length < 2) {
-          isSyncingRef.current = false;
-          setLastSync(new Date());
-          // Only load fallback if we have literally nothing
-          if (vehicles.length === 0) setVehicles(FALLBACK_ASSETS); 
-          return "Sheet Empty. Backup Protocols Standby.";
+        isSyncingRef.current = false;
+        setLastSync(new Date());
+        // Only load fallback if we have literally nothing
+        if (vehicles.length === 0) setVehicles(FALLBACK_ASSETS);
+        return "Sheet Empty. Backup Protocols Standby.";
       }
 
       const headers = parseCSVLine(lines[0].toLowerCase().trim());
@@ -492,37 +496,37 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       };
 
       if (idx.vin === -1) {
-          isSyncingRef.current = false;
-          console.warn("VIN Column Missing. Using Fallback.");
-          if (vehicles.length === 0) setVehicles(FALLBACK_ASSETS);
-          return "ERROR: Invalid Sheet Structure.";
+        isSyncingRef.current = false;
+        console.warn("VIN Column Missing. Using Fallback.");
+        if (vehicles.length === 0) setVehicles(FALLBACK_ASSETS);
+        return "ERROR: Invalid Sheet Structure.";
       }
 
       const sheetVehicles: Vehicle[] = [];
-      
+
       for (let i = 1; i < lines.length; i++) {
         const row = parseCSVLine(lines[i]);
         if (row.length < 2) continue;
 
         const vin = row[idx.vin]?.trim().toUpperCase();
         if (!vin) continue;
-        
+
         const make = idx.make > -1 ? row[idx.make] : 'Unknown';
         const model = idx.model > -1 ? row[idx.model] : 'Special';
         const year = idx.year > -1 ? (parseInt(row[idx.year]) || new Date().getFullYear()) : new Date().getFullYear();
-        const mileage = idx.mileage > -1 ? (parseInt(row[idx.mileage]?.replace(/[^0-9]+/g,"")) || 0) : 0;
-        const price = idx.price > -1 ? (parseFloat(row[idx.price]?.replace(/[^0-9.-]+/g,"")) || 0) : 0;
-        const cost = idx.cost > -1 ? (parseFloat(row[idx.cost]?.replace(/[^0-9.-]+/g,"")) || 0) : 0;
+        const mileage = idx.mileage > -1 ? (parseInt(row[idx.mileage]?.replace(/[^0-9]+/g, "")) || 0) : 0;
+        const price = idx.price > -1 ? (parseFloat(row[idx.price]?.replace(/[^0-9.-]+/g, "")) || 0) : 0;
+        const cost = idx.cost > -1 ? (parseFloat(row[idx.cost]?.replace(/[^0-9.-]+/g, "")) || 0) : 0;
         const dateAdded = idx.dateAdded > -1 ? row[idx.dateAdded] : new Date().toISOString().split('T')[0];
 
         let description = idx.desc > -1 ? row[idx.desc] : '';
         if (!description || description.trim().length < 10) {
-            description = generateOpulentCaption(make, model, year, mileage, price);
+          description = generateOpulentCaption(make, model, year, mileage, price);
         }
 
         let imageUrl = (idx.image > -1 && row[idx.image]) ? row[idx.image] : '';
         if (!imageUrl || imageUrl.trim() === '') {
-            imageUrl = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2830&auto=format&fit=crop';
+          imageUrl = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2830&auto=format&fit=crop';
         }
 
         const galleryStr = (idx.gallery > -1 && row[idx.gallery]) ? row[idx.gallery] : '';
@@ -532,25 +536,25 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const diagnostics = diagStr ? diagStr.split('|').map(s => s.trim()).filter(s => s.length > 0) : [];
 
         sheetVehicles.push({
-            id: `sheet-${vin}`,
-            vin: vin,
-            make: make,
-            model: model,
-            year: year,
-            price: price,
-            cost: cost,
-            costTowing: 0, // Default for sheet import
-            costMechanical: 0,
-            costCosmetic: 0,
-            costOther: 0,
-            mileage: mileage,
-            status: idx.status > -1 ? (row[idx.status] as VehicleStatus) || VehicleStatus.AVAILABLE : VehicleStatus.AVAILABLE,
-            imageUrl: imageUrl,
-            gallery: gallery,
-            diagnostics: diagnostics,
-            description: description,
-            registrationStatus: 'Pending',
-            dateAdded: dateAdded
+          id: `sheet-${vin}`,
+          vin: vin,
+          make: make,
+          model: model,
+          year: year,
+          price: price,
+          cost: cost,
+          costTowing: 0, // Default for sheet import
+          costMechanical: 0,
+          costCosmetic: 0,
+          costOther: 0,
+          mileage: mileage,
+          status: idx.status > -1 ? (row[idx.status] as VehicleStatus) || VehicleStatus.AVAILABLE : VehicleStatus.AVAILABLE,
+          imageUrl: imageUrl,
+          gallery: gallery,
+          diagnostics: diagnostics,
+          description: description,
+          registrationStatus: 'Pending',
+          dateAdded: dateAdded
         });
       }
 
@@ -598,10 +602,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       return msg;
     } catch (error) {
       console.warn("Command Ledger Link Unstable. Activating Sovereign Backup.", error);
-      
+
       // LOAD FALLBACK DATA IF EMPTY to ensure app doesn't look broken
       if (vehicles.length === 0) {
-          setVehicles(FALLBACK_ASSETS);
+        setVehicles(FALLBACK_ASSETS);
       }
 
       isSyncingRef.current = false;
@@ -611,7 +615,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const addLead = async (l: Lead): Promise<void> => {
     try {
-      const { error} = await supabase
+      const { error } = await supabase
         .from('leads')
         .insert([{
           name: l.name,

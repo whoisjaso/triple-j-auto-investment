@@ -75,7 +75,7 @@ const Contact = () => {
                     required
                     type="text"
                     value={form.name}
-                    onChange={e => setForm({...form, name: e.target.value})}
+                    onChange={e => setForm({ ...form, name: e.target.value })}
                     className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                     placeholder="Your Identity"
                   />
@@ -87,7 +87,7 @@ const Contact = () => {
                     required
                     type="tel"
                     value={form.phone}
-                    onChange={e => setForm({...form, phone: e.target.value})}
+                    onChange={e => setForm({ ...form, phone: e.target.value })}
                     className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                     placeholder="(XXX) XXX-XXXX"
                   />
@@ -98,7 +98,7 @@ const Contact = () => {
                   <input
                     type="email"
                     value={form.email}
-                    onChange={e => setForm({...form, email: e.target.value})}
+                    onChange={e => setForm({ ...form, email: e.target.value })}
                     className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                     placeholder="your@email.com"
                   />
@@ -109,7 +109,7 @@ const Contact = () => {
                   <textarea
                     required
                     value={form.message}
-                    onChange={e => setForm({...form, message: e.target.value})}
+                    onChange={e => setForm({ ...form, message: e.target.value })}
                     rows={5}
                     className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                     placeholder="State your inquiry..."
@@ -147,8 +147,8 @@ const Contact = () => {
                 </div>
               </div>
               <address className="not-italic text-gray-300 mb-4">
-                8774 Almeda Genoa Road<br/>
-                Houston, Texas 77075<br/>
+                8774 Almeda Genoa Road<br />
+                Houston, Texas 77075<br />
                 United States
               </address>
               <button
@@ -170,8 +170,8 @@ const Contact = () => {
                   <p className="text-gray-400 text-sm uppercase tracking-widest">Voice Channel</p>
                 </div>
               </div>
-              <a href="tel:+18327777580" className="text-white text-2xl font-mono hover:text-tj-gold transition-colors block">
-                +1 (832) 777-7580
+              <a href="tel:+18324009760" className="text-white text-2xl font-mono hover:text-tj-gold transition-colors block">
+                +1 (832) 400-9760
               </a>
             </div>
 
