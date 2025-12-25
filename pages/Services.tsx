@@ -1,23 +1,24 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Shield, Search, FileText, Truck, Wrench, CreditCard, ArrowRight, CheckCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const Services = () => {
+  const { t } = useLanguage();
   return (
     <div className="min-h-screen bg-black pt-40 pb-20 px-6">
       <div className="max-w-7xl mx-auto">
 
-        {/* Header */}
         <div className="text-center mb-20 border-b border-white/10 pb-12">
           <div className="inline-flex items-center gap-2 mb-6 text-tj-gold text-xs uppercase tracking-[0.4em]">
             <Shield size={16} />
-            <span>Service Protocols</span>
+            <span>{t.services.badge}</span>
           </div>
           <h1 className="text-6xl md:text-8xl font-display text-white tracking-tight mb-6">
-            WHAT WE PROVIDE
+            {t.services.title}
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Beyond vehicles. We deliver clarity, confidence, and dominion over your asset acquisition process.
+            {t.services.subtitle}
           </p>
         </div>
 
