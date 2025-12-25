@@ -169,6 +169,22 @@ export const t = {
             recoveryTitle: "Recovery Initiated",
             recoveryMessage: "Secure link transmission dispatched. Check your primary frequency.",
             secureNote: "Secure connection established. Unauthorized attempts are logged."
+        },
+        faq: {
+            badge: "Knowledge Base",
+            title: "FAQ",
+            subtitle: "Frequently asked questions. If your question isn't answered here, contact us directly.",
+            searchPlaceholder: "Search questions...",
+            noResults: "No results found for",
+            stillHaveQuestions: "STILL HAVE QUESTIONS?",
+            contactPrompt: "Contact us directly. We respond within the hour during business hours.",
+            contactCta: "CONTACT HEADQUARTERS"
+        },
+        services: {
+            badge: "What We Do",
+            title: "SERVICES",
+            subtitle: "Precision operations for the discerning client.",
+            learnMore: "Learn More"
         }
     },
     es: {
@@ -339,6 +355,22 @@ export const t = {
             recoveryTitle: "Recuperación Iniciada",
             recoveryMessage: "Transmisión de enlace seguro enviada. Revisa tu frecuencia principal.",
             secureNote: "Conexión segura establecida. Intentos no autorizados son registrados."
+        },
+        faq: {
+            badge: "Base de Conocimiento",
+            title: "PREGUNTAS",
+            subtitle: "Preguntas frecuentes. Si tu pregunta no está aquí, contáctanos directamente.",
+            searchPlaceholder: "Buscar preguntas...",
+            noResults: "No se encontraron resultados para",
+            stillHaveQuestions: "¿TIENES MÁS PREGUNTAS?",
+            contactPrompt: "Contáctanos directamente. Respondemos en una hora durante horario laboral.",
+            contactCta: "CONTACTAR OFICINA"
+        },
+        services: {
+            badge: "Lo Que Hacemos",
+            title: "SERVICIOS",
+            subtitle: "Operaciones de precisión para el cliente exigente.",
+            learnMore: "Saber Más"
         }
     }
 };

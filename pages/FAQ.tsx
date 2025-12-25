@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, Search } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useLanguage();
 
   const faqs = [
     {
@@ -109,17 +111,16 @@ const FAQ = () => {
     <div className="min-h-screen bg-black pt-40 pb-20 px-6">
       <div className="max-w-4xl mx-auto">
 
-        {/* Header */}
         <div className="text-center mb-16 border-b border-white/10 pb-12">
           <div className="inline-flex items-center gap-2 mb-6 text-tj-gold text-xs uppercase tracking-[0.4em]">
             <HelpCircle size={16} />
-            <span>Knowledge Base</span>
+            <span>{t.faq.badge}</span>
           </div>
           <h1 className="text-6xl md:text-8xl font-display text-white tracking-tight mb-6">
-            FAQ
+            {t.faq.title}
           </h1>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
-            Frequently asked questions. If your question isn't answered here, contact us directly.
+            {t.faq.subtitle}
           </p>
 
           {/* Search */}
@@ -129,7 +130,7 @@ const FAQ = () => {
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search questions..."
+              placeholder={t.faq.searchPlaceholder}
               className="w-full bg-tj-dark border border-white/10 pl-12 pr-4 py-4 text-white focus:border-tj-gold outline-none transition-colors"
             />
           </div>
@@ -138,7 +139,7 @@ const FAQ = () => {
         {/* FAQ Categories */}
         {filteredFaqs.length === 0 ? (
           <div className="text-center py-20 text-gray-600">
-            No results found for "{searchQuery}"
+            {t.faq.noResults} "{searchQuery}"
           </div>
         ) : (
           filteredFaqs.map((category, catIdx) => (
@@ -180,17 +181,16 @@ const FAQ = () => {
           ))
         )}
 
-        {/* CTA */}
         <div className="bg-tj-gold/10 border border-tj-gold/30 p-12 text-center mt-16">
-          <h3 className="text-white font-display text-2xl mb-4">STILL HAVE QUESTIONS?</h3>
+          <h3 className="text-white font-display text-2xl mb-4">{t.faq.stillHaveQuestions}</h3>
           <p className="text-gray-400 mb-6">
-            Contact us directly. We respond within the hour during business hours.
+            {t.faq.contactPrompt}
           </p>
           <a
             href="/contact"
             className="inline-block bg-tj-gold text-black font-bold px-8 py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors"
           >
-            CONTACT HEADQUARTERS
+            {t.faq.contactCta}
           </a>
         </div>
 
