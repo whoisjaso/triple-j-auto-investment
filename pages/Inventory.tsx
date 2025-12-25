@@ -5,81 +5,18 @@ import { VehicleStatus, Vehicle } from '../types';
 import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- LANGUAGE DICTIONARY ---
-const t = {
-  en: {
-    title: "The Collection",
-    subtext: "Secure Asset Allocations",
-    sort: "Sort Order",
-    filter: "Status Filter",
-    viewAll: "View All",
-    sold: "Deployed (Sold)",
-    available: "Available",
-    pending: "Pending",
-    expressInterest: "Express Interest",
-    price: "Capital Requirement",
-    mileage: "Miles",
-    asIs: "(AS-IS)",
-    soldStamp: "SOLD",
-    searchPlaceholder: "Search by Make/Model...",
-    modal: {
-      tabs: {
-        overview: "Overview",
-        specs: "Specs & Report",
-        transparency: "Condition",
-        purchase: "Acquire"
-      },
-      submit: "Send Inquiry",
-      submitting: "Transmitting...",
-      successTitle: "Signal Received",
-      successMsg: "Our agent has received your dossier. We will contact you shortly to finalize the acquisition.",
-      disclaimer: "By submitting, you acknowledge this vehicle is sold AS-IS without warranty.",
-      return: "Return to Collection"
-    }
-  },
-  es: {
-    title: "La Colección",
-    subtext: "Asignación de Activos",
-    sort: "Orden",
-    filter: "Estado",
-    viewAll: "Ver Todos",
-    sold: "Vendido",
-    available: "Disponible",
-    pending: "Pendiente",
-    expressInterest: "Me Interesa",
-    price: "Precio",
-    mileage: "Millas",
-    asIs: "(ASI COMO ESTA)",
-    soldStamp: "VENDIDO",
-    searchPlaceholder: "Buscar marca/modelo...",
-    modal: {
-      tabs: {
-        overview: "Resumen",
-        specs: "Reporte y Specs",
-        transparency: "Condición",
-        purchase: "Comprar"
-      },
-      submit: "Enviar Mensaje",
-      submitting: "Enviando...",
-      successTitle: "Mensaje Recibido",
-      successMsg: "Nuestro agente ha recibido sus datos. Nos pondremos en contacto pronto para finalizar la adquisición.",
-      disclaimer: "Al enviar, usted reconoce que este vehículo se vende 'AS-IS' (Tal cual) sin garantía.",
-      return: "Volver a la Colección"
-    }
-  }
-};
+import { useLanguage } from '../context/LanguageContext';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
-type Language = 'en' | 'es';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
   onClick: () => void;
-  lang: Language;
 }
 
 // --- VEHICLE CARD COMPONENT (With Carousel) ---
-const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, lang }) => {
+const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
+  const { t, lang } = useLanguage();
   const [imgIndex, setImgIndex] = useState(0);
   const images = [vehicle.imageUrl, ...(vehicle.gallery || [])].filter(Boolean);
 
@@ -108,7 +45,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, lang }) => 
       {/* Status Indicator */}
       <div className="absolute top-0 left-0 w-full flex justify-between items-center z-20 p-6 pointer-events-none">
         <div className={`px-3 py-1 text-[8px] font-bold uppercase tracking-[0.2em] border shadow-lg backdrop-blur-md ${vehicle.status === 'Available' ? 'border-tj-gold text-tj-gold bg-black/90' : 'border-gray-700 text-gray-500 bg-black/90'}`}>
-          {vehicle.status === 'Available' ? `• ${t[lang].available.toUpperCase()}` : `• ${vehicle.status.toUpperCase()}`}
+          {vehicle.status === 'Available' ? `• ${t.common.available.toUpperCase()}` : `• ${vehicle.status.toUpperCase()}`}
         </div>
       </div>
 
@@ -118,7 +55,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, lang }) => 
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
             <div className="transform -rotate-12 bg-tj-gold border-y-4 border-white shadow-[0_0_50px_rgba(0,0,0,0.8)] w-[120%] flex justify-center py-3">
               <span className="font-display font-black text-5xl md:text-6xl tracking-[0.3em] text-black uppercase drop-shadow-md">
-                {t[lang].soldStamp}
+                {t.common.sold.toUpperCase()}
               </span>
             </div>
           </div>
@@ -172,7 +109,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, lang }) => 
             </div>
             <div className="text-right">
               <span className="text-[10px] font-mono text-gray-600 block">{vehicle.year}</span>
-              <span className="text-[10px] font-mono text-gray-600 block">{vehicle.mileage.toLocaleString()} {t[lang].mileage}</span>
+              <span className="text-[10px] font-mono text-gray-600 block">{vehicle.mileage.toLocaleString()} {t.common.mileage}</span>
             </div>
           </div>
         </div>
@@ -185,12 +122,12 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, lang }) => 
 
         <div className="flex items-end justify-between mt-auto border-t border-white/5 pt-6 relative z-10">
           <div>
-            <p className="text-[8px] uppercase tracking-widest text-gray-600 mb-1 group-hover:text-tj-gold transition-colors">{t[lang].price}</p>
+            <p className="text-[8px] uppercase tracking-widest text-gray-600 mb-1 group-hover:text-tj-gold transition-colors">{t.common.price}</p>
             <div className="flex items-baseline gap-2">
               <p className="font-display text-xl text-white tracking-wider group-hover:scale-105 transition-transform origin-left">
                 {vehicle.price > 0 ? `$${vehicle.price.toLocaleString()}` : 'INQUIRE'}
               </p>
-              <span className="text-[9px] font-bold text-red-900 uppercase tracking-widest group-hover:text-red-500 transition-colors">{t[lang].asIs}</span>
+              <span className="text-[9px] font-bold text-red-900 uppercase tracking-widest group-hover:text-red-500 transition-colors">{t.common.asIs}</span>
             </div>
           </div>
 
@@ -202,7 +139,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, lang }) => 
               }}
               className="group/btn flex items-center gap-2 bg-white/5 text-gray-300 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.25em] transition-all hover:bg-tj-gold hover:text-black active:scale-95 border border-white/10 hover:border-tj-gold"
             >
-              <span className="hidden md:inline">{t[lang].expressInterest}</span>
+              <span className="hidden md:inline">{t.common.expressInterest}</span>
               <span className="md:hidden">View</span>
               <ArrowUpRight size={14} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
             </button>
@@ -215,9 +152,9 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, lang }) => 
 
 const Inventory = () => {
   const { vehicles, addLead } = useStore();
+  const { t, lang, toggleLang } = useLanguage();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
   const [sortBy, setSortBy] = useState<SortOption>('alphabetical');
-  const [lang, setLang] = useState<Language>('en');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Modal State
@@ -298,7 +235,7 @@ const Inventory = () => {
     }, 1500);
   };
 
-  const toggleLang = () => setLang(prev => prev === 'en' ? 'es' : 'en');
+
 
   // For Modal Image Carousel
   const modalImages = selectedVehicle ? [selectedVehicle.imageUrl, ...(selectedVehicle.gallery || [])].filter(Boolean) : [];
@@ -341,7 +278,7 @@ const Inventory = () => {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-2 h-2 bg-tj-gold animate-pulse"></div>
-              <p className="text-tj-gold uppercase tracking-[0.4em] text-[10px]">{t[lang].subtext}</p>
+              <p className="text-tj-gold uppercase tracking-[0.4em] text-[10px]">{t.inventory.subtext}</p>
             </div>
             <motion.h1
               initial={{ opacity: 0, x: -50 }}
@@ -349,7 +286,7 @@ const Inventory = () => {
               transition={{ duration: 0.8 }}
               className="font-display text-5xl md:text-8xl text-white tracking-tight leading-none"
             >
-              {t[lang].title.toUpperCase()}
+              {t.inventory.title.toUpperCase()}
             </motion.h1>
           </div>
 
@@ -359,7 +296,7 @@ const Inventory = () => {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={18} />
               <input
                 type="text"
-                placeholder={t[lang].searchPlaceholder}
+                placeholder={t.inventory.searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-black border border-white/10 pl-12 pr-4 py-4 text-white placeholder-gray-600 text-sm focus:border-tj-gold focus:outline-none transition-colors"
@@ -384,8 +321,8 @@ const Inventory = () => {
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
                   >
                     <option className="bg-black text-white" value="alphabetical">A-Z</option>
-                    <option className="bg-black text-white" value="price_desc">{t[lang].price}: High-Low</option>
-                    <option className="bg-black text-white" value="price_asc">{t[lang].price}: Low-High</option>
+                    <option className="bg-black text-white" value="price_desc">{t.common.price}: High-Low</option>
+                    <option className="bg-black text-white" value="price_asc">{t.common.price}: Low-High</option>
                     <option className="bg-black text-white" value="year_desc">Year: Newest</option>
                     <option className="bg-black text-white" value="year_asc">Year: Oldest</option>
                     <option className="bg-black text-white" value="mileage_asc">Mileage: Low-High</option>
@@ -404,10 +341,10 @@ const Inventory = () => {
                     value={filter}
                     onChange={(e) => setFilter(e.target.value as any)}
                   >
-                    <option className="bg-black text-white" value="All">{t[lang].viewAll}</option>
-                    <option className="bg-black text-white" value={VehicleStatus.AVAILABLE}>{t[lang].available}</option>
-                    <option className="bg-black text-white" value={VehicleStatus.PENDING}>{t[lang].pending}</option>
-                    <option className="bg-black text-white" value={VehicleStatus.SOLD}>{t[lang].sold}</option>
+                    <option className="bg-black text-white" value="All">{t.common.viewAll}</option>
+                    <option className="bg-black text-white" value={VehicleStatus.AVAILABLE}>{t.common.available}</option>
+                    <option className="bg-black text-white" value={VehicleStatus.PENDING}>{t.common.pending}</option>
+                    <option className="bg-black text-white" value={VehicleStatus.SOLD}>{t.common.sold}</option>
                   </select>
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-tj-gold">
                     <Hexagon size={10} fill="currentColor" />
@@ -429,7 +366,6 @@ const Inventory = () => {
                 key={vehicle.id}
                 vehicle={vehicle}
                 onClick={() => handleOpenModal(vehicle)}
-                lang={lang}
               />
             ))}
           </AnimatePresence>
@@ -540,19 +476,19 @@ const Inventory = () => {
                       onClick={() => setModalTab('overview')}
                       className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'overview' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-500 hover:text-white'}`}
                     >
-                      {t[lang].modal.tabs.overview}
+                      {t.inventory.modal.tabs.overview}
                     </button>
                     <button
                       onClick={() => setModalTab('specs')}
                       className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'specs' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-500 hover:text-white'}`}
                     >
-                      {t[lang].modal.tabs.specs}
+                      {t.inventory.modal.tabs.specs}
                     </button>
                     <button
                       onClick={() => setModalTab('transparency')}
                       className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'transparency' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-500 hover:text-white'}`}
                     >
-                      {t[lang].modal.tabs.transparency}
+                      {t.inventory.modal.tabs.transparency}
                     </button>
                     <button
                       onClick={() => setModalTab('purchase')}
@@ -569,11 +505,11 @@ const Inventory = () => {
                       <div className="space-y-6 animate-fade-in">
                         <div className="grid grid-cols-2 gap-4">
                           <div className="p-4 bg-white/5 border border-white/5">
-                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1">{t[lang].mileage}</p>
+                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1">{t.common.mileage}</p>
                             <p className="text-white font-mono text-lg">{selectedVehicle.mileage.toLocaleString()}</p>
                           </div>
                           <div className="p-4 bg-white/5 border border-white/5">
-                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1">{t[lang].price}</p>
+                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1">{t.common.price}</p>
                             <p className="text-tj-gold font-display text-xl">${selectedVehicle.price.toLocaleString()}</p>
                           </div>
                         </div>
@@ -720,9 +656,9 @@ const Inventory = () => {
                             <div className="w-16 h-16 mx-auto border border-tj-gold rounded-full flex items-center justify-center bg-tj-gold/10 animate-gold-pulse mb-6">
                               <Mic className="text-tj-gold" size={24} />
                             </div>
-                            <h3 className="font-display text-xl text-white tracking-widest mb-2">{t[lang].modal.successTitle.toUpperCase()}</h3>
+                            <h3 className="font-display text-xl text-white tracking-widest mb-2">{t.inventory.modal.successTitle.toUpperCase()}</h3>
                             <p className="text-gray-400 text-xs mb-8 leading-relaxed max-w-xs mx-auto">
-                              {t[lang].modal.successMsg}
+                              {t.inventory.modal.successMsg}
                             </p>
                             <a href="tel:+18324009760" className="w-full bg-tj-gold text-black font-bold py-4 text-sm uppercase tracking-[0.2em] hover:bg-white transition-colors flex items-center justify-center gap-2 mb-4">
                               <Phone size={16} /> Call Agent
@@ -766,7 +702,7 @@ const Inventory = () => {
                               <div className="flex items-center gap-2 p-3 bg-red-900/10 border border-red-900/30">
                                 <ShieldAlert size={16} className="text-red-500 flex-shrink-0" />
                                 <p className="text-[10px] text-gray-400 leading-tight">
-                                  {t[lang].modal.disclaimer}
+                                  {t.inventory.modal.disclaimer}
                                 </p>
                               </div>
                             </div>
@@ -780,7 +716,7 @@ const Inventory = () => {
                                 <Loader2 className="animate-spin" size={16} />
                               ) : (
                                 <>
-                                  {t[lang].modal.submit} <ArrowUpRight size={16} />
+                                  {t.inventory.modal.submit} <ArrowUpRight size={16} />
                                 </>
                               )}
                             </button>
@@ -797,7 +733,7 @@ const Inventory = () => {
                         onClick={() => setModalTab('purchase')}
                         className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.3)] border border-tj-gold/50 active:scale-95 transition-transform"
                       >
-                        {t[lang].modal.tabs.purchase}
+                        {t.inventory.modal.tabs.purchase}
                       </button>
                     </div>
                   )}
