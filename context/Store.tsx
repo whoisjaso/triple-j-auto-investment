@@ -220,6 +220,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const loadVehicles = async () => {
     setIsLoading(true);
     console.log('🔄 Initiating Vehicle Fetch Transaction (Timeout: 10s)...');
+
+    // Safety Valve: Force loader off after 12s regardless of fetch status
+    const safetyTimer = setTimeout(() => {
+      console.warn('⚠️ Safety Valve: Fetch took too long. Forcing loader off.');
+      setIsLoading(false);
+    }, 12000);
+
     try {
       const abortController = new AbortController();
       const timeoutId = setTimeout(() => abortController.abort(), 10000);
@@ -283,6 +290,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         setVehicles(FALLBACK_ASSETS);
       }
     } finally {
+      clearTimeout(safetyTimer);
       setIsLoading(false);
     }
   };
