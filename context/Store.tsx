@@ -149,11 +149,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   // --- SUPABASE INITIALIZATION ---
   useEffect(() => {
     if (isInitializedRef.current) return;
-    isInitializedRef.current = true;
+    isInitializedRef.current = true; // Strict Mode protection
 
-    console.log("✅ Initializing Triple J Command Center with Supabase...");
+    console.log('Initializing Triple J Command Center with Supabase...');
+    // @ts-ignore
+    console.log('Targeting Supabase Node:', supabase.supabaseUrl);
 
-    // 1. Check for existing session
+    // 1. Verify Session First (Fastest check)
     console.log("🔐 Verifying Identity Protocol...");
     authService.getSession().then(sessionUser => {
       if (sessionUser) {
