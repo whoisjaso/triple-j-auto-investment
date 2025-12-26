@@ -217,10 +217,18 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const loadVehicles = async () => {
     console.log('🔄 Initiating Vehicle Fetch Transaction...');
     try {
+      console.log('🔄 Initiating Vehicle Fetch Transaction (Timeout: 10s)...');
+
+      const abortController = new AbortController();
+      const timeoutId = setTimeout(() => abortController.abort(), 10000);
+
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
-        .order('date_added', { ascending: false });
+        .order('date_added', { ascending: false })
+        .abortSignal(abortController.signal);
+
+      clearTimeout(timeoutId);
 
       if (error) {
         console.error('❌ Failed to load vehicles from Supabase:', error);
