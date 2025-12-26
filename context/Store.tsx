@@ -151,11 +151,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     console.log("✅ Initializing Triple J Command Center with Supabase...");
 
     // 1. Check for existing session
+    console.log("🔐 Verifying Identity Protocol...");
     authService.getSession().then(sessionUser => {
       if (sessionUser) {
         setUser({ email: sessionUser.email, isAdmin: sessionUser.isAdmin });
         console.log("✅ Session restored:", sessionUser.email);
+      } else {
+        console.log("ℹ️ No active session found. Operating in public mode.");
       }
+    }).catch(err => {
+      console.error("⚠️ Auth Session Check Failed:", err);
     });
 
     // 2. Setup auth state listener
@@ -210,6 +215,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // --- DATA LOADING FUNCTIONS ---
   const loadVehicles = async () => {
+    console.log('🔄 Initiating Vehicle Fetch Transaction...');
     try {
       const { data, error } = await supabase
         .from('vehicles')
