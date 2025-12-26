@@ -225,7 +225,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
-        .order('date_added', { ascending: false })
         .abortSignal(abortController.signal);
 
       clearTimeout(timeoutId);
