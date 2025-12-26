@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../context/Store';
 import { VehicleStatus, Vehicle } from '../types';
-import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search } from 'lucide-react';
+import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -151,7 +151,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
 };
 
 const Inventory = () => {
-  const { vehicles, addLead, isLoading } = useStore();
+  const { vehicles, addLead, isLoading, refreshVehicles } = useStore();
   const { t, lang, toggleLang } = useLanguage();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
   const [sortBy, setSortBy] = useState<SortOption>('alphabetical');
@@ -382,7 +382,15 @@ const Inventory = () => {
           <div className="py-32 text-center border border-white/10 mt-12 bg-white/5">
             <ShieldAlert size={32} className="mx-auto text-gray-600 mb-4" />
             <p className="font-display text-xl text-gray-500 tracking-widest uppercase">No Visual on Assets</p>
-            <p className="text-xs text-gray-600 mt-2 font-mono">Adjust search parameters or check filtering protocols.</p>
+            <p className="text-xs text-gray-600 mt-2 font-mono max-w-md mx-auto">
+              This could be due to active filters or a database connection interruption.
+            </p>
+            <button
+              onClick={() => refreshVehicles()}
+              className="mt-6 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white border border-tj-gold/30 hover:border-tj-gold px-6 py-3 transition-all flex items-center gap-2 mx-auto"
+            >
+              <RefreshCw size={14} /> Re-Initialize Uplink
+            </button>
           </div>
         )}
       </div>

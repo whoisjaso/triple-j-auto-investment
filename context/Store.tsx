@@ -14,6 +14,7 @@ interface StoreContextType {
   user: User | null;
   lastSync: Date | null;
   isLoading: boolean;
+  refreshVehicles: () => Promise<void>;
   login: (email: string, password?: string) => Promise<boolean>;
   triggerRecovery: () => void;
   logout: () => Promise<void>;
@@ -140,7 +141,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [leads, setLeads] = useState<Lead[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isSyncingRef = useRef(false);
   const isInitializedRef = useRef(false);
@@ -701,6 +702,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       user,
       lastSync,
       isLoading,
+      refreshVehicles: loadVehicles,
       login,
       triggerRecovery,
       logout,
