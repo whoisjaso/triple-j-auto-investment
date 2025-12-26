@@ -13,6 +13,7 @@ interface StoreContextType {
   leads: Lead[];
   user: User | null;
   lastSync: Date | null;
+  isLoading: boolean;
   login: (email: string, password?: string) => Promise<boolean>;
   triggerRecovery: () => void;
   logout: () => Promise<void>;
@@ -139,6 +140,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [leads, setLeads] = useState<Lead[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const isSyncingRef = useRef(false);
   const isInitializedRef = useRef(false);
@@ -215,10 +217,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   // --- DATA LOADING FUNCTIONS ---
   const loadVehicles = async () => {
-    console.log('🔄 Initiating Vehicle Fetch Transaction...');
+    setIsLoading(true);
+    console.log('🔄 Initiating Vehicle Fetch Transaction (Timeout: 10s)...');
     try {
-      console.log('🔄 Initiating Vehicle Fetch Transaction (Timeout: 10s)...');
-
       const abortController = new AbortController();
       const timeoutId = setTimeout(() => abortController.abort(), 10000);
 
@@ -268,11 +269,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         dateAdded: v.date_added,
       }));
 
+      setVehicles(transformed);
       if (transformed.length === 0) {
-        console.warn('⚠️ Supabase returned 0 vehicles. Check RLS policies or if database is empty.');
-        // Do NOT load fallback here, transparency is key. If empty, show empty.
+        console.warn('⚠️ Supabase returned 0 vehicles. Store updated to empty.');
       } else {
-        setVehicles(transformed);
         console.log(`✅ Loaded ${transformed.length} vehicles into Store.`);
       }
     } catch (error) {
@@ -281,6 +281,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (vehicles.length === 0) {
         setVehicles(FALLBACK_ASSETS);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -693,7 +695,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   };
 
   return (
-    <StoreContext.Provider value={{ vehicles, leads, user, lastSync, login, triggerRecovery, logout, addVehicle, updateVehicle, removeVehicle, syncWithGoogleSheets, addLead, updateRegistration, resetToDefault }}>
+    <StoreContext.Provider value={{
+      vehicles,
+      leads,
+      user,
+      lastSync,
+      isLoading,
+      login,
+      triggerRecovery,
+      logout,
+      addVehicle,
+      updateVehicle,
+      removeVehicle,
+      syncWithGoogleSheets,
+      addLead,
+      updateRegistration,
+      resetToDefault
+    }}>
       {children}
     </StoreContext.Provider>
   );

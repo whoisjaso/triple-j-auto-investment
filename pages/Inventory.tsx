@@ -151,7 +151,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
 };
 
 const Inventory = () => {
-  const { vehicles, addLead } = useStore();
+  const { vehicles, addLead, isLoading } = useStore();
   const { t, lang, toggleLang } = useLanguage();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
   const [sortBy, setSortBy] = useState<SortOption>('alphabetical');
@@ -371,10 +371,18 @@ const Inventory = () => {
           </AnimatePresence>
         </motion.div>
 
-        {sortedVehicles.length === 0 && (
+        {isLoading && (
           <div className="py-32 text-center border border-white/10 mt-12 bg-white/5">
             <Loader2 size={32} className="mx-auto text-tj-gold mb-4 animate-spin" />
             <p className="font-display text-xl text-white tracking-widest animate-pulse">UPLINKING COMMAND LEDGER...</p>
+          </div>
+        )}
+
+        {!isLoading && sortedVehicles.length === 0 && (
+          <div className="py-32 text-center border border-white/10 mt-12 bg-white/5">
+            <ShieldAlert size={32} className="mx-auto text-gray-600 mb-4" />
+            <p className="font-display text-xl text-gray-500 tracking-widest uppercase">No Visual on Assets</p>
+            <p className="text-xs text-gray-600 mt-2 font-mono">Adjust search parameters or check filtering protocols.</p>
           </div>
         )}
       </div>
