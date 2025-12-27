@@ -183,12 +183,12 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       await loadVehicles();
       await loadLeads();
 
-      // Priority 2: Background Sync (Fire & Forget) - Don't await this
-      console.log("🔄 Background Sync Initiated...");
-      // Wrap in timeout to push to next tick, ensuring UI renders first
-      setTimeout(() => {
-        syncWithGoogleSheets(true).catch(err => console.error("Background Sync Failed:", err));
-      }, 100);
+      // Priority 2: Background Sync (Fire & Forget) - DISABLED to prevent overwriting Supabase data
+      // Only sync from Google Sheets if Supabase is empty (manual sync available in admin)
+      console.log("🔄 Auto-sync disabled. Use manual sync in admin panel if needed.");
+      // setTimeout(() => {
+      //   syncWithGoogleSheets(true).catch(err => console.error("Background Sync Failed:", err));
+      // }, 100);
     };
 
     initializeData();
@@ -533,8 +533,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (idx.vin === -1) {
         isSyncingRef.current = false;
-        console.warn("VIN Column Missing. Using Fallback.");
-        if (vehicles.length === 0) setVehicles(FALLBACK_ASSETS);
+        console.warn("VIN Column Missing. Sheet structure invalid.");
+        // Don't overwrite existing vehicles with fallback - just return error
+        if (vehicles.length === 0) {
+          setVehicles(FALLBACK_ASSETS);
+        }
         return "ERROR: Invalid Sheet Structure.";
       }
 
@@ -637,15 +640,16 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       return msg;
     } catch (error) {
-      console.warn("Command Ledger Link Unstable. Activating Sovereign Backup.", error);
+      console.warn("Google Sheets sync failed:", error);
 
-      // LOAD FALLBACK DATA IF EMPTY to ensure app doesn't look broken
+      // Only load fallback if we have NO vehicles at all - don't overwrite existing data
       if (vehicles.length === 0) {
+        console.warn("No vehicles found, loading fallback data.");
         setVehicles(FALLBACK_ASSETS);
       }
 
       isSyncingRef.current = false;
-      return "LINK UNSTABLE. OPERATING ON BACKUP INTEL.";
+      return "SYNC FAILED. Using existing Supabase data.";
     }
   };
 
