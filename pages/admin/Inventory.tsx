@@ -323,7 +323,7 @@ const AdminInventory = () => {
     setVinError(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCar.make || !newCar.vin) return;
     
@@ -348,15 +348,29 @@ const AdminInventory = () => {
         diagnostics: processedDiagnostics
     };
     
-    if (editingId) {
-        updateVehicle(editingId, vehiclePayload);
-        handleCancelEdit(); // Reset form
-    } else {
-        addVehicle({
+    try {
+      if (editingId) {
+        // Check if vehicle exists before updating
+        const existingVehicle = vehicles.find(v => v.id === editingId);
+        if (!existingVehicle) {
+          alert('Error: Vehicle not found. It may have been deleted.');
+          handleCancelEdit();
+          return;
+        }
+        
+        await updateVehicle(editingId, vehiclePayload);
+        handleCancelEdit(); // Reset form only on success
+      } else {
+        await addVehicle({
           id: Math.random().toString(36).substr(2, 9),
           ...vehiclePayload as Vehicle
         });
-        handleCancelEdit(); // Reset form
+        handleCancelEdit(); // Reset form only on success
+      }
+    } catch (error) {
+      // Error is already handled in updateVehicle/addVehicle, but we don't reset the form
+      console.error('Error in handleSubmit:', error);
+      // Don't call handleCancelEdit() on error so user can fix and retry
     }
   };
 
