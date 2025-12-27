@@ -33,8 +33,15 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Generate .env.production from environment variables
-RUN chmod +x scripts/generate-env.sh && ./scripts/generate-env.sh
+# Use committed .env.production if it exists, otherwise generate from build args
+# This ensures the committed .env.production is used if build args aren't available
+RUN if [ -f .env.production ]; then \
+      echo "✅ Using committed .env.production"; \
+      cat .env.production; \
+    else \
+      echo "⚠️ No .env.production found, generating from build args..."; \
+      chmod +x scripts/generate-env.sh && ./scripts/generate-env.sh; \
+    fi
 
 # Build the application (Vite will read .env.production)
 RUN npm run build

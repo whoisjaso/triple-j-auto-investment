@@ -217,12 +217,12 @@ const Inventory = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitStatus('submitting');
 
-    setTimeout(() => {
-      addLead({
+    try {
+      await addLead({
         id: Math.random().toString(36).substr(2, 9),
         name: leadForm.name,
         email: leadForm.email,
@@ -232,7 +232,11 @@ const Inventory = () => {
         status: 'New'
       });
       setSubmitStatus('success');
-    }, 1500);
+    } catch (error) {
+      console.error('Failed to submit lead:', error);
+      setSubmitStatus('idle');
+      alert('Failed to submit your interest. Please try again or call us directly.');
+    }
   };
 
 
@@ -396,7 +400,7 @@ const Inventory = () => {
       </div>
 
       {/* DETAILED REPORT MODAL (Rendered via Portal to bypass Stacking Contexts) */}
-      {createPortal(
+      {typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
           {selectedVehicle && (
             <motion.div
@@ -510,7 +514,7 @@ const Inventory = () => {
                       onClick={() => setModalTab('purchase')}
                       className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'purchase' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-500 hover:text-white'}`}
                     >
-                      {t[lang].modal.tabs.purchase}
+                      {t.inventory.modal.tabs.purchase}
                     </button>
                   </div>
 
