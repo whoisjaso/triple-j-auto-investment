@@ -427,8 +427,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (error) {
         console.error('Failed to update vehicle:', error);
-        alert('Failed to update vehicle. Please check console for details.');
-        return;
+        const errorMessage = error.message || 'Unknown error';
+        const errorDetails = error.details || error.hint || '';
+        alert(`Failed to update vehicle: ${errorMessage}${errorDetails ? '\n' + errorDetails : ''}\n\nCheck browser console for full details.`);
+        throw new Error(`Update failed: ${errorMessage}`);
       }
 
       console.log('✅ Vehicle updated successfully');
