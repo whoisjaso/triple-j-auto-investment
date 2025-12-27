@@ -412,16 +412,20 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (updatedVehicle.costCosmetic !== undefined) dbUpdate.cost_cosmetic = updatedVehicle.costCosmetic;
       if (updatedVehicle.costOther !== undefined) dbUpdate.cost_other = updatedVehicle.costOther;
       if (updatedVehicle.soldPrice !== undefined) dbUpdate.sold_price = updatedVehicle.soldPrice;
-      if (updatedVehicle.soldDate !== undefined) dbUpdate.sold_date = updatedVehicle.soldDate;
+      if (updatedVehicle.soldDate !== undefined) dbUpdate.sold_date = updatedVehicle.soldDate || null;
       if (updatedVehicle.mileage !== undefined) dbUpdate.mileage = updatedVehicle.mileage;
       if (updatedVehicle.status !== undefined) dbUpdate.status = updatedVehicle.status;
-      if (updatedVehicle.description !== undefined) dbUpdate.description = updatedVehicle.description;
-      if (updatedVehicle.imageUrl !== undefined) dbUpdate.image_url = updatedVehicle.imageUrl;
-      if (updatedVehicle.gallery !== undefined) dbUpdate.gallery = updatedVehicle.gallery;
-      if (updatedVehicle.diagnostics !== undefined) dbUpdate.diagnostics = updatedVehicle.diagnostics;
+      // Always update description (even if empty string) to ensure it saves
+      if (updatedVehicle.description !== undefined) dbUpdate.description = updatedVehicle.description || '';
+      if (updatedVehicle.imageUrl !== undefined) dbUpdate.image_url = updatedVehicle.imageUrl || '';
+      if (updatedVehicle.gallery !== undefined) dbUpdate.gallery = updatedVehicle.gallery || [];
+      // Always update diagnostics (even if empty array) to ensure it saves
+      if (updatedVehicle.diagnostics !== undefined) dbUpdate.diagnostics = updatedVehicle.diagnostics || [];
       if (updatedVehicle.registrationStatus !== undefined) dbUpdate.registration_status = updatedVehicle.registrationStatus;
-      if (updatedVehicle.registrationDueDate !== undefined) dbUpdate.registration_due_date = updatedVehicle.registrationDueDate;
+      if (updatedVehicle.registrationDueDate !== undefined) dbUpdate.registration_due_date = updatedVehicle.registrationDueDate || null;
       if (updatedVehicle.dateAdded !== undefined) dbUpdate.date_added = updatedVehicle.dateAdded;
+
+      console.log('🔄 Updating vehicle:', id, 'with data:', dbUpdate);
 
       const { error } = await supabase
         .from('vehicles')
@@ -436,7 +440,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         throw new Error(`Update failed: ${errorMessage}`);
       }
 
-      console.log('✅ Vehicle updated successfully');
+      if (data && data.length > 0) {
+        console.log('✅ Vehicle updated successfully:', data[0]);
+      } else {
+        console.warn('⚠️ Update succeeded but no data returned');
+      }
       
       // Manually reload vehicles to ensure UI updates immediately
       // Real-time subscription should also trigger, but this ensures it
