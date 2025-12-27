@@ -426,25 +426,29 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (updatedVehicle.dateAdded !== undefined) dbUpdate.date_added = updatedVehicle.dateAdded;
 
       console.log('🔄 Updating vehicle:', id, 'with data:', dbUpdate);
+      console.log('👤 Current user:', user);
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('vehicles')
         .update(dbUpdate)
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) {
-        console.error('Failed to update vehicle:', error);
+        console.error('❌ Supabase update error:', error);
         const errorMessage = error.message || 'Unknown error';
         const errorDetails = error.details || error.hint || '';
-        alert(`Failed to update vehicle: ${errorMessage}${errorDetails ? '\n' + errorDetails : ''}\n\nCheck browser console for full details.`);
-        throw new Error(`Update failed: ${errorMessage}`);
+        const errorCode = error.code || '';
+        alert(`Failed to update vehicle:\n${errorMessage}\n${errorDetails}\n\nError Code: ${errorCode}\n\nCheck console for details.`);
+        throw new Error(`Update failed [${errorCode}]: ${errorMessage}`);
       }
 
-      if (data && data.length > 0) {
-        console.log('✅ Vehicle updated successfully:', data[0]);
-      } else {
-        console.warn('⚠️ Update succeeded but no data returned');
+      if (!data || data.length === 0) {
+        console.error('⚠️ Update executed but no data returned - update may have failed');
+        throw new Error('Update verification failed - no data returned');
       }
+
+      console.log('✅ Vehicle updated successfully:', data[0]);
       
       // Manually reload vehicles to ensure UI updates immediately
       // Real-time subscription should also trigger, but this ensures it
@@ -716,17 +720,23 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const updateRegistration = async (id: string, status: string): Promise<void> => {
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('vehicles')
         .update({ registration_status: status })
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) {
-        console.error('Failed to update registration status:', error);
+        console.error('❌ Failed to update registration status:', error);
         return;
       }
 
-      console.log('✅ Registration status updated');
+      if (!data || data.length === 0) {
+        console.error('⚠️ Registration update failed - no data returned');
+        return;
+      }
+
+      console.log('✅ Registration status updated:', data[0]);
     } catch (error) {
       console.error('Unexpected error updating registration:', error);
     }
