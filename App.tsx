@@ -313,18 +313,69 @@ const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
 
 // AnimatePresence is already imported at top from 'framer-motion'
 
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-tj-green text-white p-8">
+          <div className="text-center max-w-2xl">
+            <h1 className="font-display text-3xl text-tj-gold mb-4">Error Loading Page</h1>
+            <p className="text-gray-300 mb-6">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-tj-gold text-black px-6 py-3 font-bold uppercase tracking-widest hover:bg-white transition-colors"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const AppContent = () => {
   const location = useLocation();
 
   return (
     <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">
-      <BrowserCompatibilityCheck />
+      <ErrorBoundary>
+        <BrowserCompatibilityCheck />
+      </ErrorBoundary>
       <Navbar />
       {/* Adjusted top padding since crest is gone */}
       <main className="flex-grow pt-32">
         {/* Global Page Transition Wrapper */}
         <AnimatePresence mode="wait">
-          <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="w-8 h-8 border-2 border-tj-gold border-t-transparent rounded-full animate-spin"></div></div>}>
+          <Suspense fallback={
+            <div className="flex items-center justify-center h-screen">
+              <div className="text-center">
+                <div className="w-8 h-8 border-2 border-tj-gold border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-tj-gold text-sm uppercase tracking-widest">Loading...</p>
+              </div>
+            </div>
+          }>
             <div key={location.pathname} className="min-h-full origin-top">
               <Routes location={location}>
                 <Route path="/" element={<Home />} />
@@ -350,9 +401,10 @@ const AppContent = () => {
 
                 {/* 404 Catch-All */}
                 <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </Suspense>
+                </Routes>
+              </div>
+            </Suspense>
+          </ErrorBoundary>
         </AnimatePresence>
       </main>
       <Footer />

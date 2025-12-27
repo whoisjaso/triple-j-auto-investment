@@ -13,29 +13,36 @@ const BrowserCompatibilityCheck: React.FC<BrowserCompatibilityCheckProps> = ({ o
   const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
-    // Check if user has dismissed this before (localStorage)
-    const dismissed = localStorage.getItem('browser-compat-dismissed');
-    if (dismissed) {
-      setIsDismissed(true);
-      return;
-    }
+    // Wrap everything in try-catch to prevent breaking the app
+    try {
+      // Check if user has dismissed this before (localStorage)
+      const dismissed = localStorage.getItem('browser-compat-dismissed');
+      if (dismissed) {
+        setIsDismissed(true);
+        return;
+      }
 
-    // Detect browser type
-    const userAgent = navigator.userAgent;
-    let detectedBrowser = '';
-    
-    if (userAgent.includes('Brave') || (navigator as any).brave) {
-      detectedBrowser = 'Brave';
-    } else if (userAgent.includes('Firefox')) {
-      detectedBrowser = 'Firefox';
-    } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
-      detectedBrowser = 'Safari';
-    }
-    
-    setBrowserType(detectedBrowser);
+      // Detect browser type
+      const userAgent = navigator.userAgent;
+      let detectedBrowser = '';
+      
+      if (userAgent.includes('Brave') || (navigator as any).brave) {
+        detectedBrowser = 'Brave';
+      } else if (userAgent.includes('Firefox')) {
+        detectedBrowser = 'Firefox';
+      } else if (userAgent.includes('Safari') && !userAgent.includes('Chrome')) {
+        detectedBrowser = 'Safari';
+      }
+      
+      setBrowserType(detectedBrowser);
 
     // Test Supabase connection after a short delay
     const testConnection = async () => {
+      // Only test if we have a browser that might block
+      if (!detectedBrowser) {
+        return; // Don't test for generic browsers
+      }
+
       try {
         // Try a simple query with a short timeout
         const controller = new AbortController();
@@ -60,7 +67,7 @@ const BrowserCompatibilityCheck: React.FC<BrowserCompatibilityCheckProps> = ({ o
             error.code === 'PGRST301' || // PostgREST connection error
             error.code === 'PGRST116';   // PostgREST timeout
 
-          if (isBlockingError && (detectedBrowser || errorMessage.includes('network'))) {
+          if (isBlockingError) {
             setShowWarning(true);
           }
         }
@@ -77,9 +84,14 @@ const BrowserCompatibilityCheck: React.FC<BrowserCompatibilityCheckProps> = ({ o
       }
     };
 
-    // Wait a bit before testing to let the page load
-    const timer = setTimeout(testConnection, 2000);
-    return () => clearTimeout(timer);
+      // Wait a bit before testing to let the page load
+      const timer = setTimeout(testConnection, 3000);
+      return () => clearTimeout(timer);
+    } catch (error) {
+      // Silently fail - don't break the app if this component has issues
+      console.warn('BrowserCompatibilityCheck error:', error);
+      return () => {}; // Return empty cleanup function
+    }
   }, []);
 
   const handleDismiss = () => {
