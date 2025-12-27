@@ -5,6 +5,7 @@ import { StoreProvider, useStore } from './context/Store';
 import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
+import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
 
 // Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
@@ -317,6 +318,7 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">
+      <BrowserCompatibilityCheck />
       <Navbar />
       {/* Adjusted top padding since crest is gone */}
       <main className="flex-grow pt-32">
