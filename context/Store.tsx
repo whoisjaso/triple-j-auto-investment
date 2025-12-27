@@ -383,11 +383,14 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (error) {
         console.error('Failed to add vehicle:', error);
         alert('Failed to add vehicle. Please check console for details.');
-        return;
+        throw new Error(`Add failed: ${error.message}`);
       }
 
       console.log('✅ Vehicle added successfully');
-      // Real-time subscription will automatically reload vehicles
+      
+      // Manually reload vehicles to ensure UI updates immediately
+      // Real-time subscription should also trigger, but this ensures it
+      await loadVehicles();
     } catch (error) {
       console.error('Unexpected error adding vehicle:', error);
       alert('Failed to add vehicle. Please try again.');
@@ -434,7 +437,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       }
 
       console.log('✅ Vehicle updated successfully');
-      // Real-time subscription will automatically reload vehicles
+      
+      // Manually reload vehicles to ensure UI updates immediately
+      // Real-time subscription should also trigger, but this ensures it
+      await loadVehicles();
     } catch (error) {
       console.error('Unexpected error updating vehicle:', error);
       alert('Failed to update vehicle. Please try again.');
