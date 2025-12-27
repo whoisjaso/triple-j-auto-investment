@@ -12,22 +12,52 @@ import Home from './pages/Home';
 import Inventory from './pages/Inventory';
 import Contact from './pages/Contact';
 
+// Helper function for lazy loading with error handling
+const lazyWithErrorHandling = (importFn: () => Promise<any>, pageName: string) => {
+  return lazy(async () => {
+    try {
+      return await importFn();
+    } catch (error) {
+      console.error(`Failed to load ${pageName}:`, error);
+      // Return a fallback component
+      return {
+        default: () => (
+          <div className="min-h-screen flex items-center justify-center bg-tj-green text-white p-8">
+            <div className="text-center max-w-2xl">
+              <h1 className="font-display text-3xl text-tj-gold mb-4">Error Loading {pageName}</h1>
+              <p className="text-gray-300 mb-6">
+                Failed to load the {pageName} page. Please refresh the page or contact support.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-tj-gold text-black px-6 py-3 font-bold uppercase tracking-widest hover:bg-white transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        )
+      };
+    }
+  });
+};
+
 // Non-Critical Pages (Lazy Loaded)
-const VinLookup = lazy(() => import('./pages/VinLookup'));
-const Services = lazy(() => import('./pages/Services'));
-const Finance = lazy(() => import('./pages/Finance'));
-const FAQ = lazy(() => import('./pages/FAQ'));
-const Policies = lazy(() => import('./pages/Policies'));
-const PaymentOptions = lazy(() => import('./pages/PaymentOptions'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const Login = lazy(() => import('./pages/Login'));
-const About = lazy(() => import('./pages/About'));
-const Legal = lazy(() => import('./pages/Legal'));
+const VinLookup = lazyWithErrorHandling(() => import('./pages/VinLookup'), 'VIN Lookup');
+const Services = lazyWithErrorHandling(() => import('./pages/Services'), 'Services');
+const Finance = lazyWithErrorHandling(() => import('./pages/Finance'), 'Finance');
+const FAQ = lazyWithErrorHandling(() => import('./pages/FAQ'), 'FAQ');
+const Policies = lazyWithErrorHandling(() => import('./pages/Policies'), 'Policies');
+const PaymentOptions = lazyWithErrorHandling(() => import('./pages/PaymentOptions'), 'Payment Options');
+const NotFound = lazyWithErrorHandling(() => import('./pages/NotFound'), 'Not Found');
+const Login = lazyWithErrorHandling(() => import('./pages/Login'), 'Login');
+const About = lazyWithErrorHandling(() => import('./pages/About'), 'About');
+const Legal = lazyWithErrorHandling(() => import('./pages/Legal'), 'Legal');
 
 // Admin Pages (Lazy Loaded)
-const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
-const AdminInventory = lazy(() => import('./pages/admin/Inventory'));
-const AdminRegistrations = lazy(() => import('./pages/admin/Registrations'));
+const AdminDashboard = lazyWithErrorHandling(() => import('./pages/admin/Dashboard'), 'Admin Dashboard');
+const AdminInventory = lazyWithErrorHandling(() => import('./pages/admin/Inventory'), 'Admin Inventory');
+const AdminRegistrations = lazyWithErrorHandling(() => import('./pages/admin/Registrations'), 'Admin Registrations');
 
 // Utility for Map Routing
 export const openSmartMap = () => {
