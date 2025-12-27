@@ -243,6 +243,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (error) {
         console.error('❌ Failed to load vehicles from Supabase:', error);
         console.error('Error Details:', error.message, error.details, error.hint);
+        
+        // Check if this might be a Brave browser blocking issue
+        const isBrave = navigator.userAgent.includes('Brave') || (navigator as any).brave;
+        if (isBrave && error.message?.includes('fetch') || error.message?.includes('network')) {
+          console.warn('⚠️ Possible Brave browser blocking detected. Try disabling Shields for this site.');
+        }
+        
         // Only load fallback if we really can't connect
         if (vehicles.length === 0) {
           console.warn('⚠️ Using FALLBACK assets due to fetch error.');

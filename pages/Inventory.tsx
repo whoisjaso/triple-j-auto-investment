@@ -389,6 +389,14 @@ const Inventory = () => {
             <p className="text-xs text-gray-600 mt-2 font-mono max-w-md mx-auto">
               This could be due to active filters or a database connection interruption.
             </p>
+            {(typeof navigator !== 'undefined' && (navigator.userAgent.includes('Brave') || (navigator as any).brave)) && (
+              <div className="mt-4 p-4 bg-yellow-900/20 border border-yellow-700/30 max-w-md mx-auto">
+                <p className="text-xs text-yellow-500 mb-2 font-bold uppercase">Brave Browser Detected</p>
+                <p className="text-xs text-gray-400 leading-relaxed">
+                  Brave's Shields may be blocking database requests. Try clicking the Brave icon in the address bar and disabling Shields for this site, then refresh.
+                </p>
+              </div>
+            )}
             <button
               onClick={() => refreshVehicles()}
               className="mt-6 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white border border-tj-gold/30 hover:border-tj-gold px-6 py-3 transition-all flex items-center gap-2 mx-auto"
