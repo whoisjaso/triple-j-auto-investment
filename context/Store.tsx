@@ -187,7 +187,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       console.log("🔄 Background Sync Initiated...");
       // Wrap in timeout to push to next tick, ensuring UI renders first
       setTimeout(() => {
-        syncWithGoogleSheets(true).catch(err => console.error("Create Background Sync Failed:", err));
+        syncWithGoogleSheets(true).catch(err => console.error("Background Sync Failed:", err));
       }, 100);
     };
 

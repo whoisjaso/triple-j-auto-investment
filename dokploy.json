@@ -10,6 +10,24 @@
       "protocol": "tcp"
     }
   ],
+  "buildArgs": [
+    {
+      "key": "VITE_SUPABASE_URL",
+      "value": "https://scgmpliwlfabnpygvbsy.supabase.co"
+    },
+    {
+      "key": "VITE_SUPABASE_ANON_KEY",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjZ21wbGl3bGZhYm5weWd2YnN5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU0MDg0NjQsImV4cCI6MjA4MDk4NDQ2NH0.o8jvtDPVJ6DGwDy6QPuG_3XzmHPuR_hZ82DZsdeDisM"
+    },
+    {
+      "key": "VITE_ADMIN_EMAIL",
+      "value": "jobawems@gmail.com"
+    },
+    {
+      "key": "VITE_ADMIN_PASSWORD",
+      "value": "adekunle12"
+    }
+  ],
   "env": [
     {
       "key": "NODE_ENV",
