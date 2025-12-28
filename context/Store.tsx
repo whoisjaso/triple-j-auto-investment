@@ -155,6 +155,22 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // @ts-ignore
     console.log('Targeting Supabase Node:', supabase.supabaseUrl);
 
+    // CACHE BUSTER: Check if user needs a hard refresh
+    const lastBuildVersion = '2025-12-28-v2'; // Update this when deploying
+    const cachedVersion = localStorage.getItem('tj_build_version');
+    if (cachedVersion && cachedVersion !== lastBuildVersion) {
+      console.warn('⚠️ New version detected! Clearing old cached state...');
+      localStorage.removeItem('supabase.auth.token');
+      localStorage.setItem('tj_build_version', lastBuildVersion);
+      // Force a hard reload to clear all cached JS
+      if (typeof window !== 'undefined' && !window.location.search.includes('refreshed=1')) {
+        console.log('🔄 Forcing hard refresh for new version...');
+        window.location.href = window.location.pathname + '?refreshed=1';
+        return; // Stop execution, page will reload
+      }
+    }
+    localStorage.setItem('tj_build_version', lastBuildVersion);
+
     // 1. Verify Session First (Fastest check)
     console.log("🔐 Verifying Identity Protocol...");
     authService.getSession().then(sessionUser => {
