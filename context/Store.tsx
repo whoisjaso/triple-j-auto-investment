@@ -352,6 +352,29 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const addVehicle = async (v: Vehicle): Promise<void> => {
     try {
+      // CRITICAL: Verify session before adding
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData?.session) {
+        console.error('❌ No active session for add:', sessionError);
+        alert('❌ ADD FAILED: You are not logged in!\n\nPlease log in again through the Admin page.');
+        throw new Error('No active session');
+      }
+
+      console.log('🔐 Session verified for add, user:', sessionData.session.user.email);
+
+      // Verify admin status
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', sessionData.session.user.id)
+        .single();
+
+      if (profileError || !profileData?.is_admin) {
+        console.error('❌ User is not admin:', profileError);
+        alert('❌ ADD FAILED: Your account is not set as admin.\n\nContact support to verify your admin status.');
+        throw new Error('Not an admin user');
+      }
+
       const dateAdded = v.dateAdded || new Date().toISOString().split('T')[0];
 
       const { error } = await supabase
@@ -382,23 +405,61 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (error) {
         console.error('Failed to add vehicle:', error);
-        alert('Failed to add vehicle. Please check console for details.');
+        const errorMessage = error.message || 'Unknown error';
+
+        // Check for common issues
+        if (errorMessage.includes('too large') || errorMessage.includes('payload')) {
+          alert('❌ ADD FAILED: Images are too large!\n\nTry using smaller images (under 500KB each) or fewer photos.');
+        } else if (errorMessage.includes('duplicate') || errorMessage.includes('unique')) {
+          alert('❌ ADD FAILED: A vehicle with this VIN already exists.');
+        } else {
+          alert(`Failed to add vehicle: ${errorMessage}\n\nCheck console for details.`);
+        }
         throw new Error(`Add failed: ${error.message}`);
       }
 
       console.log('✅ Vehicle added successfully');
-      
+
       // Manually reload vehicles to ensure UI updates immediately
-      // Real-time subscription should also trigger, but this ensures it
       await loadVehicles();
     } catch (error) {
       console.error('Unexpected error adding vehicle:', error);
-      alert('Failed to add vehicle. Please try again.');
+      // Don't double-alert
+      if (!(error instanceof Error) || !error.message.includes('Add failed')) {
+        alert('Failed to add vehicle. Please try again.');
+      }
+      throw error;
     }
   };
 
   const updateVehicle = async (id: string, updatedVehicle: Partial<Vehicle>): Promise<void> => {
     try {
+      // CRITICAL: Refresh session to ensure auth token is valid
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData?.session) {
+        console.error('❌ No active session for update:', sessionError);
+        alert('❌ UPDATE FAILED: You are not logged in!\n\nPlease log in again through the Admin page.');
+        throw new Error('No active session');
+      }
+
+      console.log('🔐 Session verified for update, user:', sessionData.session.user.email);
+
+      // Verify admin status in database
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', sessionData.session.user.id)
+        .single();
+
+      if (profileError || !profileData?.is_admin) {
+        console.error('❌ User is not admin or profile missing:', profileError);
+        console.error('Profile data:', profileData);
+        alert('❌ UPDATE FAILED: Your account is not set as admin in the database.\n\nContact support to verify your admin status.');
+        throw new Error('Not an admin user');
+      }
+
+      console.log('✅ Admin status verified');
+
       // Transform camelCase to snake_case for database
       const dbUpdate: any = {};
       if (updatedVehicle.vin !== undefined) dbUpdate.vin = updatedVehicle.vin;
@@ -445,26 +506,48 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (data && data.length > 0) {
         console.log('✅ Vehicle updated successfully:', data[0]);
+        // Manually reload vehicles to ensure UI updates immediately
+        await loadVehicles();
       } else {
-        // Warn but don't throw - update may have succeeded even without returned data
-        console.warn('⚠️ Update completed but no data returned (this is sometimes normal)');
+        // RLS silently blocks updates by returning empty array with no error
+        // This means the update was REJECTED, not successful!
+        console.error('❌ Update returned no data - RLS may have blocked the update');
+        console.error('Current auth state:', user?.email || 'NOT AUTHENTICATED');
+
+        // Check if user is authenticated
+        const { data: session } = await supabase.auth.getSession();
+        if (!session?.session) {
+          alert('❌ UPDATE FAILED: You are not logged in!\n\nPlease log out and log back in to refresh your session.');
+          throw new Error('Not authenticated');
+        }
+
+        alert('❌ UPDATE FAILED: Your changes were not saved.\n\nThis usually means:\n1. Your session expired - try logging out and back in\n2. The vehicle was deleted by someone else\n3. Database permissions issue\n\nCheck the browser console for details.');
+        throw new Error('Update returned no data - RLS may have blocked');
       }
-      
-      // Manually reload vehicles to ensure UI updates immediately
-      // Real-time subscription should also trigger, but this ensures it
-      await loadVehicles();
     } catch (error) {
       console.error('Unexpected error updating vehicle:', error);
-      alert('Failed to update vehicle. Please try again.');
+      // Don't show another alert if we already showed one above
+      if (!(error instanceof Error) || !error.message.includes('RLS')) {
+        alert('Failed to update vehicle. Please try again.');
+      }
+      throw error; // Re-throw so the form doesn't reset
     }
   };
 
   const removeVehicle = async (id: string): Promise<void> => {
     try {
-      const { error } = await supabase
+      // Verify session before deleting
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData?.session) {
+        alert('❌ DELETE FAILED: You are not logged in!');
+        throw new Error('No active session');
+      }
+
+      const { data, error } = await supabase
         .from('vehicles')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .select();
 
       if (error) {
         console.error('Failed to delete vehicle:', error);
@@ -472,8 +555,15 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         return;
       }
 
+      if (!data || data.length === 0) {
+        console.error('❌ Delete returned no data - RLS may have blocked');
+        alert('❌ DELETE FAILED: Permission denied or vehicle not found.');
+        return;
+      }
+
       console.log('✅ Vehicle deleted successfully');
-      // Real-time subscription will automatically reload vehicles
+      // Reload vehicles to update UI
+      await loadVehicles();
     } catch (error) {
       console.error('Unexpected error deleting vehicle:', error);
       alert('Failed to delete vehicle. Please try again.');

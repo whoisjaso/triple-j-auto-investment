@@ -431,10 +431,9 @@ const AppContent = () => {
 
                 {/* 404 Catch-All */}
                 <Route path="*" element={<NotFound />} />
-                </Routes>
-              </div>
-            </Suspense>
-          </ErrorBoundary>
+              </Routes>
+            </div>
+          </Suspense>
         </AnimatePresence>
       </main>
       <Footer />
