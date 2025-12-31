@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/Store';
-import { ArrowRight, Diamond, Brain, Zap, Fingerprint, Target, Activity, Crosshair, Wifi, ChevronDown } from 'lucide-react';
+import { ArrowRight, Diamond, Brain, Zap, Fingerprint, Target, Activity, Crosshair, Wifi, ChevronDown, Phone } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 
 // --- PSYCHOLOGICAL UTILITIES ---
@@ -187,12 +187,25 @@ const Home = () => {
                      "{t.home.hero.subtitle}"
                   </p>
 
-                  <Link to="/inventory" className="group relative overflow-hidden bg-white text-black px-20 py-6 text-xs font-bold tracking-[0.4em] uppercase hover:bg-tj-gold transition-colors duration-300 clip-path-polygon mt-4">
-                     <span className="relative z-10 flex items-center gap-3">
-                        {t.home.hero.cta} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                     </span>
-                     <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-                  </Link>
+                  <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
+                     <Link to="/inventory" className="group relative overflow-hidden bg-white text-black px-12 md:px-16 py-5 md:py-6 text-xs font-bold tracking-[0.3em] uppercase hover:bg-tj-gold transition-colors duration-300">
+                        <span className="relative z-10 flex items-center gap-3">
+                           {t.home.hero.cta} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                     </Link>
+
+                     <a
+                        href="tel:+18324009760"
+                        className="group relative overflow-hidden bg-transparent border-2 border-white text-white px-12 md:px-16 py-5 md:py-6 text-xs font-bold tracking-[0.3em] uppercase hover:bg-tj-gold hover:border-tj-gold hover:text-black transition-all duration-300"
+                     >
+                        <span className="relative z-10 flex items-center gap-3">
+                           <Phone size={14} className="group-hover:animate-pulse" />
+                           Call Now
+                        </span>
+                        <div className="absolute inset-0 bg-tj-gold/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                     </a>
+                  </div>
                </motion.div>
             </motion.div>
 

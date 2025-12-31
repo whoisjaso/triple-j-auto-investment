@@ -51,7 +51,13 @@
       "Bash(if [ ! -d \"D:\\\\triple-j-auto-investment\\\\types\" ])",
       "Bash(then mkdir \"D:\\\\triple-j-auto-investment\\\\types\")",
       "Bash(findstr:*)",
-      "WebFetch(domain:www.txdmv.gov)"
+      "WebFetch(domain:www.txdmv.gov)",
+      "Bash(cat:*)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:178.156.146.106)",
+      "Bash(grep:*)",
+      "Bash(node scripts/list-pdf-fields.mjs:*)",
+      "Bash(powershell -Command:*)"
     ],
     "deny": [],
     "ask": []

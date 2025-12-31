@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { PDFDocument } from 'pdf-lib';
 import { BillOfSaleData } from '../types';
 
 // --- BRAND CONSTANTS ---
@@ -12,6 +13,34 @@ const C_DARK = [6, 44, 32];    // #062C20 (Deep Hunter Green)
 const C_GOLD = [197, 160, 89]; // #C5A059 (Metallic Gold)
 const C_WHITE = [255, 255, 255];
 const C_GRAY = [240, 240, 240];
+
+// --- LOGO CACHING ---
+let cachedLogoBase64: string | null = null;
+
+const loadLogoAsBase64 = async (): Promise<string | null> => {
+    if (cachedLogoBase64) return cachedLogoBase64;
+
+    try {
+        const response = await fetch('/GoldTripleJLogo.png');
+        const blob = await response.blob();
+
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                cachedLogoBase64 = reader.result as string;
+                resolve(cachedLogoBase64);
+            };
+            reader.onerror = () => resolve(null);
+            reader.readAsDataURL(blob);
+        });
+    } catch {
+        console.warn('Could not load logo for PDF');
+        return null;
+    }
+};
+
+// Pre-load logo on module init
+loadLogoAsBase64();
 
 // --- UTILS ---
 
@@ -59,43 +88,42 @@ const drawSecurityBackground = (doc: jsPDF) => {
     doc.rect(6, 6, PAGE_WIDTH - 12, PAGE_HEIGHT - 12);
 };
 
-const drawHeader = (doc: jsPDF, title: string, subtitle: string) => {
-    const h = 35;
-    // Header Block
+const drawHeader = (doc: jsPDF, title: string, subtitle: string, logoBase64?: string | null) => {
+    const h = 45; // Taller header for prominent centered logo
+
+    // Header Block - Deep green background
     doc.setFillColor(C_DARK[0], C_DARK[1], C_DARK[2]);
     doc.rect(MARGIN, MARGIN, CONTENT_WIDTH, h, 'F');
 
-    // Gold Accent
+    // Gold Accent Line at bottom
     doc.setDrawColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
-    doc.setLineWidth(0.8);
+    doc.setLineWidth(1);
     doc.line(MARGIN, MARGIN + h, PAGE_WIDTH - MARGIN, MARGIN + h);
 
-    // Company Info (Left)
-    doc.setFont("times", "bold");
-    doc.setFontSize(20);
-    doc.setTextColor(C_WHITE[0], C_WHITE[1], C_WHITE[2]);
-    doc.text("TRIPLE J AUTO", MARGIN + 5, MARGIN + 12);
+    // CENTERED LOGO (prominent, speaks for itself)
+    const logoSize = 32;
+    if (logoBase64) {
+        try {
+            const logoX = (PAGE_WIDTH - logoSize) / 2;
+            doc.addImage(logoBase64, 'PNG', logoX, MARGIN + 3, logoSize, logoSize);
+        } catch (e) {
+            console.warn('Failed to add logo to PDF:', e);
+        }
+    }
 
-    doc.setFont("helvetica", "normal");
+    // Document Title (centered below logo area)
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(C_WHITE[0], C_WHITE[1], C_WHITE[2]);
+    doc.text(title.toUpperCase(), PAGE_WIDTH / 2, MARGIN + 38, { align: "center" });
+
+    // Subtitle (small, elegant)
+    doc.setFont("times", "italic");
     doc.setFontSize(7);
     doc.setTextColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
-    doc.setCharSpace(2);
-    doc.text("INVESTMENT GRADE AUTOMOBILES", MARGIN + 5, MARGIN + 18);
-    doc.text("HOUSTON, TEXAS • EST. MMXXIV", MARGIN + 5, MARGIN + 22);
-    doc.setCharSpace(0);
+    doc.text(subtitle, PAGE_WIDTH / 2, MARGIN + 43, { align: "center" });
 
-    // Document Title (Right)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(14);
-    doc.setTextColor(C_WHITE[0], C_WHITE[1], C_WHITE[2]);
-    doc.text(title.toUpperCase(), PAGE_WIDTH - MARGIN - 5, MARGIN + 12, { align: "right" });
-
-    doc.setFont("times", "italic");
-    doc.setFontSize(10);
-    doc.setTextColor(200, 200, 200);
-    doc.text(subtitle, PAGE_WIDTH - MARGIN - 5, MARGIN + 18, { align: "right" });
-
-    return MARGIN + h + 8;
+    return MARGIN + h + 6;
 };
 
 const drawSection = (doc: jsPDF, label: string, y: number) => {
@@ -145,33 +173,53 @@ const drawDataBox = (doc: jsPDF, label: string, value: string, x: number, y: num
 };
 
 const drawFooter = (doc: jsPDF) => {
-    const y = PAGE_HEIGHT - 12;
-    doc.setDrawColor(C_DARK[0], C_DARK[1], C_DARK[2]);
-    doc.setLineWidth(0.3);
+    const y = PAGE_HEIGHT - 16;
+
+    // Footer background strip
+    doc.setFillColor(C_DARK[0], C_DARK[1], C_DARK[2]);
+    doc.rect(MARGIN, y, CONTENT_WIDTH, 10, 'F');
+
+    // Gold accent line at top of footer
+    doc.setDrawColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
+    doc.setLineWidth(0.5);
     doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
 
+    // Company info (left)
     doc.setFont("helvetica", "bold");
     doc.setFontSize(6);
-    doc.setTextColor(C_DARK[0], C_DARK[1], C_DARK[2]);
-    doc.text("TRIPLE J AUTO INVESTMENT LLC", MARGIN, y + 4);
+    doc.setTextColor(C_WHITE[0], C_WHITE[1], C_WHITE[2]);
+    doc.text("TRIPLE J AUTO INVESTMENT LLC", MARGIN + 3, y + 4);
 
     doc.setFont("helvetica", "normal");
-    doc.text("8774 ALMEDA GENOA RD, HOUSTON, TX 77075", MARGIN, y + 7);
+    doc.setFontSize(5);
+    doc.setTextColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
+    doc.text("8774 ALMEDA GENOA RD, HOUSTON, TX 77075", MARGIN + 3, y + 7);
 
-    doc.text("PAGE 1 OF 1", PAGE_WIDTH - MARGIN, y + 4, { align: "right" });
-    doc.text(`GEN: ${new Date().toISOString().split('T')[0]}`, PAGE_WIDTH - MARGIN, y + 7, { align: "right" });
+    // Center - Dealer License
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(5);
+    doc.setTextColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
+    doc.text("TX DEALER LICENSE: P171632", PAGE_WIDTH / 2, y + 5.5, { align: "center" });
+
+    // Right side - Date
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(5);
+    doc.setTextColor(C_WHITE[0], C_WHITE[1], C_WHITE[2]);
+    doc.text(`Generated: ${new Date().toLocaleDateString('en-US')}`, PAGE_WIDTH - MARGIN - 3, y + 5.5, { align: "right" });
 };
 
 // --- PDF GENERATORS ---
 
-export const generateBillOfSalePDF = (data: BillOfSaleData) => {
+export const generateBillOfSalePDF = async (data: BillOfSaleData, preview: boolean = false): Promise<string | void> => {
     const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+    const logo = await loadLogoAsBase64();
     drawSecurityBackground(doc);
 
     const isSpanish = data.printLanguage === 'ES';
     let y = drawHeader(doc,
         isSpanish ? "FACTURA DE VENTA DE VEHÍCULO" : "VEHICLE BILL OF SALE",
-        isSpanish ? "TRANSFERENCIA DE PROPIEDAD" : "TRANSFER OF OWNERSHIP DOCUMENT"
+        isSpanish ? "TRANSFERENCIA DE PROPIEDAD" : "TRANSFER OF OWNERSHIP DOCUMENT",
+        logo
     );
 
     // 1. TRANSACTION DETAILS
@@ -303,18 +351,24 @@ export const generateBillOfSalePDF = (data: BillOfSaleData) => {
 
     drawFooter(doc);
     const safeName = (data.buyerName || "Client").replace(/[^a-z0-9]/gi, '_');
+
+    if (preview) {
+        return doc.output('bloburl').toString();
+    }
     doc.save(`TripleJ_BOS_${safeName}.pdf`);
 };
 
-export const generateAsIsPDF = (data: BillOfSaleData) => {
+export const generateAsIsPDF = async (data: BillOfSaleData, preview: boolean = false): Promise<string | void> => {
     const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+    const logo = await loadLogoAsBase64();
     drawSecurityBackground(doc);
 
     const isSpanish = data.printLanguage === 'ES';
 
     let y = drawHeader(doc,
         isSpanish ? "ACUSE DE RECIBO DEL COMPRADOR" : "BUYER ACKNOWLEDGMENT",
-        isSpanish ? "VENTA DE VEHÍCULO COMO ESTÁ" : "AS-IS VEHICLE SALE"
+        isSpanish ? "VENTA DE VEHÍCULO COMO ESTÁ" : "AS-IS VEHICLE SALE",
+        logo
     );
 
     doc.setFont("times", "normal");
@@ -420,14 +474,19 @@ export const generateAsIsPDF = (data: BillOfSaleData) => {
     curX = drawUnderlinedField(isSpanish ? "Millaje:" : "Mileage:", data.odometer, curX + 10, 60);
 
     drawFooter(doc);
+
+    if (preview) {
+        return doc.output('bloburl').toString();
+    }
     doc.save("TripleJ_AsIs_Acknowledgment.pdf");
 };
 
-export const generateRegistrationGuidePDF = (data: BillOfSaleData) => {
+export const generateRegistrationGuidePDF = async (data: BillOfSaleData, preview: boolean = false): Promise<string | void> => {
     const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+    const logo = await loadLogoAsBase64();
     drawSecurityBackground(doc);
 
-    let y = drawHeader(doc, "REGISTRATION PROTOCOL", "BUYER INSTRUCTIONS");
+    let y = drawHeader(doc, "REGISTRATION PROTOCOL", "BUYER INSTRUCTIONS", logo);
 
     const drawStep = (num: string, title: string, desc: string) => {
         doc.setFont("helvetica", "bold");
@@ -481,7 +540,7 @@ export const generateRegistrationGuidePDF = (data: BillOfSaleData) => {
         y += 8;
     });
 
-    // Important Note Box
+    // Important Note Box - Deadline Warning
     y += 10;
     doc.setFillColor(C_DARK[0], C_DARK[1], C_DARK[2]);
     doc.rect(MARGIN, y, CONTENT_WIDTH, 25, 'F');
@@ -493,236 +552,200 @@ export const generateRegistrationGuidePDF = (data: BillOfSaleData) => {
     doc.setFontSize(9);
     doc.text("You must transfer the title and register the vehicle within 30 days of the date of sale to avoid financial penalties. The vehicle may not be driven legally on public roads without a temporary permit or valid metal plates.", MARGIN + 5, y + 14, { maxWidth: CONTENT_WIDTH - 10 });
 
+    // LATE REGISTRATION PENALTY BOX (Critical - $20/day)
+    y += 30;
+    doc.setFillColor(180, 30, 30); // Red background for urgency
+    doc.rect(MARGIN, y, CONTENT_WIDTH, 28, 'F');
+    doc.setDrawColor(150, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.rect(MARGIN, y, CONTENT_WIDTH, 28);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("CUSTOMER REGISTRATION OPT-OUT PENALTY", MARGIN + 5, y + 7);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.text("Texas law requires dealers to process vehicle registration on behalf of customers. If you elect to handle registration independently and return to the dealership after 30 days from the date of purchase, a late processing fee of $20.00 per day will apply, calculated from the original purchase date.", MARGIN + 5, y + 13, { maxWidth: CONTENT_WIDTH - 10 });
+
+    // Acknowledgment checkbox
+    y += 32;
+    doc.setFillColor(255, 250, 240);
+    doc.rect(MARGIN, y, CONTENT_WIDTH, 18, 'F');
+    doc.setDrawColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
+    doc.setLineWidth(0.3);
+    doc.rect(MARGIN, y, CONTENT_WIDTH, 18);
+
+    // Checkbox
+    doc.setDrawColor(0, 0, 0);
+    doc.rect(MARGIN + 5, y + 6, 5, 5);
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(0, 0, 0);
+    doc.text("I ACKNOWLEDGE:", MARGIN + 14, y + 10);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    doc.text("I understand that if I choose to process registration outside the dealership and return after 30 days, I will be charged $20/day late fee.", MARGIN + 14, y + 15, { maxWidth: CONTENT_WIDTH - 20 });
+
+    // Storage Fee Policy Box
+    y += 22;
+    doc.setFillColor(255, 240, 220);
+    doc.rect(MARGIN, y, CONTENT_WIDTH, 18, 'F');
+    doc.setDrawColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
+    doc.setLineWidth(0.5);
+    doc.rect(MARGIN, y, CONTENT_WIDTH, 18);
+    doc.setTextColor(150, 100, 0);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("STORAGE POLICY", MARGIN + 5, y + 6);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 70, 0);
+    doc.text("A storage fee of $25.00 per day will be assessed for vehicles not picked up within 60 days of the date of sale. Please arrange for timely pickup to avoid additional charges.", MARGIN + 5, y + 11, { maxWidth: CONTENT_WIDTH - 10 });
+
     drawFooter(doc);
+
+    if (preview) {
+        return doc.output('bloburl').toString();
+    }
     doc.save("TripleJ_Registration_Guide.pdf");
 };
 
-// --- FORM 130-U (Texas Title/Registration Application) ---
+// --- FORM 130-U (Official Texas Title/Registration Application) ---
+// Uses the official Texas DMV Form 130-U with pdf-lib for form filling
 
-export const generateForm130U = (data: BillOfSaleData) => {
-    const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+let cached130UBytes: ArrayBuffer | null = null;
 
-    // Light gray background for form appearance
-    doc.setFillColor(252, 252, 252);
-    doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F');
+const load130UForm = async (): Promise<ArrayBuffer> => {
+    if (cached130UBytes) return cached130UBytes;
 
-    // Header - Texas DMV Style
-    doc.setFillColor(0, 51, 102); // Dark blue header
-    doc.rect(0, 0, PAGE_WIDTH, 25, 'F');
+    try {
+        const response = await fetch('/TX-130-U-2025.pdf');
+        cached130UBytes = await response.arrayBuffer();
+        return cached130UBytes;
+    } catch (error) {
+        console.error('Failed to load 130-U form:', error);
+        throw new Error('Could not load Form 130-U template');
+    }
+};
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.setTextColor(255, 255, 255);
-    doc.text("APPLICATION FOR TEXAS TITLE AND/OR REGISTRATION", PAGE_WIDTH / 2, 10, { align: 'center' });
+// Pre-load 130-U form on module init
+load130UForm().catch(() => {});
 
-    doc.setFontSize(12);
-    doc.text("FORM 130-U", PAGE_WIDTH / 2, 18, { align: 'center' });
+export const generateForm130U = async (data: BillOfSaleData, preview: boolean = false): Promise<string | void> => {
+    try {
+        const formBytes = await load130UForm();
+        const pdfDoc = await PDFDocument.load(formBytes);
+        const form = pdfDoc.getForm();
 
-    // Subtitle
-    doc.setFillColor(220, 220, 220);
-    doc.rect(0, 25, PAGE_WIDTH, 8, 'F');
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    doc.setTextColor(80, 80, 80);
-    doc.text("PRE-FILLED FOR YOUR CONVENIENCE • VERIFY ALL INFORMATION BEFORE SUBMITTING TO COUNTY TAX OFFICE", PAGE_WIDTH / 2, 30, { align: 'center' });
+        // Helper to safely set text field
+        const setTextField = (fieldName: string, value: string) => {
+            try {
+                const field = form.getTextField(fieldName);
+                field.setText(value || '');
+            } catch (e) {
+                console.warn(`Field not found: ${fieldName}`);
+            }
+        };
 
-    let y = 40;
+        // Helper to safely check checkbox
+        const checkBox = (fieldName: string) => {
+            try {
+                const field = form.getCheckBox(fieldName);
+                field.check();
+            } catch (e) {
+                console.warn(`Checkbox not found: ${fieldName}`);
+            }
+        };
 
-    // Form field helper
-    const drawFormField = (label: string, value: string, x: number, yPos: number, width: number, height: number = 12) => {
-        // Field box
-        doc.setFillColor(255, 255, 255);
-        doc.setDrawColor(0, 0, 0);
-        doc.setLineWidth(0.3);
-        doc.rect(x, yPos, width, height, 'FD');
+        // --- FILL FORM FIELDS ---
 
-        // Label (top of box)
+        // Check "Title & Registration" purpose
+        checkBox('Title  Registration');
+
+        // Vehicle Information (Section 1)
+        setTextField('1 Vehicle Identification Number', data.vin || '');
+        setTextField('2 Year', data.year || '');
+        setTextField('3 Make', data.make || '');
+        setTextField('4 Body Style', data.bodyStyle || '4D');
+        setTextField('5 Model', data.model || '');
+        setTextField('6 Major Color', data.exteriorColor || '');
+        setTextField('7 Minor Color', data.interiorColor || '');
+        setTextField('8 Texas License Plate No', data.licensePlate || '');
+        setTextField('9 Odometer Reading no tenths', data.odometer || '');
+        setTextField('11 Empty Weight', data.emptyWeight || '');
+
+        // Applicant Type - Default to Individual
+        checkBox('Individual');
+
+        // Applicant/Buyer Information (Section 2)
+        setTextField('16 Applicant First Name or Entity Name Middle Name Last Name Suffix if any', data.buyerName || '');
+        setTextField('18 Applicant Mailing Address City State Zip', data.buyerAddress || '');
+
+        // County - Extract from address if possible
+        const countyMatch = data.buyerAddress?.match(/,\s*([A-Za-z\s]+)\s+County/i);
+        if (countyMatch) {
+            setTextField('19 Applicant County of Residence', countyMatch[1].trim());
+        }
+
+        // Seller/Dealer Information (Section 3)
+        setTextField('20 Previous Owner Name or Entity Name City State', `${data.sellerName}, Houston, TX`);
+        setTextField('21 Dealer GDN if applicable', 'P171632');
+
+        // Sale Information (Section 4)
+        setTextField('Date', formatDateUS(data.date));
+        setTextField('Seller  Name', data.sellerName || 'Triple J Auto Investment LLC');
+
+        // Tax Calculation
+        const salePrice = parseFloat(data.amount?.replace(/[^0-9.]/g, '') || '0');
+        const salesTax = salePrice * 0.0625; // Texas 6.25%
+
+        setTextField('Sales Price Minus Rebate Amount', formatCurrency(salePrice.toString()));
+        setTextField('Taxable Amount', formatCurrency(salePrice.toString()));
+        setTextField('25% Tax on Taxable Amount', formatCurrency(salesTax.toString()));
+        setTextField('Amount of Tax and Penalty Due', formatCurrency(salesTax.toString()));
+
+        // Check the $28/$33 application fee checkbox
+        checkBox('$28 or $33 Application Fee for Texas Title - contact your county for the correct fee');
+
+        // Flatten form to prevent further editing (makes it look cleaner)
+        // form.flatten(); // Uncomment if you want the form to be non-editable
+
+        // Generate output
+        const filledPdfBytes = await pdfDoc.save();
+        const blob = new Blob([filledPdfBytes], { type: 'application/pdf' });
+
+        if (preview) {
+            return URL.createObjectURL(blob);
+        }
+
+        // Download the file
+        const safeName = (data.buyerName || 'Client').replace(/[^a-z0-9]/gi, '_');
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Form_130U_${safeName}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+
+    } catch (error) {
+        console.error('Error generating Form 130-U:', error);
+        // Fallback: generate simple instruction page
+        const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.text("Form 130-U - Error Loading Template", PAGE_WIDTH / 2, 50, { align: 'center' });
         doc.setFont("helvetica", "normal");
-        doc.setFontSize(6);
-        doc.setTextColor(100, 100, 100);
-        doc.text(label.toUpperCase(), x + 1.5, yPos + 3);
+        doc.setFontSize(12);
+        doc.text("Please obtain Form 130-U from your County Tax Office.", PAGE_WIDTH / 2, 70, { align: 'center' });
+        doc.text("Or visit: www.txdmv.gov", PAGE_WIDTH / 2, 85, { align: 'center' });
 
-        // Value (in box)
-        doc.setFont("courier", "bold");
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-
-        // Truncate if needed
-        let displayVal = value || "";
-        const maxWidth = width - 3;
-        while (doc.getTextWidth(displayVal) > maxWidth && displayVal.length > 0) {
-            displayVal = displayVal.slice(0, -1);
+        if (preview) {
+            return doc.output('bloburl').toString();
         }
-        doc.text(displayVal, x + 2, yPos + height - 3);
-    };
-
-    // Section 1: VEHICLE INFORMATION
-    doc.setFillColor(0, 51, 102);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 6, 'F');
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.text("SECTION 1: VEHICLE INFORMATION", MARGIN + 3, y + 4);
-    y += 8;
-
-    // Row 1: VIN (full width)
-    drawFormField("Vehicle Identification Number (VIN)", data.vin, MARGIN, y, CONTENT_WIDTH);
-    y += 14;
-
-    // Row 2: Year, Make, Model, Body Style
-    const w4 = (CONTENT_WIDTH - 6) / 4;
-    drawFormField("Year", data.year, MARGIN, y, w4);
-    drawFormField("Make", data.make, MARGIN + w4 + 2, y, w4);
-    drawFormField("Model", data.model, MARGIN + (w4 + 2) * 2, y, w4);
-    drawFormField("Body Style", data.bodyStyle || "4D", MARGIN + (w4 + 2) * 3, y, w4);
-    y += 14;
-
-    // Row 3: Colors, License Plate
-    const w3 = (CONTENT_WIDTH - 4) / 3;
-    drawFormField("Major Color", data.exteriorColor || "N/A", MARGIN, y, w3);
-    drawFormField("Minor Color", data.interiorColor || "N/A", MARGIN + w3 + 2, y, w3);
-    drawFormField("Texas License Plate No.", data.licensePlate || "", MARGIN + (w3 + 2) * 2, y, w3);
-    y += 14;
-
-    // Row 4: Odometer, Empty Weight
-    const w2 = (CONTENT_WIDTH - 2) / 2;
-    drawFormField("Odometer Reading (No Tenths)", data.odometer, MARGIN, y, w2);
-    drawFormField("Empty Weight (lbs)", data.emptyWeight || "", MARGIN + w2 + 2, y, w2);
-    y += 18;
-
-    // Section 2: APPLICANT/NEW OWNER INFORMATION
-    doc.setFillColor(0, 51, 102);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 6, 'F');
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.text("SECTION 2: APPLICANT / NEW OWNER INFORMATION", MARGIN + 3, y + 4);
-    y += 8;
-
-    // Applicant Type checkboxes
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Applicant Type:", MARGIN, y + 3);
-
-    const types = ["Individual", "Business", "Government", "Trust", "Non-Profit"];
-    let checkX = MARGIN + 25;
-    types.forEach((type, i) => {
-        doc.rect(checkX, y, 3, 3);
-        if (i === 0) { // Default to Individual
-            doc.setFillColor(0, 0, 0);
-            doc.rect(checkX + 0.5, y + 0.5, 2, 2, 'F');
-        }
-        doc.text(type, checkX + 4, y + 2.5);
-        checkX += 30;
-    });
-    y += 8;
-
-    // Owner Name
-    drawFormField("Applicant's/Owner's Legal Name (Last, First, Middle or Business Name)", data.buyerName, MARGIN, y, CONTENT_WIDTH, 14);
-    y += 16;
-
-    // Owner Address
-    drawFormField("Mailing Address (Street, City, State, ZIP)", data.buyerAddress, MARGIN, y, CONTENT_WIDTH, 14);
-    y += 20;
-
-    // Section 3: SELLER INFORMATION
-    doc.setFillColor(0, 51, 102);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 6, 'F');
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.text("SECTION 3: SELLER INFORMATION", MARGIN + 3, y + 4);
-    y += 8;
-
-    // Seller Name and Address
-    drawFormField("Seller's Name (Dealer or Individual)", data.sellerName, MARGIN, y, w2);
-    drawFormField("Dealer License Number", "P171632", MARGIN + w2 + 2, y, w2);
-    y += 14;
-
-    drawFormField("Seller's Address", data.sellerAddress, MARGIN, y, CONTENT_WIDTH, 14);
-    y += 20;
-
-    // Section 4: SALE INFORMATION
-    doc.setFillColor(0, 51, 102);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 6, 'F');
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.text("SECTION 4: SALE / TRANSACTION INFORMATION", MARGIN + 3, y + 4);
-    y += 8;
-
-    // Date, Sales Price
-    drawFormField("Date of Sale (MM/DD/YYYY)", formatDateUS(data.date), MARGIN, y, w3);
-    drawFormField("Sales Price", formatCurrency(data.amount), MARGIN + w3 + 2, y, w3);
-    drawFormField("Trade-In Allowance", "$0.00", MARGIN + (w3 + 2) * 2, y, w3);
-    y += 14;
-
-    // Rebate, Net Price
-    drawFormField("Manufacturer Rebate", "$0.00", MARGIN, y, w3);
-    const netPrice = parseFloat(data.amount.replace(/[^0-9.]/g, '')) || 0;
-    drawFormField("Taxable Value", formatCurrency(netPrice.toString()), MARGIN + w3 + 2, y, w3);
-    const salesTax = netPrice * 0.0625; // Texas 6.25% sales tax
-    drawFormField("Motor Vehicle Tax (6.25%)", formatCurrency(salesTax.toString()), MARGIN + (w3 + 2) * 2, y, w3);
-    y += 20;
-
-    // Section 5: CERTIFICATION
-    doc.setFillColor(0, 51, 102);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 6, 'F');
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.setTextColor(255, 255, 255);
-    doc.text("SECTION 5: CERTIFICATION", MARGIN + 3, y + 4);
-    y += 10;
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-    doc.setTextColor(0, 0, 0);
-    const certText = "I certify under penalty of perjury that all information on this application is true and correct. I understand that giving false information to obtain a title is a felony (Texas Penal Code §37.10).";
-    doc.text(doc.splitTextToSize(certText, CONTENT_WIDTH), MARGIN, y);
-    y += 12;
-
-    // Signature lines
-    doc.setLineWidth(0.3);
-    doc.line(MARGIN, y + 8, MARGIN + 80, y + 8);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(6);
-    doc.text("SELLER SIGNATURE", MARGIN, y + 12);
-    doc.text("Triple J Auto Investment LLC", MARGIN, y + 16);
-
-    doc.line(MARGIN + 100, y + 8, PAGE_WIDTH - MARGIN, y + 8);
-    doc.text("BUYER SIGNATURE", MARGIN + 100, y + 12);
-    doc.text("X", MARGIN + 100, y + 6);
-
-    // Footer with instructions
-    y = PAGE_HEIGHT - 35;
-    doc.setFillColor(255, 255, 230);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 25, 'F');
-    doc.setDrawColor(200, 180, 0);
-    doc.setLineWidth(0.5);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 25);
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
-    doc.setTextColor(100, 80, 0);
-    doc.text("IMPORTANT: SUBMIT THIS FORM WITHIN 30 DAYS", MARGIN + 5, y + 6);
-
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-    doc.setTextColor(80, 60, 0);
-    const instructions = "Take this completed form along with your signed title, proof of insurance, and valid photo ID to your local County Tax Assessor-Collector's Office. Registration and title transfer fees will be collected at time of submission.";
-    doc.text(doc.splitTextToSize(instructions, CONTENT_WIDTH - 10), MARGIN + 5, y + 12);
-
-    // Official footer
-    doc.setFillColor(0, 51, 102);
-    doc.rect(0, PAGE_HEIGHT - 8, PAGE_WIDTH, 8, 'F');
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(6);
-    doc.setTextColor(255, 255, 255);
-    doc.text("PRE-FILLED BY TRIPLE J AUTO INVESTMENT LLC • DEALER LICENSE P171632 • 8774 ALMEDA GENOA RD, HOUSTON, TX 77075", PAGE_WIDTH / 2, PAGE_HEIGHT - 3, { align: 'center' });
-
-    const safeName = (data.buyerName || "Client").replace(/[^a-z0-9]/gi, '_');
-    doc.save(`Form_130U_${safeName}.pdf`);
+        doc.save('Form_130U_Instructions.pdf');
+    }
 };
 
 // Helper function to create BillOfSaleData from a Vehicle

@@ -60,6 +60,10 @@ const FAQ = () => {
         {
           q: 'Do you handle out-of-state registration?',
           a: 'We can facilitate, but buyer is responsible for their state DMV requirements and fees. We provide necessary documentation.'
+        },
+        {
+          q: 'What happens if I don\'t pick up my vehicle within 60 days?',
+          a: 'After 60 days from the date of sale, a storage fee of $25.00 per day will be assessed. We strongly recommend completing your title transfer and vehicle pickup as soon as possible to avoid these additional charges. Storage fees must be paid in full before vehicle release.'
         }
       ]
     },

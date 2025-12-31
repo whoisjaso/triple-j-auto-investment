@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, FileText, Car, Calendar, DollarSign, User, Globe, Loader2, CheckCircle, Printer } from 'lucide-react';
+import { X, FileText, Car, Calendar, DollarSign, User, Globe, Loader2, CheckCircle, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Vehicle, BillOfSaleData } from '../../types';
 import { AddressInput } from '../AddressInput';
+import { PdfPreviewModal } from './PdfPreviewModal';
 import {
   generateBillOfSalePDF,
   generateAsIsPDF,
@@ -33,6 +34,11 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
   const [language, setLanguage] = useState<'EN' | 'ES'>('EN');
   const [generatingType, setGeneratingType] = useState<string | null>(null);
   const [lastGenerated, setLastGenerated] = useState<string | null>(null);
+
+  // Preview state
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewDocName, setPreviewDocName] = useState<string>('');
+  const [currentDocType, setCurrentDocType] = useState<string | null>(null);
 
   // Available vehicles (not sold)
   const availableVehicles = vehicles.filter(v => v.status !== 'Sold');
@@ -99,15 +105,56 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     } as BillOfSaleData;
   };
 
+  // Close preview modal
+  const closePreview = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setPreviewUrl(null);
+    setPreviewDocName('');
+    setCurrentDocType(null);
+  };
+
+  // Download from preview
+  const handleDownloadFromPreview = async () => {
+    const data = buildBillOfSaleData();
+    if (!data) return;
+
+    closePreview();
+
+    // Generate and download the actual file
+    switch (currentDocType) {
+      case 'bos':
+        await generateBillOfSalePDF(data, false);
+        setLastGenerated('Bill of Sale');
+        break;
+      case 'asis':
+        await generateAsIsPDF(data, false);
+        setLastGenerated('As-Is Acknowledgment');
+        break;
+      case 'reg':
+        await generateRegistrationGuidePDF(data, false);
+        setLastGenerated('Registration Guide');
+        break;
+      case '130u':
+        await generateForm130U(data, false);
+        setLastGenerated('Form 130-U');
+        break;
+    }
+  };
+
   const handleGenerateBOS = async () => {
     const data = buildBillOfSaleData();
     if (!data) return;
 
     setGeneratingType('bos');
     try {
-      await new Promise(resolve => setTimeout(resolve, 500)); // Brief delay for UX
-      generateBillOfSalePDF(data);
-      setLastGenerated('Bill of Sale');
+      const url = await generateBillOfSalePDF(data, true);
+      if (url) {
+        setPreviewUrl(url as string);
+        setPreviewDocName('Bill of Sale');
+        setCurrentDocType('bos');
+      }
     } finally {
       setGeneratingType(null);
     }
@@ -119,9 +166,12 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
 
     setGeneratingType('asis');
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      generateAsIsPDF(data);
-      setLastGenerated('As-Is Acknowledgment');
+      const url = await generateAsIsPDF(data, true);
+      if (url) {
+        setPreviewUrl(url as string);
+        setPreviewDocName('As-Is Acknowledgment');
+        setCurrentDocType('asis');
+      }
     } finally {
       setGeneratingType(null);
     }
@@ -133,9 +183,12 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
 
     setGeneratingType('reg');
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      generateRegistrationGuidePDF(data);
-      setLastGenerated('Registration Guide');
+      const url = await generateRegistrationGuidePDF(data, true);
+      if (url) {
+        setPreviewUrl(url as string);
+        setPreviewDocName('Registration Guide');
+        setCurrentDocType('reg');
+      }
     } finally {
       setGeneratingType(null);
     }
@@ -147,9 +200,12 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
 
     setGeneratingType('130u');
     try {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      generateForm130U(data);
-      setLastGenerated('Form 130-U');
+      const url = await generateForm130U(data, true);
+      if (url) {
+        setPreviewUrl(url as string);
+        setPreviewDocName('Form 130-U (Texas Title Application)');
+        setCurrentDocType('130u');
+      }
     } finally {
       setGeneratingType(null);
     }
@@ -354,7 +410,7 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                   {generatingType === 'bos' ? (
                     <Loader2 className="animate-spin" size={16} />
                   ) : (
-                    <Printer size={16} />
+                    <Eye size={16} />
                   )}
                   Bill of Sale
                 </button>
@@ -367,7 +423,7 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                   {generatingType === '130u' ? (
                     <Loader2 className="animate-spin" size={16} />
                   ) : (
-                    <FileText size={16} />
+                    <Eye size={16} />
                   )}
                   Form 130-U
                 </button>
@@ -380,7 +436,7 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                   {generatingType === 'asis' ? (
                     <Loader2 className="animate-spin" size={16} />
                   ) : (
-                    <FileText size={16} />
+                    <Eye size={16} />
                   )}
                   As-Is Form
                 </button>
@@ -393,11 +449,15 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                   {generatingType === 'reg' ? (
                     <Loader2 className="animate-spin" size={16} />
                   ) : (
-                    <FileText size={16} />
+                    <Eye size={16} />
                   )}
                   Reg Guide
                 </button>
               </div>
+
+              <p className="text-[9px] text-gray-500 text-center mt-3 flex items-center justify-center gap-1">
+                <Eye size={10} /> Click to preview • Download or print from preview
+              </p>
 
               {!isFormValid && (
                 <p className="text-[10px] text-gray-500 text-center mt-3">
@@ -406,6 +466,15 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
               )}
             </div>
           </motion.div>
+
+          {/* PDF Preview Modal */}
+          <PdfPreviewModal
+            isOpen={!!previewUrl}
+            onClose={closePreview}
+            pdfUrl={previewUrl}
+            documentName={previewDocName}
+            onDownload={handleDownloadFromPreview}
+          />
         </motion.div>
       )}
     </AnimatePresence>,

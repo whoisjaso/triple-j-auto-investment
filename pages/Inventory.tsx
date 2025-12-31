@@ -6,7 +6,6 @@ import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, Shi
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
-import { FloatingCallButton } from '../components/FloatingCallButton';
 import { ImageLightbox } from '../components/ImageLightbox';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
@@ -278,9 +277,6 @@ const Inventory = () => {
     <div className="bg-black min-h-screen px-4 md:px-6 pb-20 relative">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
-
-      {/* AI Voice Agent Floating Button - Fixed Bottom Left */}
-      <FloatingCallButton phoneNumber="+18324009760" show={vehicles.length > 0} />
 
       {/* Language Switcher Fixed Bottom Right */}
       <button

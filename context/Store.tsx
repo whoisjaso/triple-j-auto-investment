@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { Vehicle, VehicleStatus, Lead, User } from '../types';
 import { sendLeadNotification } from '../services/emailService';
+import { triggerRetellOutboundCall } from '../services/retellService';
 import { supabase } from '../supabase/config';
 import { authService } from '../lib/auth';
 
@@ -817,6 +818,27 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         });
       } catch (emailError) {
         console.error('Email notification failed, but lead was saved:', emailError);
+      }
+
+      // Trigger Retell AI outbound call (non-blocking)
+      // Only if phone number is provided
+      if (l.phone && l.phone.trim()) {
+        try {
+          const callResult = await triggerRetellOutboundCall({
+            customerName: l.name,
+            customerPhone: l.phone,
+            customerEmail: l.email,
+            vehicleInterest: l.interest
+          });
+
+          if (callResult.success) {
+            console.log('📞 Retell AI: Outbound call initiated, ID:', callResult.callId);
+          } else {
+            console.warn('📞 Retell AI: Could not initiate call -', callResult.error);
+          }
+        } catch (retellError) {
+          console.error('Retell AI call failed, but lead was saved:', retellError);
+        }
       }
     } catch (error) {
       console.error('Unexpected error adding lead:', error);

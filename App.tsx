@@ -6,6 +6,7 @@ import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Dat
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
+import { CrestLoader } from './components/CrestLoader';
 
 // Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
@@ -478,14 +479,7 @@ const AppContent = () => {
       <main className="flex-grow pt-32">
         {/* Global Page Transition Wrapper */}
         <AnimatePresence mode="wait">
-          <Suspense fallback={
-            <div className="flex items-center justify-center h-screen">
-              <div className="text-center">
-                <div className="w-8 h-8 border-2 border-tj-gold border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-tj-gold text-sm uppercase tracking-widest">Loading...</p>
-              </div>
-            </div>
-          }>
+          <Suspense fallback={<CrestLoader />}>
             <div key={location.pathname} className="min-h-full origin-top">
               <Routes location={location}>
                 <Route path="/" element={<Home />} />

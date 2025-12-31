@@ -36,6 +36,10 @@ export default {
         'pan-diagonal': 'panDiagonal 10s linear infinite',
         'marquee': 'marquee 35s linear infinite',
         'marquee-slow': 'marquee 50s linear infinite',
+        'button-press': 'buttonPress 0.15s ease-out',
+        'card-lift': 'cardLift 0.3s ease-out forwards',
+        'smooth-appear': 'smoothAppear 0.5s ease-out forwards',
+        'scale-in': 'scaleIn 0.2s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -73,6 +77,21 @@ export default {
         marquee: {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-33.333%)' },
+        },
+        buttonPress: {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(0.97)' },
+        },
+        cardLift: {
+          'to': { transform: 'translateY(-4px)', boxShadow: '0 10px 40px rgba(212,175,55,0.15)' },
+        },
+        smoothAppear: {
+          'from': { opacity: '0', transform: 'translateY(10px)' },
+          'to': { opacity: '1', transform: 'translateY(0)' },
+        },
+        scaleIn: {
+          'from': { opacity: '0', transform: 'scale(0.95)' },
+          'to': { opacity: '1', transform: 'scale(1)' },
         },
       },
     },
