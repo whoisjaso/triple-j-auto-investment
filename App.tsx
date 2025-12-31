@@ -7,6 +7,7 @@ import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
 import { CrestLoader } from './components/CrestLoader';
+import { SplashScreen } from './components/SplashScreen';
 
 // Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
@@ -520,7 +521,9 @@ export default function App() {
     <LanguageProvider>
       <StoreProvider>
         <Router>
-          <AppContent />
+          <SplashScreen>
+            <AppContent />
+          </SplashScreen>
         </Router>
       </StoreProvider>
     </LanguageProvider>
