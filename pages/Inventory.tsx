@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../context/Store';
 import { VehicleStatus, Vehicle } from '../types';
-import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw } from 'lucide-react';
+import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw, Car, ZoomIn } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
+import { FloatingCallButton } from '../components/FloatingCallButton';
+import { ImageLightbox } from '../components/ImageLightbox';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
 
@@ -154,6 +156,7 @@ const Inventory = () => {
   const { vehicles, addLead, isLoading, refreshVehicles } = useStore();
   const { t, lang, toggleLang } = useLanguage();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
+  const [makeFilter, setMakeFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<SortOption>('alphabetical');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -166,9 +169,22 @@ const Inventory = () => {
   // Modal Carousel State
   const [modalImgIndex, setModalImgIndex] = useState(0);
 
+  // Lightbox State
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Derive unique makes for dropdown
+  const uniqueMakes = useMemo(() => {
+    const makes = [...new Set(vehicles.map(v => v.make))].filter(Boolean).sort();
+    return ['All', ...makes];
+  }, [vehicles]);
+
   const filteredVehicles = vehicles.filter(v => {
     // Filter by status
     const matchesStatus = filter === 'All' || v.status === filter;
+
+    // Filter by make
+    const matchesMake = makeFilter === 'All' || v.make === makeFilter;
 
     // Filter by search term
     const matchesSearch = searchTerm === '' ||
@@ -177,7 +193,7 @@ const Inventory = () => {
       v.year.toString().includes(searchTerm) ||
       v.vin.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesStatus && matchesSearch;
+    return matchesStatus && matchesMake && matchesSearch;
   });
 
   const sortedVehicles = [...filteredVehicles].sort((a, b) => {
@@ -263,6 +279,9 @@ const Inventory = () => {
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
 
+      {/* AI Voice Agent Floating Button - Fixed Bottom Left */}
+      <FloatingCallButton phoneNumber="+18324009760" show={vehicles.length > 0} />
+
       {/* Language Switcher Fixed Bottom Right */}
       <button
         onClick={toggleLang}
@@ -337,11 +356,31 @@ const Inventory = () => {
                 </div>
               </div>
 
-              {/* Filter Dropdown */}
+              {/* Make Filter Dropdown */}
               <div className="flex items-center gap-4 bg-tj-dark border border-white/10 p-1 w-full md:w-auto">
                 <div className="relative group w-full">
                   <select
-                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[200px]"
+                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[160px]"
+                    value={makeFilter}
+                    onChange={(e) => setMakeFilter(e.target.value)}
+                  >
+                    {uniqueMakes.map(make => (
+                      <option key={make} className="bg-black text-white" value={make}>
+                        {make === 'All' ? 'All Makes' : make}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-tj-gold">
+                    <Car size={10} />
+                  </div>
+                </div>
+              </div>
+
+              {/* Status Filter Dropdown */}
+              <div className="flex items-center gap-4 bg-tj-dark border border-white/10 p-1 w-full md:w-auto">
+                <div className="relative group w-full">
+                  <select
+                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[160px]"
                     value={filter}
                     onChange={(e) => setFilter(e.target.value as any)}
                   >
@@ -488,11 +527,25 @@ const Inventory = () => {
                 {/* LEFT: Image Gallery (Mobile: Top 40% / Desktop: Left 55%) */}
                 <div className="w-full md:w-[55%] h-[40%] md:h-full bg-black relative flex flex-col border-b md:border-b-0 md:border-r border-white/10 shrink-0">
                   <div className="flex-grow relative overflow-hidden group select-none">
-                    <img
-                      src={modalImages[modalImgIndex]}
-                      alt="Detail"
-                      className="w-full h-full object-cover opacity-90"
-                    />
+                    {/* Clickable Image for Lightbox */}
+                    <button
+                      onClick={() => {
+                        setLightboxIndex(modalImgIndex);
+                        setLightboxOpen(true);
+                      }}
+                      className="w-full h-full cursor-zoom-in"
+                    >
+                      <img
+                        src={modalImages[modalImgIndex]}
+                        alt="Detail"
+                        className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
+                      />
+                      {/* Fullscreen Hint */}
+                      <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm text-white p-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-white/20">
+                        <ZoomIn size={14} />
+                        <span className="text-[9px] uppercase tracking-widest">Click to Fullscreen</span>
+                      </div>
+                    </button>
 
                     {/* Carousel Controls */}
                     {modalImages.length > 1 && (
@@ -809,6 +862,18 @@ const Inventory = () => {
                       </button>
                     </div>
                   )}
+
+                  {/* AI Voice Agent CTA - Desktop (Always visible at bottom) */}
+                  <div className="hidden md:block border-t border-white/10 p-4 bg-gradient-to-r from-tj-gold/10 via-transparent to-tj-gold/10 shrink-0">
+                    <a
+                      href="tel:+18324009760"
+                      className="flex items-center justify-center gap-3 text-tj-gold hover:text-white transition-colors group"
+                    >
+                      <Phone size={16} className="group-hover:animate-bounce" />
+                      <span className="text-xs uppercase tracking-widest font-bold">Speak with AI Agent Now</span>
+                      <Mic size={14} className="animate-pulse" />
+                    </a>
+                  </div>
                 </div>
 
               </motion.div>
@@ -817,6 +882,14 @@ const Inventory = () => {
         </AnimatePresence>,
         document.body
       )}
+
+      {/* Full-Screen Image Lightbox */}
+      <ImageLightbox
+        images={modalImages}
+        initialIndex={lightboxIndex}
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+      />
     </div>
   );
 };

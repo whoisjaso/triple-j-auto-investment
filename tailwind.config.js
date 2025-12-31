@@ -34,6 +34,8 @@ export default {
         'subtle-zoom': 'subtleZoom 20s ease-in-out infinite alternate',
         'spin-slow': 'spin 15s linear infinite',
         'pan-diagonal': 'panDiagonal 10s linear infinite',
+        'marquee': 'marquee 35s linear infinite',
+        'marquee-slow': 'marquee 50s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -67,6 +69,10 @@ export default {
         panDiagonal: {
           '0%': { backgroundPosition: '0% 50%' },
           '100%': { backgroundPosition: '100% 50%' },
+        },
+        marquee: {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-33.333%)' },
         },
       },
     },

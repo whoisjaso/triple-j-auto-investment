@@ -1,125 +1,73 @@
-// Direct Schema Execution using Supabase Database API
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+/**
+ * Add Manheim-related columns to vehicles table
+ * Since Supabase JS client can't run DDL, this prints the SQL to execute
+ */
+
 import { createClient } from '@supabase/supabase-js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const SUPABASE_URL = 'https://scgmpliwlfabnpygvbsy.supabase.co';
-const SERVICE_ROLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjZ21wbGl3bGZhYm5weWd2YnN5Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTQwODQ2NCwiZXhwIjoyMDgwOTg0NDY0fQ.9Xnx_7ECRm0kHbij8uIugF-bnTiijOsPualtuVSRVZ0';
+const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-console.log('🚀 Setting up database schema via Supabase client...\n');
+if (!SERVICE_ROLE_KEY) {
+  console.error('❌ SUPABASE_SERVICE_ROLE_KEY not set');
+  process.exit(1);
+}
 
-const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+  auth: { autoRefreshToken: false, persistSession: false }
+});
 
-async function executeSchema() {
-  try {
-    // Read schema
-    const schemaPath = path.join(__dirname, '..', 'supabase', 'schema.sql');
-    const schema = fs.readFileSync(schemaPath, 'utf8');
+// SQL to add missing columns
+const ALTER_SQL = `
+-- Add Manheim-related columns to vehicles table
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'manual';
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS exterior_color TEXT;
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS interior_color TEXT;
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS trim TEXT;
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS buy_fee DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS total_cost DECIMAL(10,2) DEFAULT 0;
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS purchase_location TEXT;
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS seller_name TEXT;
+ALTER TABLE public.vehicles ADD COLUMN IF NOT EXISTS manheim_work_order TEXT;
+`;
 
-    console.log('📖 Schema loaded, executing via database API...\n');
+async function checkAndAddColumns() {
+  console.log('='.repeat(60));
+  console.log('ADDING MANHEIM COLUMNS TO VEHICLES TABLE');
+  console.log('='.repeat(60));
 
-    // Try using the SQL endpoint
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/`, {
-      method: 'POST',
-      headers: {
-        'apikey': SERVICE_ROLE_KEY,
-        'Authorization': `Bearer ${SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/sql',
-        'Accept': 'application/json'
-      },
-      body: schema
-    });
+  // First, check what columns exist
+  console.log('\n📋 Checking current schema...');
+  const { data: sample } = await supabase
+    .from('vehicles')
+    .select('*')
+    .limit(1);
 
-    if (response.ok) {
-      console.log('✅ Schema executed successfully!\n');
+  if (sample && sample[0]) {
+    const cols = Object.keys(sample[0]);
+    console.log(`   Found ${cols.length} columns`);
+
+    // Check if our columns exist
+    const newCols = ['source', 'exterior_color', 'interior_color', 'trim', 'buy_fee', 'total_cost', 'purchase_location', 'seller_name', 'manheim_work_order'];
+    const missing = newCols.filter(c => !cols.includes(c));
+
+    if (missing.length === 0) {
+      console.log('\n✅ All Manheim columns already exist!');
       return true;
-    } else {
-      const errorText = await response.text();
-      console.log('⚠️  API execution not available. Manual step required.\n');
-      console.log('Please copy schema from: D:\\triple-j-auto-investment\\supabase\\schema.sql');
-      console.log('And paste into: https://supabase.com/dashboard/project/scgmpliwlfabnpygvbsy/sql');
-      return false;
     }
 
-  } catch (error) {
-    console.log('ℹ️  Automated schema execution not supported.');
-    console.log('\n📋 QUICK MANUAL STEP (30 seconds):');
-    console.log('1. Open: https://supabase.com/dashboard/project/scgmpliwlfabnpygvbsy/sql/new');
-    console.log('2. Copy contents from: D:\\triple-j-auto-investment\\supabase\\schema.sql');
-    console.log('3. Paste and click "Run"');
-    console.log('\n');
-    return false;
+    console.log(`\n⚠️  Missing columns: ${missing.join(', ')}`);
   }
+
+  // Print SQL for manual execution
+  console.log('\n' + '='.repeat(60));
+  console.log('RUN THIS SQL IN SUPABASE DASHBOARD:');
+  console.log('https://supabase.com/dashboard/project/scgmpliwlfabnpygvbsy/sql/new');
+  console.log('='.repeat(60));
+  console.log(ALTER_SQL);
+  console.log('='.repeat(60));
+
+  return false;
 }
 
-// Verify tables exist
-async function verifySetup() {
-  console.log('🔍 Verifying database setup...\n');
-
-  try {
-    // Try to query profiles table
-    const { data: profiles, error: profileError } = await supabase
-      .from('profiles')
-      .select('count')
-      .limit(1);
-
-    if (!profileError) {
-      console.log('✅ profiles table exists');
-    }
-
-    // Try to query vehicles table
-    const { data: vehicles, error: vehicleError } = await supabase
-      .from('vehicles')
-      .select('count')
-      .limit(1);
-
-    if (!vehicleError) {
-      console.log('✅ vehicles table exists');
-    }
-
-    // Try to query leads table
-    const { data: leads, error: leadError } = await supabase
-      .from('leads')
-      .select('count')
-      .limit(1);
-
-    if (!leadError) {
-      console.log('✅ leads table exists');
-    }
-
-    if (!profileError && !vehicleError && !leadError) {
-      console.log('\n✨ Database is fully configured!');
-      console.log('✅ Ready to proceed with Store.tsx update\n');
-      return true;
-    } else {
-      console.log('\n⚠️  Some tables missing - schema needs to be run');
-      return false;
-    }
-
-  } catch (error) {
-    console.log('\n⚠️  Tables not found - schema needs to be run first\n');
-    return false;
-  }
-}
-
-async function main() {
-  const executed = await executeSchema();
-
-  // Wait a moment for database to process
-  await new Promise(resolve => setTimeout(resolve, 2000));
-
-  const verified = await verifySetup();
-
-  if (!verified) {
-    console.log('================================================');
-    console.log('ACTION NEEDED: Run schema in Supabase dashboard');
-    console.log('(This is a one-time 30-second copy-paste task)');
-    console.log('================================================\n');
-  }
-}
-
-main();
+checkAndAddColumns().catch(console.error);

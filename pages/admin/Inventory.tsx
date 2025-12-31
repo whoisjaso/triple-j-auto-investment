@@ -4,7 +4,8 @@ import { useStore } from '../../context/Store';
 import { generateVehicleDescription } from '../../services/geminiService';
 import { decodeVin } from '../../services/nhtsaService';
 import { Vehicle, VehicleStatus } from '../../types';
-import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText } from 'lucide-react';
+import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer } from 'lucide-react';
+import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 
 // Utility: Compress and resize image to avoid LocalStorage limits (approx 5MB total)
 const resizeImage = (file: File): Promise<string> => {
@@ -63,6 +64,15 @@ const AdminInventory = () => {
 
   // Editing State
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Bill of Sale Modal State
+  const [showBOSModal, setShowBOSModal] = useState(false);
+  const [bosVehicle, setBosVehicle] = useState<Vehicle | null>(null);
+
+  const handleOpenBOS = (vehicle?: Vehicle) => {
+    setBosVehicle(vehicle || null);
+    setShowBOSModal(true);
+  };
   
   const [newCar, setNewCar] = useState<Partial<Vehicle>>({
     make: '',
@@ -464,7 +474,14 @@ const AdminInventory = () => {
                   Hard Reset Data
                 </button>
 
-                <button 
+                <button
+                    onClick={() => handleOpenBOS()}
+                    className="flex items-center gap-2 text-xs uppercase tracking-widest text-black bg-tj-gold hover:bg-white px-6 py-3 border border-tj-gold transition-all group"
+                >
+                <Printer size={14} />
+                Generate Docs
+                </button>
+                <button
                     onClick={handleSheetSync}
                     className="flex items-center gap-2 text-xs uppercase tracking-widest text-white bg-green-900/30 hover:bg-green-900/50 px-6 py-3 border border-green-900 hover:border-green-500 transition-all group"
                 >
@@ -1079,13 +1096,20 @@ const AdminInventory = () => {
                             </td>
                             <td className="p-4 text-right">
                                 <div className="flex items-center justify-end gap-2">
-                                    <button 
+                                    <button
+                                        onClick={() => handleOpenBOS(v)}
+                                        className="bg-tj-gold/10 hover:bg-tj-gold hover:text-black text-tj-gold border border-tj-gold/30 px-3 py-2 text-[10px] uppercase tracking-widest transition-all flex items-center gap-2"
+                                        title="Generate Documents"
+                                    >
+                                        <Printer size={12} /> Docs
+                                    </button>
+                                    <button
                                         onClick={() => handleEdit(v)}
                                         className="bg-white/5 hover:bg-tj-gold hover:text-black text-white border border-white/10 px-4 py-2 text-[10px] uppercase tracking-widest transition-all flex items-center gap-2"
                                     >
                                         <Edit2 size={12} /> Edit
                                     </button>
-                                    <button 
+                                    <button
                                         onClick={() => {
                                             if(window.confirm('Permanently delete this asset record?')) removeVehicle(v.id);
                                         }}
@@ -1103,6 +1127,17 @@ const AdminInventory = () => {
            </div>
         </div>
       </div>
+
+      {/* Bill of Sale Modal */}
+      <BillOfSaleModal
+        isOpen={showBOSModal}
+        onClose={() => {
+          setShowBOSModal(false);
+          setBosVehicle(null);
+        }}
+        vehicles={vehicles}
+        preSelectedVehicle={bosVehicle}
+      />
     </div>
   );
 };

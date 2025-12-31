@@ -42,7 +42,16 @@
       "Bash(git pull:*)",
       "WebFetch(domain:docs.google.com)",
       "WebFetch(domain:doc-14-ak-sheets.googleusercontent.com)",
-      "WebFetch(domain:thetriplejauto.com)"
+      "WebFetch(domain:thetriplejauto.com)",
+      "Bash(node scripts/fix-database.js:*)",
+      "Bash(node scripts/fix-rls-policies.js:*)",
+      "Bash(node --env-file=.env.local scripts/add-schema-columns.js:*)",
+      "Bash(node scripts/add-columns-direct.js:*)",
+      "Bash(find:*)",
+      "Bash(if [ ! -d \"D:\\\\triple-j-auto-investment\\\\types\" ])",
+      "Bash(then mkdir \"D:\\\\triple-j-auto-investment\\\\types\")",
+      "Bash(findstr:*)",
+      "WebFetch(domain:www.txdmv.gov)"
     ],
     "deny": [],
     "ask": []

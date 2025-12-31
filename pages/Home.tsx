@@ -209,9 +209,9 @@ const Home = () => {
             </motion.div>
          </div>
 
-         {/* --- SUBCONSCIOUS TICKER --- */}
+         {/* --- SUBCONSCIOUS TICKER (Infinite Marquee) --- */}
          <div className="bg-tj-gold text-black py-3 border-y border-black overflow-hidden relative z-20 select-none">
-            <div className="animate-marquee whitespace-nowrap flex items-center font-display font-black tracking-[0.2em] text-xs md:text-sm">
+            <div className="animate-marquee whitespace-nowrap flex items-center font-display font-black tracking-[0.2em] text-xs md:text-sm will-change-transform">
                {Array(3).fill(null).map((_, i) => (
                   <React.Fragment key={i}>
                      {t.home.ticker.map((text, idx) => (

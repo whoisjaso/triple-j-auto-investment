@@ -69,3 +69,33 @@ export interface VinResult {
   ErrorCode?: string;
   ErrorText?: string;
 }
+
+// Bill of Sale Types
+export interface BillOfSaleData {
+  date: string;
+  amount: string;
+  buyerName: string;
+  buyerAddress: string;
+  sellerName: string;
+  sellerAddress: string;
+  sellerRepresentative: string;
+  year: string;
+  make: string;
+  model: string;
+  bodyStyle: string;
+  vin: string;
+  licensePlate: string;
+  odometer: string;
+  emptyWeight: string;
+  exteriorColor: string;
+  exteriorColorHex?: string;
+  interiorColor: string;
+  interiorColorHex?: string;
+  notes: string;
+  printLanguage: 'EN' | 'ES';
+}
+
+export interface AddressSuggestion {
+  display_name: string;
+  place_id: number;
+}

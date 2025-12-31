@@ -199,65 +199,145 @@ const Navbar = () => {
       </div>
 
       {/* --- PSYCHOLOGICAL PORTAL (MOBILE MENU) --- */}
-      {/* --- PSYCHOLOGICAL PORTAL (MOBILE MENU) --- */}
+      {/* Enhanced Mobile Menu with Solid Black Background & Staggered Slide Animations */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            animate={{ opacity: 1, backdropFilter: "blur(20px)" }}
-            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-[60] bg-black/80 flex flex-col justify-center items-center md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed inset-0 z-[60] bg-black flex flex-col justify-center items-center md:hidden overflow-hidden"
           >
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 pointer-events-none mix-blend-overlay"></div>
+            {/* Subtle animated gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-tj-gold/5 via-transparent to-tj-gold/5 pointer-events-none"></div>
+
+            {/* Decorative corner accents */}
+            <div className="absolute top-8 left-8 w-12 h-12 border-l-2 border-t-2 border-tj-gold/30"></div>
+            <div className="absolute top-8 right-8 w-12 h-12 border-r-2 border-t-2 border-tj-gold/30"></div>
+            <div className="absolute bottom-8 left-8 w-12 h-12 border-l-2 border-b-2 border-tj-gold/30"></div>
+            <div className="absolute bottom-8 right-8 w-12 h-12 border-r-2 border-b-2 border-tj-gold/30"></div>
 
             <motion.div
-              className="flex flex-col items-center gap-8 z-10 w-full px-6"
+              className="flex flex-col items-center gap-8 z-10 w-full px-8"
               initial="hidden"
               animate="visible"
               exit="hidden"
               variants={{
-                visible: { transition: { staggerChildren: 0.1 } },
+                visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
                 hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
               }}
             >
+              {/* Public Navigation Links */}
               {[
                 { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT" },
                 { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "ACQUIRE ASSETS" },
                 { to: "/vin", label: "INTEL", sub: "DEEP DATA ANALYSIS" },
                 { to: "/about", label: t.nav.about.toUpperCase(), sub: "THE PHILOSOPHY" }
-              ].map((link) => (
+              ].map((link, index) => (
                 <motion.div
                   key={link.to}
                   variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 20 } }
+                    hidden: { opacity: 0, x: -40, y: 20 },
+                    visible: {
+                      opacity: 1,
+                      x: 0,
+                      y: 0,
+                      transition: {
+                        type: "spring",
+                        stiffness: 80,
+                        damping: 12,
+                        duration: 0.6
+                      }
+                    }
                   }}
-                  className="w-full text-center"
+                  className="w-full text-center group"
                 >
                   <Link
                     to={link.to}
                     onClick={() => setIsOpen(false)}
-                    className="block font-display text-4xl md:text-5xl text-white tracking-widest hover:text-tj-gold transition-colors duration-300"
+                    className="block font-display text-3xl text-white tracking-[0.15em] hover:text-tj-gold transition-all duration-300 hover:tracking-[0.2em]"
                   >
-                    {link.label}
+                    <motion.span
+                      className="inline-block"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      {link.label}
+                    </motion.span>
                   </Link>
-                  <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-2">{link.sub}</p>
+                  <motion.p
+                    className="text-[9px] text-gray-600 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 + index * 0.1 }}
+                  >
+                    {link.sub}
+                  </motion.p>
                 </motion.div>
               ))}
+
+              {/* Admin Links - Only shown when logged in */}
+              {user && (
+                <motion.div
+                  variants={{
+                    hidden: { opacity: 0, y: 20 },
+                    visible: { opacity: 1, y: 0, transition: { delay: 0.5 } }
+                  }}
+                  className="w-full border-t border-tj-gold/30 pt-6 mt-2"
+                >
+                  <p className="text-[9px] text-tj-gold uppercase tracking-[0.3em] mb-4 text-center">Admin Access</p>
+                  <div className="flex flex-col gap-4">
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                    >
+                      <LayoutDashboard size={18} />
+                      <span className="text-lg font-display tracking-widest">DASHBOARD</span>
+                    </Link>
+                    <Link
+                      to="/admin/inventory"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                    >
+                      <Car size={18} />
+                      <span className="text-lg font-display tracking-widest">INVENTORY</span>
+                    </Link>
+                    <button
+                      onClick={() => { logout(); setIsOpen(false); }}
+                      className="flex items-center justify-center gap-3 text-red-500 hover:text-red-400 transition-colors py-2"
+                    >
+                      <Lock size={18} />
+                      <span className="text-lg font-display tracking-widest">LOGOUT</span>
+                    </button>
+                  </div>
+                </motion.div>
+              )}
             </motion.div>
+
+            {/* AI Voice Agent CTA in Mobile Menu */}
+            <motion.a
+              href="tel:+18324009760"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
+              className="absolute bottom-28 flex items-center gap-3 text-tj-gold border border-tj-gold px-6 py-3 hover:bg-tj-gold hover:text-black transition-colors"
+            >
+              <span className="text-[10px] uppercase tracking-widest font-bold">Speak to AI Agent</span>
+            </motion.a>
 
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="absolute bottom-16"
+              transition={{ delay: 0.6 }}
+              className="absolute bottom-12"
             >
               <button
                 onClick={toggleLang}
-                className="text-tj-gold border border-tj-gold/30 px-6 py-2 rounded-none text-[10px] uppercase tracking-widest hover:bg-tj-gold hover:text-black transition-colors"
+                className="text-gray-500 hover:text-tj-gold px-6 py-2 text-[10px] uppercase tracking-widest transition-colors"
               >
-                {lang === 'en' ? 'SWITCH TO ESPAÑOL' : 'SWITCH TO ENGLISH'}
+                {lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}
               </button>
             </motion.div>
           </motion.div>

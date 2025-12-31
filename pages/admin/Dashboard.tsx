@@ -118,19 +118,19 @@ const Dashboard = () => {
                   </div>
                   
                   <div className="overflow-auto flex-grow">
-                      <table className="w-full text-left border-collapse">
+                      <table className="w-full text-left border-collapse min-w-[600px]">
                           <thead className="bg-black text-gray-500 text-[9px] uppercase tracking-[0.2em] sticky top-0 z-10 shadow-md">
                               <tr>
-                                  <th className="p-4 border-b border-gray-800">Asset</th>
-                                  <th className="p-4 border-b border-gray-800">Turn Speed</th>
-                                  <th className="p-4 border-b border-gray-800 text-right">Sold Price</th>
-                                  <th className="p-4 border-b border-gray-800 text-right">Acquisition</th>
-                                  <th className="p-4 border-b border-gray-800 text-right">Towing</th>
-                                  <th className="p-4 border-b border-gray-800 text-right">Mech</th>
-                                  <th className="p-4 border-b border-gray-800 text-right">Cosmetic</th>
-                                  <th className="p-4 border-b border-gray-800 text-right">Other</th>
-                                  <th className="p-4 border-b border-gray-800 text-right">Total Cost</th>
-                                  <th className="p-4 border-b border-gray-800 text-right bg-white/5">Realized P/L</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800">Asset</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800">Days</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800 text-right">Sold</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800 text-right hidden sm:table-cell">Acq.</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800 text-right hidden lg:table-cell">Tow</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800 text-right hidden lg:table-cell">Mech</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800 text-right hidden lg:table-cell">Cosm</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800 text-right hidden lg:table-cell">Other</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800 text-right">Cost</th>
+                                  <th className="p-2 md:p-4 border-b border-gray-800 text-right bg-white/5">P/L</th>
                               </tr>
                           </thead>
                           <tbody className="divide-y divide-gray-800 text-xs font-mono">
@@ -143,42 +143,42 @@ const Dashboard = () => {
                                   const totalC = acq + tow + mech + cosm + other;
                                   const profit = (v.soldPrice || v.price) - totalC;
                                   const days = calculateDaysOnMarket(v);
-                                  
+
                                   return (
                                       <tr key={v.id} className="hover:bg-white/5 transition-colors">
-                                          <td className="p-4 text-white font-bold">
-                                              {v.year} {v.make} {v.model}
-                                              <span className="block text-[9px] font-normal text-gray-600 mt-1">{v.vin}</span>
+                                          <td className="p-2 md:p-4 text-white font-bold">
+                                              <span className="text-[10px] md:text-xs">{v.year} {v.make} {v.model}</span>
+                                              <span className="block text-[8px] md:text-[9px] font-normal text-gray-600 mt-1 truncate max-w-[120px] md:max-w-none">{v.vin}</span>
                                           </td>
-                                          <td className="p-4 text-gray-400">{days} Days</td>
-                                          <td className="p-4 text-right text-gray-300">${(v.soldPrice || v.price).toLocaleString()}</td>
-                                          <td className="p-4 text-right text-gray-500">${acq.toLocaleString()}</td>
-                                          <td className="p-4 text-right text-gray-500">{tow > 0 ? `$${tow.toLocaleString()}` : '-'}</td>
-                                          <td className="p-4 text-right text-gray-500">{mech > 0 ? `$${mech.toLocaleString()}` : '-'}</td>
-                                          <td className="p-4 text-right text-gray-500">{cosm > 0 ? `$${cosm.toLocaleString()}` : '-'}</td>
-                                          <td className="p-4 text-right text-gray-500">{other > 0 ? `$${other.toLocaleString()}` : '-'}</td>
-                                          <td className="p-4 text-right text-red-400/70">${totalC.toLocaleString()}</td>
-                                          <td className={`p-4 text-right font-bold text-sm border-l border-gray-800 ${profit >= 0 ? 'text-green-500 bg-green-900/10' : 'text-red-500 bg-red-900/10'}`}>
+                                          <td className="p-2 md:p-4 text-gray-400 text-[10px] md:text-xs">{days}d</td>
+                                          <td className="p-2 md:p-4 text-right text-gray-300 text-[10px] md:text-xs">${(v.soldPrice || v.price).toLocaleString()}</td>
+                                          <td className="p-2 md:p-4 text-right text-gray-500 hidden sm:table-cell">${acq.toLocaleString()}</td>
+                                          <td className="p-2 md:p-4 text-right text-gray-500 hidden lg:table-cell">{tow > 0 ? `$${tow.toLocaleString()}` : '-'}</td>
+                                          <td className="p-2 md:p-4 text-right text-gray-500 hidden lg:table-cell">{mech > 0 ? `$${mech.toLocaleString()}` : '-'}</td>
+                                          <td className="p-2 md:p-4 text-right text-gray-500 hidden lg:table-cell">{cosm > 0 ? `$${cosm.toLocaleString()}` : '-'}</td>
+                                          <td className="p-2 md:p-4 text-right text-gray-500 hidden lg:table-cell">{other > 0 ? `$${other.toLocaleString()}` : '-'}</td>
+                                          <td className="p-2 md:p-4 text-right text-red-400/70 text-[10px] md:text-xs">${totalC.toLocaleString()}</td>
+                                          <td className={`p-2 md:p-4 text-right font-bold text-[10px] md:text-sm border-l border-gray-800 ${profit >= 0 ? 'text-green-500 bg-green-900/10' : 'text-red-500 bg-red-900/10'}`}>
                                               {profit >= 0 ? '+' : ''}${profit.toLocaleString()}
-                                              {profit < 0 && <AlertTriangle size={12} className="inline ml-2 mb-0.5" />}
+                                              {profit < 0 && <AlertTriangle size={10} className="inline ml-1 mb-0.5" />}
                                           </td>
                                       </tr>
                                   );
                               })}
                           </tbody>
                           {/* TOTALS FOOTER */}
-                          <tfoot className="bg-white/5 text-white font-bold text-xs border-t-2 border-tj-gold sticky bottom-0 z-10 shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
+                          <tfoot className="bg-white/5 text-white font-bold text-[10px] md:text-xs border-t-2 border-tj-gold sticky bottom-0 z-10 shadow-[0_-5px_20px_rgba(0,0,0,0.5)]">
                               <tr>
-                                  <td className="p-4 uppercase tracking-widest text-tj-gold">Ledger Totals</td>
-                                  <td className="p-4 text-gray-500">-</td>
-                                  <td className="p-4 text-right">${totalRevenue.toLocaleString()}</td>
-                                  <td className="p-4 text-right">${totalAcquisition.toLocaleString()}</td>
-                                  <td className="p-4 text-right text-gray-400">${totalTowing.toLocaleString()}</td>
-                                  <td className="p-4 text-right text-gray-400">${totalMechanical.toLocaleString()}</td>
-                                  <td className="p-4 text-right text-gray-400">${totalCosmetic.toLocaleString()}</td>
-                                  <td className="p-4 text-right text-gray-400">${totalOther.toLocaleString()}</td>
-                                  <td className="p-4 text-right text-red-400">${totalCost.toLocaleString()}</td>
-                                  <td className={`p-4 text-right text-sm border-l border-gray-800 ${netProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                  <td className="p-2 md:p-4 uppercase tracking-widest text-tj-gold text-[9px] md:text-xs">Total</td>
+                                  <td className="p-2 md:p-4 text-gray-500">-</td>
+                                  <td className="p-2 md:p-4 text-right">${totalRevenue.toLocaleString()}</td>
+                                  <td className="p-2 md:p-4 text-right hidden sm:table-cell">${totalAcquisition.toLocaleString()}</td>
+                                  <td className="p-2 md:p-4 text-right text-gray-400 hidden lg:table-cell">${totalTowing.toLocaleString()}</td>
+                                  <td className="p-2 md:p-4 text-right text-gray-400 hidden lg:table-cell">${totalMechanical.toLocaleString()}</td>
+                                  <td className="p-2 md:p-4 text-right text-gray-400 hidden lg:table-cell">${totalCosmetic.toLocaleString()}</td>
+                                  <td className="p-2 md:p-4 text-right text-gray-400 hidden lg:table-cell">${totalOther.toLocaleString()}</td>
+                                  <td className="p-2 md:p-4 text-right text-red-400">${totalCost.toLocaleString()}</td>
+                                  <td className={`p-2 md:p-4 text-right text-[10px] md:text-sm border-l border-gray-800 ${netProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                                       ${netProfit.toLocaleString()}
                                   </td>
                               </tr>
@@ -205,22 +205,22 @@ const Dashboard = () => {
             </h1>
             <p className="text-xs text-gray-500 font-mono mt-2">FINANCIAL INTELLIGENCE UNIT ACTIVE</p>
           </div>
-          <div className="mt-4 md:mt-0 flex items-center gap-6">
+          <div className="mt-4 md:mt-0 flex flex-wrap items-center gap-4 md:gap-6">
              <div className="text-right">
                  <p className="text-[9px] uppercase tracking-widest text-gray-500">Net Yield (All-Time)</p>
-                 <p className={`font-display text-xl tracking-widest ${netProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                 <p className={`font-display text-lg md:text-xl tracking-widest ${netProfit >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                     ${netProfit.toLocaleString()}
                  </p>
              </div>
-             <div className="h-8 w-px bg-gray-800"></div>
+             <div className="h-8 w-px bg-gray-800 hidden md:block"></div>
              <div className="text-right">
                  <p className="text-[9px] uppercase tracking-widest text-gray-500">Avg Profit Margin</p>
-                 <p className="font-mono text-xl text-tj-gold">{marginPercent}%</p>
+                 <p className="font-mono text-lg md:text-xl text-tj-gold">{marginPercent}%</p>
              </div>
-             <div className="h-8 w-px bg-gray-800"></div>
+             <div className="h-8 w-px bg-gray-800 hidden md:block"></div>
              <div className="text-right">
                  <p className="text-[9px] uppercase tracking-widest text-gray-500">Avg Turn Speed</p>
-                 <p className="font-mono text-xl text-white">{avgDaysToSell} <span className="text-xs text-gray-500">Days</span></p>
+                 <p className="font-mono text-lg md:text-xl text-white">{avgDaysToSell} <span className="text-xs text-gray-500">Days</span></p>
              </div>
           </div>
         </header>
@@ -255,7 +255,7 @@ const Dashboard = () => {
                 </button>
 
                 {/* EXPENSE BREAKDOWN ROW */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="bg-black border border-gray-800 p-6 flex flex-col justify-between hover:border-red-900/50 transition-colors group">
                         <div className="flex items-center gap-3 mb-4 text-gray-500 group-hover:text-white transition-colors">
                             <Truck size={16} />
@@ -300,7 +300,7 @@ const Dashboard = () => {
                         <span className="text-[9px] text-gray-500">ASSETS {'>'} 45 DAYS</span>
                      </div>
                      
-                     <div className="space-y-3 h-[200px] overflow-y-auto custom-scrollbar">
+                     <div className="space-y-3 h-[150px] sm:h-[180px] md:h-[200px] overflow-y-auto custom-scrollbar">
                          {staleAssets.length === 0 ? (
                              <div className="flex flex-col items-center justify-center h-full text-center text-gray-600">
                                  <Activity size={24} className="mb-2 text-green-500" />
@@ -357,11 +357,11 @@ const Dashboard = () => {
                 <table className="w-full text-left border-collapse">
                     <thead className="bg-black/50 text-gray-500 text-[9px] uppercase tracking-[0.2em]">
                         <tr>
-                            <th className="p-6 font-medium">Status</th>
-                            <th className="p-6 font-medium">Identity (Name)</th>
-                            <th className="p-6 font-medium">Comm Channel (Contact)</th>
-                            <th className="p-6 font-medium">Target Asset</th>
-                            <th className="p-6 font-medium">Time Logged</th>
+                            <th className="p-3 md:p-6 font-medium">Status</th>
+                            <th className="p-3 md:p-6 font-medium">Identity</th>
+                            <th className="p-3 md:p-6 font-medium hidden sm:table-cell">Contact</th>
+                            <th className="p-3 md:p-6 font-medium hidden md:table-cell">Target Asset</th>
+                            <th className="p-3 md:p-6 font-medium hidden lg:table-cell">Time Logged</th>
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800 text-sm">
@@ -374,31 +374,33 @@ const Dashboard = () => {
                         ) : (
                             leads.slice().reverse().map((lead) => (
                                 <tr key={lead.id} className="hover:bg-white/5 transition-colors group">
-                                    <td className="p-6">
+                                    <td className="p-3 md:p-6">
                                         <span className="px-2 py-1 border border-green-900 text-green-500 text-[9px] uppercase tracking-widest bg-green-900/10">
                                             {lead.status.toUpperCase()}
                                         </span>
                                     </td>
-                                    <td className="p-6 text-white font-bold flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-tj-gold">
-                                            <User size={14} />
+                                    <td className="p-3 md:p-6 text-white font-bold">
+                                        <div className="flex items-center gap-2 md:gap-3">
+                                            <div className="w-6 h-6 md:w-8 md:h-8 bg-gray-800 rounded-full flex items-center justify-center text-tj-gold shrink-0">
+                                                <User size={12} />
+                                            </div>
+                                            <span className="text-xs md:text-sm">{lead.name}</span>
                                         </div>
-                                        {lead.name}
                                     </td>
-                                    <td className="p-6">
+                                    <td className="p-3 md:p-6 hidden sm:table-cell">
                                         <div className="space-y-1">
-                                            <div className="flex items-center gap-2 text-gray-300">
+                                            <div className="flex items-center gap-2 text-gray-300 text-xs">
                                                 <Mail size={12} className="text-gray-600" /> {lead.email}
                                             </div>
-                                            <div className="flex items-center gap-2 text-gray-300">
+                                            <div className="flex items-center gap-2 text-gray-300 text-xs">
                                                 <Phone size={12} className="text-gray-600" /> {lead.phone}
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="p-6 text-tj-gold font-mono text-xs">
+                                    <td className="p-3 md:p-6 text-tj-gold font-mono text-xs hidden md:table-cell">
                                         {lead.interest}
                                     </td>
-                                    <td className="p-6 text-gray-500 text-xs font-mono">
+                                    <td className="p-3 md:p-6 text-gray-500 text-xs font-mono hidden lg:table-cell">
                                         <div className="flex items-center gap-2">
                                             <Clock size={12} />
                                             {new Date(lead.date).toLocaleDateString()} <br/>
