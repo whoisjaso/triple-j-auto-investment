@@ -1,231 +1,188 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 interface CrestLoaderProps {
   size?: 'sm' | 'md' | 'lg';
-  showText?: boolean;
+  text?: string;
 }
 
 export const CrestLoader: React.FC<CrestLoaderProps> = ({
   size = 'lg',
-  showText = true
+  text
 }) => {
   const sizeMap = {
-    sm: { crest: 60, container: 80 },
-    md: { crest: 100, container: 130 },
-    lg: { crest: 150, container: 190 }
+    sm: { container: 80, crest: 48, ring: 35, innerRing: 28, stroke: 2 },
+    md: { container: 120, crest: 68, ring: 52, innerRing: 42, stroke: 2 },
+    lg: { container: 160, crest: 88, ring: 72, innerRing: 58, stroke: 2.5 }
   };
 
-  const { crest, container } = sizeMap[size];
+  const { container, crest, ring, innerRing, stroke } = sizeMap[size];
+  const center = container / 2;
 
   return (
-    <div className="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center">
-      {/* Subtle radial gradient background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(212,175,55,0.03)_0%,transparent_70%)]" />
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: '#000',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flexDirection: 'column',
+        zIndex: 9999
+      }}
+    >
+      {/* Radial gradient background - pulsing */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'radial-gradient(circle at center, rgba(212,175,55,0.12) 0%, transparent 55%)',
+          animation: 'crestBgPulse 2.5s ease-in-out infinite'
+        }}
+      />
 
-      {/* Main loader container */}
-      <div className="relative" style={{ width: container, height: container }}>
+      {/* Loader container */}
+      <div style={{ position: 'relative', width: container, height: container }}>
 
-        {/* Animated gold ring - outer trace */}
+        {/* Outer rotating gold ring */}
         <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 100 100"
+          width={container}
+          height={container}
+          viewBox={`0 0 ${container} ${container}`}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            animation: 'crestLoaderSpin 2.5s linear infinite'
+          }}
         >
-          {/* Background ring (subtle) */}
-          <circle
-            cx="50"
-            cy="50"
-            r="48"
-            fill="none"
-            stroke="rgba(212,175,55,0.1)"
-            strokeWidth="0.5"
-          />
-
-          {/* Animated tracing ring */}
-          <motion.circle
-            cx="50"
-            cy="50"
-            r="48"
-            fill="none"
-            stroke="url(#goldGradient)"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            initial={{ pathLength: 0, rotate: 0 }}
-            animate={{
-              pathLength: [0, 0.4, 0],
-              rotate: 360
-            }}
-            transition={{
-              pathLength: {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut"
-              },
-              rotate: {
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear"
-              }
-            }}
-            style={{
-              filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.8))'
-            }}
-          />
-
-          {/* Second tracing ring (opposite direction) */}
-          <motion.circle
-            cx="50"
-            cy="50"
-            r="44"
-            fill="none"
-            stroke="url(#goldGradient2)"
-            strokeWidth="0.8"
-            strokeLinecap="round"
-            initial={{ pathLength: 0, rotate: 180 }}
-            animate={{
-              pathLength: [0, 0.3, 0],
-              rotate: -180
-            }}
-            transition={{
-              pathLength: {
-                duration: 1.8,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5
-              },
-              rotate: {
-                duration: 4,
-                repeat: Infinity,
-                ease: "linear"
-              }
-            }}
-            style={{
-              filter: 'drop-shadow(0 0 4px rgba(212,175,55,0.6))'
-            }}
-          />
-
-          {/* Gradient definitions */}
           <defs>
-            <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id="crestLoaderGold" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C5A059" />
               <stop offset="50%" stopColor="#FFD700" />
               <stop offset="100%" stopColor="#C5A059" />
             </linearGradient>
-            <linearGradient id="goldGradient2" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="rgba(197,160,89,0.3)" />
-              <stop offset="50%" stopColor="rgba(255,215,0,0.6)" />
-              <stop offset="100%" stopColor="rgba(197,160,89,0.3)" />
-            </linearGradient>
           </defs>
+          {/* Background ring */}
+          <circle
+            cx={center}
+            cy={center}
+            r={ring}
+            fill="none"
+            stroke="rgba(212,175,55,0.08)"
+            strokeWidth="1"
+          />
+          {/* Animated arc */}
+          <circle
+            cx={center}
+            cy={center}
+            r={ring}
+            fill="none"
+            stroke="url(#crestLoaderGold)"
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            strokeDasharray={`${ring * 1} ${ring * 5}`}
+            style={{ filter: 'drop-shadow(0 0 10px rgba(212,175,55,0.7))' }}
+          />
         </svg>
 
-        {/* Pulsing glow behind crest */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          animate={{
-            opacity: [0.3, 0.6, 0.3],
-            scale: [0.95, 1.02, 0.95]
-          }}
-          transition={{
-            duration: 2.5,
-            repeat: Infinity,
-            ease: "easeInOut"
+        {/* Inner counter-rotating ring */}
+        <svg
+          width={container}
+          height={container}
+          viewBox={`0 0 ${container} ${container}`}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            animation: 'crestLoaderSpinReverse 3.5s linear infinite'
           }}
         >
-          <div
-            className="rounded-full bg-tj-gold/10 blur-xl"
-            style={{ width: crest * 1.2, height: crest * 1.2 }}
+          <circle
+            cx={center}
+            cy={center}
+            r={innerRing}
+            fill="none"
+            stroke="rgba(212,175,55,0.15)"
+            strokeWidth="1"
+            strokeDasharray={`${innerRing * 0.3} ${innerRing * 0.7}`}
           />
-        </motion.div>
+        </svg>
 
-        {/* The Crest */}
-        <motion.div
-          className="absolute inset-0 flex items-center justify-center"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+        {/* Crest image - centered with float animation */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            animation: 'crestLogoFloat 3s ease-in-out infinite'
+          }}
         >
-          <motion.img
+          <img
             src="/GoldTripleJLogo.png"
-            alt="Triple J Auto Investment"
-            style={{ width: crest, height: crest }}
-            className="object-contain drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]"
-            animate={{
-              filter: [
-                'drop-shadow(0 0 15px rgba(212,175,55,0.3))',
-                'drop-shadow(0 0 25px rgba(212,175,55,0.5))',
-                'drop-shadow(0 0 15px rgba(212,175,55,0.3))'
-              ]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-        </motion.div>
-
-        {/* Sparkle particles */}
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-tj-gold rounded-full"
+            alt="Triple J"
             style={{
-              left: '50%',
-              top: '50%',
-            }}
-            animate={{
-              x: [0, Math.cos(i * 60 * Math.PI / 180) * (container / 2 + 10)],
-              y: [0, Math.sin(i * 60 * Math.PI / 180) * (container / 2 + 10)],
-              opacity: [0, 1, 0],
-              scale: [0, 1.5, 0]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: i * 0.3,
-              ease: "easeOut"
+              width: crest,
+              height: crest,
+              objectFit: 'contain',
+              filter: 'drop-shadow(0 0 18px rgba(212,175,55,0.5))'
             }}
           />
-        ))}
+        </div>
       </div>
 
       {/* Loading text */}
-      {showText && (
-        <motion.div
-          className="mt-8 text-center"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
+      {text && (
+        <p
+          style={{
+            marginTop: 32,
+            fontSize: 10,
+            letterSpacing: '0.25em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.5)',
+            animation: 'crestTextPulse 2s ease-in-out infinite'
+          }}
         >
-          <motion.p
-            className="text-tj-gold text-xs uppercase tracking-[0.4em] font-display"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            Loading
-          </motion.p>
-
-          {/* Animated dots */}
-          <div className="flex justify-center gap-1 mt-2">
-            {[0, 1, 2].map((i) => (
-              <motion.span
-                key={i}
-                className="w-1.5 h-1.5 bg-tj-gold/60 rounded-full"
-                animate={{
-                  opacity: [0.3, 1, 0.3],
-                  scale: [0.8, 1.2, 0.8]
-                }}
-                transition={{
-                  duration: 1,
-                  repeat: Infinity,
-                  delay: i * 0.2
-                }}
-              />
-            ))}
-          </div>
-        </motion.div>
+          {text}
+        </p>
       )}
+
+      {/* Keyframe animations */}
+      <style>{`
+        @keyframes crestLoaderSpin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes crestLoaderSpinReverse {
+          from { transform: rotate(360deg); }
+          to { transform: rotate(0deg); }
+        }
+        @keyframes crestBgPulse {
+          0%, 100% { opacity: 0.6; transform: scale(1); }
+          50% { opacity: 1; transform: scale(1.03); }
+        }
+        @keyframes crestLogoFloat {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-4px) scale(1.02); }
+        }
+        @keyframes crestTextPulse {
+          0%, 100% { opacity: 0.4; }
+          50% { opacity: 0.8; }
+        }
+      `}</style>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import { PDFDocument } from 'pdf-lib';
 import { BillOfSaleData } from '../types';
+import { getCountyFromAddress } from '../utils/texasCountyLookup';
 
 // --- BRAND CONSTANTS ---
 const PAGE_WIDTH = 215.9; // Letter Width (mm)
@@ -638,24 +639,45 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         const pdfDoc = await PDFDocument.load(formBytes);
         const form = pdfDoc.getForm();
 
-        // Helper to safely set text field
+        // Helper to safely set text field - tries multiple field name variants
         const setTextField = (fieldName: string, value: string) => {
-            try {
-                const field = form.getTextField(fieldName);
-                field.setText(value || '');
-            } catch (e) {
-                console.warn(`Field not found: ${fieldName}`);
+            // Try the exact field name first, then try with/without extra spaces
+            const variants = [
+                fieldName,
+                fieldName.replace(/\s{2,}/g, ' '),  // Remove double spaces
+                fieldName.replace(/\s/g, '  '),     // Add double spaces between words
+            ];
+
+            for (const name of variants) {
+                try {
+                    const field = form.getTextField(name);
+                    field.setText(value || '');
+                    return; // Success, stop trying variants
+                } catch {
+                    continue; // Try next variant
+                }
             }
+            console.warn(`Field not found (tried variants): ${fieldName}`);
         };
 
-        // Helper to safely check checkbox
+        // Helper to safely check checkbox - tries multiple field name variants
         const checkBox = (fieldName: string) => {
-            try {
-                const field = form.getCheckBox(fieldName);
-                field.check();
-            } catch (e) {
-                console.warn(`Checkbox not found: ${fieldName}`);
+            const variants = [
+                fieldName,
+                fieldName.replace(/\s{2,}/g, ' '),
+                fieldName.replace(/\s/g, '  '),
+            ];
+
+            for (const name of variants) {
+                try {
+                    const field = form.getCheckBox(name);
+                    field.check();
+                    return;
+                } catch {
+                    continue;
+                }
             }
+            console.warn(`Checkbox not found (tried variants): ${fieldName}`);
         };
 
         // --- FILL FORM FIELDS ---
@@ -682,10 +704,10 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         setTextField('16 Applicant First Name or Entity Name Middle Name Last Name Suffix if any', data.buyerName || '');
         setTextField('18 Applicant Mailing Address City State Zip', data.buyerAddress || '');
 
-        // County - Extract from address if possible
-        const countyMatch = data.buyerAddress?.match(/,\s*([A-Za-z\s]+)\s+County/i);
-        if (countyMatch) {
-            setTextField('19 Applicant County of Residence', countyMatch[1].trim());
+        // County - Auto-detect from zip code in address
+        const county = getCountyFromAddress(data.buyerAddress || '');
+        if (county) {
+            setTextField('19 Applicant County of Residence', county);
         }
 
         // Seller/Dealer Information (Section 3)

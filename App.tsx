@@ -6,7 +6,6 @@ import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Dat
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
-import { CrestLoader } from './components/CrestLoader';
 import { SplashScreen } from './components/SplashScreen';
 
 // Critical Pages (Eagerly Loaded)
@@ -279,43 +278,57 @@ const Navbar = () => {
                 </motion.div>
               ))}
 
-              {/* Admin Links - Only shown when logged in */}
-              {user && (
-                <motion.div
-                  variants={{
-                    hidden: { opacity: 0, y: 20 },
-                    visible: { opacity: 1, y: 0, transition: { delay: 0.5 } }
-                  }}
-                  className="w-full border-t border-tj-gold/30 pt-6 mt-2"
-                >
-                  <p className="text-[9px] text-tj-gold uppercase tracking-[0.3em] mb-4 text-center">Admin Access</p>
-                  <div className="flex flex-col gap-4">
+              {/* Admin Links - Always show, different content based on login status */}
+              <motion.div
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { opacity: 1, y: 0, transition: { delay: 0.5 } }
+                }}
+                className="w-full border-t border-tj-gold/30 pt-6 mt-2"
+              >
+                {user ? (
+                  <>
+                    <p className="text-[9px] text-tj-gold uppercase tracking-[0.3em] mb-4 text-center">Admin Access</p>
+                    <div className="flex flex-col gap-4">
+                      <Link
+                        to="/admin/dashboard"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                      >
+                        <LayoutDashboard size={18} />
+                        <span className="text-lg font-display tracking-widest">DASHBOARD</span>
+                      </Link>
+                      <Link
+                        to="/admin/inventory"
+                        onClick={() => setIsOpen(false)}
+                        className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                      >
+                        <Car size={18} />
+                        <span className="text-lg font-display tracking-widest">INVENTORY</span>
+                      </Link>
+                      <button
+                        onClick={() => { logout(); setIsOpen(false); }}
+                        className="flex items-center justify-center gap-3 text-red-500 hover:text-red-400 transition-colors py-2"
+                      >
+                        <Lock size={18} />
+                        <span className="text-lg font-display tracking-widest">LOGOUT</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-[9px] text-gray-600 uppercase tracking-[0.3em] mb-4 text-center">Dealer Portal</p>
                     <Link
-                      to="/admin/dashboard"
+                      to="/login"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                      className="flex items-center justify-center gap-3 text-gray-500 hover:text-tj-gold transition-colors py-3 border border-gray-800 hover:border-tj-gold/50 bg-black/50"
                     >
-                      <LayoutDashboard size={18} />
-                      <span className="text-lg font-display tracking-widest">DASHBOARD</span>
+                      <Lock size={16} />
+                      <span className="text-sm font-display tracking-widest">ADMIN LOGIN</span>
                     </Link>
-                    <Link
-                      to="/admin/inventory"
-                      onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
-                    >
-                      <Car size={18} />
-                      <span className="text-lg font-display tracking-widest">INVENTORY</span>
-                    </Link>
-                    <button
-                      onClick={() => { logout(); setIsOpen(false); }}
-                      className="flex items-center justify-center gap-3 text-red-500 hover:text-red-400 transition-colors py-2"
-                    >
-                      <Lock size={18} />
-                      <span className="text-lg font-display tracking-widest">LOGOUT</span>
-                    </button>
-                  </div>
-                </motion.div>
-              )}
+                  </>
+                )}
+              </motion.div>
             </motion.div>
 
             {/* AI Voice Agent CTA in Mobile Menu */}
@@ -354,8 +367,14 @@ const Footer = () => {
 
   return (
     <footer className="bg-black text-gray-600 py-20 border-t border-white/5 relative overflow-hidden">
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 text-[15vw] font-display font-bold text-white/[0.02] pointer-events-none whitespace-nowrap select-none leading-none">
-        TRIPLE J
+      {/* Background Crest Watermark */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.03]">
+        <img
+          src="/GoldTripleJLogo.png"
+          alt=""
+          className="w-[40vw] max-w-[500px] h-auto"
+          aria-hidden="true"
+        />
       </div>
 
       <div className="max-w-[1400px] mx-auto px-6 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-24">
@@ -364,7 +383,18 @@ const Footer = () => {
         <div className="flex flex-col items-start">
           <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">Headquarters</h3>
           <div className="mb-6">
-            <p className="text-white font-display text-xl tracking-wider mb-4">TRIPLE J <br /><span className="text-gray-500 text-sm">AUTO INVESTMENT</span></p>
+            {/* Crest Logo instead of text */}
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src="/GoldTripleJLogo.png"
+                alt="Triple J Auto Investment"
+                className="w-12 h-12 object-contain"
+              />
+              <div>
+                <p className="text-white font-display text-lg tracking-wider leading-tight">TRIPLE J</p>
+                <p className="text-gray-500 text-[10px] uppercase tracking-widest">Auto Investment</p>
+              </div>
+            </div>
             <p className="text-xs text-gray-500 italic mb-4">{t.footer.tagline}</p>
             <button
               onClick={openSmartMap}
@@ -480,7 +510,7 @@ const AppContent = () => {
       <main className="flex-grow pt-32">
         {/* Global Page Transition Wrapper */}
         <AnimatePresence mode="wait">
-          <Suspense fallback={<CrestLoader />}>
+          <Suspense fallback={null}>
             <div key={location.pathname} className="min-h-full origin-top">
               <Routes location={location}>
                 <Route path="/" element={<Home />} />
@@ -521,7 +551,7 @@ export default function App() {
     <LanguageProvider>
       <StoreProvider>
         <Router>
-          <SplashScreen>
+          <SplashScreen duration={3500}>
             <AppContent />
           </SplashScreen>
         </Router>

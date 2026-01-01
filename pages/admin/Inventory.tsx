@@ -1,11 +1,140 @@
 
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/Store';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { generateVehicleDescription } from '../../services/geminiService';
 import { decodeVin } from '../../services/nhtsaService';
 import { Vehicle, VehicleStatus } from '../../types';
-import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer } from 'lucide-react';
+import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer, LayoutDashboard, Car, LogOut, Menu } from 'lucide-react';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
+
+// Shared Admin Header Component
+const AdminHeader = () => {
+  const { logout, vehicles } = useStore();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [showDocModal, setShowDocModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/inventory', label: 'Inventory', icon: Car },
+  ];
+
+  return (
+    <>
+      <header className="bg-black/95 backdrop-blur-md border-b border-tj-gold/30 sticky top-0 z-50 shadow-lg">
+        <div className="max-w-[1800px] mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
+            {/* Logo & Brand */}
+            <Link to="/" className="flex items-center gap-3 group">
+              <img
+                src="/GoldTripleJLogo.png"
+                alt="Triple J"
+                className="w-10 h-10 md:w-12 md:h-12 object-contain transition-transform group-hover:scale-110"
+              />
+              <div className="hidden sm:block">
+                <p className="text-white font-display text-sm md:text-base tracking-wider leading-tight">TRIPLE J</p>
+                <p className="text-tj-gold text-[8px] md:text-[9px] uppercase tracking-[0.2em]">Admin Portal</p>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-2">
+              {navItems.map(item => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold transition-all border ${
+                    location.pathname === item.path
+                      ? 'bg-tj-gold text-black border-tj-gold'
+                      : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/5'
+                  }`}
+                >
+                  <item.icon size={14} />
+                  {item.label}
+                </Link>
+              ))}
+
+              {/* Documents Button */}
+              <button
+                onClick={() => setShowDocModal(true)}
+                className="flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold text-gray-400 hover:text-white border border-transparent hover:border-white/20 hover:bg-white/5 transition-all"
+              >
+                <FileText size={14} />
+                Documents
+              </button>
+
+              <div className="h-6 w-px bg-gray-700 mx-2" />
+
+              <button
+                onClick={() => { logout(); navigate('/'); }}
+                className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all"
+              >
+                <LogOut size={14} />
+                Logout
+              </button>
+            </nav>
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="md:hidden p-2 text-white hover:text-tj-gold transition-colors"
+            >
+              <Menu size={24} />
+            </button>
+          </div>
+
+          {/* Mobile Navigation */}
+          {mobileMenuOpen && (
+            <nav className="md:hidden border-t border-white/10 py-4 space-y-2">
+              {navItems.map(item => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold transition-all ${
+                    location.pathname === item.path
+                      ? 'bg-tj-gold/10 text-tj-gold border-l-2 border-tj-gold'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <item.icon size={18} />
+                  {item.label}
+                </Link>
+              ))}
+
+              <button
+                onClick={() => { setShowDocModal(true); setMobileMenuOpen(false); }}
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+              >
+                <FileText size={18} />
+                Documents
+              </button>
+
+              <div className="border-t border-white/10 mt-2 pt-2">
+                <button
+                  onClick={() => { logout(); navigate('/'); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400 hover:bg-red-900/20 transition-all"
+                >
+                  <LogOut size={18} />
+                  Logout
+                </button>
+              </div>
+            </nav>
+          )}
+        </div>
+      </header>
+
+      {/* Document Generator Modal */}
+      <BillOfSaleModal
+        isOpen={showDocModal}
+        onClose={() => setShowDocModal(false)}
+        vehicles={vehicles}
+      />
+    </>
+  );
+};
 
 // Utility: Compress and resize image to avoid LocalStorage limits (approx 5MB total)
 const resizeImage = (file: File): Promise<string> => {
@@ -438,7 +567,9 @@ const AdminInventory = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black p-6 md:p-12 font-sans relative">
+    <>
+      <AdminHeader />
+      <div className="min-h-screen bg-black p-4 md:p-8 lg:p-12 font-sans relative">
       {/* Sync Overlay */}
       {isSyncing && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center">
@@ -1139,6 +1270,7 @@ const AdminInventory = () => {
         preSelectedVehicle={bosVehicle}
       />
     </div>
+    </>
   );
 };
 

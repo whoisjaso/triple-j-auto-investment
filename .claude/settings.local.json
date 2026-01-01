@@ -57,7 +57,13 @@
       "WebFetch(domain:178.156.146.106)",
       "Bash(grep:*)",
       "Bash(node scripts/list-pdf-fields.mjs:*)",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(ls:*)",
+      "Bash(git -C D:/triple-j-auto-investment status)",
+      "Bash(git -C D:/triple-j-auto-investment log -3 --oneline)",
+      "Bash(git -C D:/triple-j-auto-investment remote:*)",
+      "Bash(git -C D:/triple-j-auto-investment add -A)",
+      "Bash(git -C D:/triple-j-auto-investment commit -m \"$\\(cat <<''EOF''\nAdmin UX Overhaul: Fixed Headers, Mobile Access, Smooth Animations\n\n- Fixed fullscreen scroll lock issue with improved useScrollLock hook\n- Added proper admin header with navigation tabs \\(Dashboard, Inventory, Documents\\)\n- Replaced text headers with crest logo throughout site\n- Added mobile admin access with lock icon in menu\n- Enhanced splash screen with dual rotating rings and smooth fade transitions\n- Improved CrestLoader with counter-rotating rings and float animation\n- Footer now includes crest watermark and branded logo\n- All admin pages share consistent navigation header\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>\nEOF\n\\)\")"
     ],
     "deny": [],
     "ask": []

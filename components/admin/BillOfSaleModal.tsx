@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Vehicle, BillOfSaleData } from '../../types';
 import { AddressInput } from '../AddressInput';
 import { PdfPreviewModal } from './PdfPreviewModal';
+import { useScrollLock } from '../../hooks/useScrollLock';
 import {
   generateBillOfSalePDF,
   generateAsIsPDF,
@@ -62,22 +63,7 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
   }, [selectedVehicle]);
 
   // Lock body scroll when modal is open
-  useEffect(() => {
-    if (isOpen) {
-      const scrollY = window.scrollY;
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-    } else {
-      const scrollY = document.body.style.top;
-      document.body.style.position = '';
-      document.body.style.top = '';
-      document.body.style.width = '';
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || '0') * -1);
-      }
-    }
-  }, [isOpen]);
+  useScrollLock(isOpen);
 
   const handleClose = () => {
     setLastGenerated(null);
@@ -115,31 +101,64 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     setCurrentDocType(null);
   };
 
-  // Download from preview
+  // Download from preview - uses existing blob URL for efficiency
   const handleDownloadFromPreview = async () => {
-    const data = buildBillOfSaleData();
-    if (!data) return;
+    if (!previewUrl) return;
 
-    closePreview();
+    try {
+      // Fetch the blob from the existing preview URL
+      const response = await fetch(previewUrl);
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
 
-    // Generate and download the actual file
-    switch (currentDocType) {
-      case 'bos':
-        await generateBillOfSalePDF(data, false);
-        setLastGenerated('Bill of Sale');
-        break;
-      case 'asis':
-        await generateAsIsPDF(data, false);
-        setLastGenerated('As-Is Acknowledgment');
-        break;
-      case 'reg':
-        await generateRegistrationGuidePDF(data, false);
-        setLastGenerated('Registration Guide');
-        break;
-      case '130u':
-        await generateForm130U(data, false);
-        setLastGenerated('Form 130-U');
-        break;
+      // Determine filename based on document type
+      const safeName = (buyerName || 'Client').replace(/[^a-z0-9]/gi, '_');
+      const fileNames: Record<string, string> = {
+        'bos': `Bill_of_Sale_${safeName}.pdf`,
+        'asis': `As_Is_Acknowledgment_${safeName}.pdf`,
+        'reg': `Registration_Guide_${safeName}.pdf`,
+        '130u': `Form_130U_${safeName}.pdf`
+      };
+      const fileName = fileNames[currentDocType || 'bos'] || 'Document.pdf';
+
+      // Create download link and trigger
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(downloadUrl);
+
+      // Update UI and close preview
+      setLastGenerated(previewDocName);
+      closePreview();
+    } catch (error) {
+      console.error('Download failed, regenerating:', error);
+      // Fallback to regeneration if blob fetch fails
+      const data = buildBillOfSaleData();
+      if (!data) return;
+
+      closePreview();
+
+      switch (currentDocType) {
+        case 'bos':
+          await generateBillOfSalePDF(data, false);
+          setLastGenerated('Bill of Sale');
+          break;
+        case 'asis':
+          await generateAsIsPDF(data, false);
+          setLastGenerated('As-Is Acknowledgment');
+          break;
+        case 'reg':
+          await generateRegistrationGuidePDF(data, false);
+          setLastGenerated('Registration Guide');
+          break;
+        case '130u':
+          await generateForm130U(data, false);
+          setLastGenerated('Form 130-U');
+          break;
+      }
     }
   };
 

@@ -3,10 +3,12 @@ import { createPortal } from 'react-dom';
 import { useStore } from '../context/Store';
 import { VehicleStatus, Vehicle } from '../types';
 import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw, Car, ZoomIn } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
-import { ImageLightbox } from '../components/ImageLightbox';
+import { useScrollLock } from '../hooks/useScrollLock';
+import { ImageGallery } from '../components/ImageGallery';
+import { triggerOutboundCall } from '../services/retellService';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
 
@@ -163,7 +165,23 @@ const Inventory = () => {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   const [modalTab, setModalTab] = useState<'overview' | 'specs' | 'transparency' | 'purchase'>('overview');
   const [leadForm, setLeadForm] = useState({ name: '', email: '', phone: '' });
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [formError, setFormError] = useState<string>('');
+
+  // Phone number formatting helper
+  const formatPhoneNumber = (value: string): string => {
+    const digits = value.replace(/\D/g, '');
+    if (digits.length <= 3) return digits;
+    if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+    return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setLeadForm({ ...leadForm, phone: formatted });
+    // Clear error when user starts typing
+    if (formError) setFormError('');
+  };
 
   // Modal Carousel State
   const [modalImgIndex, setModalImgIndex] = useState(0);
@@ -171,6 +189,23 @@ const Inventory = () => {
   // Lightbox State
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Use scroll lock hook for modal and lightbox
+  useScrollLock(!!selectedVehicle || lightboxOpen);
+
+  // Set mobile viewport height variable for proper fullscreen
+  useEffect(() => {
+    const setVh = () => {
+      document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    };
+    setVh();
+    window.addEventListener('resize', setVh);
+    window.addEventListener('orientationchange', setVh);
+    return () => {
+      window.removeEventListener('resize', setVh);
+      window.removeEventListener('orientationchange', setVh);
+    };
+  }, []);
 
   // Derive unique makes for dropdown
   const uniqueMakes = useMemo(() => {
@@ -211,32 +246,38 @@ const Inventory = () => {
     setSelectedVehicle(vehicle);
     setLeadForm({ name: '', email: '', phone: '' });
     setSubmitStatus('idle');
+    setFormError('');
     setModalTab('overview');
     setModalImgIndex(0);
-    // iOS-compatible scroll lock
-    const scrollY = window.scrollY;
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${scrollY}px`;
-    document.body.style.width = '100%';
   };
 
   const handleCloseModal = () => {
     setSelectedVehicle(null);
-    // Restore scroll position
-    const scrollY = document.body.style.top;
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.width = '';
-    if (scrollY) {
-      window.scrollTo(0, parseInt(scrollY || '0') * -1);
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFormError('');
+
+    // Validate phone number (must be 10 digits)
+    const phoneDigits = leadForm.phone.replace(/\D/g, '');
+    if (phoneDigits.length < 10) {
+      setFormError('Please enter a valid 10-digit phone number');
+      setSubmitStatus('error');
+      return;
+    }
+
+    // Validate name
+    if (!leadForm.name.trim()) {
+      setFormError('Please enter your name');
+      setSubmitStatus('error');
+      return;
+    }
+
     setSubmitStatus('submitting');
 
     try {
+      // Add lead to store
       await addLead({
         id: Math.random().toString(36).substr(2, 9),
         name: leadForm.name,
@@ -246,11 +287,36 @@ const Inventory = () => {
         date: new Date().toISOString(),
         status: 'New'
       });
+
+      // Trigger Divine outbound call via Retell AI
+      if (selectedVehicle) {
+        const callResult = await triggerOutboundCall({
+          customer_name: leadForm.name.trim(),
+          phone_number: `+1${phoneDigits}`,
+          email: leadForm.email.trim(),
+          vehicle_year: selectedVehicle.year.toString(),
+          vehicle_make: selectedVehicle.make,
+          vehicle_model: selectedVehicle.model,
+          vehicle_full: `${selectedVehicle.year} ${selectedVehicle.make} ${selectedVehicle.model}`,
+          vehicle_price: selectedVehicle.price > 0 ? `$${selectedVehicle.price.toLocaleString()}` : 'Inquire',
+          vehicle_condition: selectedVehicle.description || 'No known issues',
+          vehicle_status: selectedVehicle.status,
+          vehicle_id: selectedVehicle.id,
+          inquiry_source: 'Website Inventory',
+          inquiry_timestamp: new Date().toISOString()
+        });
+
+        if (!callResult.success) {
+          console.error('Retell call failed:', callResult.error);
+          // Still show success since lead was saved - just log the call failure
+        }
+      }
+
       setSubmitStatus('success');
     } catch (error) {
       console.error('Failed to submit lead:', error);
-      setSubmitStatus('idle');
-      alert('Failed to submit your interest. Please try again or call us directly.');
+      setFormError('Something went wrong. Please call us directly at (832) 400-9760');
+      setSubmitStatus('error');
     }
   };
 
@@ -504,18 +570,19 @@ const Inventory = () => {
                 onClick={handleCloseModal}
               ></motion.div>
 
-              {/* Modal Container - FULL SCREEN ON MOBILE (100dvh) */}
+              {/* Modal Container - FULL SCREEN ON MOBILE */}
               <motion.div
                 initial={{ scale: 0.95, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 20 }}
-                className="relative w-full h-[100dvh] md:h-[85vh] md:max-h-[800px] max-w-7xl bg-[#080808] md:border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] flex flex-col md:flex-row overflow-hidden md:rounded-sm"
+                className="relative w-full h-screen md:h-[85vh] md:max-h-[800px] max-w-7xl bg-[#080808] md:border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] flex flex-col md:flex-row overflow-hidden md:rounded-sm"
+                style={{ height: 'calc(var(--vh, 1vh) * 100)', maxHeight: '100vh' }}
               >
 
                 {/* Close Button - Optimized Touch Target */}
                 <button
                   onClick={handleCloseModal}
-                  className="absolute top-4 right-4 z-[120] text-white hover:text-tj-gold bg-black/80 backdrop-blur-md rounded-full p-4 md:p-3 border border-white/10 hover:border-tj-gold transition-all shadow-lg active:scale-90"
+                  className="absolute top-4 right-4 z-30 text-white hover:text-tj-gold bg-black/80 backdrop-blur-md rounded-full p-4 md:p-3 border border-white/10 hover:border-tj-gold transition-all shadow-lg active:scale-90"
                 >
                   <X size={24} />
                 </button>
@@ -775,14 +842,18 @@ const Inventory = () => {
                         {submitStatus === 'success' ? (
                           <div className="text-center py-8 flex-grow flex flex-col justify-center">
                             <div className="w-16 h-16 mx-auto border border-tj-gold rounded-full flex items-center justify-center bg-tj-gold/10 animate-gold-pulse mb-6">
-                              <Mic className="text-tj-gold" size={24} />
+                              <Phone className="text-tj-gold" size={24} />
                             </div>
-                            <h3 className="font-display text-xl text-white tracking-widest mb-2">{t.inventory.modal.successTitle.toUpperCase()}</h3>
-                            <p className="text-gray-400 text-xs mb-8 leading-relaxed max-w-xs mx-auto">
-                              {t.inventory.modal.successMsg}
+                            <h3 className="font-display text-xl text-white tracking-widest mb-2">DIVINE WILL CALL YOU</h3>
+                            <p className="text-gray-400 text-xs mb-4 leading-relaxed max-w-xs mx-auto">
+                              Our advisor Divine will call you within the next few minutes to discuss the{' '}
+                              <span className="text-tj-gold">{selectedVehicle?.year} {selectedVehicle?.make} {selectedVehicle?.model}</span>.
                             </p>
-                            <a href="tel:+18324009760" className="w-full bg-tj-gold text-black font-bold py-4 text-sm uppercase tracking-[0.2em] hover:bg-white transition-colors flex items-center justify-center gap-2 mb-4">
-                              <Phone size={16} /> Call Agent
+                            <p className="text-[10px] text-gray-600 uppercase tracking-widest mb-8">
+                              Keep your phone nearby
+                            </p>
+                            <a href="tel:+18324009760" className="w-full bg-white/10 text-white font-bold py-4 text-sm uppercase tracking-[0.2em] hover:bg-tj-gold hover:text-black transition-colors flex items-center justify-center gap-2 mb-4 border border-white/20">
+                              <Phone size={16} /> Can't Wait? Call Us Now
                             </a>
                           </div>
                         ) : (
@@ -805,9 +876,12 @@ const Inventory = () => {
                                   required
                                   type="tel"
                                   value={leadForm.phone}
-                                  onChange={e => setLeadForm({ ...leadForm, phone: e.target.value })}
-                                  className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
-                                  placeholder="(XXX) XXX-XXXX"
+                                  onChange={e => handlePhoneChange(e.target.value)}
+                                  className={`w-full bg-black border p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors font-mono ${
+                                    submitStatus === 'error' && formError.includes('phone') ? 'border-red-500' : 'border-gray-700'
+                                  }`}
+                                  placeholder="(832) 400-9760"
+                                  maxLength={14}
                                 />
                               </div>
                               <div>
@@ -820,6 +894,14 @@ const Inventory = () => {
                                   placeholder="email@address.com"
                                 />
                               </div>
+                              {/* Error Message Display */}
+                              {submitStatus === 'error' && formError && (
+                                <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/50 animate-shake">
+                                  <AlertTriangle size={16} className="text-red-400 flex-shrink-0" />
+                                  <p className="text-xs text-red-400">{formError}</p>
+                                </div>
+                              )}
+
                               <div className="flex items-center gap-2 p-3 bg-red-900/10 border border-red-900/30">
                                 <ShieldAlert size={16} className="text-red-500 flex-shrink-0" />
                                 <p className="text-[10px] text-gray-400 leading-tight">
@@ -879,8 +961,8 @@ const Inventory = () => {
         document.body
       )}
 
-      {/* Full-Screen Image Lightbox */}
-      <ImageLightbox
+      {/* Full-Screen Swipeable Image Gallery */}
+      <ImageGallery
         images={modalImages}
         initialIndex={lightboxIndex}
         isOpen={lightboxOpen}
