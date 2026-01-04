@@ -200,162 +200,106 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* --- PSYCHOLOGICAL PORTAL (MOBILE MENU) --- */}
-      {/* Enhanced Mobile Menu with Solid Black Background & Staggered Slide Animations */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[60] bg-black flex flex-col justify-center items-center md:hidden overflow-hidden"
-          >
-            {/* Subtle animated gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-tj-gold/5 via-transparent to-tj-gold/5 pointer-events-none"></div>
+      {/* --- MOBILE MENU --- */}
+      {/* Simplified mobile menu without complex animations for reliability */}
+      {isOpen && (
+        <div className="fixed inset-0 z-[60] bg-black flex flex-col justify-center items-center md:hidden overflow-hidden">
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-tj-gold/5 via-transparent to-tj-gold/5 pointer-events-none"></div>
 
-            {/* Decorative corner accents */}
-            <div className="absolute top-8 left-8 w-12 h-12 border-l-2 border-t-2 border-tj-gold/30"></div>
-            <div className="absolute top-8 right-8 w-12 h-12 border-r-2 border-t-2 border-tj-gold/30"></div>
-            <div className="absolute bottom-8 left-8 w-12 h-12 border-l-2 border-b-2 border-tj-gold/30"></div>
-            <div className="absolute bottom-8 right-8 w-12 h-12 border-r-2 border-b-2 border-tj-gold/30"></div>
+          {/* Decorative corner accents */}
+          <div className="absolute top-8 left-8 w-12 h-12 border-l-2 border-t-2 border-tj-gold/30"></div>
+          <div className="absolute top-8 right-8 w-12 h-12 border-r-2 border-t-2 border-tj-gold/30"></div>
+          <div className="absolute bottom-8 left-8 w-12 h-12 border-l-2 border-b-2 border-tj-gold/30"></div>
+          <div className="absolute bottom-8 right-8 w-12 h-12 border-r-2 border-b-2 border-tj-gold/30"></div>
 
-            <motion.div
-              className="flex flex-col items-center gap-8 z-10 w-full px-8"
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-              variants={{
-                visible: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
-                hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
-              }}
-            >
-              {/* Public Navigation Links - with animation fallback for mobile browsers */}
-              {[
-                { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT" },
-                { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "ACQUIRE ASSETS" },
-                { to: "/vin", label: "INTEL", sub: "DEEP DATA ANALYSIS" },
-                { to: "/about", label: t.nav.about.toUpperCase(), sub: "THE PHILOSOPHY" }
-              ].map((link, index) => (
-                <motion.div
-                  key={link.to}
-                  initial={{ opacity: 0, x: -40, y: 20 }}
-                  animate={{ opacity: 1, x: 0, y: 0 }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 15,
-                    delay: index * 0.08
-                  }}
-                  className="w-full text-center group"
-                  style={{ opacity: 1 }}
+          <div className="flex flex-col items-center gap-8 z-10 w-full px-8">
+            {/* Public Navigation Links */}
+            {[
+              { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT" },
+              { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "ACQUIRE ASSETS" },
+              { to: "/vin", label: "INTEL", sub: "DEEP DATA ANALYSIS" },
+              { to: "/about", label: t.nav.about.toUpperCase(), sub: "THE PHILOSOPHY" }
+            ].map((link) => (
+              <div key={link.to} className="w-full text-center group">
+                <Link
+                  to={link.to}
+                  onClick={() => setIsOpen(false)}
+                  className="block font-display text-3xl text-white tracking-[0.15em] hover:text-tj-gold transition-all duration-300"
                 >
-                  <Link
-                    to={link.to}
-                    onClick={() => setIsOpen(false)}
-                    className="block font-display text-3xl text-white tracking-[0.15em] hover:text-tj-gold transition-all duration-300 hover:tracking-[0.2em]"
-                    style={{ opacity: 1 }}
-                  >
-                    <span className="inline-block hover:scale-105 transition-transform" style={{ opacity: 1 }}>
-                      {link.label}
-                    </span>
-                  </Link>
-                  <p
-                    className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors"
-                    style={{ opacity: 1 }}
-                  >
-                    {link.sub}
-                  </p>
-                </motion.div>
-              ))}
+                  {link.label}
+                </Link>
+                <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors">
+                  {link.sub}
+                </p>
+              </div>
+            ))}
 
-              {/* Admin Links - Always show, different content based on login status */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
-                className="w-full border-t border-tj-gold/30 pt-6 mt-2"
-                style={{ opacity: 1 }}
-              >
-                {user ? (
-                  <>
-                    <p className="text-[9px] text-tj-gold uppercase tracking-[0.3em] mb-4 text-center" style={{ opacity: 1 }}>Admin Access</p>
-                    <div className="flex flex-col gap-4">
-                      <Link
-                        to="/admin/dashboard"
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
-                        style={{ opacity: 1 }}
-                      >
-                        <LayoutDashboard size={18} />
-                        <span className="text-lg font-display tracking-widest" style={{ opacity: 1 }}>DASHBOARD</span>
-                      </Link>
-                      <Link
-                        to="/admin/inventory"
-                        onClick={() => setIsOpen(false)}
-                        className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
-                        style={{ opacity: 1 }}
-                      >
-                        <Car size={18} />
-                        <span className="text-lg font-display tracking-widest" style={{ opacity: 1 }}>INVENTORY</span>
-                      </Link>
-                      <button
-                        onClick={() => { logout(); setIsOpen(false); }}
-                        className="flex items-center justify-center gap-3 text-red-500 hover:text-red-400 transition-colors py-2"
-                        style={{ opacity: 1 }}
-                      >
-                        <Lock size={18} />
-                        <span className="text-lg font-display tracking-widest" style={{ opacity: 1 }}>LOGOUT</span>
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mb-4 text-center" style={{ opacity: 1 }}>Dealer Portal</p>
+            {/* Admin Links */}
+            <div className="w-full border-t border-tj-gold/30 pt-6 mt-2">
+              {user ? (
+                <>
+                  <p className="text-[9px] text-tj-gold uppercase tracking-[0.3em] mb-4 text-center">Admin Access</p>
+                  <div className="flex flex-col gap-4">
                     <Link
-                      to="/login"
+                      to="/admin/dashboard"
                       onClick={() => setIsOpen(false)}
-                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-3 border border-gray-700 hover:border-tj-gold/50 bg-black/50"
-                      style={{ opacity: 1 }}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
                     >
-                      <Lock size={16} />
-                      <span className="text-sm font-display tracking-widest" style={{ opacity: 1 }}>ADMIN LOGIN</span>
+                      <LayoutDashboard size={18} />
+                      <span className="text-lg font-display tracking-widest">DASHBOARD</span>
                     </Link>
-                  </>
-                )}
-              </motion.div>
-            </motion.div>
+                    <Link
+                      to="/admin/inventory"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                    >
+                      <Car size={18} />
+                      <span className="text-lg font-display tracking-widest">INVENTORY</span>
+                    </Link>
+                    <button
+                      onClick={() => { logout(); setIsOpen(false); }}
+                      className="flex items-center justify-center gap-3 text-red-500 hover:text-red-400 transition-colors py-2"
+                    >
+                      <Lock size={18} />
+                      <span className="text-lg font-display tracking-widest">LOGOUT</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Dealer Portal</p>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-3 border border-gray-700 hover:border-tj-gold/50 bg-black/50"
+                  >
+                    <Lock size={16} />
+                    <span className="text-sm font-display tracking-widest">ADMIN LOGIN</span>
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
 
-            {/* AI Voice Agent CTA in Mobile Menu */}
-            <motion.a
-              href="tel:+18324009760"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
-              className="absolute bottom-28 flex items-center gap-3 text-tj-gold border border-tj-gold px-6 py-3 hover:bg-tj-gold hover:text-black transition-colors"
-              style={{ opacity: 1 }}
-            >
-              <span className="text-[10px] uppercase tracking-widest font-bold" style={{ opacity: 1 }}>Speak to AI Agent</span>
-            </motion.a>
+          {/* AI Voice Agent CTA */}
+          <a
+            href="tel:+18324009760"
+            className="absolute bottom-28 flex items-center gap-3 text-tj-gold border border-tj-gold px-6 py-3 hover:bg-tj-gold hover:text-black transition-colors"
+          >
+            <span className="text-[10px] uppercase tracking-widest font-bold">Speak to AI Agent</span>
+          </a>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="absolute bottom-12"
-              style={{ opacity: 1 }}
+          <div className="absolute bottom-12">
+            <button
+              onClick={toggleLang}
+              className="text-gray-500 hover:text-tj-gold px-6 py-2 text-[10px] uppercase tracking-widest transition-colors"
             >
-              <button
-                onClick={toggleLang}
-                className="text-gray-500 hover:text-tj-gold px-6 py-2 text-[10px] uppercase tracking-widest transition-colors"
-                style={{ opacity: 1 }}
-              >
-                {lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              {lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}
+            </button>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
