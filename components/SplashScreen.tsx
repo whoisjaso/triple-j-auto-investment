@@ -41,6 +41,31 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
   const isFadingOut = phase === 'fadeOut';
   const isComplete = phase === 'complete';
 
+  // Shield path for tracing animation - expanded for more spacing
+  const container = 260;
+  const center = 130;
+  const pathScale = 1.45;
+  const pathLength = 400;
+
+  const shieldPath = `
+    M ${center} ${center - 45 * pathScale}
+    C ${center + 35 * pathScale} ${center - 45 * pathScale}
+      ${center + 48 * pathScale} ${center - 35 * pathScale}
+      ${center + 48 * pathScale} ${center - 15 * pathScale}
+    L ${center + 48 * pathScale} ${center + 5 * pathScale}
+    C ${center + 48 * pathScale} ${center + 25 * pathScale}
+      ${center + 35 * pathScale} ${center + 42 * pathScale}
+      ${center} ${center + 50 * pathScale}
+    C ${center - 35 * pathScale} ${center + 42 * pathScale}
+      ${center - 48 * pathScale} ${center + 25 * pathScale}
+      ${center - 48 * pathScale} ${center + 5 * pathScale}
+    L ${center - 48 * pathScale} ${center - 15 * pathScale}
+    C ${center - 48 * pathScale} ${center - 35 * pathScale}
+      ${center - 35 * pathScale} ${center - 45 * pathScale}
+      ${center} ${center - 45 * pathScale}
+    Z
+  `;
+
   return (
     <>
       {/* Children - fade in when complete */}
@@ -55,7 +80,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
         {children}
       </div>
 
-      {/* Splash Screen Overlay */}
+      {/* Splash Screen Overlay - Crest with Tracing Animation Only */}
       {showSplash && (
         <div
           style={{
@@ -77,7 +102,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
             transition: 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
-          {/* Radial gradient background - pulsing */}
+          {/* Radial gradient background - subtle pulse */}
           <div
             style={{
               position: 'absolute',
@@ -85,86 +110,89 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               left: 0,
               right: 0,
               bottom: 0,
-              background: 'radial-gradient(circle at center, rgba(212,175,55,0.15) 0%, transparent 60%)',
-              animation: 'splashPulse 2s ease-in-out infinite'
+              background: 'radial-gradient(circle at center, rgba(212,175,55,0.1) 0%, transparent 55%)',
+              animation: 'splashBgPulse 3s ease-in-out infinite'
             }}
           />
 
-          {/* Decorative corner accents */}
-          <div style={{ position: 'absolute', top: 40, left: 40, width: 30, height: 30, borderLeft: '2px solid rgba(212,175,55,0.3)', borderTop: '2px solid rgba(212,175,55,0.3)' }} />
-          <div style={{ position: 'absolute', top: 40, right: 40, width: 30, height: 30, borderRight: '2px solid rgba(212,175,55,0.3)', borderTop: '2px solid rgba(212,175,55,0.3)' }} />
-          <div style={{ position: 'absolute', bottom: 40, left: 40, width: 30, height: 30, borderLeft: '2px solid rgba(212,175,55,0.3)', borderBottom: '2px solid rgba(212,175,55,0.3)' }} />
-          <div style={{ position: 'absolute', bottom: 40, right: 40, width: 30, height: 30, borderRight: '2px solid rgba(212,175,55,0.3)', borderBottom: '2px solid rgba(212,175,55,0.3)' }} />
-
           {/* Loader container */}
-          <div style={{ position: 'relative', width: 200, height: 200 }}>
+          <div style={{ position: 'relative', width: container, height: container }}>
 
-            {/* Outer rotating ring */}
+            {/* Tracing outline SVG */}
             <svg
-              width="200"
-              height="200"
-              viewBox="0 0 200 200"
+              width={container}
+              height={container}
+              viewBox={`0 0 ${container} ${container}`}
               style={{
                 position: 'absolute',
                 top: 0,
-                left: 0,
-                animation: 'splashSpin 2.5s linear infinite'
+                left: 0
               }}
             >
               <defs>
-                <linearGradient id="splashGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                {/* Gold gradient for the tracing line */}
+                <linearGradient id="splashTraceGold" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#C5A059" />
-                  <stop offset="50%" stopColor="#FFD700" />
+                  <stop offset="25%" stopColor="#FFD700" />
+                  <stop offset="50%" stopColor="#FFF8DC" />
+                  <stop offset="75%" stopColor="#FFD700" />
                   <stop offset="100%" stopColor="#C5A059" />
                 </linearGradient>
+
+                {/* Glow filter */}
+                <filter id="splashGlow" x="-50%" y="-50%" width="200%" height="200%">
+                  <feGaussianBlur stdDeviation="4" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
               </defs>
-              {/* Background ring */}
-              <circle
-                cx="100"
-                cy="100"
-                r="90"
+
+              {/* Static faint outline */}
+              <path
+                d={shieldPath}
                 fill="none"
-                stroke="rgba(212,175,55,0.1)"
+                stroke="rgba(212,175,55,0.08)"
                 strokeWidth="1"
               />
-              {/* Animated arc */}
-              <circle
-                cx="100"
-                cy="100"
-                r="90"
+
+              {/* Animated tracing path */}
+              <path
+                d={shieldPath}
                 fill="none"
-                stroke="url(#splashGoldGrad)"
-                strokeWidth="2"
+                stroke="url(#splashTraceGold)"
+                strokeWidth="3"
                 strokeLinecap="round"
-                strokeDasharray="120 450"
-                style={{ filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.8))' }}
+                strokeLinejoin="round"
+                filter="url(#splashGlow)"
+                style={{
+                  strokeDasharray: pathLength,
+                  strokeDashoffset: pathLength,
+                  animation: 'splashTrace 2.5s ease-in-out infinite'
+                }}
               />
-            </svg>
 
-            {/* Inner counter-rotating ring */}
-            <svg
-              width="200"
-              height="200"
-              viewBox="0 0 200 200"
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                animation: 'splashSpinReverse 3s linear infinite'
-              }}
-            >
-              <circle
-                cx="100"
-                cy="100"
-                r="75"
+              {/* Secondary trace for fuller effect (delayed) */}
+              <path
+                d={shieldPath}
                 fill="none"
-                stroke="rgba(212,175,55,0.2)"
-                strokeWidth="1"
-                strokeDasharray="40 100"
+                stroke="url(#splashTraceGold)"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  strokeDasharray: pathLength,
+                  strokeDashoffset: pathLength,
+                  animation: 'splashTrace 2.5s ease-in-out infinite',
+                  animationDelay: '0.6s',
+                  opacity: 0.5
+                }}
               />
             </svg>
 
-            {/* Crest image - centered with subtle pulse */}
+            {/* Crest image - centered */}
             <div
               style={{
                 position: 'absolute',
@@ -174,75 +202,55 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 bottom: 0,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                animation: 'splashLogoFloat 3s ease-in-out infinite'
+                justifyContent: 'center'
               }}
             >
               <img
                 src="/GoldTripleJLogo.png"
-                alt="Triple J"
+                alt="Triple J Auto Investment"
                 style={{
-                  width: 100,
-                  height: 100,
+                  width: 110,
+                  height: 110,
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0 0 25px rgba(212,175,55,0.6))'
+                  filter: 'drop-shadow(0 0 15px rgba(212,175,55,0.5))',
+                  animation: 'splashLogoGlow 3s ease-in-out infinite'
                 }}
               />
             </div>
           </div>
 
-          {/* Brand text below loader */}
-          <div
-            style={{
-              marginTop: 40,
-              textAlign: 'center',
-              animation: 'splashFadeIn 1s ease-out 0.3s both'
-            }}
-          >
-            <p
-              style={{
-                color: '#fff',
-                fontFamily: '"Playfair Display", serif',
-                fontSize: 18,
-                letterSpacing: '0.3em',
-                marginBottom: 8
-              }}
-            >
-              TRIPLE J
-            </p>
-            <p
-              style={{
-                color: 'rgba(212,175,55,0.8)',
-                fontSize: 9,
-                letterSpacing: '0.4em',
-                textTransform: 'uppercase'
-              }}
-            >
-              Auto Investment
-            </p>
-          </div>
-
           {/* Keyframe animations */}
           <style>{`
-            @keyframes splashSpin {
-              from { transform: rotate(0deg); }
-              to { transform: rotate(360deg); }
+            @keyframes splashTrace {
+              0% {
+                stroke-dashoffset: ${pathLength};
+              }
+              50% {
+                stroke-dashoffset: 0;
+              }
+              100% {
+                stroke-dashoffset: -${pathLength};
+              }
             }
-            @keyframes splashSpinReverse {
-              from { transform: rotate(360deg); }
-              to { transform: rotate(0deg); }
+
+            @keyframes splashBgPulse {
+              0%, 100% {
+                opacity: 0.5;
+                transform: scale(1);
+              }
+              50% {
+                opacity: 1;
+                transform: scale(1.08);
+              }
             }
-            @keyframes splashPulse {
-              0%, 100% { opacity: 0.6; transform: scale(1); }
-              50% { opacity: 1; transform: scale(1.05); }
-            }
-            @keyframes splashLogoFloat {
-              0%, 100% { transform: translateY(0px) scale(1); }
-              50% { transform: translateY(-5px) scale(1.02); }
-            }
-            @keyframes splashFadeIn {
-              from { opacity: 0; transform: translateY(10px); }
-              to { opacity: 1; transform: translateY(0); }
+
+            @keyframes splashLogoGlow {
+              0%, 100% {
+                filter: drop-shadow(0 0 15px rgba(212,175,55,0.5));
+              }
+              50% {
+                filter: drop-shadow(0 0 25px rgba(212,175,55,0.8));
+              }
             }
           `}</style>
         </div>

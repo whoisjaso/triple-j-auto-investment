@@ -23,20 +23,16 @@ const AdminHeader = () => {
 
   return (
     <>
-      <header className="bg-black/95 backdrop-blur-md border-b border-tj-gold/30 sticky top-0 z-50 shadow-lg">
+      <header className="bg-black backdrop-blur-md border-b border-tj-gold/30 sticky top-0 z-[100] shadow-lg">
         <div className="max-w-[1800px] mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Logo & Brand */}
-            <Link to="/" className="flex items-center gap-3 group">
+            {/* Logo Only - No Text */}
+            <Link to="/" className="flex items-center group">
               <img
                 src="/GoldTripleJLogo.png"
-                alt="Triple J"
-                className="w-10 h-10 md:w-12 md:h-12 object-contain transition-transform group-hover:scale-110"
+                alt="Triple J Auto Investment"
+                className="w-12 h-12 md:w-14 md:h-14 object-contain transition-transform group-hover:scale-110 drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]"
               />
-              <div className="hidden sm:block">
-                <p className="text-white font-display text-sm md:text-base tracking-wider leading-tight">TRIPLE J</p>
-                <p className="text-tj-gold text-[8px] md:text-[9px] uppercase tracking-[0.2em]">Admin Portal</p>
-              </div>
             </Link>
 
             {/* Desktop Navigation */}

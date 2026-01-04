@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, FileText, Car, Calendar, DollarSign, User, Globe, Loader2, CheckCircle, Eye } from 'lucide-react';
+import { X, FileText, Car, Calendar, DollarSign, User, Globe, Loader2, CheckCircle, Eye, Printer, Download, FileX } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Vehicle, BillOfSaleData } from '../../types';
 import { AddressInput } from '../AddressInput';
-import { PdfPreviewModal } from './PdfPreviewModal';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import {
   generateBillOfSalePDF,
@@ -40,6 +39,7 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewDocName, setPreviewDocName] = useState<string>('');
   const [currentDocType, setCurrentDocType] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Available vehicles (not sold)
   const availableVehicles = vehicles.filter(v => v.status !== 'Sold');
@@ -91,8 +91,8 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     } as BillOfSaleData;
   };
 
-  // Close preview modal
-  const closePreview = () => {
+  // Clear preview
+  const clearPreview = () => {
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
@@ -101,11 +101,10 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     setCurrentDocType(null);
   };
 
-  // Download from preview - uses existing blob URL directly (no fetch needed)
-  const handleDownloadFromPreview = () => {
+  // Download current preview
+  const handleDownload = () => {
     if (!previewUrl) return;
 
-    // Determine filename based on document type
     const safeName = (buyerName || 'Client').replace(/[^a-z0-9]/gi, '_');
     const fileNames: Record<string, string> = {
       'bos': `Bill_of_Sale_${safeName}.pdf`,
@@ -115,7 +114,6 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     };
     const fileName = fileNames[currentDocType || 'bos'] || 'Document.pdf';
 
-    // Use the existing blob URL directly - no need to fetch
     const link = document.createElement('a');
     link.href = previewUrl;
     link.download = fileName;
@@ -123,23 +121,43 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     link.click();
     document.body.removeChild(link);
 
-    // Update UI and close preview
     setLastGenerated(previewDocName);
-    closePreview();
+  };
+
+  // Print current preview
+  const handlePrint = () => {
+    if (!previewUrl) return;
+    const printWindow = window.open(previewUrl, '_blank');
+    if (printWindow) {
+      printWindow.onload = () => {
+        printWindow.print();
+      };
+    }
   };
 
   const handleGenerateBOS = async () => {
     const data = buildBillOfSaleData();
-    if (!data) return;
+    if (!data) {
+      setErrorMessage('Please fill in all required fields');
+      return;
+    }
 
     setGeneratingType('bos');
+    setErrorMessage(null);
     try {
+      console.log('Generating Bill of Sale...', data);
       const url = await generateBillOfSalePDF(data, true);
+      console.log('PDF URL generated:', url);
       if (url) {
         setPreviewUrl(url as string);
         setPreviewDocName('Bill of Sale');
         setCurrentDocType('bos');
+      } else {
+        setErrorMessage('Failed to generate PDF - no URL returned');
       }
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      setErrorMessage(`PDF generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setGeneratingType(null);
     }
@@ -147,16 +165,27 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
 
   const handleGenerateAsIs = async () => {
     const data = buildBillOfSaleData();
-    if (!data) return;
+    if (!data) {
+      setErrorMessage('Please fill in all required fields');
+      return;
+    }
 
     setGeneratingType('asis');
+    setErrorMessage(null);
     try {
+      console.log('Generating As-Is Form...', data);
       const url = await generateAsIsPDF(data, true);
+      console.log('PDF URL generated:', url);
       if (url) {
         setPreviewUrl(url as string);
         setPreviewDocName('As-Is Acknowledgment');
         setCurrentDocType('asis');
+      } else {
+        setErrorMessage('Failed to generate PDF - no URL returned');
       }
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      setErrorMessage(`PDF generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setGeneratingType(null);
     }
@@ -164,16 +193,27 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
 
   const handleGenerateRegistration = async () => {
     const data = buildBillOfSaleData();
-    if (!data) return;
+    if (!data) {
+      setErrorMessage('Please fill in all required fields');
+      return;
+    }
 
     setGeneratingType('reg');
+    setErrorMessage(null);
     try {
+      console.log('Generating Registration Guide...', data);
       const url = await generateRegistrationGuidePDF(data, true);
+      console.log('PDF URL generated:', url);
       if (url) {
         setPreviewUrl(url as string);
         setPreviewDocName('Registration Guide');
         setCurrentDocType('reg');
+      } else {
+        setErrorMessage('Failed to generate PDF - no URL returned');
       }
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      setErrorMessage(`PDF generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setGeneratingType(null);
     }
@@ -181,16 +221,27 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
 
   const handleGenerateForm130U = async () => {
     const data = buildBillOfSaleData();
-    if (!data) return;
+    if (!data) {
+      setErrorMessage('Please fill in all required fields');
+      return;
+    }
 
     setGeneratingType('130u');
+    setErrorMessage(null);
     try {
+      console.log('Generating Form 130-U...', data);
       const url = await generateForm130U(data, true);
+      console.log('PDF URL generated:', url);
       if (url) {
         setPreviewUrl(url as string);
         setPreviewDocName('Form 130-U (Texas Title Application)');
         setCurrentDocType('130u');
+      } else {
+        setErrorMessage('Failed to generate PDF - no URL returned');
       }
+    } catch (error) {
+      console.error('PDF Generation Error:', error);
+      setErrorMessage(`PDF generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setGeneratingType(null);
     }
@@ -215,15 +266,15 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
             onClick={handleClose}
           />
 
-          {/* Modal */}
+          {/* Modal - Wide for side-by-side layout */}
           <motion.div
             initial={{ scale: 0.95, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
-            className="relative w-full max-w-3xl max-h-[90vh] bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
+            className="relative w-full max-w-6xl max-h-[90vh] bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10 shrink-0">
+            <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10 shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center">
                   <FileText className="text-tj-gold" size={20} />
@@ -241,8 +292,10 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
               </button>
             </div>
 
-            {/* Content - Scrollable */}
-            <div className="flex-grow overflow-y-auto p-6 space-y-6">
+            {/* Content - Side by Side Layout */}
+            <div className="flex-grow overflow-hidden flex flex-col md:flex-row">
+              {/* LEFT PANEL - Form */}
+              <div className="w-full md:w-1/2 overflow-y-auto p-4 md:p-6 space-y-6 border-r border-white/10">
 
               {/* Vehicle Selection */}
               <div className="bg-black/50 border border-white/10 p-4">
@@ -382,84 +435,143 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                   </span>
                 </div>
               )}
-            </div>
 
-            {/* Footer Actions */}
-            <div className="p-6 border-t border-white/10 bg-black/50 shrink-0">
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={handleGenerateBOS}
-                  disabled={!isFormValid || generatingType !== null}
-                  className="bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-widest hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {generatingType === 'bos' ? (
-                    <Loader2 className="animate-spin" size={16} />
-                  ) : (
-                    <Eye size={16} />
-                  )}
-                  Bill of Sale
-                </button>
+              {/* Error Message */}
+              {errorMessage && (
+                <div className="bg-red-900/20 border border-red-700/50 p-4 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <X className="text-red-500" size={20} />
+                    <span className="text-red-400 text-sm">{errorMessage}</span>
+                  </div>
+                  <button
+                    onClick={() => setErrorMessage(null)}
+                    className="text-red-400 hover:text-red-300 transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              )}
 
-                <button
-                  onClick={handleGenerateForm130U}
-                  disabled={!isFormValid || generatingType !== null}
-                  className="bg-blue-800 text-white font-bold py-4 text-xs uppercase tracking-widest hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {generatingType === '130u' ? (
-                    <Loader2 className="animate-spin" size={16} />
-                  ) : (
-                    <Eye size={16} />
-                  )}
-                  Form 130-U
-                </button>
+                {/* Document Buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  <button
+                    onClick={handleGenerateBOS}
+                    disabled={!isFormValid || generatingType !== null}
+                    className="bg-tj-gold text-black font-bold py-3 text-xs uppercase tracking-widest hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {generatingType === 'bos' ? (
+                      <Loader2 className="animate-spin" size={16} />
+                    ) : (
+                      <Eye size={16} />
+                    )}
+                    Bill of Sale
+                  </button>
 
-                <button
-                  onClick={handleGenerateAsIs}
-                  disabled={!isFormValid || generatingType !== null}
-                  className="bg-white/10 text-white font-bold py-4 text-xs uppercase tracking-widest hover:bg-tj-gold hover:text-black border border-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {generatingType === 'asis' ? (
-                    <Loader2 className="animate-spin" size={16} />
-                  ) : (
-                    <Eye size={16} />
-                  )}
-                  As-Is Form
-                </button>
+                  <button
+                    onClick={handleGenerateForm130U}
+                    disabled={!isFormValid || generatingType !== null}
+                    className="bg-blue-800 text-white font-bold py-3 text-xs uppercase tracking-widest hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {generatingType === '130u' ? (
+                      <Loader2 className="animate-spin" size={16} />
+                    ) : (
+                      <Eye size={16} />
+                    )}
+                    Form 130-U
+                  </button>
 
-                <button
-                  onClick={handleGenerateRegistration}
-                  disabled={!isFormValid || generatingType !== null}
-                  className="bg-white/10 text-white font-bold py-4 text-xs uppercase tracking-widest hover:bg-tj-gold hover:text-black border border-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {generatingType === 'reg' ? (
-                    <Loader2 className="animate-spin" size={16} />
-                  ) : (
-                    <Eye size={16} />
-                  )}
-                  Reg Guide
-                </button>
+                  <button
+                    onClick={handleGenerateAsIs}
+                    disabled={!isFormValid || generatingType !== null}
+                    className="bg-white/10 text-white font-bold py-3 text-xs uppercase tracking-widest hover:bg-tj-gold hover:text-black border border-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {generatingType === 'asis' ? (
+                      <Loader2 className="animate-spin" size={16} />
+                    ) : (
+                      <Eye size={16} />
+                    )}
+                    As-Is Form
+                  </button>
+
+                  <button
+                    onClick={handleGenerateRegistration}
+                    disabled={!isFormValid || generatingType !== null}
+                    className="bg-white/10 text-white font-bold py-3 text-xs uppercase tracking-widest hover:bg-tj-gold hover:text-black border border-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {generatingType === 'reg' ? (
+                      <Loader2 className="animate-spin" size={16} />
+                    ) : (
+                      <Eye size={16} />
+                    )}
+                    Reg Guide
+                  </button>
+                </div>
+
+                {!isFormValid && (
+                  <p className="text-[10px] text-gray-500 text-center mt-3">
+                    Select a vehicle and fill in buyer information to generate documents
+                  </p>
+                )}
               </div>
 
-              <p className="text-[9px] text-gray-500 text-center mt-3 flex items-center justify-center gap-1">
-                <Eye size={10} /> Click to preview • Download or print from preview
-              </p>
+              {/* RIGHT PANEL - Preview */}
+              <div className="w-full md:w-1/2 flex flex-col bg-black/30">
+                {previewUrl ? (
+                  <>
+                    {/* Preview Header */}
+                    <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
+                      <div className="flex items-center gap-3">
+                        <FileText className="text-tj-gold" size={18} />
+                        <span className="text-white font-medium text-sm">{previewDocName}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={handlePrint}
+                          className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs uppercase tracking-widest transition-colors border border-white/10"
+                        >
+                          <Printer size={14} />
+                          Print
+                        </button>
+                        <button
+                          onClick={handleDownload}
+                          className="flex items-center gap-2 px-3 py-2 bg-tj-gold hover:bg-white text-black text-xs uppercase tracking-widest font-bold transition-colors"
+                        >
+                          <Download size={14} />
+                          Download
+                        </button>
+                        <button
+                          onClick={clearPreview}
+                          className="p-2 text-gray-500 hover:text-white transition-colors"
+                        >
+                          <X size={18} />
+                        </button>
+                      </div>
+                    </div>
 
-              {!isFormValid && (
-                <p className="text-[10px] text-gray-500 text-center mt-3">
-                  Select a vehicle and fill in buyer information to generate documents
-                </p>
-              )}
+                    {/* PDF Viewer */}
+                    <div className="flex-grow relative min-h-[400px]">
+                      <iframe
+                        src={previewUrl}
+                        className="absolute inset-0 w-full h-full border-0"
+                        title="Document Preview"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  /* Empty State */
+                  <div className="flex-grow flex flex-col items-center justify-center p-8 text-center min-h-[400px]">
+                    <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
+                      <FileX className="text-gray-600" size={32} />
+                    </div>
+                    <h3 className="text-white font-medium mb-2">No Document Selected</h3>
+                    <p className="text-gray-500 text-sm max-w-xs">
+                      Fill in the form and click a document button to generate a preview
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
-
-          {/* PDF Preview Modal */}
-          <PdfPreviewModal
-            isOpen={!!previewUrl}
-            onClose={closePreview}
-            pdfUrl={previewUrl}
-            documentName={previewDocName}
-            onDownload={handleDownloadFromPreview}
-          />
         </motion.div>
       )}
     </AnimatePresence>,

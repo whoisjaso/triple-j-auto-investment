@@ -2,21 +2,44 @@ import React from 'react';
 
 interface CrestLoaderProps {
   size?: 'sm' | 'md' | 'lg';
-  text?: string;
 }
 
 export const CrestLoader: React.FC<CrestLoaderProps> = ({
-  size = 'lg',
-  text
+  size = 'lg'
 }) => {
+  // Expanded container sizes for more space between crest and outline
   const sizeMap = {
-    sm: { container: 80, crest: 48, ring: 35, innerRing: 28, stroke: 2 },
-    md: { container: 120, crest: 68, ring: 52, innerRing: 42, stroke: 2 },
-    lg: { container: 160, crest: 88, ring: 72, innerRing: 58, stroke: 2.5 }
+    sm: { container: 130, crest: 60, pathScale: 0.78 },
+    md: { container: 180, crest: 84, pathScale: 1.08 },
+    lg: { container: 240, crest: 108, pathScale: 1.44 }
   };
 
-  const { container, crest, ring, innerRing, stroke } = sizeMap[size];
+  const { container, crest, pathScale } = sizeMap[size];
   const center = container / 2;
+
+  // Shield/Crest silhouette path - centered at origin, scaled
+  // This traces the outline of a classic heraldic shield shape
+  const shieldPath = `
+    M ${center} ${center - 45 * pathScale}
+    C ${center + 35 * pathScale} ${center - 45 * pathScale}
+      ${center + 48 * pathScale} ${center - 35 * pathScale}
+      ${center + 48 * pathScale} ${center - 15 * pathScale}
+    L ${center + 48 * pathScale} ${center + 5 * pathScale}
+    C ${center + 48 * pathScale} ${center + 25 * pathScale}
+      ${center + 35 * pathScale} ${center + 42 * pathScale}
+      ${center} ${center + 50 * pathScale}
+    C ${center - 35 * pathScale} ${center + 42 * pathScale}
+      ${center - 48 * pathScale} ${center + 25 * pathScale}
+      ${center - 48 * pathScale} ${center + 5 * pathScale}
+    L ${center - 48 * pathScale} ${center - 15 * pathScale}
+    C ${center - 48 * pathScale} ${center - 35 * pathScale}
+      ${center - 35 * pathScale} ${center - 45 * pathScale}
+      ${center} ${center - 45 * pathScale}
+    Z
+  `;
+
+  // Calculate approximate path length for animation
+  const pathLength = 400;
 
   return (
     <div
@@ -36,7 +59,7 @@ export const CrestLoader: React.FC<CrestLoaderProps> = ({
         zIndex: 9999
       }}
     >
-      {/* Radial gradient background - pulsing */}
+      {/* Radial gradient background - subtle pulse */}
       <div
         style={{
           position: 'absolute',
@@ -44,15 +67,15 @@ export const CrestLoader: React.FC<CrestLoaderProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'radial-gradient(circle at center, rgba(212,175,55,0.12) 0%, transparent 55%)',
-          animation: 'crestBgPulse 2.5s ease-in-out infinite'
+          background: 'radial-gradient(circle at center, rgba(212,175,55,0.08) 0%, transparent 50%)',
+          animation: 'crestBgPulse 3s ease-in-out infinite'
         }}
       />
 
       {/* Loader container */}
       <div style={{ position: 'relative', width: container, height: container }}>
 
-        {/* Outer rotating gold ring */}
+        {/* Tracing outline SVG */}
         <svg
           width={container}
           height={container}
@@ -60,64 +83,73 @@ export const CrestLoader: React.FC<CrestLoaderProps> = ({
           style={{
             position: 'absolute',
             top: 0,
-            left: 0,
-            animation: 'crestLoaderSpin 2.5s linear infinite'
+            left: 0
           }}
         >
           <defs>
-            <linearGradient id="crestLoaderGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            {/* Gold gradient for the tracing line */}
+            <linearGradient id="crestTraceGold" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#C5A059" />
-              <stop offset="50%" stopColor="#FFD700" />
+              <stop offset="25%" stopColor="#FFD700" />
+              <stop offset="50%" stopColor="#FFF8DC" />
+              <stop offset="75%" stopColor="#FFD700" />
               <stop offset="100%" stopColor="#C5A059" />
             </linearGradient>
+
+            {/* Glow filter */}
+            <filter id="crestGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
-          {/* Background ring */}
-          <circle
-            cx={center}
-            cy={center}
-            r={ring}
+
+          {/* Static faint outline */}
+          <path
+            d={shieldPath}
             fill="none"
-            stroke="rgba(212,175,55,0.08)"
+            stroke="rgba(212,175,55,0.1)"
             strokeWidth="1"
           />
-          {/* Animated arc */}
-          <circle
-            cx={center}
-            cy={center}
-            r={ring}
+
+          {/* Animated tracing path */}
+          <path
+            d={shieldPath}
             fill="none"
-            stroke="url(#crestLoaderGold)"
-            strokeWidth={stroke}
+            stroke="url(#crestTraceGold)"
+            strokeWidth="2.5"
             strokeLinecap="round"
-            strokeDasharray={`${ring * 1} ${ring * 5}`}
-            style={{ filter: 'drop-shadow(0 0 10px rgba(212,175,55,0.7))' }}
+            strokeLinejoin="round"
+            filter="url(#crestGlow)"
+            style={{
+              strokeDasharray: pathLength,
+              strokeDashoffset: pathLength,
+              animation: 'crestTrace 2.5s ease-in-out infinite'
+            }}
           />
-        </svg>
 
-        {/* Inner counter-rotating ring */}
-        <svg
-          width={container}
-          height={container}
-          viewBox={`0 0 ${container} ${container}`}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            animation: 'crestLoaderSpinReverse 3.5s linear infinite'
-          }}
-        >
-          <circle
-            cx={center}
-            cy={center}
-            r={innerRing}
+          {/* Secondary trace for fuller effect (delayed) */}
+          <path
+            d={shieldPath}
             fill="none"
-            stroke="rgba(212,175,55,0.15)"
-            strokeWidth="1"
-            strokeDasharray={`${innerRing * 0.3} ${innerRing * 0.7}`}
+            stroke="url(#crestTraceGold)"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{
+              strokeDasharray: pathLength,
+              strokeDashoffset: pathLength,
+              animation: 'crestTrace 2.5s ease-in-out infinite',
+              animationDelay: '0.5s',
+              opacity: 0.6
+            }}
           />
         </svg>
 
-        {/* Crest image - centered with float animation */}
+        {/* Crest image - centered */}
         <div
           style={{
             position: 'absolute',
@@ -127,60 +159,55 @@ export const CrestLoader: React.FC<CrestLoaderProps> = ({
             bottom: 0,
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            animation: 'crestLogoFloat 3s ease-in-out infinite'
+            justifyContent: 'center'
           }}
         >
           <img
             src="/GoldTripleJLogo.png"
-            alt="Triple J"
+            alt="Triple J Auto Investment"
             style={{
               width: crest,
               height: crest,
               objectFit: 'contain',
-              filter: 'drop-shadow(0 0 18px rgba(212,175,55,0.5))'
+              filter: 'drop-shadow(0 0 12px rgba(212,175,55,0.4))',
+              animation: 'crestLogoGlow 3s ease-in-out infinite'
             }}
           />
         </div>
       </div>
 
-      {/* Loading text */}
-      {text && (
-        <p
-          style={{
-            marginTop: 32,
-            fontSize: 10,
-            letterSpacing: '0.25em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.5)',
-            animation: 'crestTextPulse 2s ease-in-out infinite'
-          }}
-        >
-          {text}
-        </p>
-      )}
-
       {/* Keyframe animations */}
       <style>{`
-        @keyframes crestLoaderSpin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
+        @keyframes crestTrace {
+          0% {
+            stroke-dashoffset: ${pathLength};
+          }
+          50% {
+            stroke-dashoffset: 0;
+          }
+          100% {
+            stroke-dashoffset: -${pathLength};
+          }
         }
-        @keyframes crestLoaderSpinReverse {
-          from { transform: rotate(360deg); }
-          to { transform: rotate(0deg); }
-        }
+
         @keyframes crestBgPulse {
-          0%, 100% { opacity: 0.6; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.03); }
+          0%, 100% {
+            opacity: 0.5;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.05);
+          }
         }
-        @keyframes crestLogoFloat {
-          0%, 100% { transform: translateY(0) scale(1); }
-          50% { transform: translateY(-4px) scale(1.02); }
-        }
-        @keyframes crestTextPulse {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 0.8; }
+
+        @keyframes crestLogoGlow {
+          0%, 100% {
+            filter: drop-shadow(0 0 12px rgba(212,175,55,0.4));
+          }
+          50% {
+            filter: drop-shadow(0 0 20px rgba(212,175,55,0.7));
+          }
         }
       `}</style>
     </div>

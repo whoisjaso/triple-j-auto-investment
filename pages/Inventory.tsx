@@ -190,8 +190,9 @@ const Inventory = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  // Use scroll lock hook for modal and lightbox
-  useScrollLock(!!selectedVehicle || lightboxOpen);
+  // Use scroll lock hook for modal only (ImageGallery handles its own lock)
+  // When lightbox is open, let ImageGallery handle scroll lock to avoid double-locking
+  useScrollLock(!!selectedVehicle && !lightboxOpen);
 
   // Set mobile viewport height variable for proper fullscreen
   useEffect(() => {
