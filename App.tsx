@@ -230,7 +230,7 @@ const Navbar = () => {
                 hidden: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
               }}
             >
-              {/* Public Navigation Links */}
+              {/* Public Navigation Links - with animation fallback for mobile browsers */}
               {[
                 { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT" },
                 { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "ACQUIRE ASSETS" },
@@ -248,18 +248,21 @@ const Navbar = () => {
                     delay: index * 0.08
                   }}
                   className="w-full text-center group"
+                  style={{ opacity: 1 }}
                 >
                   <Link
                     to={link.to}
                     onClick={() => setIsOpen(false)}
                     className="block font-display text-3xl text-white tracking-[0.15em] hover:text-tj-gold transition-all duration-300 hover:tracking-[0.2em]"
+                    style={{ opacity: 1 }}
                   >
-                    <span className="inline-block hover:scale-105 transition-transform">
+                    <span className="inline-block hover:scale-105 transition-transform" style={{ opacity: 1 }}>
                       {link.label}
                     </span>
                   </Link>
                   <p
                     className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors"
+                    style={{ opacity: 1 }}
                   >
                     {link.sub}
                   </p>
@@ -272,46 +275,51 @@ const Navbar = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4, type: "spring", stiffness: 100 }}
                 className="w-full border-t border-tj-gold/30 pt-6 mt-2"
+                style={{ opacity: 1 }}
               >
                 {user ? (
                   <>
-                    <p className="text-[9px] text-tj-gold uppercase tracking-[0.3em] mb-4 text-center">Admin Access</p>
+                    <p className="text-[9px] text-tj-gold uppercase tracking-[0.3em] mb-4 text-center" style={{ opacity: 1 }}>Admin Access</p>
                     <div className="flex flex-col gap-4">
                       <Link
                         to="/admin/dashboard"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                        style={{ opacity: 1 }}
                       >
                         <LayoutDashboard size={18} />
-                        <span className="text-lg font-display tracking-widest">DASHBOARD</span>
+                        <span className="text-lg font-display tracking-widest" style={{ opacity: 1 }}>DASHBOARD</span>
                       </Link>
                       <Link
                         to="/admin/inventory"
                         onClick={() => setIsOpen(false)}
                         className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                        style={{ opacity: 1 }}
                       >
                         <Car size={18} />
-                        <span className="text-lg font-display tracking-widest">INVENTORY</span>
+                        <span className="text-lg font-display tracking-widest" style={{ opacity: 1 }}>INVENTORY</span>
                       </Link>
                       <button
                         onClick={() => { logout(); setIsOpen(false); }}
                         className="flex items-center justify-center gap-3 text-red-500 hover:text-red-400 transition-colors py-2"
+                        style={{ opacity: 1 }}
                       >
                         <Lock size={18} />
-                        <span className="text-lg font-display tracking-widest">LOGOUT</span>
+                        <span className="text-lg font-display tracking-widest" style={{ opacity: 1 }}>LOGOUT</span>
                       </button>
                     </div>
                   </>
                 ) : (
                   <>
-                    <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Dealer Portal</p>
+                    <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mb-4 text-center" style={{ opacity: 1 }}>Dealer Portal</p>
                     <Link
                       to="/login"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-3 border border-gray-700 hover:border-tj-gold/50 bg-black/50"
+                      style={{ opacity: 1 }}
                     >
                       <Lock size={16} />
-                      <span className="text-sm font-display tracking-widest">ADMIN LOGIN</span>
+                      <span className="text-sm font-display tracking-widest" style={{ opacity: 1 }}>ADMIN LOGIN</span>
                     </Link>
                   </>
                 )}
@@ -325,8 +333,9 @@ const Navbar = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, type: "spring", stiffness: 100 }}
               className="absolute bottom-28 flex items-center gap-3 text-tj-gold border border-tj-gold px-6 py-3 hover:bg-tj-gold hover:text-black transition-colors"
+              style={{ opacity: 1 }}
             >
-              <span className="text-[10px] uppercase tracking-widest font-bold">Speak to AI Agent</span>
+              <span className="text-[10px] uppercase tracking-widest font-bold" style={{ opacity: 1 }}>Speak to AI Agent</span>
             </motion.a>
 
             <motion.div
@@ -334,10 +343,12 @@ const Navbar = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
               className="absolute bottom-12"
+              style={{ opacity: 1 }}
             >
               <button
                 onClick={toggleLang}
                 className="text-gray-500 hover:text-tj-gold px-6 py-2 text-[10px] uppercase tracking-widest transition-colors"
+                style={{ opacity: 1 }}
               >
                 {lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}
               </button>
