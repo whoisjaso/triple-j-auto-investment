@@ -201,9 +201,12 @@ const Navbar = () => {
       </div>
 
       {/* --- MOBILE MENU --- */}
-      {/* Simplified mobile menu without complex animations for reliability */}
+      {/* Simplified mobile menu - ultra high z-index to ensure visibility */}
       {isOpen && (
-        <div className="fixed inset-0 z-[60] bg-black flex flex-col justify-center items-center md:hidden overflow-hidden">
+        <div
+          className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black flex flex-col justify-center items-center md:hidden overflow-hidden"
+          style={{ zIndex: 99999, position: 'fixed' }}
+        >
           {/* Subtle gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-b from-tj-gold/5 via-transparent to-tj-gold/5 pointer-events-none"></div>
 
