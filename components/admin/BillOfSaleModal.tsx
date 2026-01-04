@@ -101,65 +101,31 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     setCurrentDocType(null);
   };
 
-  // Download from preview - uses existing blob URL for efficiency
-  const handleDownloadFromPreview = async () => {
+  // Download from preview - uses existing blob URL directly (no fetch needed)
+  const handleDownloadFromPreview = () => {
     if (!previewUrl) return;
 
-    try {
-      // Fetch the blob from the existing preview URL
-      const response = await fetch(previewUrl);
-      const blob = await response.blob();
-      const downloadUrl = URL.createObjectURL(blob);
+    // Determine filename based on document type
+    const safeName = (buyerName || 'Client').replace(/[^a-z0-9]/gi, '_');
+    const fileNames: Record<string, string> = {
+      'bos': `Bill_of_Sale_${safeName}.pdf`,
+      'asis': `As_Is_Acknowledgment_${safeName}.pdf`,
+      'reg': `Registration_Guide_${safeName}.pdf`,
+      '130u': `Form_130U_${safeName}.pdf`
+    };
+    const fileName = fileNames[currentDocType || 'bos'] || 'Document.pdf';
 
-      // Determine filename based on document type
-      const safeName = (buyerName || 'Client').replace(/[^a-z0-9]/gi, '_');
-      const fileNames: Record<string, string> = {
-        'bos': `Bill_of_Sale_${safeName}.pdf`,
-        'asis': `As_Is_Acknowledgment_${safeName}.pdf`,
-        'reg': `Registration_Guide_${safeName}.pdf`,
-        '130u': `Form_130U_${safeName}.pdf`
-      };
-      const fileName = fileNames[currentDocType || 'bos'] || 'Document.pdf';
+    // Use the existing blob URL directly - no need to fetch
+    const link = document.createElement('a');
+    link.href = previewUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 
-      // Create download link and trigger
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(downloadUrl);
-
-      // Update UI and close preview
-      setLastGenerated(previewDocName);
-      closePreview();
-    } catch (error) {
-      console.error('Download failed, regenerating:', error);
-      // Fallback to regeneration if blob fetch fails
-      const data = buildBillOfSaleData();
-      if (!data) return;
-
-      closePreview();
-
-      switch (currentDocType) {
-        case 'bos':
-          await generateBillOfSalePDF(data, false);
-          setLastGenerated('Bill of Sale');
-          break;
-        case 'asis':
-          await generateAsIsPDF(data, false);
-          setLastGenerated('As-Is Acknowledgment');
-          break;
-        case 'reg':
-          await generateRegistrationGuidePDF(data, false);
-          setLastGenerated('Registration Guide');
-          break;
-        case '130u':
-          await generateForm130U(data, false);
-          setLastGenerated('Form 130-U');
-          break;
-      }
-    }
+    // Update UI and close preview
+    setLastGenerated(previewDocName);
+    closePreview();
   };
 
   const handleGenerateBOS = async () => {

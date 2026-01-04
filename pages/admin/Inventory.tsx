@@ -179,7 +179,7 @@ const resizeImage = (file: File): Promise<string> => {
 };
 
 const AdminInventory = () => {
-  const { vehicles, addVehicle, updateVehicle, removeVehicle, syncWithGoogleSheets, lastSync, resetToDefault } = useStore();
+  const { vehicles, addVehicle, updateVehicle, removeVehicle, syncWithGoogleSheets, lastSync, resetToDefault, connectionError } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDecoding, setIsDecoding] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
@@ -569,6 +569,19 @@ const AdminInventory = () => {
   return (
     <>
       <AdminHeader />
+
+      {/* Connection Error Banner */}
+      {connectionError && (
+        <div className="bg-red-900/90 border-b border-red-700 px-4 py-3 text-center">
+          <p className="text-red-200 text-sm font-medium">
+            <span className="font-bold">Connection Issue:</span> {connectionError}
+          </p>
+          <p className="text-red-300/70 text-xs mt-1">
+            Some features may not work. Check your internet connection or contact support.
+          </p>
+        </div>
+      )}
+
       <div className="min-h-screen bg-black p-4 md:p-8 lg:p-12 font-sans relative">
       {/* Sync Overlay */}
       {isSyncing && (

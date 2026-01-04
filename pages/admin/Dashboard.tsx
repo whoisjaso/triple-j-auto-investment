@@ -136,7 +136,7 @@ const AdminHeader = () => {
 };
 
 const Dashboard = () => {
-  const { vehicles, leads } = useStore();
+  const { vehicles, leads, connectionError } = useStore();
   const [financialReport, setFinancialReport] = useState<string>("INITIALIZING FINANCIAL NEURAL NETWORK...");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -233,6 +233,19 @@ const Dashboard = () => {
   return (
     <>
       <AdminHeader />
+
+      {/* Connection Error Banner */}
+      {connectionError && (
+        <div className="bg-red-900/90 border-b border-red-700 px-4 py-3 text-center">
+          <p className="text-red-200 text-sm font-medium">
+            <span className="font-bold">Connection Issue:</span> {connectionError}
+          </p>
+          <p className="text-red-300/70 text-xs mt-1">
+            Some features may not work. Check your internet connection or contact support.
+          </p>
+        </div>
+      )}
+
       <div className="min-h-screen bg-black p-4 md:p-8 lg:p-12 font-sans text-gray-100 relative">
       {/* DEEP DIVE MODAL (PROFIT LEDGER) */}
       {showProfitDetails && (

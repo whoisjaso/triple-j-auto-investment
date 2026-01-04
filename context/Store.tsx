@@ -14,6 +14,7 @@ interface StoreContextType {
   user: User | null;
   lastSync: Date | null;
   isLoading: boolean;
+  connectionError: string | null;
   refreshVehicles: () => Promise<void>;
   login: (email: string, password?: string) => Promise<boolean>;
   triggerRecovery: () => void;
@@ -142,6 +143,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [user, setUser] = useState<User | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const isSyncingRef = useRef(false);
   const isInitializedRef = useRef(false);
@@ -259,13 +261,18 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (error) {
         console.error('❌ Failed to load vehicles from Supabase:', error);
         console.error('Error Details:', error.message, error.details, error.hint);
-        
+
+        // Set visible connection error
+        const errorMsg = error.message || 'Database connection failed';
+        setConnectionError(`Database Error: ${errorMsg}`);
+
         // Check if this might be a Brave browser blocking issue
         const isBrave = navigator.userAgent.includes('Brave') || (navigator as any).brave;
         if (isBrave && error.message?.includes('fetch') || error.message?.includes('network')) {
           console.warn('⚠️ Possible Brave browser blocking detected. Try disabling Shields for this site.');
+          setConnectionError('Connection blocked. Try disabling browser shields for this site.');
         }
-        
+
         // Only load fallback if we really can't connect
         if (vehicles.length === 0) {
           console.warn('⚠️ Using FALLBACK assets due to fetch error.');
@@ -273,6 +280,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
         return;
       }
+
+      // Clear any previous connection error on success
+      setConnectionError(null);
 
       console.log(`📡 Supabase Fetch Complete. Found ${data?.length || 0} vehicles.`);
 
@@ -857,6 +867,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       user,
       lastSync,
       isLoading,
+      connectionError,
       refreshVehicles: loadVehicles,
       login,
       triggerRecovery,
