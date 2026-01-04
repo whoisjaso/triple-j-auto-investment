@@ -201,22 +201,13 @@ const Navbar = () => {
       </div>
 
       {/* --- MOBILE MENU --- */}
-      {/* Simplified mobile menu - ultra high z-index to ensure visibility */}
+      {/* Pure black background, no overlays */}
       {isOpen && (
         <div
-          className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen bg-black flex flex-col justify-center items-center md:hidden overflow-hidden"
-          style={{ zIndex: 99999, position: 'fixed' }}
+          className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen flex flex-col justify-center items-center md:hidden"
+          style={{ zIndex: 99999, position: 'fixed', backgroundColor: '#000000' }}
         >
-          {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-tj-gold/5 via-transparent to-tj-gold/5 pointer-events-none"></div>
-
-          {/* Decorative corner accents */}
-          <div className="absolute top-8 left-8 w-12 h-12 border-l-2 border-t-2 border-tj-gold/30"></div>
-          <div className="absolute top-8 right-8 w-12 h-12 border-r-2 border-t-2 border-tj-gold/30"></div>
-          <div className="absolute bottom-8 left-8 w-12 h-12 border-l-2 border-b-2 border-tj-gold/30"></div>
-          <div className="absolute bottom-8 right-8 w-12 h-12 border-r-2 border-b-2 border-tj-gold/30"></div>
-
-          <div className="flex flex-col items-center gap-8 z-10 w-full px-8">
+          <div className="flex flex-col items-center gap-8 w-full px-8">
             {/* Public Navigation Links */}
             {[
               { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT" },
