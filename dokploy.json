@@ -26,6 +26,18 @@
     {
       "key": "VITE_ADMIN_PASSWORD",
       "value": "adekunle12"
+    },
+    {
+      "key": "VITE_RETELL_API_KEY",
+      "value": "key_86a41f8fad555c03e879a71d0398"
+    },
+    {
+      "key": "VITE_RETELL_OUTBOUND_AGENT_ID",
+      "value": "agent_b8c93771b686703566f5cef9a7"
+    },
+    {
+      "key": "VITE_RETELL_OUTBOUND_NUMBER",
+      "value": "+18324005294"
     }
   ],
   "env": [
