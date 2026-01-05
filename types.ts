@@ -70,6 +70,26 @@ export interface VinResult {
   ErrorText?: string;
 }
 
+// Photo ID Types for Form 130-U
+export type PhotoIdType =
+  | 'US_DRIVERS_LICENSE'
+  | 'US_PASSPORT'
+  | 'US_MILITARY_ID'
+  | 'NATO_ID'
+  | 'US_CITIZENSHIP_CERT'
+  | 'PERMANENT_RESIDENT_CARD'
+  | 'STATE_ID';
+
+export const PHOTO_ID_LABELS: Record<PhotoIdType, string> = {
+  'US_DRIVERS_LICENSE': 'U.S. Driver License',
+  'US_PASSPORT': 'U.S. Passport',
+  'US_MILITARY_ID': 'U.S. Military ID',
+  'NATO_ID': 'NATO ID',
+  'US_CITIZENSHIP_CERT': 'U.S. Citizenship Certificate',
+  'PERMANENT_RESIDENT_CARD': 'Permanent Resident Card (Green Card)',
+  'STATE_ID': 'State-Issued ID'
+};
+
 // Bill of Sale Types
 export interface BillOfSaleData {
   date: string;
@@ -91,6 +111,11 @@ export interface BillOfSaleData {
   exteriorColorHex?: string;
   interiorColor: string;
   interiorColorHex?: string;
+  majorColor: string;           // Primary/Major color for Form 130-U
+  minorColor: string;           // Secondary/Minor color for Form 130-U
+  texasPlantNo: string;         // Texas Plant Number
+  applicantIdType: PhotoIdType; // Type of photo ID presented
+  applicantIdNumber: string;    // ID number
   notes: string;
   printLanguage: 'EN' | 'ES';
 }

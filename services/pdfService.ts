@@ -691,10 +691,11 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         setTextField('3 Make', data.make || '');
         setTextField('4 Body Style', data.bodyStyle || '4D');
         setTextField('5 Model', data.model || '');
-        setTextField('6 Major Color', data.exteriorColor || '');
-        setTextField('7 Minor Color', data.interiorColor || '');
+        setTextField('6 Major Color', data.majorColor || data.exteriorColor || '');
+        setTextField('7 Minor Color', data.minorColor || data.interiorColor || '');
         setTextField('8 Texas License Plate No', data.licensePlate || '');
         setTextField('9 Odometer Reading no tenths', data.odometer || '');
+        setTextField('10 Texas Plant No', data.texasPlantNo || '');
         setTextField('11 Empty Weight', data.emptyWeight || '');
 
         // Applicant Type - Default to Individual
@@ -703,6 +704,26 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         // Applicant/Buyer Information (Section 2)
         setTextField('16 Applicant First Name or Entity Name Middle Name Last Name Suffix if any', data.buyerName || '');
         setTextField('18 Applicant Mailing Address City State Zip', data.buyerAddress || '');
+
+        // Applicant Photo ID Information
+        if (data.applicantIdType && data.applicantIdNumber) {
+            // Map ID type to form field checkbox names
+            const idTypeCheckboxMap: Record<string, string> = {
+                'US_DRIVERS_LICENSE': 'US Drivers License',
+                'US_PASSPORT': 'US Passport',
+                'US_MILITARY_ID': 'US Military ID',
+                'NATO_ID': 'NATO ID',
+                'US_CITIZENSHIP_CERT': 'US Citizenship Certificate',
+                'PERMANENT_RESIDENT_CARD': 'Permanent Resident Card',
+                'STATE_ID': 'State ID'
+            };
+            const checkboxName = idTypeCheckboxMap[data.applicantIdType];
+            if (checkboxName) {
+                checkBox(checkboxName);
+            }
+            // Set ID number field
+            setTextField('17 Applicant ID Number', data.applicantIdNumber || '');
+        }
 
         // County - Auto-detect from zip code in address
         const county = getCountyFromAddress(data.buyerAddress || '');
@@ -796,6 +817,11 @@ export const createBillOfSaleFromVehicle = (vehicle: {
     emptyWeight: '',
     exteriorColor: '',
     interiorColor: '',
+    majorColor: '',
+    minorColor: '',
+    texasPlantNo: '',
+    applicantIdType: 'US_DRIVERS_LICENSE',
+    applicantIdNumber: '',
     notes: '',
     buyerName: '',
     buyerAddress: ''

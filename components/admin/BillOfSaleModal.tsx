@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, FileText, Car, Calendar, DollarSign, User, Globe, Loader2, CheckCircle, Eye, Printer, Download, FileX } from 'lucide-react';
+import { X, FileText, Car, Calendar, DollarSign, User, Globe, Loader2, CheckCircle, Eye, Printer, Download, FileX, Palette, CreditCard, Factory } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Vehicle, BillOfSaleData } from '../../types';
+import { Vehicle, BillOfSaleData, PhotoIdType, PHOTO_ID_LABELS } from '../../types';
 import { AddressInput } from '../AddressInput';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import {
@@ -34,6 +34,13 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
   const [language, setLanguage] = useState<'EN' | 'ES'>('EN');
   const [generatingType, setGeneratingType] = useState<string | null>(null);
   const [lastGenerated, setLastGenerated] = useState<string | null>(null);
+
+  // New fields for Form 130-U
+  const [majorColor, setMajorColor] = useState('');
+  const [minorColor, setMinorColor] = useState('');
+  const [texasPlantNo, setTexasPlantNo] = useState('');
+  const [applicantIdType, setApplicantIdType] = useState<PhotoIdType>('US_DRIVERS_LICENSE');
+  const [applicantIdNumber, setApplicantIdNumber] = useState('');
 
   // Preview state
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -87,6 +94,11 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
       emptyWeight: '',
       exteriorColor: '',
       interiorColor: '',
+      majorColor,
+      minorColor,
+      texasPlantNo,
+      applicantIdType,
+      applicantIdNumber,
       notes: ''
     } as BillOfSaleData;
   };
@@ -422,6 +434,88 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                     >
                       Español
                     </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Vehicle Colors & Texas Plant No (for Form 130-U) */}
+              <div className="space-y-4">
+                <h3 className="text-[10px] uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                  <Palette size={12} /> Vehicle Colors & Details
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                      Major Color
+                    </label>
+                    <input
+                      type="text"
+                      value={majorColor}
+                      onChange={(e) => setMajorColor(e.target.value)}
+                      placeholder="Black"
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                      Minor Color
+                    </label>
+                    <input
+                      type="text"
+                      value={minorColor}
+                      onChange={(e) => setMinorColor(e.target.value)}
+                      placeholder="Gray"
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-2">
+                      <Factory size={12} /> Texas Plant No.
+                    </label>
+                    <input
+                      type="text"
+                      value={texasPlantNo}
+                      onChange={(e) => setTexasPlantNo(e.target.value)}
+                      placeholder="Optional"
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Applicant Photo ID */}
+              <div className="space-y-4">
+                <h3 className="text-[10px] uppercase tracking-widest text-gray-500 flex items-center gap-2">
+                  <CreditCard size={12} /> Applicant Photo ID
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                      ID Type
+                    </label>
+                    <select
+                      value={applicantIdType}
+                      onChange={(e) => setApplicantIdType(e.target.value as PhotoIdType)}
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors appearance-none cursor-pointer"
+                    >
+                      {Object.entries(PHOTO_ID_LABELS).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+                      ID Number
+                    </label>
+                    <input
+                      type="text"
+                      value={applicantIdNumber}
+                      onChange={(e) => setApplicantIdNumber(e.target.value)}
+                      placeholder="Enter ID number"
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                    />
                   </div>
                 </div>
               </div>
