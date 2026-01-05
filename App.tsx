@@ -276,14 +276,6 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* AI Voice Agent CTA */}
-          <a
-            href="tel:+18324009760"
-            className="absolute bottom-28 flex items-center gap-3 text-tj-gold border border-tj-gold px-6 py-3 hover:bg-tj-gold hover:text-black transition-colors"
-          >
-            <span className="text-[10px] uppercase tracking-widest font-bold">Speak to AI Agent</span>
-          </a>
-
           <div className="absolute bottom-12">
             <button
               onClick={toggleLang}
