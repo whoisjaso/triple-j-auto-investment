@@ -254,11 +254,19 @@ export const generateBillOfSalePDF = async (data: BillOfSaleData, preview: boole
     drawDataBox(doc, isSpanish ? "PLACA" : "LICENSE PLATE", data.licensePlate, MARGIN + (CONTENT_WIDTH * 0.7), y, CONTENT_WIDTH * 0.3, 10, { mono: true, align: 'center' });
     y += 10;
 
-    // Details Row
-    const wThird = CONTENT_WIDTH / 3;
-    drawDataBox(doc, isSpanish ? "COLOR (EXT/INT)" : "COLOR (EXT/INT)", `${data.exteriorColor} / ${data.interiorColor}`, MARGIN, y, wThird, 10);
-    drawDataBox(doc, isSpanish ? "PESO VACÍO" : "EMPTY WEIGHT (LBS)", data.emptyWeight, MARGIN + wThird, y, wThird, 10);
-    drawDataBox(doc, isSpanish ? "FECHA DE VENTA" : "DATE OF SALE", data.date, MARGIN + (wThird * 2), y, wThird, 10, { align: 'center' });
+    // Details Row - Colors
+    const wQuarter = CONTENT_WIDTH / 4;
+    drawDataBox(doc, isSpanish ? "COLOR MAYOR" : "MAJOR COLOR", data.majorColor || data.exteriorColor, MARGIN, y, wQuarter, 10);
+    drawDataBox(doc, isSpanish ? "COLOR MENOR" : "MINOR COLOR", data.minorColor || data.interiorColor, MARGIN + wQuarter, y, wQuarter, 10);
+    drawDataBox(doc, isSpanish ? "PESO VACÍO" : "EMPTY WEIGHT (LBS)", data.emptyWeight, MARGIN + (wQuarter * 2), y, wQuarter, 10);
+    drawDataBox(doc, isSpanish ? "FECHA DE VENTA" : "DATE OF SALE", data.date, MARGIN + (wQuarter * 3), y, wQuarter, 10, { align: 'center' });
+    y += 10;
+
+    // Texas Plant No & Applicant ID Row
+    const wHalf = CONTENT_WIDTH / 2;
+    drawDataBox(doc, isSpanish ? "PLANTA TX NO." : "TEXAS PLANT NO.", data.texasPlantNo || 'N/A', MARGIN, y, wHalf * 0.4, 10);
+    drawDataBox(doc, isSpanish ? "TIPO DE ID" : "APPLICANT ID TYPE", data.applicantIdType ? data.applicantIdType.replace(/_/g, ' ') : '', MARGIN + (wHalf * 0.4), y, wHalf * 0.6, 10);
+    drawDataBox(doc, isSpanish ? "NÚMERO DE ID" : "APPLICANT ID NUMBER", data.applicantIdNumber || '', MARGIN + wHalf, y, wHalf, 10, { mono: true });
     y += 14;
 
     // 3. ODOMETER DISCLOSURE
@@ -474,6 +482,22 @@ export const generateAsIsPDF = async (data: BillOfSaleData, preview: boolean = f
     curX = drawUnderlinedField("VIN:", data.vin, curX, 100);
     curX = drawUnderlinedField(isSpanish ? "Millaje:" : "Mileage:", data.odometer, curX + 10, 60);
 
+    y += 10;
+
+    // Row 3: Colors
+    curX = MARGIN;
+    curX = drawUnderlinedField(isSpanish ? "Color Mayor:" : "Major Color:", data.majorColor || data.exteriorColor, curX, 60);
+    curX = drawUnderlinedField(isSpanish ? "Color Menor:" : "Minor Color:", data.minorColor || data.interiorColor, curX + 5, 60);
+    curX = drawUnderlinedField(isSpanish ? "Planta TX:" : "TX Plant No:", data.texasPlantNo, curX + 5, 50);
+
+    y += 10;
+
+    // Row 4: Applicant ID
+    curX = MARGIN;
+    const idTypeLabel = data.applicantIdType ? data.applicantIdType.replace(/_/g, ' ') : '';
+    curX = drawUnderlinedField(isSpanish ? "Tipo de ID:" : "ID Type:", idTypeLabel, curX, 80);
+    curX = drawUnderlinedField(isSpanish ? "Número de ID:" : "ID Number:", data.applicantIdNumber, curX + 5, 80);
+
     drawFooter(doc);
 
     if (preview) {
@@ -508,6 +532,29 @@ export const generateRegistrationGuidePDF = async (data: BillOfSaleData, preview
         doc.text(lines, MARGIN + 12, y);
         y += (lines.length * 5) + 8;
     };
+
+    // Vehicle Information Section
+    y = drawSection(doc, "VEHICLE INFORMATION", y);
+    y += 2;
+
+    const colW = CONTENT_WIDTH / 4;
+    drawDataBox(doc, "YEAR", data.year, MARGIN, y, colW * 0.6, 10, { align: 'center' });
+    drawDataBox(doc, "MAKE", data.make, MARGIN + (colW * 0.6), y, colW, 10);
+    drawDataBox(doc, "MODEL", data.model, MARGIN + (colW * 1.6), y, colW, 10);
+    drawDataBox(doc, "VIN", data.vin, MARGIN + (colW * 2.6), y, colW * 1.4, 10, { mono: true });
+    y += 10;
+
+    drawDataBox(doc, "MAJOR COLOR", data.majorColor || data.exteriorColor, MARGIN, y, colW, 10);
+    drawDataBox(doc, "MINOR COLOR", data.minorColor || data.interiorColor, MARGIN + colW, y, colW, 10);
+    drawDataBox(doc, "TX PLANT NO", data.texasPlantNo || 'N/A', MARGIN + (colW * 2), y, colW, 10);
+    drawDataBox(doc, "ODOMETER", data.odometer, MARGIN + (colW * 3), y, colW, 10, { align: 'center' });
+    y += 12;
+
+    // Buyer Information
+    drawDataBox(doc, "BUYER NAME", data.buyerName, MARGIN, y, CONTENT_WIDTH / 2, 10);
+    drawDataBox(doc, "BUYER ID TYPE", data.applicantIdType ? data.applicantIdType.replace(/_/g, ' ') : '', MARGIN + (CONTENT_WIDTH / 2), y, CONTENT_WIDTH / 4, 10);
+    drawDataBox(doc, "ID NUMBER", data.applicantIdNumber, MARGIN + (CONTENT_WIDTH * 0.75), y, CONTENT_WIDTH / 4, 10, { mono: true });
+    y += 14;
 
     y = drawSection(doc, "CRITICAL NEXT STEPS FOR REGISTRATION", y);
     y += 5;
