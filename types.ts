@@ -124,3 +124,184 @@ export interface AddressSuggestion {
   display_name: string;
   place_id: number;
 }
+
+// ================================================================
+// REGISTRATION STATUS LEDGER TYPES
+// ================================================================
+
+export type RegistrationStageKey =
+  | 'payment'
+  | 'insurance'
+  | 'inspection'
+  | 'submission'
+  | 'dmv_processing'
+  | 'approved'
+  | 'ready';
+
+export type RegistrationStageStatus = 'waiting' | 'pending' | 'complete' | 'blocked';
+
+export type RegistrationOwnership = 'customer' | 'dealer' | 'state';
+
+export interface RegistrationStage {
+  id: string;
+  registrationId: string;
+  stageKey: RegistrationStageKey;
+  stageLabel: string;
+  stageOrder: number;
+  status: RegistrationStageStatus;
+  ownership: RegistrationOwnership;
+  startedAt?: string;
+  completedAt?: string;
+  blockedReason?: string;
+  actionRequired?: string;
+  actionUrl?: string;
+  internalNotes?: string;
+  updatedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Registration {
+  id: string;
+  orderId: string;
+  vehicleId?: string;
+
+  // Customer Info
+  customerName: string;
+  customerEmail?: string;
+  customerPhone?: string;
+
+  // Vehicle Info (snapshot)
+  vin: string;
+  vehicleYear: number;
+  vehicleMake: string;
+  vehicleModel: string;
+
+  // Status
+  currentStage: RegistrationStageKey;
+  currentStatus: RegistrationStageStatus;
+
+  // Timestamps
+  purchaseDate: string;
+  createdAt: string;
+  updatedAt: string;
+
+  // Related data (populated on fetch)
+  stages?: RegistrationStage[];
+}
+
+export interface RegistrationDocument {
+  id: string;
+  registrationId: string;
+  stageKey: RegistrationStageKey;
+  documentType: string;
+  documentName?: string;
+  fileUrl: string;
+  verified: boolean;
+  verifiedBy?: string;
+  verifiedAt?: string;
+  rejectionReason?: string;
+  uploadedBy: 'customer' | 'admin';
+  createdAt: string;
+}
+
+export interface RegistrationNotification {
+  id: string;
+  registrationId: string;
+  notificationType: 'stage_complete' | 'action_required' | 'blocked' | 'ready_pickup';
+  channel: 'sms' | 'email';
+  recipient: string;
+  message: string;
+  sentAt: string;
+  delivered?: boolean;
+  deliveryError?: string;
+  triggeredBy: 'admin_action' | 'auto' | 'system';
+  createdAt: string;
+}
+
+// Stage Configuration for UI rendering
+export interface StageConfig {
+  key: RegistrationStageKey;
+  label: string;
+  ownership: RegistrationOwnership;
+  ownershipLabel: string;
+  description: string;
+  actionRequiredText?: string;
+  expectedDuration?: string;
+}
+
+export const REGISTRATION_STAGES: StageConfig[] = [
+  {
+    key: 'payment',
+    label: 'Payment Received',
+    ownership: 'dealer',
+    ownershipLabel: 'Triple J Processing',
+    description: 'Your investment is secured.'
+  },
+  {
+    key: 'insurance',
+    label: 'Insurance Verified',
+    ownership: 'customer',
+    ownershipLabel: 'Your Action Required',
+    description: 'Please provide your proof of insurance.',
+    actionRequiredText: 'Upload Insurance'
+  },
+  {
+    key: 'inspection',
+    label: 'Inspection Complete',
+    ownership: 'customer',
+    ownershipLabel: 'Your Action Required',
+    description: 'Please complete your vehicle inspection.',
+    actionRequiredText: 'Complete Inspection'
+  },
+  {
+    key: 'submission',
+    label: 'Dealer Submission',
+    ownership: 'dealer',
+    ownershipLabel: 'Triple J Processing',
+    description: 'We are preparing your registration package.'
+  },
+  {
+    key: 'dmv_processing',
+    label: 'DMV Processing',
+    ownership: 'state',
+    ownershipLabel: 'State Processing',
+    description: 'Your registration is in the state queue.',
+    expectedDuration: '5-10 business days'
+  },
+  {
+    key: 'approved',
+    label: 'Registration Approved',
+    ownership: 'state',
+    ownershipLabel: 'State Processing',
+    description: 'Your registration has been approved.'
+  },
+  {
+    key: 'ready',
+    label: 'Ready for Delivery',
+    ownership: 'dealer',
+    ownershipLabel: 'Triple J Processing',
+    description: 'Your plates are ready for pickup.',
+    actionRequiredText: 'Schedule Pickup'
+  }
+];
+
+// Helper to get stage config by key
+export const getStageConfig = (key: RegistrationStageKey): StageConfig | undefined => {
+  return REGISTRATION_STAGES.find(s => s.key === key);
+};
+
+// Ownership color mapping for UI
+export const OWNERSHIP_COLORS: Record<RegistrationOwnership, { bg: string; text: string; border: string }> = {
+  customer: { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/50' },
+  dealer: { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/50' },
+  state: { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/50' }
+};
+
+// Status color mapping for UI
+export const STATUS_COLORS: Record<RegistrationStageStatus, { bg: string; text: string; icon: string }> = {
+  waiting: { bg: 'bg-gray-800', text: 'text-gray-500', icon: 'circle' },
+  pending: { bg: 'bg-amber-500/20', text: 'text-amber-400', icon: 'clock' },
+  complete: { bg: 'bg-green-500/20', text: 'text-green-400', icon: 'check-circle' },
+  blocked: { bg: 'bg-red-500/20', text: 'text-red-400', icon: 'alert-circle' }
+};

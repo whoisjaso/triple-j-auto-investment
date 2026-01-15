@@ -55,6 +55,7 @@ const NotFound = lazyWithErrorHandling(() => import('./pages/NotFound'), 'Not Fo
 const Login = lazyWithErrorHandling(() => import('./pages/Login'), 'Login');
 const About = lazyWithErrorHandling(() => import('./pages/About'), 'About');
 const Legal = lazyWithErrorHandling(() => import('./pages/Legal'), 'Legal');
+const RegistrationTracker = lazyWithErrorHandling(() => import('./pages/RegistrationTracker'), 'Registration Tracker');
 
 // Admin Pages (Lazy Loaded)
 const AdminDashboard = lazyWithErrorHandling(() => import('./pages/admin/Dashboard'), 'Admin Dashboard');
@@ -169,6 +170,9 @@ const Navbar = () => {
                   <Link to="/admin/inventory" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('inventory') ? 'text-tj-gold' : 'text-gray-400'}`}>
                     <Car size={14} /> Assets
                   </Link>
+                  <Link to="/admin/registrations" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('registrations') ? 'text-tj-gold' : 'text-gray-400'}`}>
+                    <ShieldCheck size={14} /> Ledger
+                  </Link>
                   <button onClick={logout} className="text-[10px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors ml-4">Logout</button>
                 </div>
               )}
@@ -250,6 +254,14 @@ const Navbar = () => {
                     >
                       <Car size={18} />
                       <span className="text-lg font-display tracking-widest">INVENTORY</span>
+                    </Link>
+                    <Link
+                      to="/admin/registrations"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                    >
+                      <ShieldCheck size={18} />
+                      <span className="text-lg font-display tracking-widest">LEDGER</span>
                     </Link>
                     <button
                       onClick={() => { logout(); setIsOpen(false); }}
@@ -456,6 +468,8 @@ const AppContent = () => {
                 <Route path="/commercial-wholesale" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/legal/:section" element={<Legal />} />
+                <Route path="/track" element={<RegistrationTracker />} />
+                <Route path="/track/:orderId" element={<RegistrationTracker />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
