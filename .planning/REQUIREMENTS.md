@@ -44,8 +44,8 @@ Requirements for current milestone. Each maps to roadmap phases.
 ### Plate Tracking
 
 - [ ] **PLAT-01**: Plates as first-class entity with assignment history
-- [ ] **PLAT-02**: Plate → Vehicle assignment tracking
-- [ ] **PLAT-03**: Plate → Rental Customer tracking (who has plate, return date)
+- [ ] **PLAT-02**: Plate -> Vehicle assignment tracking
+- [ ] **PLAT-03**: Plate -> Rental Customer tracking (who has plate, return date)
 - [ ] **PLAT-04**: Dashboard view of all plates currently "out" with customers
 - [ ] **PLAT-05**: Alerts for unaccounted plates and overdue rentals
 
@@ -99,43 +99,45 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STAB-01 | TBD | Pending |
-| STAB-02 | TBD | Pending |
-| STAB-03 | TBD | Pending |
-| PORT-01 | TBD | Pending |
-| PORT-02 | TBD | Pending |
-| PORT-03 | TBD | Pending |
-| PORT-04 | TBD | Pending |
-| PORT-05 | TBD | Pending |
-| PORT-06 | TBD | Pending |
-| PORT-07 | TBD | Pending |
-| REGC-01 | TBD | Pending |
-| REGC-02 | TBD | Pending |
-| REGC-03 | TBD | Pending |
-| REGC-04 | TBD | Pending |
-| REGC-05 | TBD | Pending |
-| REGC-06 | TBD | Pending |
-| RENT-01 | TBD | Pending |
-| RENT-02 | TBD | Pending |
-| RENT-03 | TBD | Pending |
-| RENT-04 | TBD | Pending |
-| RENT-05 | TBD | Pending |
-| RENT-06 | TBD | Pending |
-| PLAT-01 | TBD | Pending |
-| PLAT-02 | TBD | Pending |
-| PLAT-03 | TBD | Pending |
-| PLAT-04 | TBD | Pending |
-| PLAT-05 | TBD | Pending |
-| RINS-01 | TBD | Pending |
-| RINS-02 | TBD | Pending |
-| RINS-03 | TBD | Pending |
-| RINS-04 | TBD | Pending |
+| STAB-01 | Phase 1 | Pending |
+| STAB-02 | Phase 1 | Pending |
+| STAB-03 | Phase 1 | Pending |
+| PORT-01 | Phase 3 | Pending |
+| PORT-02 | Phase 3 | Pending |
+| PORT-03 | Phase 2 | Pending |
+| PORT-04 | Phase 3 | Pending |
+| PORT-05 | Phase 4 | Pending |
+| PORT-06 | Phase 4 | Pending |
+| PORT-07 | Phase 3 | Pending |
+| REGC-01 | Phase 5 | Pending |
+| REGC-02 | Phase 5 | Pending |
+| REGC-03 | Phase 5 | Pending |
+| REGC-04 | Phase 5 | Pending |
+| REGC-05 | Phase 5 | Pending |
+| REGC-06 | Phase 5 | Pending |
+| RENT-01 | Phase 6 | Pending |
+| RENT-02 | Phase 6 | Pending |
+| RENT-03 | Phase 6 | Pending |
+| RENT-04 | Phase 6 | Pending |
+| RENT-05 | Phase 9 | Blocked |
+| RENT-06 | Phase 6 | Pending |
+| PLAT-01 | Phase 7 | Pending |
+| PLAT-02 | Phase 7 | Pending |
+| PLAT-03 | Phase 7 | Pending |
+| PLAT-04 | Phase 7 | Pending |
+| PLAT-05 | Phase 7 | Pending |
+| RINS-01 | Phase 8 | Pending |
+| RINS-02 | Phase 8 | Pending |
+| RINS-03 | Phase 8 | Pending |
+| RINS-04 | Phase 8 | Pending |
 
 **Coverage:**
 - v1 requirements: 26 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 26 (will be mapped during roadmap creation)
+- Mapped to phases: 26 (100%)
+- Pending: 25
+- Blocked: 1 (RENT-05 - needs Spireon API)
+- Completed: 0
 
 ---
 *Requirements defined: 2025-01-29*
-*Last updated: 2025-01-29 after initial definition*
+*Last updated: 2026-01-29 after roadmap creation*
