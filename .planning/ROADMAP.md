@@ -31,6 +31,16 @@ This roadmap delivers a dealership operations platform in 8 phases: stabilizing 
 3. Store.tsx is decomposed into AuthContext, VehicleContext, and base state - each under 300 lines
 4. Existing functionality (Bill of Sale, lead management, inventory CRUD) continues working after refactor
 
+**Plans:** 6 plans
+
+Plans:
+- [x] 01-01-PLAN.md - Error handling infrastructure (ErrorModal, useRetry, AppError types)
+- [x] 01-02-PLAN.md - STAB-01 loop bug fix (hasLoaded state, loading UI)
+- [ ] 01-03-PLAN.md - Wire ErrorModal/useRetry into error handling flow
+- [ ] 01-04-PLAN.md - Extract AuthContext from Store.tsx
+- [ ] 01-05-PLAN.md - Extract VehicleContext from Store.tsx
+- [ ] 01-06-PLAN.md - Human verification checkpoint
+
 ---
 
 ### Phase 2: Registration Database Foundation
@@ -205,7 +215,7 @@ This roadmap delivers a dealership operations platform in 8 phases: stabilizing 
 
 | Phase | Status | Requirements | Completion |
 |-------|--------|--------------|------------|
-| 1 - Reliability & Stability | Pending | 3 | 0% |
+| 1 - Reliability & Stability | In Progress | 3 | 33% (2/6 plans) |
 | 2 - Registration Database Foundation | Pending | 1 | 0% |
 | 3 - Customer Portal - Status Tracker | Pending | 4 | 0% |
 | 4 - Customer Portal - Notifications & Login | Pending | 2 | 0% |
@@ -268,4 +278,4 @@ Phase 1: Reliability & Stability
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-01-29*
+*Last updated: 2026-02-01*
