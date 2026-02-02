@@ -1,6 +1,6 @@
 
-import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
-import { Vehicle, VehicleStatus, Lead, User } from '../types';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback } from 'react';
+import { Vehicle, VehicleStatus, Lead, User, AppError, ErrorCodes } from '../types';
 import { sendLeadNotification } from '../services/emailService';
 import { supabase } from '../supabase/config';
 import { authService } from '../lib/auth';
@@ -16,6 +16,8 @@ interface StoreContextType {
   isLoading: boolean;
   hasLoaded: boolean;
   connectionError: string | null;
+  lastError: AppError | null;
+  clearLastError: () => void;
   refreshVehicles: () => Promise<void>;
   login: (email: string, password?: string) => Promise<boolean>;
   triggerRecovery: () => void;
@@ -146,9 +148,24 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
+  const [lastError, setLastError] = useState<AppError | null>(null);
 
   const isSyncingRef = useRef(false);
   const isInitializedRef = useRef(false);
+
+  // Clear last error (for use by StoreErrorBridge after consuming)
+  const clearLastError = useCallback(() => {
+    setLastError(null);
+  }, []);
+
+  // Helper to create AppError objects
+  const createAppError = useCallback((code: string, message: string, details?: string): AppError => ({
+    code,
+    message,
+    details,
+    timestamp: new Date(),
+    retryable: ![ErrorCodes.RLS_NOT_ADMIN, ErrorCodes.DB_DUPLICATE, ErrorCodes.DB_CONSTRAINT].includes(code as any),
+  }), []);
 
   // --- SUPABASE INITIALIZATION ---
   useEffect(() => {
@@ -377,7 +394,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !sessionData?.session) {
         console.error('❌ No active session for add:', sessionError);
-        alert('❌ ADD FAILED: You are not logged in!\n\nPlease log in again through the Admin page.');
+        setLastError(createAppError(ErrorCodes.RLS_NO_SESSION, 'You are not logged in. Please log in again through the Admin page.'));
         throw new Error('No active session');
       }
 
@@ -392,7 +409,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (profileError || !profileData?.is_admin) {
         console.error('❌ User is not admin:', profileError);
-        alert('❌ ADD FAILED: Your account is not set as admin.\n\nContact support to verify your admin status.');
+        setLastError(createAppError(ErrorCodes.RLS_NOT_ADMIN, 'Your account is not set as admin. Contact support to verify your admin status.'));
         throw new Error('Not an admin user');
       }
 
@@ -430,11 +447,11 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
         // Check for common issues
         if (errorMessage.includes('too large') || errorMessage.includes('payload')) {
-          alert('❌ ADD FAILED: Images are too large!\n\nTry using smaller images (under 500KB each) or fewer photos.');
+          setLastError(createAppError(ErrorCodes.DB_CONSTRAINT, 'Images are too large. Try using smaller images (under 500KB each) or fewer photos.', errorMessage));
         } else if (errorMessage.includes('duplicate') || errorMessage.includes('unique')) {
-          alert('❌ ADD FAILED: A vehicle with this VIN already exists.');
+          setLastError(createAppError(ErrorCodes.DB_DUPLICATE, 'A vehicle with this VIN already exists.', errorMessage));
         } else {
-          alert(`Failed to add vehicle: ${errorMessage}\n\nCheck console for details.`);
+          setLastError(createAppError(ErrorCodes.DB_UNKNOWN, 'Failed to add vehicle. Please try again.', errorMessage));
         }
         throw new Error(`Add failed: ${error.message}`);
       }
@@ -445,9 +462,9 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       await loadVehicles();
     } catch (error) {
       console.error('Unexpected error adding vehicle:', error);
-      // Don't double-alert
+      // Don't double-show error if we already set one
       if (!(error instanceof Error) || !error.message.includes('Add failed')) {
-        alert('Failed to add vehicle. Please try again.');
+        setLastError(createAppError(ErrorCodes.DB_UNKNOWN, 'Failed to add vehicle. Please try again.', error instanceof Error ? error.message : undefined));
       }
       throw error;
     }
@@ -459,7 +476,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !sessionData?.session) {
         console.error('❌ No active session for update:', sessionError);
-        alert('❌ UPDATE FAILED: You are not logged in!\n\nPlease log in again through the Admin page.');
+        setLastError(createAppError(ErrorCodes.RLS_NO_SESSION, 'You are not logged in. Please log in again through the Admin page.'));
         throw new Error('No active session');
       }
 
@@ -475,7 +492,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       if (profileError || !profileData?.is_admin) {
         console.error('❌ User is not admin or profile missing:', profileError);
         console.error('Profile data:', profileData);
-        alert('❌ UPDATE FAILED: Your account is not set as admin in the database.\n\nContact support to verify your admin status.');
+        setLastError(createAppError(ErrorCodes.RLS_NOT_ADMIN, 'Your account is not set as admin in the database. Contact support to verify your admin status.'));
         throw new Error('Not an admin user');
       }
 
@@ -521,7 +538,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         const errorMessage = error.message || 'Unknown error';
         const errorDetails = error.details || error.hint || '';
         const errorCode = error.code || '';
-        alert(`Failed to update vehicle:\n${errorMessage}\n${errorDetails}\n\nError Code: ${errorCode}\n\nCheck console for details.`);
+        setLastError(createAppError(ErrorCodes.DB_UNKNOWN, 'Failed to update vehicle. Please try again.', `${errorMessage} ${errorDetails} [${errorCode}]`));
         throw new Error(`Update failed [${errorCode}]: ${errorMessage}`);
       }
 
@@ -538,18 +555,18 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         // Check if user is authenticated
         const { data: session } = await supabase.auth.getSession();
         if (!session?.session) {
-          alert('❌ UPDATE FAILED: You are not logged in!\n\nPlease log out and log back in to refresh your session.');
+          setLastError(createAppError(ErrorCodes.RLS_NO_SESSION, 'You are not logged in. Please log out and log back in to refresh your session.'));
           throw new Error('Not authenticated');
         }
 
-        alert('❌ UPDATE FAILED: Your changes were not saved.\n\nThis usually means:\n1. Your session expired - try logging out and back in\n2. The vehicle was deleted by someone else\n3. Database permissions issue\n\nCheck the browser console for details.');
+        setLastError(createAppError(ErrorCodes.RLS_BLOCKED, 'Your changes were not saved. This usually means your session expired, the vehicle was deleted, or there is a database permissions issue.'));
         throw new Error('Update returned no data - RLS may have blocked');
       }
     } catch (error) {
       console.error('Unexpected error updating vehicle:', error);
-      // Don't show another alert if we already showed one above
-      if (!(error instanceof Error) || !error.message.includes('RLS')) {
-        alert('Failed to update vehicle. Please try again.');
+      // Don't show another error if we already set one above
+      if (!(error instanceof Error) || (!error.message.includes('RLS') && !error.message.includes('Update failed') && !error.message.includes('Not authenticated') && !error.message.includes('Not an admin'))) {
+        setLastError(createAppError(ErrorCodes.DB_UNKNOWN, 'Failed to update vehicle. Please try again.', error instanceof Error ? error.message : undefined));
       }
       throw error; // Re-throw so the form doesn't reset
     }
@@ -560,7 +577,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // Verify session before deleting
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError || !sessionData?.session) {
-        alert('❌ DELETE FAILED: You are not logged in!');
+        setLastError(createAppError(ErrorCodes.RLS_NO_SESSION, 'You are not logged in. Please log in again.'));
         throw new Error('No active session');
       }
 
@@ -572,13 +589,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (error) {
         console.error('Failed to delete vehicle:', error);
-        alert('Failed to delete vehicle. Please check console for details.');
+        setLastError(createAppError(ErrorCodes.DB_UNKNOWN, 'Failed to delete vehicle. Please try again.', error.message));
         return;
       }
 
       if (!data || data.length === 0) {
         console.error('❌ Delete returned no data - RLS may have blocked');
-        alert('❌ DELETE FAILED: Permission denied or vehicle not found.');
+        setLastError(createAppError(ErrorCodes.RLS_BLOCKED, 'Permission denied or vehicle not found.'));
         return;
       }
 
@@ -587,7 +604,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       await loadVehicles();
     } catch (error) {
       console.error('Unexpected error deleting vehicle:', error);
-      alert('Failed to delete vehicle. Please try again.');
+      // Don't show another error if we already set one
+      if (!(error instanceof Error) || !error.message.includes('No active session')) {
+        setLastError(createAppError(ErrorCodes.DB_UNKNOWN, 'Failed to delete vehicle. Please try again.', error instanceof Error ? error.message : undefined));
+      }
     }
   };
 
@@ -806,7 +826,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       if (error) {
         console.error('Failed to add lead:', error);
-        alert('Failed to save lead. Please check console for details.');
+        setLastError(createAppError(ErrorCodes.DB_UNKNOWN, 'Failed to save lead. Please try again.', error.message));
         return;
       }
 
@@ -828,7 +848,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // This addLead function only saves the lead to database
     } catch (error) {
       console.error('Unexpected error adding lead:', error);
-      alert('Failed to add lead. Please try again.');
+      setLastError(createAppError(ErrorCodes.DB_UNKNOWN, 'Failed to add lead. Please try again.', error instanceof Error ? error.message : undefined));
     }
   };
 
@@ -864,6 +884,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       isLoading,
       hasLoaded,
       connectionError,
+      lastError,
+      clearLastError,
       refreshVehicles: loadVehicles,
       login,
       triggerRecovery,
