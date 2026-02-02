@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ErrorProvider } from './components/ErrorProvider';
 import { StoreErrorBridge } from './components/StoreErrorBridge';
@@ -40,7 +41,7 @@ export const openSmartMap = () => {
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, logout } = useStore();
+  const { user, logout } = useAuth();
   const { t, lang, toggleLang } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
@@ -205,7 +206,7 @@ const Footer = () => {
 
 // Protected Route
 const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
-  const { user } = useStore();
+  const { user } = useAuth();
   if (!user?.isAdmin) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
@@ -267,16 +268,20 @@ const AppContent = () => {
 };
 
 // Main App
+// Provider order: LanguageProvider > ErrorProvider > AuthProvider > StoreProvider
+// AuthProvider must wrap StoreProvider since Store uses useAuth()
 export default function App() {
   return (
     <LanguageProvider>
       <ErrorProvider showAdminDetails={true}>
-        <StoreProvider>
-          <StoreErrorBridge />
-          <Router>
-            <AppContent />
-          </Router>
-        </StoreProvider>
+        <AuthProvider>
+          <StoreProvider>
+            <StoreErrorBridge />
+            <Router>
+              <AppContent />
+            </Router>
+          </StoreProvider>
+        </AuthProvider>
       </ErrorProvider>
     </LanguageProvider>
   );
