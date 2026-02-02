@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNa
 import { StoreProvider, useStore } from './context/Store';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ErrorProvider } from './components/ErrorProvider';
+import { StoreErrorBridge } from './components/StoreErrorBridge';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Menu, X, Lock, LayoutDashboard, Car, ShieldCheck, Globe, MapPin, Phone, ArrowRight } from 'lucide-react';
 
@@ -271,6 +272,7 @@ export default function App() {
     <LanguageProvider>
       <ErrorProvider showAdminDetails={true}>
         <StoreProvider>
+          <StoreErrorBridge />
           <Router>
             <AppContent />
           </Router>
