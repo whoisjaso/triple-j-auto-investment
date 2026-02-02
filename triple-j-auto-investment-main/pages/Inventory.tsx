@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../context/Store';
+import { useVehicles } from '../context/VehicleContext';
 import { VehicleStatus, Vehicle } from '../types';
 import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw, Car, ZoomIn } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
@@ -154,7 +155,8 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
 };
 
 const Inventory = () => {
-  const { vehicles, addLead, isLoading, hasLoaded, connectionError, refreshVehicles } = useStore();
+  const { vehicles, isLoading, hasLoaded, connectionError, refreshVehicles } = useVehicles();
+  const { addLead } = useStore();
   const { t, lang, toggleLang } = useLanguage();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
   const [makeFilter, setMakeFilter] = useState<string>('All');

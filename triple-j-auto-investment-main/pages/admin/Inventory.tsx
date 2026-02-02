@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/Store';
 import { useAuth } from '../../context/AuthContext';
+import { useVehicles } from '../../context/VehicleContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { generateVehicleDescription } from '../../services/geminiService';
 import { decodeVin } from '../../services/nhtsaService';
@@ -11,7 +12,7 @@ import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 
 // Shared Admin Header Component
 const AdminHeader = () => {
-  const { vehicles } = useStore();
+  const { vehicles } = useVehicles();
   const { logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -177,7 +178,8 @@ const resizeImage = (file: File): Promise<string> => {
 };
 
 const AdminInventory = () => {
-  const { vehicles, addVehicle, updateVehicle, removeVehicle, syncWithGoogleSheets, lastSync, resetToDefault, connectionError } = useStore();
+  const { vehicles, addVehicle, updateVehicle, removeVehicle, syncWithGoogleSheets, resetToDefault, connectionError } = useVehicles();
+  const { lastSync } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDecoding, setIsDecoding] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);

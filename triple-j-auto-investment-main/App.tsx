@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { VehicleProvider } from './context/VehicleContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { ErrorProvider } from './components/ErrorProvider';
 import { StoreErrorBridge } from './components/StoreErrorBridge';
@@ -268,19 +269,22 @@ const AppContent = () => {
 };
 
 // Main App
-// Provider order: LanguageProvider > ErrorProvider > AuthProvider > StoreProvider
-// AuthProvider must wrap StoreProvider since Store uses useAuth()
+// Provider order: LanguageProvider > ErrorProvider > AuthProvider > VehicleProvider > StoreProvider
+// AuthProvider must wrap VehicleProvider since VehicleContext uses useAuth()
+// VehicleProvider must wrap StoreProvider to ensure vehicles are available
 export default function App() {
   return (
     <LanguageProvider>
       <ErrorProvider showAdminDetails={true}>
         <AuthProvider>
-          <StoreProvider>
-            <StoreErrorBridge />
-            <Router>
-              <AppContent />
-            </Router>
-          </StoreProvider>
+          <VehicleProvider>
+            <StoreProvider>
+              <StoreErrorBridge />
+              <Router>
+                <AppContent />
+              </Router>
+            </StoreProvider>
+          </VehicleProvider>
         </AuthProvider>
       </ErrorProvider>
     </LanguageProvider>

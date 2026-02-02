@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/Store';
+import { useVehicles } from '../../context/VehicleContext';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { analyzeFinancialPerformance } from '../../services/geminiService';
@@ -10,7 +11,7 @@ import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 
 // Admin Navigation Header Component
 const AdminHeader = () => {
-  const { vehicles } = useStore();
+  const { vehicles } = useVehicles();
   const { logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -133,7 +134,8 @@ const AdminHeader = () => {
 };
 
 const Dashboard = () => {
-  const { vehicles, leads, connectionError } = useStore();
+  const { vehicles, connectionError } = useVehicles();
+  const { leads } = useStore();
   const [financialReport, setFinancialReport] = useState<string>("INITIALIZING FINANCIAL NEURAL NETWORK...");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
