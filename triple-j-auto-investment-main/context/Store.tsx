@@ -1,9 +1,9 @@
 
 import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback } from 'react';
-import { Vehicle, VehicleStatus, Lead, User, AppError, ErrorCodes } from '../types';
+import { Vehicle, VehicleStatus, Lead, AppError, ErrorCodes } from '../types';
 import { sendLeadNotification } from '../services/emailService';
 import { supabase } from '../supabase/config';
-import { authService } from '../lib/auth';
+import { useAuth } from './AuthContext';
 
 // --- CONFIGURATION ---
 const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHeta2U3ATyxE4hlQC3-kVCV8Iu-hnJYQIij68ptCBZYVw4C4vxIiu2fli5ltWXdsb7uVKxXco9WE3/pub?output=csv";
@@ -11,7 +11,6 @@ const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHeta
 interface StoreContextType {
   vehicles: Vehicle[];
   leads: Lead[];
-  user: User | null;
   lastSync: Date | null;
   isLoading: boolean;
   hasLoaded: boolean;
@@ -19,9 +18,6 @@ interface StoreContextType {
   lastError: AppError | null;
   clearLastError: () => void;
   refreshVehicles: () => Promise<void>;
-  login: (email: string, password?: string) => Promise<boolean>;
-  triggerRecovery: () => void;
-  logout: () => Promise<void>;
   addVehicle: (v: Vehicle) => Promise<void>;
   updateVehicle: (id: string, v: Partial<Vehicle>) => Promise<void>;
   removeVehicle: (id: string) => Promise<void>;
@@ -141,9 +137,11 @@ const generateOpulentCaption = (make: string, model: string, year: number, milea
 };
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Get user from AuthContext (auth logic extracted to AuthContext.tsx)
+  const { user } = useAuth();
+
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
-  const [user, setUser] = useState<User | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -167,7 +165,8 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     retryable: ![ErrorCodes.RLS_NOT_ADMIN, ErrorCodes.DB_DUPLICATE, ErrorCodes.DB_CONSTRAINT].includes(code as any),
   }), []);
 
-  // --- SUPABASE INITIALIZATION ---
+  // --- SUPABASE DATA INITIALIZATION ---
+  // Note: Auth logic (session check, auth listener, cache buster) moved to AuthContext.tsx
   useEffect(() => {
     if (isInitializedRef.current) return;
     isInitializedRef.current = true; // Strict Mode protection
@@ -176,65 +175,20 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     // @ts-ignore
     console.log('Targeting Supabase Node:', supabase.supabaseUrl);
 
-    // CACHE BUSTER: Check if user needs a hard refresh
-    const lastBuildVersion = '2025-12-28-v2'; // Update this when deploying
-    const cachedVersion = localStorage.getItem('tj_build_version');
-    if (cachedVersion && cachedVersion !== lastBuildVersion) {
-      console.warn('⚠️ New version detected! Clearing old cached state...');
-      localStorage.removeItem('supabase.auth.token');
-      localStorage.setItem('tj_build_version', lastBuildVersion);
-      // Force a hard reload to clear all cached JS
-      if (typeof window !== 'undefined' && !window.location.search.includes('refreshed=1')) {
-        console.log('🔄 Forcing hard refresh for new version...');
-        window.location.href = window.location.pathname + '?refreshed=1';
-        return; // Stop execution, page will reload
-      }
-    }
-    localStorage.setItem('tj_build_version', lastBuildVersion);
-
-    // 1. Verify Session First (Fastest check)
-    console.log("🔐 Verifying Identity Protocol...");
-    authService.getSession().then(sessionUser => {
-      if (sessionUser) {
-        setUser({ email: sessionUser.email, isAdmin: sessionUser.isAdmin });
-        console.log("✅ Session restored:", sessionUser.email);
-      } else {
-        console.log("ℹ️ No active session found. Operating in public mode.");
-      }
-    }).catch(err => {
-      console.error("⚠️ Auth Session Check Failed:", err);
-    });
-
-    // 2. Setup auth state listener
-    const authListener = authService.onAuthStateChange(sessionUser => {
-      if (sessionUser) {
-        setUser({ email: sessionUser.email, isAdmin: sessionUser.isAdmin });
-      } else {
-        setUser(null);
-      }
-    });
-
-    // 3. Load data from Supabase and sync from Google Sheets
+    // Load data from Supabase
     const initializeData = async () => {
-      // Priority 1: Instant Load from DB
       await loadVehicles();
       await loadLeads();
-
-      // Priority 2: Background Sync (Fire & Forget) - DISABLED to prevent overwriting Supabase data
-      // Only sync from Google Sheets if Supabase is empty (manual sync available in admin)
-      console.log("🔄 Auto-sync disabled. Use manual sync in admin panel if needed.");
-      // setTimeout(() => {
-      //   syncWithGoogleSheets(true).catch(err => console.error("Background Sync Failed:", err));
-      // }, 100);
+      console.log("Auto-sync disabled. Use manual sync in admin panel if needed.");
     };
 
     initializeData();
 
-    // 4. Setup real-time subscriptions
+    // Setup real-time subscriptions
     const vehicleSubscription = supabase
       .channel('vehicles_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
-        console.log('🔄 Vehicle data changed, reloading...');
+        console.log('Vehicle data changed, reloading...');
         loadVehicles();
       })
       .subscribe();
@@ -242,14 +196,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const leadSubscription = supabase
       .channel('leads_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => {
-        console.log('🔄 Lead data changed, reloading...');
+        console.log('Lead data changed, reloading...');
         loadLeads();
       })
       .subscribe();
 
     // Cleanup
     return () => {
-      authListener?.subscription.unsubscribe();
       vehicleSubscription.unsubscribe();
       leadSubscription.unsubscribe();
     };
@@ -361,32 +314,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
-  const login = async (email: string, password?: string): Promise<boolean> => {
-    if (!password) return false;
-
-    console.log('🔐 Authenticating with Supabase...');
-
-    const authUser = await authService.login(email, password);
-    if (authUser) {
-      setUser({ email: authUser.email, isAdmin: authUser.isAdmin });
-      console.log('✅ Login successful:', authUser.email);
-      return true;
-    }
-
-    console.error('❌ Login failed');
-    return false;
-  };
-
-  const triggerRecovery = () => {
-    console.log("Security Alert: Unauthorized access attempt. Email dispatched.");
-  };
-
-  const logout = async (): Promise<void> => {
-    console.log('🔓 Logging out...');
-    await authService.logout();
-    setUser(null);
-    console.log('✅ Logout successful');
-  };
+  // Note: login, logout, triggerRecovery moved to AuthContext.tsx
 
   const addVehicle = async (v: Vehicle): Promise<void> => {
     try {
@@ -879,7 +807,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     <StoreContext.Provider value={{
       vehicles,
       leads,
-      user,
       lastSync,
       isLoading,
       hasLoaded,
@@ -887,9 +814,6 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       lastError,
       clearLastError,
       refreshVehicles: loadVehicles,
-      login,
-      triggerRecovery,
-      logout,
       addVehicle,
       updateVehicle,
       removeVehicle,
