@@ -8,7 +8,7 @@
 
 Database schema supports registration tracking with customer access. Admin can update any customer's registration status from the dashboard. Status history is preserved with audit trail.
 
-**In scope:** Schema design, status workflow, admin status controls, audit trail
+**In scope:** Schema design, status workflow, admin status controls (single registration), audit trail
 **Out of scope:** Customer-facing portal (Phase 3), notifications (Phase 4), document validation (Phase 5)
 
 </domain>
@@ -52,7 +52,6 @@ Database schema supports registration tracking with customer access. Admin can u
 ### Admin Status Controls
 - **Location** — Accessible from both dedicated registrations list page AND vehicle detail page
 - **Control type** — Step buttons for each valid next status (e.g., "Mark Submitted", "Mark Approved"), not dropdown
-- **Bulk actions** — Select multiple registrations, apply same status change
 - **Filtering** — Full filtering: status, date range, customer name/phone search
 - **Rejection notes** — Optional when marking as Rejected
 - **Confirmation** — All status changes require confirmation dialog
@@ -65,7 +64,6 @@ Database schema supports registration tracking with customer access. Admin can u
 - **Detail level** — Show old and new values (e.g., "Status changed from Processing to Approved")
 - **Retention** — Forever (no automatic cleanup)
 - **Deletion** — Soft delete only; registrations can be canceled/archived but never hard deleted
-- **Export** — Admin can download history as CSV/PDF for compliance review
 - **Timestamps** — UTC stored in database, displayed in user's local timezone
 
 ### Claude's Discretion
@@ -91,7 +89,10 @@ Database schema supports registration tracking with customer access. Admin can u
 <deferred>
 ## Deferred Ideas
 
-None — discussion stayed within phase scope
+The following were discussed but are deferred to later phases as they are not essential for proving the database foundation works:
+
+- **Bulk status changes** — Select multiple registrations, apply same status change. Nice-to-have UI optimization. Single-registration updates prove the schema; bulk is efficiency improvement. Deferred to Phase 3 or later.
+- **Audit export (CSV/PDF)** — Admin can download history for compliance review. Presentation/reporting feature, not core schema functionality. Deferred to Phase 5 (Document Validation) or later when compliance features are consolidated.
 
 </deferred>
 
