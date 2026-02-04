@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-04
-**Session:** Phase 2 Plan 01 COMPLETE - Registration Schema Migration
+**Session:** Phase 2 COMPLETE - Registration Database Foundation
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 2 (Registration Database Foundation) - In progress (Plan 1/2 complete).
+**Current Focus:** Phase 3 (Customer Portal - Status Tracker) - Ready to start.
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,9 +22,9 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 2 of 9 (Registration Database Foundation) - In progress
-**Plan:** 1/2 complete
-**Status:** Plan 02-01 complete, ready for 02-02
+**Phase:** 2 of 9 (Registration Database Foundation) - COMPLETE
+**Plan:** 2/2 complete
+**Status:** Phase 2 complete, ready for Phase 3
 
 **Progress:**
 ```
@@ -36,9 +36,9 @@ Phase 1:    [====================] 100% (6/6 plans complete) - COMPLETE
   Plan 04:  [X] Sheets & Leads Extraction (lib/store/sheets.ts, leads.ts)
   Plan 05:  [X] Store.tsx Integration (facade pattern - 281 lines)
   Plan 06:  [X] STAB-03 Verification (build passes, interface unchanged)
-Phase 2:    [==========          ] 50% (1/2 plans complete)
+Phase 2:    [====================] 100% (2/2 plans complete) - COMPLETE
   Plan 01:  [X] Schema Migration (6-stage workflow, audit trail, RLS)
-  Plan 02:  [ ] TypeScript Types & Service Updates
+  Plan 02:  [X] TypeScript Types & Service Updates (types.ts, registrationService.ts)
 Phase 3:    [ ] Not started (Customer Portal - Status Tracker)
 Phase 4:    [ ] Not started (Customer Portal - Notifications & Login)
 Phase 5:    [ ] Not started (Registration Checker)
@@ -51,7 +51,7 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 **Requirements Coverage:**
 - Total v1: 26
 - Mapped: 26 (100%)
-- Completed: 0 (feature work begins Phase 2 Plan 02)
+- Completed: 0 (feature work visible to users begins Phase 3)
 - Remaining: 26
 
 ---
@@ -61,9 +61,9 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 | Metric | Value | Notes |
 |--------|-------|-------|
 | Phases Planned | 9 | 1 blocked (Phase 9) |
-| Phases Complete | 1 | Phase 1 - Reliability & Stability |
+| Phases Complete | 2 | Phase 1 + Phase 2 |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 7 | 01-01 through 01-06, 02-01 complete |
+| Plans Executed | 8 | 01-01 through 01-06, 02-01, 02-02 complete |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -93,6 +93,9 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 | Explicit field comparison in audit trigger | Clearer than dynamic information_schema loop | 2026-02-04 | 02-01 |
 | ON DELETE SET NULL for audit FK | Preserves compliance history if registration deleted | 2026-02-04 | 02-01 |
 | DB-level status transitions | Enforces valid transitions even from direct SQL | 2026-02-04 | 02-01 |
+| Simplified RegistrationStageStatus | in_progress/complete only - stages handle workflow, blocked removed | 2026-02-04 | 02-02 |
+| Removed customer ownership | Dealer handles all stages per Texas dealer workflow | 2026-02-04 | 02-02 |
+| Client-side isValidTransition | Mirrors DB constraint for early UX feedback | 2026-02-04 | 02-02 |
 
 ### Patterns Established
 
@@ -106,6 +109,8 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 - **Audit trigger pattern:** pending_change_reason captured and cleared by trigger
 - **Granular RLS pattern:** registration_admin can INSERT/UPDATE, only is_admin can DELETE
 - **Milestone auto-population:** Trigger sets dates when status advances
+- **Service transformer pattern:** snake_case DB to camelCase TS mapping in transform functions
+- **Soft delete pattern:** is_archived flag, filter archived by default
 
 ### Architecture Summary (Current)
 
@@ -122,7 +127,22 @@ Store.tsx (281 lines - 68% reduction from 893):
   - React state management, Supabase subscriptions
   - Auth integration, useStore() interface UNCHANGED
 
-supabase/migrations/ (NEW in 02-01):
+types.ts Registration Types (UPDATED in 02-02):
+  - RegistrationStageKey: 7 values (6 stages + rejected)
+  - Registration interface: 23 fields (doc checklist, milestones, notes)
+  - VALID_TRANSITIONS: Forward-only state machine
+  - RegistrationAudit interface: Audit trail records
+  - REGISTRATION_STAGES: UI configuration for 7 stages
+
+services/registrationService.ts (UPDATED in 02-02):
+  - transformRegistration: Maps 23 DB columns to TS fields
+  - updateRegistrationStatus: With pending_change_reason audit support
+  - updateDocumentChecklist: Boolean doc flags with audit
+  - getRegistrationAudit: Fetch audit trail
+  - archiveRegistration/restoreRegistration: Soft delete
+  - Query helpers: getRegistrationsByStage, getRejectedRegistrations, etc.
+
+supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
     - 6-stage workflow: sale_complete -> documents_collected ->
       submitted_to_dmv -> dmv_processing -> sticker_ready ->
@@ -139,7 +159,9 @@ supabase/migrations/ (NEW in 02-01):
 
 | Issue | Impact | Phase to Address |
 |-------|--------|------------------|
-| RLS silent failures | Data loss without warning | Phase 2+ (database work) |
+| pages/admin/Registrations.tsx type errors | Uses old RegistrationStage type | Phase 3 (UI update) |
+| pages/RegistrationTracker.tsx type errors | Uses old stage values | Phase 3 (UI update) |
+| RLS silent failures | Data loss without warning | Ongoing monitoring |
 | No Spireon API access | Can't build GPS feature | Phase 9 blocked |
 | TypeScript strict mode | ErrorBoundary class issues | Low priority (build works) |
 
@@ -154,34 +176,36 @@ supabase/migrations/ (NEW in 02-01):
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed Plan 02-01: Registration Schema Migration
-- Created 483-line SQL migration with 6-stage workflow
-- Implemented registration_audit table with comprehensive change tracking
-- Added validate_status_transition() for forward-only status enforcement
-- Added auto_set_milestone_dates() for milestone auto-population
-- Updated RLS policies for is_registration_admin role
-- Created README with data migration helper and rollback instructions
+- Executed Plan 02-02: TypeScript Types & Service Updates
+- Updated types.ts with 23-field Registration interface
+- Added VALID_TRANSITIONS constant matching DB constraint
+- Added RegistrationAudit interface for audit trail
+- Updated registrationService.ts with all new fields
+- Added updateRegistrationStatus with audit support
+- Added updateDocumentChecklist, getRegistrationAudit functions
+- Added archiveRegistration/restoreRegistration for soft delete
+- Added helper functions: isValidTransition, getNextStages
+- Added query helpers for stage filtering
 
-### Plan 02-01 Summary
+### Plan 02-02 Summary
 | Deliverable | Status | Notes |
 |-------------|--------|-------|
-| Migration file | CREATED | 483 lines, all schema changes |
-| Audit infrastructure | CREATED | Table + trigger + indexes |
-| Status validation | CREATED | DB-level enforcement |
-| RLS policies | UPDATED | Granular permissions |
-| README | CREATED | 81 lines, migration docs |
+| types.ts updates | COMPLETE | 23 fields, 7 stages, VALID_TRANSITIONS |
+| registrationService.ts | COMPLETE | All transformers and functions updated |
+| Audit support | COMPLETE | pending_change_reason pattern implemented |
+| Soft delete | COMPLETE | archiveRegistration function added |
 
 ### What Comes Next
-- Execute Plan 02-02: TypeScript Types & Service Updates
-- Update types.ts REGISTRATION_STAGES to 6-stage workflow
-- Update registrationService.ts transformers for new columns
-- Add change reason support to update functions
+- Begin Phase 3: Customer Portal - Status Tracker
+- Update pages/RegistrationTracker.tsx for 6-stage display
+- Update pages/admin/Registrations.tsx for new workflow
+- Add audit history view to registration detail
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/02-registration-database-foundation/02-01-SUMMARY.md` - latest plan
+3. `.planning/phases/02-registration-database-foundation/02-02-SUMMARY.md` - latest plan
 4. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
