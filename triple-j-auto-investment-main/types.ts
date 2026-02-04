@@ -130,64 +130,87 @@ export interface AddressSuggestion {
 // ================================================================
 
 export type RegistrationStageKey =
-  | 'payment'
-  | 'insurance'
-  | 'inspection'
-  | 'submission'
+  | 'sale_complete'
+  | 'documents_collected'
+  | 'submitted_to_dmv'
   | 'dmv_processing'
-  | 'approved'
-  | 'ready';
+  | 'sticker_ready'
+  | 'sticker_delivered'
+  | 'rejected';
 
-export type RegistrationStageStatus = 'waiting' | 'pending' | 'complete' | 'blocked';
+export type RegistrationStageStatus = 'in_progress' | 'complete';
 
-export type RegistrationOwnership = 'customer' | 'dealer' | 'state';
-
-export interface RegistrationStage {
-  id: string;
-  registrationId: string;
-  stageKey: RegistrationStageKey;
-  stageLabel: string;
-  stageOrder: number;
-  status: RegistrationStageStatus;
-  ownership: RegistrationOwnership;
-  startedAt?: string;
-  completedAt?: string;
-  blockedReason?: string;
-  actionRequired?: string;
-  actionUrl?: string;
-  internalNotes?: string;
-  updatedBy?: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export type RegistrationOwnership = 'dealer' | 'state';
 
 export interface Registration {
   id: string;
   orderId: string;
   vehicleId?: string;
+  billOfSaleId?: string;
 
   // Customer Info
   customerName: string;
   customerEmail?: string;
   customerPhone?: string;
+  customerAddress?: string;
 
   // Vehicle Info (snapshot)
   vin: string;
   vehicleYear: number;
   vehicleMake: string;
   vehicleModel: string;
+  plateNumber?: string;
+
+  // Document Checklist
+  docTitleFront: boolean;
+  docTitleBack: boolean;
+  doc130u: boolean;
+  docInsurance: boolean;
+  docInspection: boolean;
 
   // Status
   currentStage: RegistrationStageKey;
-  currentStatus: RegistrationStageStatus;
 
-  // Timestamps
+  // Milestone Dates
+  saleDate?: string;
+  submissionDate?: string;
+  approvalDate?: string;
+  deliveryDate?: string;
+
+  // Notes
+  notes?: string;
+  rejectionNotes?: string;
+
+  // Metadata
+  isArchived: boolean;
   purchaseDate: string;
   createdAt: string;
   updatedAt: string;
+}
 
-  // Related data (populated on fetch)
-  stages?: RegistrationStage[];
+// Valid stage transitions (forward-only except rejected -> submitted_to_dmv)
+export const VALID_TRANSITIONS: Record<RegistrationStageKey, RegistrationStageKey[]> = {
+  'sale_complete': ['documents_collected'],
+  'documents_collected': ['submitted_to_dmv'],
+  'submitted_to_dmv': ['dmv_processing'],
+  'dmv_processing': ['sticker_ready', 'rejected'],
+  'sticker_ready': ['sticker_delivered'],
+  'sticker_delivered': [],
+  'rejected': ['submitted_to_dmv']
+};
+
+// Audit trail record for registration changes
+export interface RegistrationAudit {
+  id: string;
+  registrationId: string;
+  operation: 'INSERT' | 'UPDATE' | 'DELETE';
+  changedFields?: Record<string, { old: unknown; new: unknown }>;
+  fullOldRecord?: Registration;
+  fullNewRecord?: Registration;
+  changedBy?: string;
+  changedAt: string;
+  changeReason?: string;
+  createdAt: string;
 }
 
 export interface RegistrationDocument {
@@ -226,63 +249,67 @@ export interface StageConfig {
   ownership: RegistrationOwnership;
   ownershipLabel: string;
   description: string;
-  actionRequiredText?: string;
   expectedDuration?: string;
+  order: number;
 }
 
 export const REGISTRATION_STAGES: StageConfig[] = [
   {
-    key: 'payment',
-    label: 'Payment Received',
+    key: 'sale_complete',
+    label: 'Sale Complete',
     ownership: 'dealer',
-    ownershipLabel: 'Triple J Processing',
-    description: 'Your investment is secured.'
+    ownershipLabel: 'Triple J',
+    description: 'Vehicle sold, plates assigned from dealer inventory.',
+    order: 1
   },
   {
-    key: 'insurance',
-    label: 'Insurance Verified',
-    ownership: 'customer',
-    ownershipLabel: 'Your Action Required',
-    description: 'Please provide your proof of insurance.',
-    actionRequiredText: 'Upload Insurance'
-  },
-  {
-    key: 'inspection',
-    label: 'Inspection Complete',
-    ownership: 'customer',
-    ownershipLabel: 'Your Action Required',
-    description: 'Please complete your vehicle inspection.',
-    actionRequiredText: 'Complete Inspection'
-  },
-  {
-    key: 'submission',
-    label: 'Dealer Submission',
+    key: 'documents_collected',
+    label: 'Documents Collected',
     ownership: 'dealer',
-    ownershipLabel: 'Triple J Processing',
-    description: 'We are preparing your registration package.'
+    ownershipLabel: 'Triple J',
+    description: 'All paperwork received (title, 130-U, insurance, inspection).',
+    order: 2
+  },
+  {
+    key: 'submitted_to_dmv',
+    label: 'Submitted to DMV',
+    ownership: 'dealer',
+    ownershipLabel: 'Triple J',
+    description: 'Packet uploaded to webDEALER.',
+    order: 3
   },
   {
     key: 'dmv_processing',
     label: 'DMV Processing',
     ownership: 'state',
-    ownershipLabel: 'State Processing',
-    description: 'Your registration is in the state queue.',
-    expectedDuration: '5-10 business days'
+    ownershipLabel: 'State',
+    description: 'Awaiting DMV review.',
+    expectedDuration: '5-10 business days',
+    order: 4
   },
   {
-    key: 'approved',
-    label: 'Registration Approved',
-    ownership: 'state',
-    ownershipLabel: 'State Processing',
-    description: 'Your registration has been approved.'
-  },
-  {
-    key: 'ready',
-    label: 'Ready for Delivery',
+    key: 'sticker_ready',
+    label: 'Sticker Ready',
     ownership: 'dealer',
-    ownershipLabel: 'Triple J Processing',
-    description: 'Your plates are ready for pickup.',
-    actionRequiredText: 'Schedule Pickup'
+    ownershipLabel: 'Triple J',
+    description: 'Registration approved, sticker available for pickup/delivery.',
+    order: 5
+  },
+  {
+    key: 'sticker_delivered',
+    label: 'Sticker Delivered',
+    ownership: 'dealer',
+    ownershipLabel: 'Triple J',
+    description: 'Customer received their sticker.',
+    order: 6
+  },
+  {
+    key: 'rejected',
+    label: 'Rejected',
+    ownership: 'state',
+    ownershipLabel: 'State',
+    description: 'DMV rejected submission. Review notes and resubmit.',
+    order: 0 // Special case, branches from dmv_processing
   }
 ];
 
@@ -293,15 +320,17 @@ export const getStageConfig = (key: RegistrationStageKey): StageConfig | undefin
 
 // Ownership color mapping for UI
 export const OWNERSHIP_COLORS: Record<RegistrationOwnership, { bg: string; text: string; border: string }> = {
-  customer: { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/50' },
   dealer: { bg: 'bg-blue-500/20', text: 'text-blue-400', border: 'border-blue-500/50' },
   state: { bg: 'bg-gray-500/20', text: 'text-gray-400', border: 'border-gray-500/50' }
 };
 
 // Status color mapping for UI
 export const STATUS_COLORS: Record<RegistrationStageStatus, { bg: string; text: string; icon: string }> = {
-  waiting: { bg: 'bg-gray-800', text: 'text-gray-500', icon: 'circle' },
-  pending: { bg: 'bg-amber-500/20', text: 'text-amber-400', icon: 'clock' },
-  complete: { bg: 'bg-green-500/20', text: 'text-green-400', icon: 'check-circle' },
-  blocked: { bg: 'bg-red-500/20', text: 'text-red-400', icon: 'alert-circle' }
+  in_progress: { bg: 'bg-amber-500/20', text: 'text-amber-400', icon: 'clock' },
+  complete: { bg: 'bg-green-500/20', text: 'text-green-400', icon: 'check-circle' }
+};
+
+// Stage-specific colors (for rejected state)
+export const STAGE_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
+  rejected: { bg: 'bg-red-500/20', text: 'text-red-400', icon: 'alert-circle' }
 };
