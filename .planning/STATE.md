@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-04
-**Session:** Phase 1 COMPLETE - Ready for Phase 2
+**Session:** Phase 2 Plan 01 COMPLETE - Registration Schema Migration
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 1 (Reliability & Stability) - COMPLETE. Ready to begin Phase 2 (Registration Database Foundation).
+**Current Focus:** Phase 2 (Registration Database Foundation) - In progress (Plan 1/2 complete).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,9 +22,9 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 1 of 9 (Reliability & Stability) - COMPLETE
-**Plan:** 6/6 complete
-**Status:** Phase 1 verified and complete
+**Phase:** 2 of 9 (Registration Database Foundation) - In progress
+**Plan:** 1/2 complete
+**Status:** Plan 02-01 complete, ready for 02-02
 
 **Progress:**
 ```
@@ -36,7 +36,9 @@ Phase 1:    [====================] 100% (6/6 plans complete) - COMPLETE
   Plan 04:  [X] Sheets & Leads Extraction (lib/store/sheets.ts, leads.ts)
   Plan 05:  [X] Store.tsx Integration (facade pattern - 281 lines)
   Plan 06:  [X] STAB-03 Verification (build passes, interface unchanged)
-Phase 2:    [ ] Not started (Registration Database Foundation)
+Phase 2:    [==========          ] 50% (1/2 plans complete)
+  Plan 01:  [X] Schema Migration (6-stage workflow, audit trail, RLS)
+  Plan 02:  [ ] TypeScript Types & Service Updates
 Phase 3:    [ ] Not started (Customer Portal - Status Tracker)
 Phase 4:    [ ] Not started (Customer Portal - Notifications & Login)
 Phase 5:    [ ] Not started (Registration Checker)
@@ -49,8 +51,8 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 **Requirements Coverage:**
 - Total v1: 26
 - Mapped: 26 (100%)
-- Completed: 0 (Phase 1 was infrastructure/refactoring)
-- Remaining: 26 (feature work begins Phase 2)
+- Completed: 0 (feature work begins Phase 2 Plan 02)
+- Remaining: 26
 
 ---
 
@@ -61,7 +63,7 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 | Phases Planned | 9 | 1 blocked (Phase 9) |
 | Phases Complete | 1 | Phase 1 - Reliability & Stability |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 6 | 01-01 through 01-06 complete |
+| Plans Executed | 7 | 01-01 through 01-06, 02-01 complete |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -87,6 +89,10 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 | vehiclesRef pattern for closures | useRef tracks current vehicles to avoid stale state in callbacks | 2026-02-04 | 01-05 |
 | Keep updateRegistration inline | Only ~20 lines, not worth extracting to separate module | 2026-02-04 | 01-05 |
 | TypeScript strict errors acceptable | Pre-existing ErrorBoundary issues unrelated to decomposition | 2026-02-04 | 01-06 |
+| Custom audit trigger over supa_audit | supa_audit doesn't support change notes/reasons | 2026-02-04 | 02-01 |
+| Explicit field comparison in audit trigger | Clearer than dynamic information_schema loop | 2026-02-04 | 02-01 |
+| ON DELETE SET NULL for audit FK | Preserves compliance history if registration deleted | 2026-02-04 | 02-01 |
+| DB-level status transitions | Enforces valid transitions even from direct SQL | 2026-02-04 | 02-01 |
 
 ### Patterns Established
 
@@ -97,6 +103,9 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 - **Module extraction pattern:** Extract logic to lib/store/*.ts, keep Store.tsx as facade
 - **Setter injection pattern:** Pass React state setters via VehicleSetters interface
 - **Facade pattern:** Store.tsx orchestrates modules, exposes unchanged useStore() interface
+- **Audit trigger pattern:** pending_change_reason captured and cleared by trigger
+- **Granular RLS pattern:** registration_admin can INSERT/UPDATE, only is_admin can DELETE
+- **Milestone auto-population:** Trigger sets dates when status advances
 
 ### Architecture Summary (Current)
 
@@ -105,20 +114,25 @@ lib/store/ Module Structure (750 lines total):
   index.ts      - Barrel export (7 lines)
   types.ts      - VehicleState, VehicleSetters interfaces (20 lines)
   vehicles.ts   - Vehicle CRUD operations (426 lines)
-                  - FALLBACK_VEHICLES constant
-                  - loadVehicles, addVehicle, updateVehicle, removeVehicle
   sheets.ts     - Google Sheets sync (229 lines)
-                  - generateOpulentCaption, parseCSVLine
-                  - syncWithGoogleSheets
   leads.ts      - Lead management (68 lines)
-                  - loadLeads, addLead
 
 Store.tsx (281 lines - 68% reduction from 893):
   - Thin facade that imports from lib/store/*
-  - React state management
-  - Supabase subscriptions
-  - Auth integration
-  - useStore() interface UNCHANGED
+  - React state management, Supabase subscriptions
+  - Auth integration, useStore() interface UNCHANGED
+
+supabase/migrations/ (NEW in 02-01):
+  02_registration_schema_update.sql (483 lines)
+    - 6-stage workflow: sale_complete -> documents_collected ->
+      submitted_to_dmv -> dmv_processing -> sticker_ready ->
+      sticker_delivered (+ rejected branch)
+    - registration_audit table with change tracking
+    - validate_status_transition() trigger
+    - auto_set_milestone_dates() trigger
+    - is_registration_admin RLS policies
+  README.md (81 lines)
+    - Migration order, breaking changes, rollback
 ```
 
 ### Known Issues
@@ -140,31 +154,34 @@ Store.tsx (281 lines - 68% reduction from 893):
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed Plan 01-06: STAB-03 verification
-- Verified TypeScript/Vite build passes
-- Confirmed Store.tsx at 281 lines (under 300 target)
-- Verified lib/store has all 5 modules (750 lines total)
-- Confirmed StoreContextType interface unchanged (17 properties)
-- Phase 1 officially complete
+- Executed Plan 02-01: Registration Schema Migration
+- Created 483-line SQL migration with 6-stage workflow
+- Implemented registration_audit table with comprehensive change tracking
+- Added validate_status_transition() for forward-only status enforcement
+- Added auto_set_milestone_dates() for milestone auto-population
+- Updated RLS policies for is_registration_admin role
+- Created README with data migration helper and rollback instructions
 
-### Phase 1 Final Summary
-| Requirement | Status | Notes |
+### Plan 02-01 Summary
+| Deliverable | Status | Notes |
 |-------------|--------|-------|
-| STAB-01 (infinite loop) | FIXED | hasLoaded flag pattern |
-| STAB-02 (RLS silent failures) | DEFERRED | Requires database schema work in Phase 2 |
-| STAB-03 (Store.tsx decomposition) | COMPLETE | Module extraction, 281 lines facade |
+| Migration file | CREATED | 483 lines, all schema changes |
+| Audit infrastructure | CREATED | Table + trigger + indexes |
+| Status validation | CREATED | DB-level enforcement |
+| RLS policies | UPDATED | Granular permissions |
+| README | CREATED | 81 lines, migration docs |
 
 ### What Comes Next
-- Begin Phase 2: Registration Database Foundation
-- Define registration_status table schema
-- Create Supabase migrations
-- Implement registration tracking backend
+- Execute Plan 02-02: TypeScript Types & Service Updates
+- Update types.ts REGISTRATION_STAGES to 6-stage workflow
+- Update registrationService.ts transformers for new columns
+- Add change reason support to update functions
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/01-reliability-stability/01-06-SUMMARY.md` - latest plan
+3. `.planning/phases/02-registration-database-foundation/02-01-SUMMARY.md` - latest plan
 4. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
