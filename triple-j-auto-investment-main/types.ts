@@ -305,34 +305,3 @@ export const STATUS_COLORS: Record<RegistrationStageStatus, { bg: string; text: 
   complete: { bg: 'bg-green-500/20', text: 'text-green-400', icon: 'check-circle' },
   blocked: { bg: 'bg-red-500/20', text: 'text-red-400', icon: 'alert-circle' }
 };
-
-// ================================================================
-// ERROR HANDLING TYPES (Phase 1 - STAB-01/02)
-// ================================================================
-
-export interface AppError {
-  code: string;           // e.g., "RLS-403", "NET-TIMEOUT"
-  message: string;        // User-friendly message
-  details?: string;       // Technical details (shown to admins only)
-  timestamp: Date;
-  retryable: boolean;
-}
-
-export const ErrorCodes = {
-  // RLS errors (STAB-02)
-  RLS_BLOCKED: 'RLS-403',
-  RLS_NO_SESSION: 'RLS-401',
-  RLS_NOT_ADMIN: 'RLS-FORBIDDEN',
-
-  // Network errors (STAB-01)
-  NET_TIMEOUT: 'NET-TIMEOUT',
-  NET_FETCH_FAILED: 'NET-FETCH',
-  NET_ABORTED: 'NET-ABORT',
-
-  // Database errors
-  DB_DUPLICATE: 'DB-DUP',
-  DB_CONSTRAINT: 'DB-CONSTRAINT',
-  DB_UNKNOWN: 'DB-ERR',
-} as const;
-
-export type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes];

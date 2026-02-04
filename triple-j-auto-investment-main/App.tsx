@@ -1,292 +1,504 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
-import { AuthProvider, useAuth } from './context/AuthContext';
-import { VehicleProvider } from './context/VehicleContext';
+import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
-import { ErrorProvider } from './components/ErrorProvider';
-import { StoreErrorBridge } from './components/StoreErrorBridge';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Menu, X, Lock, LayoutDashboard, Car, ShieldCheck, Globe, MapPin, Phone, ArrowRight } from 'lucide-react';
+import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
+import { SplashScreen } from './components/SplashScreen';
+import { ScrollToTop } from './components/ScrollToTop';
 
-// Critical Pages
+// Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
 import Inventory from './pages/Inventory';
 import Contact from './pages/Contact';
 
-// Lazy loaded pages
-const VinLookup = React.lazy(() => import('./pages/VinLookup'));
-const Services = React.lazy(() => import('./pages/Services'));
-const Finance = React.lazy(() => import('./pages/Finance'));
-const FAQ = React.lazy(() => import('./pages/FAQ'));
-const Policies = React.lazy(() => import('./pages/Policies'));
-const PaymentOptions = React.lazy(() => import('./pages/PaymentOptions'));
-const NotFound = React.lazy(() => import('./pages/NotFound'));
-const Login = React.lazy(() => import('./pages/Login'));
-const About = React.lazy(() => import('./pages/About'));
-const Legal = React.lazy(() => import('./pages/Legal'));
-const RegistrationTracker = React.lazy(() => import('./pages/RegistrationTracker'));
-const AdminDashboard = React.lazy(() => import('./pages/admin/Dashboard'));
-const AdminInventory = React.lazy(() => import('./pages/admin/Inventory'));
-const AdminRegistrations = React.lazy(() => import('./pages/admin/Registrations'));
+// Helper function for lazy loading with error handling
+const lazyWithErrorHandling = (importFn: () => Promise<any>, pageName: string) => {
+  return lazy(async () => {
+    try {
+      return await importFn();
+    } catch (error) {
+      console.error(`Failed to load ${pageName}:`, error);
+      // Return a fallback component
+      return {
+        default: () => (
+          <div className="min-h-screen flex items-center justify-center bg-tj-green text-white p-8">
+            <div className="text-center max-w-2xl">
+              <h1 className="font-display text-3xl text-tj-gold mb-4">Error Loading {pageName}</h1>
+              <p className="text-gray-300 mb-6">
+                Failed to load the {pageName} page. Please refresh the page or contact support.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-tj-gold text-black px-6 py-3 font-bold uppercase tracking-widest hover:bg-white transition-colors"
+              >
+                Reload Page
+              </button>
+            </div>
+          </div>
+        )
+      };
+    }
+  });
+};
 
-// Map utility
+// Non-Critical Pages (Lazy Loaded)
+const VinLookup = lazyWithErrorHandling(() => import('./pages/VinLookup'), 'VIN Lookup');
+const Services = lazyWithErrorHandling(() => import('./pages/Services'), 'Services');
+const Finance = lazyWithErrorHandling(() => import('./pages/Finance'), 'Finance');
+const FAQ = lazyWithErrorHandling(() => import('./pages/FAQ'), 'FAQ');
+const Policies = lazyWithErrorHandling(() => import('./pages/Policies'), 'Policies');
+const PaymentOptions = lazyWithErrorHandling(() => import('./pages/PaymentOptions'), 'Payment Options');
+const NotFound = lazyWithErrorHandling(() => import('./pages/NotFound'), 'Not Found');
+const Login = lazyWithErrorHandling(() => import('./pages/Login'), 'Login');
+const About = lazyWithErrorHandling(() => import('./pages/About'), 'About');
+const Legal = lazyWithErrorHandling(() => import('./pages/Legal'), 'Legal');
+const RegistrationTracker = lazyWithErrorHandling(() => import('./pages/RegistrationTracker'), 'Registration Tracker');
+
+// Admin Pages (Lazy Loaded)
+const AdminDashboard = lazyWithErrorHandling(() => import('./pages/admin/Dashboard'), 'Admin Dashboard');
+const AdminInventory = lazyWithErrorHandling(() => import('./pages/admin/Inventory'), 'Admin Inventory');
+const AdminRegistrations = lazyWithErrorHandling(() => import('./pages/admin/Registrations'), 'Admin Registrations');
+
+// Utility for Map Routing
 export const openSmartMap = () => {
   const address = "8774 Almeda Genoa Road, Houston, TX 77075";
   const encoded = encodeURIComponent(address);
   const isIOS = /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent);
-  window.open(isIOS ? `http://maps.apple.com/?q=${encoded}` : `https://www.google.com/maps/search/?api=1&query=${encoded}`, '_blank');
+
+  if (isIOS) {
+    window.open(`http://maps.apple.com/?q=${encoded}`, '_blank');
+  } else {
+    window.open(`https://www.google.com/maps/search/?api=1&query=${encoded}`, '_blank');
+  }
 };
 
-// Clean Navigation
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const { user, logout } = useAuth();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const { user, logout } = useStore();
   const { t, lang, toggleLang } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      navigate('/');
+    }
+  };
 
-  const navLinks = [
-    { to: '/inventory', label: t.nav.inventory },
-    { to: '/services', label: 'Services' },
-    { to: '/about', label: t.nav.about },
-    { to: '/contact', label: t.nav.contact },
-  ];
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.touchAction = 'none';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.touchAction = '';
+    };
+  }, [isOpen]);
+
+  const NavLink = ({ to, label }: { to: string, label: string }) => (
+    <Link
+      to={to}
+      className={`group relative flex flex-col items-center px-6 py-4 transition-all duration-700 ${location.pathname === to ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+      onClick={() => setIsOpen(false)}
+    >
+      <span className={`text-[10px] uppercase tracking-[0.3em] font-display ${location.pathname === to ? 'text-tj-gold' : 'text-white'} group-hover:text-tj-gold transition-colors`}>
+        {label}
+      </span>
+      {/* Clean, sophisticated active indicator - Underline instead of floating dot */}
+      <span className={`absolute bottom-3 w-full h-[1px] bg-tj-gold transition-all duration-500 ${location.pathname === to ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0 group-hover:scale-x-50 group-hover:opacity-50'}`}></span>
+    </Link>
+  );
 
   return (
-    <>
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/95 backdrop-blur-sm shadow-sm' : 'bg-transparent'}`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-3">
-              <img src="/GoldTripleJLogo.png" alt="Triple J" className="h-12 w-12 object-contain" />
-              <div className="hidden sm:block">
-                <span className={`font-semibold tracking-wide ${scrolled ? 'text-gray-900' : 'text-white'}`}>Triple J</span>
-                <span className={`text-xs block ${scrolled ? 'text-gray-500' : 'text-white/70'}`}>Auto Investment</span>
-              </div>
-            </Link>
+    <nav className="fixed w-full z-50">
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-transparent pointer-events-none h-48 transition-opacity duration-500"></div>
 
-            {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={`text-sm font-medium transition-colors hover:text-yellow-600 ${
-                    location.pathname === link.to ? 'text-yellow-600' : scrolled ? 'text-gray-700' : 'text-white/90'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-              
-              <button onClick={toggleLang} className={`text-sm ${scrolled ? 'text-gray-600' : 'text-white/80'}`}>
-                {lang === 'en' ? 'ES' : 'EN'}
+      <div className="border-b border-white/5 backdrop-blur-[2px] relative z-10">
+        <div className="max-w-[1920px] mx-auto px-6 md:px-12">
+          <div className="relative flex justify-between items-center h-24 md:h-32">
+
+            {/* Left Axis: Operational */}
+            <div className="hidden md:flex flex-1 items-center justify-start space-x-10 pl-12">
+              <NavLink to="/inventory" label={t.nav.inventory} />
+              <NavLink to="/vin" label="INTEL" />
+            </div>
+
+            {/* CENTER AXIS: OFFICIAL LOGO */}
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[100]">
+              <button onClick={handleLogoClick} className="group relative flex flex-col items-center justify-center cursor-pointer bg-transparent border-none p-0">
+                <img
+                  src="/GoldTripleJLogo.png"
+                  alt="Triple J Auto Investment Logo"
+                  className="w-20 h-20 md:w-24 md:h-24 object-contain transition-transform duration-700 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]"
+                />
+              </button>
+            </div>
+
+            {/* Right Axis: Philosophical */}
+            <div className="hidden md:flex flex-1 items-center justify-end space-x-8 pr-12">
+              {/* Language Toggle */}
+              <button
+                onClick={toggleLang}
+                className="flex items-center gap-2 text-[9px] uppercase tracking-widest text-gray-400 hover:text-white transition-colors mr-4"
+              >
+                <Globe size={12} />
+                <span>{lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}</span>
               </button>
 
               {!user ? (
-                <Link to="/login" className={`${scrolled ? 'text-gray-600' : 'text-white/80'}`}>
-                  <Lock size={16} />
-                </Link>
+                <>
+                  <NavLink to="/about" label={t.nav.about} />
+                  <Link to="/login" className="opacity-50 hover:opacity-100 hover:text-tj-gold transition-all p-2" aria-label="Restricted Access">
+                    <Lock size={12} />
+                  </Link>
+                </>
               ) : (
-                <div className="flex items-center gap-4 ml-4 pl-4 border-l border-gray-200">
-                  <Link to="/admin/dashboard" className="text-sm text-gray-600 hover:text-yellow-600">Admin</Link>
-                  <button onClick={logout} className="text-sm text-red-500">Logout</button>
+                <div className="flex items-center gap-8 border-l border-white/10 pl-8">
+                  <Link to="/admin/dashboard" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('dashboard') ? 'text-tj-gold' : 'text-gray-400'}`}>
+                    <LayoutDashboard size={14} /> Command
+                  </Link>
+                  <Link to="/admin/inventory" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('inventory') ? 'text-tj-gold' : 'text-gray-400'}`}>
+                    <Car size={14} /> Assets
+                  </Link>
+                  <Link to="/admin/registrations" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('registrations') ? 'text-tj-gold' : 'text-gray-400'}`}>
+                    <ShieldCheck size={14} /> Ledger
+                  </Link>
+                  <button onClick={logout} className="text-[10px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors ml-4">Logout</button>
                 </div>
               )}
             </div>
 
-            {/* Mobile Menu Button */}
-            <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2">
-              {isOpen ? <X size={24} className={scrolled ? 'text-gray-900' : 'text-white'} /> : <Menu size={24} className={scrolled ? 'text-gray-900' : 'text-white'} />}
-            </button>
+            {/* Mobile Trigger */}
+            <div className="flex flex-1 justify-end md:hidden z-[70] pr-2 items-center gap-4">
+              <button
+                onClick={toggleLang}
+                className="text-tj-gold p-2"
+                aria-label={lang === 'en' ? 'Switch to Spanish' : 'Cambiar a Inglés'}
+              >
+                <span className="text-[10px] font-bold">{lang === 'en' ? 'ES' : 'EN'}</span>
+              </button>
+
+              <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={`group relative p-3 border transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden ${isOpen ? 'border-tj-gold text-tj-gold bg-black' : 'border-white/10 text-white bg-black/50 backdrop-blur'}`}
+                aria-label={isOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={isOpen}
+              >
+                <div className={`absolute inset-0 bg-tj-gold/10 transform transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}></div>
+                <div className={`relative z-10 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isOpen ? 'rotate-90 scale-110' : 'rotate-0'}`}>
+                  {isOpen ? <X size={24} /> : <Menu size={24} />}
+                </div>
+              </button>
+            </div>
           </div>
         </div>
-      </nav>
+      </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="fixed inset-0 z-40 bg-white pt-24"
-          >
-            <div className="flex flex-col items-center gap-6 p-8">
-              {navLinks.map((link) => (
+      {/* --- MOBILE MENU --- */}
+      {/* Pure black background, no overlays */}
+      {isOpen && (
+        <div
+          className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen flex flex-col justify-center items-center md:hidden"
+          style={{ zIndex: 99999, position: 'fixed', backgroundColor: '#000000' }}
+        >
+          <div className="flex flex-col items-center gap-8 w-full px-8">
+            {/* Public Navigation Links */}
+            {[
+              { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT" },
+              { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "ACQUIRE ASSETS" },
+              { to: "/vin", label: "INTEL", sub: "DEEP DATA ANALYSIS" },
+              { to: "/about", label: t.nav.about.toUpperCase(), sub: "THE PHILOSOPHY" }
+            ].map((link) => (
+              <div key={link.to} className="w-full text-center group">
                 <Link
-                  key={link.to}
                   to={link.to}
                   onClick={() => setIsOpen(false)}
-                  className="text-xl font-medium text-gray-900 hover:text-yellow-600"
+                  className="block font-display text-3xl text-white tracking-[0.15em] hover:text-tj-gold transition-all duration-300"
                 >
                   {link.label}
                 </Link>
-              ))}
-              <button onClick={toggleLang} className="text-gray-600 mt-4">
-                {lang === 'en' ? 'Switch to Español' : 'Switch to English'}
-              </button>
+                <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors">
+                  {link.sub}
+                </p>
+              </div>
+            ))}
+
+            {/* Admin Links */}
+            <div className="w-full border-t border-tj-gold/30 pt-6 mt-2">
+              {user ? (
+                <>
+                  <p className="text-[9px] text-tj-gold uppercase tracking-[0.3em] mb-4 text-center">Admin Access</p>
+                  <div className="flex flex-col gap-4">
+                    <Link
+                      to="/admin/dashboard"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                    >
+                      <LayoutDashboard size={18} />
+                      <span className="text-lg font-display tracking-widest">DASHBOARD</span>
+                    </Link>
+                    <Link
+                      to="/admin/inventory"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                    >
+                      <Car size={18} />
+                      <span className="text-lg font-display tracking-widest">INVENTORY</span>
+                    </Link>
+                    <Link
+                      to="/admin/registrations"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                    >
+                      <ShieldCheck size={18} />
+                      <span className="text-lg font-display tracking-widest">LEDGER</span>
+                    </Link>
+                    <button
+                      onClick={() => { logout(); setIsOpen(false); }}
+                      className="flex items-center justify-center gap-3 text-red-500 hover:text-red-400 transition-colors py-2"
+                    >
+                      <Lock size={18} />
+                      <span className="text-lg font-display tracking-widest">LOGOUT</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Dealer Portal</p>
+                  <Link
+                    to="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-3 border border-gray-700 hover:border-tj-gold/50 bg-black/50"
+                  >
+                    <Lock size={16} />
+                    <span className="text-sm font-display tracking-widest">ADMIN LOGIN</span>
+                  </Link>
+                </>
+              )}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+          </div>
+
+          <div className="absolute bottom-12">
+            <button
+              onClick={toggleLang}
+              className="text-gray-500 hover:text-tj-gold px-6 py-2 text-[10px] uppercase tracking-widest transition-colors"
+            >
+              {lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}
+            </button>
+          </div>
+        </div>
+      )}
+    </nav>
   );
 };
 
-// Clean Footer
 const Footer = () => {
   const { t } = useLanguage();
-  
+
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          {/* Brand */}
-          <div className="md:col-span-2">
+    <footer className="bg-black text-gray-600 py-20 border-t border-white/5 relative overflow-hidden">
+      {/* Background Crest Watermark */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.03]">
+        <img
+          src="/GoldTripleJLogo.png"
+          alt=""
+          className="w-[40vw] max-w-[500px] h-auto"
+          aria-hidden="true"
+        />
+      </div>
+
+      <div className="max-w-[1400px] mx-auto px-6 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-24">
+
+        {/* HEADQUARTERS */}
+        <div className="flex flex-col items-start">
+          <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">Headquarters</h3>
+          <div className="mb-6">
+            {/* Crest Logo instead of text */}
             <div className="flex items-center gap-3 mb-4">
-              <img src="/GoldTripleJLogo.png" alt="Triple J" className="h-10 w-10 object-contain" />
+              <img
+                src="/GoldTripleJLogo.png"
+                alt="Triple J Auto Investment"
+                className="w-12 h-12 object-contain"
+              />
               <div>
-                <span className="font-semibold text-lg">Triple J Auto Investment</span>
-                <p className="text-gray-400 text-sm">Houston's Premier Luxury Auto Dealer</p>
+                <p className="text-white font-display text-lg tracking-wider leading-tight">TRIPLE J</p>
+                <p className="text-gray-500 text-[10px] uppercase tracking-widest">Auto Investment</p>
               </div>
             </div>
-            <button onClick={openSmartMap} className="flex items-start gap-2 text-gray-400 hover:text-white mt-4">
-              <MapPin size={18} className="mt-0.5 flex-shrink-0" />
-              <div className="text-left text-sm">
-                <p>8774 Almeda Genoa Road</p>
-                <p>Houston, TX 77075</p>
+            <p className="text-xs text-gray-500 italic mb-4">{t.footer.tagline}</p>
+            <button
+              onClick={openSmartMap}
+              className="not-italic text-sm text-gray-400 leading-loose text-left hover:text-tj-gold transition-colors group"
+            >
+              <div className="flex items-center gap-2 mb-1">
+                <MapPin size={14} className="text-tj-gold group-hover:animate-bounce" />
+                <span>8774 Almeda Genoa Road</span>
               </div>
+              <span className="pl-6 block">Houston, Texas 77075</span>
             </button>
           </div>
-
-          {/* Links */}
-          <div>
-            <h3 className="font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link to="/inventory" className="hover:text-white">Inventory</Link></li>
-              <li><Link to="/services" className="hover:text-white">Services</Link></li>
-              <li><Link to="/about" className="hover:text-white">About</Link></li>
-              <li><Link to="/contact" className="hover:text-white">Contact</Link></li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="font-semibold mb-4">Contact</h3>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li className="flex items-center gap-2">
-                <Phone size={14} />
-                <a href="tel:+18324009760" className="hover:text-white">832-400-9760</a>
-              </li>
-              <li>TX License: P171632</li>
-            </ul>
-          </div>
+          <p className="text-[10px] uppercase tracking-widest text-gray-600 mt-auto">
+            © {new Date().getFullYear()} Sovereign Entity. {t.footer.rights}
+          </p>
         </div>
 
-        <div className="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-          <p>© {new Date().getFullYear()} Triple J Auto Investment. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link to="/legal/privacy" className="hover:text-white">Privacy</Link>
-            <Link to="/legal/terms" className="hover:text-white">Terms</Link>
+        {/* COMPLIANCE */}
+        <div className="flex flex-col items-start">
+          <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full flex items-center gap-2">
+            <ShieldCheck size={14} /> {t.footer.legal.toUpperCase()}
+          </h3>
+          <div className="mb-6 w-full">
+            <div className="flex justify-between items-center border-b border-white/5 pb-3 mb-3">
+              <span className="text-[10px] uppercase tracking-widest text-gray-500">TX Dealer License</span>
+              <span className="font-mono text-tj-gold text-sm">P171632</span>
+            </div>
           </div>
+          <ul className="space-y-3 text-[10px] uppercase tracking-widest text-gray-500 w-full">
+            <li><Link to="/legal/dmv" className="hover:text-tj-gold transition-colors block py-1">Texas DMV</Link></li>
+            <li><Link to="/legal/privacy" className="hover:text-tj-gold transition-colors block py-1">{t.footer.privacy}</Link></li>
+            <li><Link to="/legal/terms" className="hover:text-tj-gold transition-colors block py-1">{t.footer.terms}</Link></li>
+            <li><Link to="/legal/arbitration" className="hover:text-tj-gold transition-colors block py-1">Arbitration</Link></li>
+          </ul>
         </div>
+
+        {/* SYSTEM LINKS */}
+        <div className="flex flex-col items-start">
+          <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">{t.footer.quickLinks.toUpperCase()}</h3>
+          <ul className="space-y-4 text-[10px] uppercase tracking-widest w-full">
+            <li><Link to="/inventory" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.nav.inventory}</Link></li>
+            <li><Link to="/about" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.nav.about}</Link></li>
+            <li><Link to="/vin" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">Intel</Link></li>
+            <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-600 flex items-center gap-2"><Lock size={10} /> {t.nav.login}</Link></li>
+          </ul>
+        </div>
+
       </div>
     </footer>
   );
 };
 
-// Protected Route
 const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user } = useStore();
   if (!user?.isAdmin) return <Navigate to="/login" replace />;
   return <>{children}</>;
 };
 
-// Scroll to top
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  useEffect(() => window.scrollTo(0, 0), [pathname]);
-  return null;
-};
+// AnimatePresence is already imported at top from 'framer-motion'
 
-// App Content
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Error caught by boundary:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-tj-green text-white p-8">
+          <div className="text-center max-w-2xl">
+            <h1 className="font-display text-3xl text-tj-gold mb-4">Error Loading Page</h1>
+            <p className="text-gray-300 mb-6">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-tj-gold text-black px-6 py-3 font-bold uppercase tracking-widest hover:bg-white transition-colors"
+            >
+              Reload Page
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
 const AppContent = () => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <ScrollToTop />
+    <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">
+      <ErrorBoundary>
+        <BrowserCompatibilityCheck />
+      </ErrorBoundary>
       <Navbar />
-      
-      <main className="flex-grow">
-        <React.Suspense fallback={null}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-            >
+      {/* Adjusted top padding since crest is gone */}
+      <main className="flex-grow pt-32">
+        {/* Global Page Transition Wrapper */}
+        <AnimatePresence mode="wait">
+          <Suspense fallback={null}>
+            <div key={location.pathname} className="min-h-full origin-top">
               <Routes location={location}>
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/inventory" element={<Inventory />} />
                 <Route path="/vin" element={<VinLookup />} />
+                <Route path="/vin/free-check" element={<VinLookup />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/finance" element={<Finance />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/policies" element={<Policies />} />
+                <Route path="/terms" element={<Policies />} />
                 <Route path="/payment-options" element={<PaymentOptions />} />
+                <Route path="/commercial-wholesale" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/legal/:section" element={<Legal />} />
                 <Route path="/track" element={<RegistrationTracker />} />
                 <Route path="/track/:orderId" element={<RegistrationTracker />} />
+
+                {/* Admin Routes */}
                 <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                 <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventory /></ProtectedRoute>} />
                 <Route path="/admin/registrations" element={<ProtectedRoute><AdminRegistrations /></ProtectedRoute>} />
+
+                {/* 404 Catch-All */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </motion.div>
-          </AnimatePresence>
-        </React.Suspense>
+            </div>
+          </Suspense>
+        </AnimatePresence>
       </main>
-      
       <Footer />
     </div>
   );
-};
+}
 
-// Main App
-// Provider order: LanguageProvider > ErrorProvider > AuthProvider > VehicleProvider > StoreProvider
-// AuthProvider must wrap VehicleProvider since VehicleContext uses useAuth()
-// VehicleProvider must wrap StoreProvider to ensure vehicles are available
 export default function App() {
   return (
     <LanguageProvider>
-      <ErrorProvider showAdminDetails={true}>
-        <AuthProvider>
-          <VehicleProvider>
-            <StoreProvider>
-              <StoreErrorBridge />
-              <Router>
-                <AppContent />
-              </Router>
-            </StoreProvider>
-          </VehicleProvider>
-        </AuthProvider>
-      </ErrorProvider>
+      <StoreProvider>
+        <Router>
+          <ScrollToTop />
+          <SplashScreen duration={3500}>
+            <AppContent />
+          </SplashScreen>
+        </Router>
+      </StoreProvider>
     </LanguageProvider>
   );
 }

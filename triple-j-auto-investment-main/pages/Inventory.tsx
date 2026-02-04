@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../context/Store';
-import { useVehicles } from '../context/VehicleContext';
 import { VehicleStatus, Vehicle } from '../types';
 import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw, Car, ZoomIn } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
@@ -155,8 +154,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
 };
 
 const Inventory = () => {
-  const { vehicles, isLoading, hasLoaded, connectionError, refreshVehicles } = useVehicles();
-  const { addLead } = useStore();
+  const { vehicles, addLead, isLoading, refreshVehicles } = useStore();
   const { t, lang, toggleLang } = useLanguage();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
   const [makeFilter, setMakeFilter] = useState<string>('All');
@@ -344,18 +342,6 @@ const Inventory = () => {
 
   return (
     <div className="bg-black min-h-screen px-4 md:px-6 pb-20 relative">
-      {/* Loading Progress Bar - top of page */}
-      {isLoading && (
-        <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-zinc-800">
-          <motion.div
-            className="h-full bg-tj-gold"
-            initial={{ width: '0%' }}
-            animate={{ width: '90%' }}
-            transition={{ duration: 2, ease: 'easeOut' }}
-          />
-        </div>
-      )}
-
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
 
@@ -491,38 +477,78 @@ const Inventory = () => {
           </AnimatePresence>
         </motion.div>
 
-        {isLoading && !hasLoaded && (
-          <div className="py-32 text-center border border-white/10 mt-12 bg-white/5 rounded-lg">
+        {isLoading && (
+          <div className="py-32 text-center border border-white/10 mt-12 bg-white/5">
             <Loader2 size={32} className="mx-auto text-tj-gold mb-4 animate-spin" />
-            <p className="font-display text-xl text-white tracking-widest animate-pulse">
-              Loading Inventory...
-            </p>
+            <p className="font-display text-xl text-white tracking-widest animate-pulse">UPLINKING COMMAND LEDGER...</p>
           </div>
         )}
 
-        {hasLoaded && !isLoading && sortedVehicles.length === 0 && (
-          <div className="py-16 text-center border border-white/10 mt-12 bg-white/5 rounded-lg">
-            {connectionError ? (
-              <>
-                <AlertTriangle size={48} className="mx-auto text-red-500 mb-4" />
-                <h3 className="text-xl font-display text-white mb-2">Connection Issue</h3>
-                <p className="text-zinc-400 mb-4">{connectionError}</p>
-                <button
-                  onClick={refreshVehicles}
-                  className="px-6 py-2 bg-tj-gold text-black font-medium rounded hover:bg-tj-gold/90 transition-colors"
-                >
-                  Try Again
-                </button>
-              </>
-            ) : (
-              <>
-                <Car size={48} className="mx-auto text-zinc-600 mb-4" />
-                <h3 className="text-xl font-display text-white mb-2">No Vehicles Found</h3>
-                <p className="text-zinc-400">
-                  Check back soon for new inventory.
-                </p>
-              </>
-            )}
+        {!isLoading && sortedVehicles.length === 0 && (
+          <div className="py-16 text-center border border-red-900/30 mt-12 bg-red-900/5">
+            <ShieldAlert size={48} className="mx-auto text-red-500 mb-4" />
+            <p className="font-display text-2xl text-white tracking-widest uppercase mb-2">Connection Issue Detected</p>
+            <p className="text-sm text-gray-400 mt-2 max-w-lg mx-auto mb-6">
+              Unable to load vehicle inventory. This is usually a browser or network issue.
+            </p>
+
+            {/* Diagnostic Info */}
+            <div className="max-w-xl mx-auto text-left space-y-3 mb-8 px-4">
+              <p className="text-xs text-tj-gold uppercase tracking-widest font-bold mb-4 text-center">Try These Fixes:</p>
+
+              <div className="bg-black/50 border border-white/10 p-4">
+                <p className="text-sm text-white font-bold mb-1">1. Hard Refresh</p>
+                <p className="text-xs text-gray-400">Press <span className="text-tj-gold font-mono">Ctrl + Shift + R</span> (Windows) or <span className="text-tj-gold font-mono">Cmd + Shift + R</span> (Mac)</p>
+              </div>
+
+              <div className="bg-black/50 border border-white/10 p-4">
+                <p className="text-sm text-white font-bold mb-1">2. Clear Browser Cache</p>
+                <p className="text-xs text-gray-400">Settings → Privacy → Clear browsing data → Select "Cached images and files" → Clear</p>
+              </div>
+
+              <div className="bg-black/50 border border-white/10 p-4">
+                <p className="text-sm text-white font-bold mb-1">3. Disable Ad Blockers / Extensions</p>
+                <p className="text-xs text-gray-400">Extensions may block our secure database connection. Try disabling them temporarily.</p>
+              </div>
+
+              {(typeof navigator !== 'undefined' && (navigator.userAgent.includes('Brave') || (navigator as any).brave)) && (
+                <div className="bg-yellow-900/30 border border-yellow-700/50 p-4">
+                  <p className="text-sm text-yellow-400 font-bold mb-1">⚠️ Brave Browser Detected</p>
+                  <p className="text-xs text-gray-300">Click the <span className="text-yellow-400">lion icon</span> in the address bar → Turn OFF Shields for this site → Refresh</p>
+                </div>
+              )}
+
+              <div className="bg-black/50 border border-white/10 p-4">
+                <p className="text-sm text-white font-bold mb-1">4. Try Incognito/Private Mode</p>
+                <p className="text-xs text-gray-400">This bypasses cached data and most extensions.</p>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                onClick={() => {
+                  // Clear local cache
+                  localStorage.removeItem('tj_build_version');
+                  localStorage.removeItem('supabase.auth.token');
+                  // Force hard refresh
+                  window.location.reload();
+                }}
+                className="text-[10px] uppercase tracking-widest bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all flex items-center gap-2 font-bold"
+              >
+                <RefreshCw size={14} /> Clear Cache & Reload
+              </button>
+
+              <button
+                onClick={() => refreshVehicles()}
+                className="text-[10px] uppercase tracking-widest text-tj-gold hover:text-white border border-tj-gold/30 hover:border-tj-gold px-6 py-4 transition-all flex items-center gap-2"
+              >
+                <RefreshCw size={14} /> Retry Connection
+              </button>
+            </div>
+
+            <p className="text-[10px] text-gray-600 mt-8 font-mono">
+              If this persists, check the browser console (F12) for errors or try a different browser.
+            </p>
           </div>
         )}
       </div>

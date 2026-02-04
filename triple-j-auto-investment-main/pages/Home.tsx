@@ -1,278 +1,532 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useVehicles } from '../context/VehicleContext';
+import { useStore } from '../context/Store';
+import { ArrowRight, Diamond, Brain, Zap, Fingerprint, Target, Activity, Crosshair, Wifi, ChevronDown, Phone } from 'lucide-react';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+
+// --- PSYCHOLOGICAL UTILITIES ---
+
+const DecryptText = ({ text, delay = 0, speed = 30 }: { text: string, delay?: number, speed?: number }) => {
+   const [display, setDisplay] = useState('');
+   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&';
+
+   useEffect(() => {
+      let iteration = 0;
+      const startTimeout = setTimeout(() => {
+         const interval = setInterval(() => {
+            setDisplay(text
+               .split('')
+               .map((letter, index) => {
+                  if (index < iteration) {
+                     return text[index];
+                  }
+                  return chars[Math.floor(Math.random() * chars.length)];
+               })
+               .join('')
+            );
+
+            if (iteration >= text.length) {
+               clearInterval(interval);
+            }
+
+            iteration += 1 / 2; // Faster decoding for short attention spans
+         }, speed);
+         return () => clearInterval(interval);
+      }, delay);
+      return () => clearTimeout(startTimeout);
+   }, [text, delay, speed]);
+
+   return <span>{display}</span>;
+};
+
+// Subliminal Flash Component - Primes the user's brain
+const SubliminalPrime = () => {
+   const [word, setWord] = useState('');
+   const [visible, setVisible] = useState(false);
+   const words = ['AUTHORITY', 'CONTROL', 'LEGACY', 'DOMINION', 'SOVEREIGNTY'];
+
+   useEffect(() => {
+      // Flash a random word every few seconds for 100ms
+      const interval = setInterval(() => {
+         if (Math.random() > 0.7) {
+            setWord(words[Math.floor(Math.random() * words.length)]);
+            setVisible(true);
+            setTimeout(() => setVisible(false), 150); // Subconscious flash speed
+         }
+      }, 4000);
+      return () => clearInterval(interval);
+   }, []);
+
+   if (!visible) return null;
+
+   return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none mix-blend-overlay">
+         <motion.h2
+            initial={{ opacity: 0, scale: 2 }}
+            animate={{ opacity: 0.1, scale: 1.5 }}
+            exit={{ opacity: 0 }}
+            className="text-[20vw] font-display font-black text-white tracking-tighter uppercase"
+         >
+            {word}
+         </motion.h2>
+      </div>
+   );
+};
+
 import { useLanguage } from '../context/LanguageContext';
-import { ArrowRight, Check, Shield, Clock, Award } from 'lucide-react';
-import { motion } from 'framer-motion';
 
-// Simple Hero Section
-const Hero = () => {
-  return (
-    <section className="relative h-[90vh] flex items-center justify-center bg-gray-900 overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ 
-          backgroundImage: 'url(https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&q=80)',
-          filter: 'brightness(0.4)'
-        }}
-      />
-      
-      {/* Content */}
-      <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight"
-        >
-          Premium Vehicles, <br />
-          <span className="text-yellow-500">Exceptional Value</span>
-        </motion.h1>
-        
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-lg md:text-xl text-gray-300 mb-10 max-w-2xl mx-auto"
-        >
-          Houston's trusted destination for quality used luxury vehicles. 
-          Transparent pricing, no hidden fees.
-        </motion.p>
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center"
-        >
-          <Link 
-            to="/inventory"
-            className="inline-flex items-center justify-center gap-2 bg-yellow-500 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-yellow-400 transition-colors"
-          >
-            View Inventory
-            <ArrowRight size={18} />
-          </Link>
-          <Link 
-            to="/contact"
-            className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-gray-900 transition-colors"
-          >
-            Contact Us
-          </Link>
-        </motion.div>
-      </div>
+// ... (imports remain same)
 
-      {/* Scroll indicator */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
-          <motion.div 
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-1 h-2 bg-white rounded-full"
-          />
-        </div>
-      </motion.div>
-    </section>
-  );
-};
-
-// Stats Section
-const Stats = () => {
-  const stats = [
-    { value: '500+', label: 'Vehicles Sold' },
-    { value: '15+', label: 'Years Experience' },
-    { value: '98%', label: 'Satisfaction Rate' },
-    { value: '4.9', label: 'Google Rating' },
-  ];
-
-  return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((stat, i) => (
-            <div key={i} className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">{stat.value}</div>
-              <div className="text-sm text-gray-600">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// Featured Vehicles
-const FeaturedVehicles = () => {
-  const { vehicles } = useVehicles();
-  const featured = vehicles
-    .filter(v => v.status === 'Available')
-    .sort((a, b) => b.price - a.price)
-    .slice(0, 3);
-
-  return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Vehicles</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Hand-selected premium vehicles. Each car undergoes a comprehensive inspection before listing.
-          </p>
-        </div>
-
-        {featured.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featured.map((vehicle) => (
-              <Link 
-                key={vehicle.id} 
-                to="/inventory"
-                className="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border border-gray-100"
-              >
-                <div className="aspect-[4/3] overflow-hidden bg-gray-100">
-                  <img 
-                    src={vehicle.imageUrl} 
-                    alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
-                    <span>{vehicle.year}</span>
-                    <span>•</span>
-                    <span>{vehicle.make}</span>
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{vehicle.model}</h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-bold text-yellow-600">
-                      ${vehicle.price.toLocaleString()}
-                    </span>
-                    <span className="text-sm text-green-600 font-medium">Available</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-16 bg-gray-50 rounded-xl">
-            <p className="text-gray-500">New inventory arriving soon. Check back later!</p>
-          </div>
-        )}
-
-        <div className="text-center mt-12">
-          <Link 
-            to="/inventory"
-            className="inline-flex items-center gap-2 text-yellow-600 font-semibold hover:text-yellow-700"
-          >
-            View All Inventory
-            <ArrowRight size={18} />
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// Why Choose Us
-const WhyChooseUs = () => {
-  const features = [
-    {
-      icon: Check,
-      title: 'Thoroughly Inspected',
-      description: 'Every vehicle undergoes a comprehensive 150-point inspection.',
-    },
-    {
-      icon: Shield,
-      title: 'Transparent Pricing',
-      description: 'No hidden fees or surprises. What you see is what you pay.',
-    },
-    {
-      icon: Clock,
-      title: 'Fast Financing',
-      description: 'Get pre-approved in minutes with our financing partners.',
-    },
-    {
-      icon: Award,
-      title: 'Texas Licensed',
-      description: 'Fully licensed dealer (TX License P171632) with years of experience.',
-    },
-  ];
-
-  return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Triple J?</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            We believe in honest business and quality vehicles. Here's what sets us apart.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {features.map((feature, i) => (
-            <div key={i} className="bg-white p-8 rounded-xl shadow-sm">
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-6">
-                <feature.icon className="text-yellow-600" size={24} />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">{feature.title}</h3>
-              <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// CTA Section
-const CTASection = () => {
-  return (
-    <section className="py-20 bg-gray-900">
-      <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-          Ready to Find Your Next Vehicle?
-        </h2>
-        <p className="text-gray-400 mb-10 max-w-2xl mx-auto">
-          Visit our showroom in Houston or browse our inventory online. 
-          Our team is ready to help you find the perfect car.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link 
-            to="/inventory"
-            className="inline-flex items-center justify-center gap-2 bg-yellow-500 text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-yellow-400 transition-colors"
-          >
-            Browse Inventory
-          </Link>
-          <Link 
-            to="/contact"
-            className="inline-flex items-center justify-center gap-2 border-2 border-gray-600 text-white px-8 py-4 rounded-lg font-semibold hover:border-white transition-colors"
-          >
-            Get Directions
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// Main Home Component
 const Home = () => {
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <Hero />
-      <Stats />
-      <FeaturedVehicles />
-      <WhyChooseUs />
-      <CTASection />
-    </motion.div>
-  );
+   const { vehicles } = useStore();
+   const { t } = useLanguage();
+   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+   const { scrollY } = useScroll();
+
+   // Smooth Parallax
+   const y1 = useTransform(scrollY, [0, 500], [0, 200]);
+   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+
+   // Mouse Parallax for Hero
+   const mouseX = useSpring(0, { stiffness: 50, damping: 20 });
+   const mouseY = useSpring(0, { stiffness: 50, damping: 20 });
+
+   // Get Top 3 Available Assets for "The Arsenal"
+   const featuredAssets = vehicles
+      .filter(v => v.status === 'Available')
+      .sort((a, b) => b.price - a.price)
+      .slice(0, 3);
+
+   // Fallback if no assets
+   const hasAssets = featuredAssets.length > 0;
+
+   useEffect(() => {
+      const handleMouseMove = (e: MouseEvent) => {
+         const x = (e.clientX / window.innerWidth) - 0.5;
+         const y = (e.clientY / window.innerHeight) - 0.5;
+         setMousePos({ x, y });
+         mouseX.set(x);
+         mouseY.set(y);
+      };
+
+      window.addEventListener('mousemove', handleMouseMove);
+      return () => {
+         window.removeEventListener('mousemove', handleMouseMove);
+      };
+   }, []);
+
+   const containerVariants = {
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
+   };
+
+   const itemVariants = {
+      hidden: { opacity: 0, y: 30 },
+      visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } }
+   };
+
+   return (
+      <motion.div
+         initial={{ opacity: 0 }}
+         animate={{ opacity: 1 }}
+         exit={{ opacity: 0 }}
+         className="bg-black overflow-hidden font-sans selection:bg-tj-gold selection:text-black"
+      >
+         <SubliminalPrime />
+
+         {/* --- HERO SECTION: THE SIGNAL --- */}
+         <div className="relative h-screen flex flex-col justify-center items-center overflow-hidden">
+            {/* ... (background remains) */}
+            <div className="absolute inset-0 pointer-events-none">
+               <motion.div
+                  className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2830&auto=format&fit=crop')] bg-cover bg-center"
+                  style={{
+                     scale: 1.1,
+                     x: useTransform(mouseX, [-0.5, 0.5], [20, -20]),
+                     y: useTransform(mouseY, [-0.5, 0.5], [20, -20]),
+                     filter: 'grayscale(100%) contrast(110%) brightness(0.35)'
+                  }}
+               ></motion.div>
+               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 animate-pulse"></div>
+               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)]"></div>
+            </div>
+
+            <motion.div
+               style={{ y: y1, opacity }}
+               className="relative z-10 text-center px-6 w-full max-w-[1920px]"
+            >
+
+               {/* Main Typography */}
+               <h1 className="font-display text-[13vw] md:text-[11vw] leading-[0.8] text-white tracking-tighter mix-blend-difference mb-12 select-none perspective-1000">
+                  <motion.span
+                     initial={{ opacity: 0, rotateX: 90 }}
+                     animate={{ opacity: 1, rotateX: 0 }}
+                     transition={{ duration: 1, type: "spring", bounce: 0.4 }}
+                     className="block origin-bottom"
+                  >
+                     {t.home.hero.title1}
+                  </motion.span>
+                  <motion.span
+                     initial={{ opacity: 0, rotateX: -90 }}
+                     animate={{ opacity: 1, rotateX: 0 }}
+                     transition={{ duration: 1, delay: 0.2, type: "spring", bounce: 0.4 }}
+                     className="block text-transparent bg-clip-text bg-gradient-to-b from-tj-gold via-yellow-600 to-transparent origin-top"
+                  >
+                     {t.home.hero.title2}
+                  </motion.span>
+               </h1>
+
+               {/* Action Trigger */}
+               <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1, type: "spring" }}
+                  className="flex flex-col items-center gap-6"
+               >
+                  <p className="text-sm md:text-lg text-gray-400 font-serif italic max-w-xl">
+                     "{t.home.hero.subtitle}"
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
+                     <Link to="/inventory" className="group relative overflow-hidden bg-white text-black px-12 md:px-16 py-5 md:py-6 text-xs font-bold tracking-[0.3em] uppercase hover:bg-tj-gold transition-colors duration-300">
+                        <span className="relative z-10 flex items-center gap-3">
+                           {t.home.hero.cta} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                        </span>
+                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                     </Link>
+
+                     <a
+                        href="tel:+18324009760"
+                        className="group relative overflow-hidden bg-transparent border-2 border-white text-white px-12 md:px-16 py-5 md:py-6 text-xs font-bold tracking-[0.3em] uppercase hover:bg-tj-gold hover:border-tj-gold hover:text-black transition-all duration-300"
+                     >
+                        <span className="relative z-10 flex items-center gap-3">
+                           <Phone size={14} className="group-hover:animate-pulse" />
+                           Call Now
+                        </span>
+                        <div className="absolute inset-0 bg-tj-gold/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                     </a>
+                  </div>
+               </motion.div>
+            </motion.div>
+
+            {/* Scroll Indicator */}
+            <motion.div
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               transition={{ delay: 2, duration: 1 }}
+               className="absolute bottom-12 animate-bounce text-tj-gold/50 flex flex-col items-center gap-2 cursor-pointer mix-blend-difference"
+               onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+            >
+               <span className="text-[9px] uppercase tracking-widest writing-vertical-rl">SCROLL</span>
+               <ChevronDown size={20} />
+            </motion.div>
+         </div>
+
+         {/* --- SUBCONSCIOUS TICKER (Infinite Marquee) --- */}
+         <div className="bg-tj-gold text-black py-3 border-y border-black overflow-hidden relative z-20 select-none">
+            <div className="animate-marquee whitespace-nowrap flex items-center font-display font-black tracking-[0.2em] text-xs md:text-sm will-change-transform">
+               {Array(3).fill(null).map((_, i) => (
+                  <React.Fragment key={i}>
+                     {t.home.ticker.map((text, idx) => (
+                        <React.Fragment key={idx}>
+                           <span className="mx-8">{text}</span> <Crosshair size={12} />
+                        </React.Fragment>
+                     ))}
+                  </React.Fragment>
+               ))}
+            </div>
+         </div>
+
+         {/* --- THE ARSENAL --- */}
+         {hasAssets && (
+            <section className="py-24 bg-[#050505] relative overflow-hidden border-b border-white/10">
+               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent"></div>
+
+               <div className="max-w-[1920px] mx-auto px-6">
+                  <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+                     <motion.div
+                        initial={{ opacity: 0, x: -50 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                     >
+                        <h2 className="text-4xl md:text-6xl font-display text-white mb-2 flex items-center gap-4">
+                           {t.home.arsenal.title.toUpperCase()} <span className="text-xs font-mono text-tj-gold bg-tj-gold/10 px-2 py-1 rounded border border-tj-gold/20 align-middle tracking-widest uppercase">{t.home.arsenal.subtitle}</span>
+                        </h2>
+                        <p className="text-gray-500 text-xs font-mono uppercase tracking-widest">{t.home.arsenal.desc}</p>
+                     </motion.div>
+                     <Link to="/inventory" className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white transition-colors">
+                        {t.home.arsenal.viewAll} <ArrowRight size={12} />
+                     </Link>
+                  </div>
+
+                  <motion.div
+                     variants={containerVariants}
+                     initial="hidden"
+                     whileInView="visible"
+                     viewport={{ once: true, margin: "-100px" }}
+                     className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                  >
+                     {featuredAssets.map((vehicle, idx) => (
+                        <motion.div variants={itemVariants} key={vehicle.id}>
+                           <Link to="/inventory" className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden border border-white/10 bg-gray-900 cursor-pointer block">
+                              <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 backdrop-blur px-3 py-1 rounded-full border border-green-500/30">
+                                 <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                                 <span className="text-[8px] uppercase tracking-widest text-green-500 font-bold">{t.common.available}</span>
+                              </div>
+
+                              <div className="absolute top-4 right-4 z-20">
+                                 <span className="text-lg font-display text-white drop-shadow-md tracking-wider">
+                                    ${vehicle.price.toLocaleString()}
+                                 </span>
+                              </div>
+
+                              <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
+
+                              <motion.img
+                                 src={vehicle.imageUrl}
+                                 alt={vehicle.model}
+                                 className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0"
+                                 whileHover={{ scale: 1.1 }}
+                                 transition={{ duration: 0.7 }}
+                              />
+
+                              <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent z-20 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                 <p className="text-tj-gold text-[10px] uppercase tracking-[0.2em] mb-1">{vehicle.year} {vehicle.make}</p>
+                                 <h3 className="text-2xl font-display text-white leading-none mb-4">{vehicle.model}</h3>
+                                 <div className="flex items-center gap-2 text-[9px] uppercase tracking-widest text-gray-400 group-hover:text-white transition-colors">
+                                    <span>{t.common.viewAll}</span>
+                                    <div className="w-8 h-px bg-current"></div>
+                                 </div>
+                              </div>
+                           </Link>
+                        </motion.div>
+                     ))}
+                  </motion.div>
+
+                  <div className="mt-8 text-center md:hidden">
+                     <Link to="/inventory" className="inline-block border border-tj-gold text-tj-gold px-8 py-4 text-xs uppercase tracking-widest font-bold">
+                        {t.home.arsenal.viewAll}
+                     </Link>
+                  </div>
+               </div>
+            </section>
+         )}
+
+         {/* --- DOCTRINE PILLARS --- */}
+         <section className="py-24 px-6 max-w-[1920px] mx-auto bg-black">
+            <div className="flex items-end justify-between mb-16 border-b border-white/10 pb-6">
+               <h2 className="text-white font-display text-4xl md:text-5xl tracking-tighter">
+                  {t.home.pillars.title.split(' ')[0]} <span className="text-tj-gold">{t.home.pillars.title.split(' ').slice(1).join(' ')}</span>
+               </h2>
+               <p className="hidden md:block text-gray-500 text-xs font-mono uppercase tracking-widest">
+                  {t.home.pillars.subtitle}
+               </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10 border border-white/10">
+               {/* Pillar 1 */}
+               <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="bg-tj-dark p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden h-[350px] flex flex-col justify-between"
+               >
+                  <div>
+                     <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
+                        <Fingerprint size={40} className="group-hover:animate-pulse" />
+                     </div>
+                     <h3 className="text-white font-display text-3xl tracking-wide mb-4">{t.home.pillars.p1Title}</h3>
+                     <p className="text-gray-500 text-sm leading-relaxed font-light">
+                        {t.home.pillars.p1Desc} <br /><span className="text-white">{t.home.pillars.p1Highlight}</span>
+                     </p>
+                  </div>
+                  <div className="w-full h-px bg-white/10 group-hover:bg-tj-gold/50 transition-colors duration-500 flex items-center">
+                     <div className="w-full h-full bg-tj-gold transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-out"></div>
+                  </div>
+               </motion.div>
+
+               {/* Pillar 2 */}
+               <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                  className="bg-tj-dark p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden h-[350px] flex flex-col justify-between"
+               >
+                  <div>
+                     <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
+                        <Zap size={40} className="group-hover:text-white transition-colors" />
+                     </div>
+                     <h3 className="text-white font-display text-3xl tracking-wide mb-4">{t.home.pillars.p2Title}</h3>
+                     <p className="text-gray-500 text-sm leading-relaxed font-light">
+                        {t.home.pillars.p2Desc} <br /><span className="text-white">{t.home.pillars.p2Highlight}</span>
+                     </p>
+                  </div>
+                  <div className="w-full h-px bg-white/10 group-hover:bg-tj-gold/50 transition-colors duration-500 flex items-center">
+                     <div className="w-full h-full bg-tj-gold transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-out delay-100"></div>
+                  </div>
+               </motion.div>
+
+               {/* Pillar 3 */}
+               <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.4 }}
+                  className="bg-tj-dark p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden h-[350px] flex flex-col justify-between"
+               >
+                  <div>
+                     <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
+                        <Target size={40} className="group-hover:rotate-90 transition-transform duration-700" />
+                     </div>
+                     <h3 className="text-white font-display text-3xl tracking-wide mb-4">{t.home.pillars.p3Title}</h3>
+                     <p className="text-gray-500 text-sm leading-relaxed font-light">
+                        {t.home.pillars.p3Desc} <br /><span className="text-white">{t.home.pillars.p3Highlight}</span>
+                     </p>
+                  </div>
+                  <div className="w-full h-px bg-white/10 group-hover:bg-tj-gold/50 transition-colors duration-500 flex items-center">
+                     <div className="w-full h-full bg-tj-gold transform -translate-x-full group-hover:translate-x-0 transition-transform duration-700 ease-out delay-200"></div>
+                  </div>
+               </motion.div>
+            </div>
+         </section>
+
+         {/* --- LIVE SIGNALS (Social Proof) --- */}
+         <section className="bg-tj-dark border-y border-white/10 py-12 overflow-hidden relative">
+            {/* ... (keep as is for now, maybe translate signals later if needed) */}
+            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-tj-dark to-transparent z-10"></div>
+            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-tj-dark to-transparent z-10"></div>
+
+            <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
+               <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-900/50 rounded-full animate-pulse">
+                  <Activity size={12} className="text-green-500" />
+                  <span className="text-[9px] uppercase tracking-widest text-green-400">Intercepted Transmissions</span>
+               </div>
+            </div>
+
+            <div className="flex gap-8 animate-marquee whitespace-nowrap items-center">
+               {/* Keep signals hardcoded or fetch from DB later */}
+               {[
+                  "ASSET SECURED: 2021 G-WAGON (HOUSTON)",
+                  "DOMINION ESTABLISHED: SECTOR 7",
+                  "ROLLS ROYCE WRAITH: DEPLOYED",
+                  "CLIENT IDENTITY: VERIFIED",
+                  "TRANSACTION VELOCITY: < 24 HOURS",
+                  "LAMBORGHINI HURACAN: ALLOCATED",
+                  "STATUS: SOVEREIGN"
+               ].map((signal, i) => (
+                  <div key={i} className="flex items-center gap-4 bg-black/40 border border-white/5 px-6 py-3 rounded">
+                     <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping"></div>
+                     <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{signal}</span>
+                  </div>
+               ))}
+               {[
+                  "ASSET SECURED: 2021 G-WAGON (HOUSTON)",
+                  "DOMINION ESTABLISHED: SECTOR 7",
+                  "ROLLS ROYCE WRAITH: DEPLOYED",
+                  "CLIENT IDENTITY: VERIFIED",
+                  "TRANSACTION VELOCITY: < 24 HOURS",
+                  "LAMBORGHINI HURACAN: ALLOCATED",
+                  "STATUS: SOVEREIGN"
+               ].map((signal, i) => (
+                  <div key={`dup-${i}`} className="flex items-center gap-4 bg-black/40 border border-white/5 px-6 py-3 rounded">
+                     <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping"></div>
+                     <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{signal}</span>
+                  </div>
+               ))}
+            </div>
+         </section>
+
+         {/* --- SYSTEM ARCHITECTURE --- */}
+         <section className="py-20 px-6 max-w-[1600px] mx-auto">
+            <div className="text-center mb-16">
+               <h2 className="font-display text-sm text-tj-gold tracking-[0.5em] uppercase mb-4">System Architecture</h2>
+               <div className="w-px h-16 bg-gradient-to-b from-tj-gold to-transparent mx-auto"></div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               {/* Card 1 */}
+               <Link to="/vin" className="bg-tj-dark border border-white/5 p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
+                  <div className="absolute -right-12 -top-12 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                     <Diamond size={150} />
+                  </div>
+
+                  <div className="mb-8 text-tj-gold transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_25px_rgba(212,175,55,0.8)] relative z-10">
+                     <Diamond size={32} className="group-hover:animate-[spin_4s_linear_infinite]" />
+                  </div>
+
+                  <h3 className="font-display text-xl text-white mb-4 tracking-widest relative z-10 group-hover:text-tj-gold transition-colors">{t.home.cards.vetting.title}</h3>
+                  <p className="text-gray-500 text-xs leading-relaxed mb-6 relative z-10 group-hover:text-gray-300 transition-colors">
+                     {t.home.cards.vetting.desc}
+                  </p>
+                  <span className="text-[9px] uppercase tracking-widest text-tj-gold flex items-center gap-2 group-hover:gap-4 transition-all">
+                     {t.home.cards.vetting.cta} <ArrowRight size={10} />
+                  </span>
+               </Link>
+
+               {/* Card 2 (Featured) */}
+               <Link to="/about" className="bg-gradient-to-br from-black to-tj-dark border border-tj-gold/30 p-8 group hover:border-tj-gold hover:-translate-y-3 hover:scale-[1.05] transition-all duration-500 relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:shadow-[0_0_60px_rgba(212,175,55,0.2)] z-10 scale-[1.02]">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse"></div>
+
+                  <div className="mb-8 text-tj-gold transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_30px_rgba(212,175,55,1)] relative z-10">
+                     <Brain size={32} className="group-hover:animate-gold-pulse" />
+                  </div>
+
+                  <h3 className="font-display text-xl text-white mb-4 tracking-widest relative z-10 group-hover:text-tj-gold transition-colors">{t.home.cards.psych.title}</h3>
+                  <p className="text-gray-400 text-xs leading-relaxed mb-6 relative z-10 group-hover:text-white transition-colors">
+                     {t.home.cards.psych.desc}
+                  </p>
+                  <span className="text-[9px] uppercase tracking-widest text-white border-b border-tj-gold pb-0.5 group-hover:text-tj-gold group-hover:border-white transition-colors">
+                     {t.home.cards.psych.cta}
+                  </span>
+               </Link>
+
+               {/* Card 3 */}
+               <div className="bg-tj-dark border border-white/5 p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
+                  <div className="absolute -right-12 -top-12 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
+                     <Zap size={150} />
+                  </div>
+
+                  <div className="mb-8 text-tj-gold transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_25px_rgba(212,175,55,0.8)] relative z-10">
+                     <Zap size={32} className="group-hover:animate-gold-pulse" />
+                  </div>
+
+                  <h3 className="font-display text-xl text-white mb-4 tracking-widest relative z-10 group-hover:text-tj-gold transition-colors">{t.home.cards.velocity.title}</h3>
+                  <p className="text-gray-500 text-xs leading-relaxed mb-6 relative z-10 group-hover:text-gray-300 transition-colors">
+                     {t.home.cards.velocity.desc}
+                  </p>
+                  <span className="text-[9px] uppercase tracking-widest text-gray-600 flex items-center gap-2 group-hover:text-white transition-colors">
+                     {t.home.cards.velocity.cta} <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
+                  </span>
+               </div>
+            </div>
+         </section>
+
+         {/* --- INVENTORY TEASER --- */}
+         <section className="h-[70vh] relative flex items-center justify-center overflow-hidden border-t border-white/10 group">
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center grayscale brightness-50 group-hover:brightness-75 group-hover:grayscale-0 transition-all duration-[1.5s] ease-out transform group-hover:scale-105"></div>
+            <div className="absolute inset-0 bg-black/60 group-hover:bg-black/30 transition-colors duration-700"></div>
+
+            <div className="relative z-10 text-center">
+               <div className="mb-6 inline-block overflow-hidden">
+                  <span className="block text-tj-gold text-xs font-mono uppercase tracking-[0.5em] translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                     {t.home.vault.access}
+                  </span>
+               </div>
+
+               <h2 className="text-6xl md:text-9xl font-display text-white mb-10 tracking-tighter mix-blend-overlay group-hover:mix-blend-normal transition-all duration-700">
+                  {t.home.vault.title}
+               </h2>
+
+               <Link to="/inventory" className="inline-flex flex-col items-center gap-2 text-white hover:text-tj-gold transition-colors duration-300">
+                  <div className="w-20 h-20 border border-white/30 rounded-full flex items-center justify-center group-hover:border-tj-gold group-hover:scale-110 transition-all duration-500 bg-black/20 backdrop-blur-sm">
+                     <ArrowRight size={32} className="group-hover:-rotate-45 transition-transform duration-500" />
+                  </div>
+                  <span className="text-[10px] uppercase tracking-widest mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">{t.home.vault.enter}</span>
+               </Link>
+            </div>
+         </section>
+
+      </motion.div>
+   );
 };
 
 export default Home;

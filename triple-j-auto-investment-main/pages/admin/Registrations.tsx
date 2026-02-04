@@ -4,8 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useVehicles } from '../../context/VehicleContext';
-import { useAuth } from '../../context/AuthContext';
+import { useStore } from '../../context/Store';
 import {
   Clock,
   FileText,
@@ -65,8 +64,7 @@ const STAGE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const Registrations: React.FC = () => {
-  const { vehicles } = useVehicles();
-  const { user } = useAuth();
+  const { vehicles, user } = useStore();
 
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);

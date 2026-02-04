@@ -1,8 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/Store';
-import { useVehicles } from '../../context/VehicleContext';
-import { useAuth } from '../../context/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { analyzeFinancialPerformance } from '../../services/geminiService';
 import { Target, Globe, Radio, User, Phone, Mail, Clock, MessageSquare, FileText, Car, ArrowUpRight, TrendingUp, DollarSign, Activity, Wrench, Truck, PaintBucket, X, PieChart, ChevronRight, AlertTriangle, Hourglass, Calendar, LayoutDashboard, Database, LogOut, Menu, ClipboardCheck } from 'lucide-react';
@@ -11,8 +9,7 @@ import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 
 // Admin Navigation Header Component
 const AdminHeader = () => {
-  const { vehicles } = useVehicles();
-  const { logout } = useAuth();
+  const { logout, vehicles } = useStore();
   const location = useLocation();
   const navigate = useNavigate();
   const [showDocModal, setShowDocModal] = useState(false);
@@ -134,8 +131,7 @@ const AdminHeader = () => {
 };
 
 const Dashboard = () => {
-  const { vehicles, connectionError } = useVehicles();
-  const { leads } = useStore();
+  const { vehicles, leads, connectionError } = useStore();
   const [financialReport, setFinancialReport] = useState<string>("INITIALIZING FINANCIAL NEURAL NETWORK...");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 

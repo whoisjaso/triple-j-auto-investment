@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useStore } from '../context/Store';
 import { useNavigate } from 'react-router-dom';
 import { Key, ShieldAlert, Fingerprint } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
@@ -8,7 +8,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState<'idle' | 'error' | 'recovery'>('idle');
-  const { login, triggerRecovery } = useAuth();
+  const { login, triggerRecovery } = useStore();
   const navigate = useNavigate();
   const { t } = useLanguage();
 
