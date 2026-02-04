@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-02
-**Session:** Phase 1 Gap Closure Complete - Plan 05 Done
+**Last Updated:** 2026-02-04
+**Session:** Phase 1 Store.tsx Module Extraction (Re-planned)
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 1 (Reliability & Stability) gap closure COMPLETE. Ready for Phase 2.
+**Current Focus:** Phase 1 (Reliability & Stability) - Store.tsx module extraction in progress.
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,19 +22,20 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 1 of 9 (Reliability & Stability) - COMPLETE
-**Plan:** 05 of Phase 1 Gap Closure (Vehicle Context Extraction - COMPLETE)
-**Status:** Phase 1 complete - Ready for Phase 2
+**Phase:** 1 of 9 (Reliability & Stability) - IN PROGRESS
+**Plan:** 04 complete, ready for Plan 05
+**Status:** Module extraction phase - lib/store/ created with types, sheets, leads
 
 **Progress:**
 ```
 Roadmap:    [X] Created
-Phase 1:    [====================] 100% (5/5 plans complete)
+Phase 1:    [==============......] 67% (4/6 plans complete)
   Plan 01:  [X] Error Handling Infrastructure (ErrorModal, useRetry, AppError)
   Plan 02:  [X] STAB-01 Loop Bug Fix (hasLoaded, loading states)
-  Plan 03:  [X] Error Infrastructure Wiring (ErrorProvider, StoreErrorBridge)
-  Plan 04:  [X] Auth Context Extraction (STAB-03 Part 1)
-  Plan 05:  [X] Vehicle Context Extraction (STAB-03 Part 2)
+  Plan 03:  [X] Store Types Extraction (lib/store/types.ts)
+  Plan 04:  [X] Sheets and Leads Extraction (lib/store/sheets.ts, leads.ts)
+  Plan 05:  [ ] Store.tsx Integration (import extracted modules)
+  Plan 06:  [ ] Human verification
 Phase 2:    [ ] Not started (Registration Database Foundation)
 Phase 3:    [ ] Not started (Customer Portal - Status Tracker)
 Phase 4:    [ ] Not started (Customer Portal - Notifications & Login)
@@ -59,7 +60,7 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 |--------|-------|-------|
 | Phases Planned | 9 | 1 blocked (Phase 9) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 5 | 01-01 through 01-05 complete |
+| Plans Executed | 4 | 01-01 through 01-04 complete |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -80,13 +81,9 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 | hasLoaded flag (not enum) | Minimal change, TypeScript infers correctly | 2026-02-01 | 01-02 |
 | Progress bar always, spinner first-load only | Real-time updates shouldn't show jarring spinner | 2026-02-01 | 01-02 |
 | Remove safety timer | Proper state management eliminates need for timeout | 2026-02-01 | 01-02 |
-| Bridge component pattern for context-to-context communication | Store.tsx cannot use useErrorContext (contexts can't use other contexts at same level) | 2026-02-01 | 01-03 |
-| ErrorProvider outside StoreProvider, bridge inside | Bridge needs access to both contexts | 2026-02-01 | 01-03 |
-| Separate AuthContext from Store | Single responsibility - Store handles data, AuthContext handles auth | 2026-02-01 | 01-04 |
-| AuthProvider wraps StoreProvider | Store uses useAuth(), so AuthProvider must be outer | 2026-02-01 | 01-04 |
-| Extract VehicleContext from Store | Single responsibility - each context handles one domain | 2026-02-02 | 01-05 |
-| Provider order: Auth > Vehicle > Store | VehicleContext needs useAuth(), StoreProvider needs neither | 2026-02-02 | 01-05 |
-| Error state per context | Errors originate in context operations, handle where they occur | 2026-02-02 | 01-05 |
+| Extract types to lib/store/types.ts | Shared types between Store modules without circular imports | 2026-02-04 | 01-03 |
+| SyncDependencies interface for dependency injection | Allows Store.tsx to pass state setters to extracted sync function | 2026-02-04 | 01-04 |
+| Preserve exact logic during extraction | Maintain identical behavior during extraction phase | 2026-02-04 | 01-04 |
 
 ### Patterns Established
 
@@ -94,27 +91,22 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 - **Retry pattern:** useRetry hook with countdown state and AbortController
 - **Modal pattern:** ErrorModal following BillOfSaleModal animation patterns
 - **Loading state pattern:** hasLoaded flag to distinguish first-load from reload
-- **Provider bridge pattern:** StoreErrorBridge connecting Store.lastError to ErrorProvider
-- **Context extraction pattern:** Separate contexts by domain (Auth, Vehicle, Leads)
-- **Hook naming pattern:** useAuth(), useVehicles(), useStore() for domain-specific data access
+- **Module extraction pattern:** Extract logic to lib/store/*.ts, keep Store.tsx as facade
+- **Dependency injection pattern:** Pass state setters via interface (SyncDependencies)
 
-### Architecture Summary (Post-Phase 1)
+### Architecture Summary (Current)
 
 ```
-Provider Hierarchy:
-LanguageProvider
-  ErrorProvider
-    AuthProvider (user, login, logout)
-      VehicleProvider (vehicles, CRUD, sync)
-        StoreProvider (leads, addLead)
-          StoreErrorBridge
-            Router
-```
+lib/store/ Module Structure:
+  types.ts      - Shared interfaces (FALLBACK_ASSETS, internal types)
+  sheets.ts     - Google Sheets sync (229 lines)
+  leads.ts      - Lead management (68 lines)
 
-Context Line Counts:
-- AuthContext.tsx: 119 lines
-- VehicleContext.tsx: 744 lines
-- Store.tsx: 141 lines (down from 888)
+Store.tsx:
+  - Still monolithic (893 lines)
+  - Plan 05 will integrate extracted modules
+  - useStore() interface unchanged for consumers
+```
 
 ### Known Issues
 
@@ -134,40 +126,37 @@ Context Line Counts:
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed Plan 01-05: Vehicle Context Extraction (STAB-03 Part 2)
-- Created VehicleContext.tsx (744 lines) with all vehicle CRUD and sync operations
-- Reduced Store.tsx from 835 to 141 lines (leads-only)
-- Updated provider hierarchy: AuthProvider > VehicleProvider > StoreProvider
-- Migrated all vehicle consumers to useVehicles hook
-- Fixed bug in Registrations.tsx (was using wrong context for user)
-- Created 01-05-SUMMARY.md
-- Phase 1 gap closure COMPLETE
+- Executed Plan 01-03: Created lib/store/types.ts with internal types
+- Executed Plan 01-04: Extracted sheets.ts (229 lines) and leads.ts (68 lines)
+- No UI files modified (constraint preserved)
+- Store.tsx unchanged (integration in Plan 05)
 
-### Commits This Session
-- 96437dc: feat(01-05): create VehicleContext.tsx with vehicle state and CRUD
-- f795ef0: refactor(01-05): reduce Store.tsx to leads-only (141 lines)
-- 239c511: feat(01-05): wire VehicleProvider and migrate all consumers
+### Key Constraint
+**DO NOT MODIFY these files:**
+- App.tsx
+- pages/*.tsx (Home, Login, Inventory, etc.)
+- pages/admin/*.tsx
+
+Store.tsx decomposition must be internal only - consumers should not need to change their imports.
 
 ### What Comes Next
-- Phase 2: Registration Database Foundation
-- Create registrations and registration_stages tables
-- Build registration CRUD operations
-- Wire to new RegistrationContext
+- Plan 05: Integrate extracted modules into Store.tsx
+- Plan 06: Human verification that UI still works identically
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/01-reliability-stability/01-05-SUMMARY.md` - just completed
-4. Phase 2 plan files when available
+3. `.planning/phases/01-reliability-stability/01-04-SUMMARY.md` - latest plan
+4. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
-Phase 1 complete with:
-- Error handling infrastructure (01-01)
-- Loop bug fix (01-02)
-- Error infrastructure wiring (01-03)
-- Auth context extraction (01-04)
-- Vehicle context extraction (01-05)
+Phase 1 status:
+- Error handling infrastructure (01-01) - COMPLETE (but unused)
+- Loop bug fix (01-02) - COMPLETE
+- Types extraction (01-03) - COMPLETE
+- Sheets/Leads extraction (01-04) - COMPLETE
+- Store integration (01-05) - NEXT
 
 ---
 
-*State updated: 2026-02-02*
+*State updated: 2026-02-04*
