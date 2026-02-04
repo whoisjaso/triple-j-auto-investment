@@ -16,4 +16,5 @@ export interface VehicleSetters {
 }
 
 // Re-export for convenience
-export { Vehicle, VehicleStatus };
+export type { Vehicle };
+export { VehicleStatus };
