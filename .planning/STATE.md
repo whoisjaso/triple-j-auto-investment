@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-04
-**Session:** Phase 1 Store.tsx Module Extraction - Vehicle CRUD Complete
+**Session:** Phase 1 STAB-03 Complete - Store.tsx Decomposition Finished
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 1 (Reliability & Stability) - Store.tsx module extraction in progress.
+**Current Focus:** Phase 1 (Reliability & Stability) - Store.tsx decomposition complete, ready for verification.
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,20 +22,20 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 1 of 9 (Reliability & Stability) - IN PROGRESS
-**Plan:** 03 complete, ready for Plan 04
-**Status:** Module extraction phase - lib/store/vehicles.ts created (426 lines)
+**Phase:** 1 of 9 (Reliability & Stability) - NEAR COMPLETION
+**Plan:** 05 complete, ready for Plan 06 (verification)
+**Status:** Store.tsx facade complete (281 lines), modules integrated
 
 **Progress:**
 ```
 Roadmap:    [X] Created
-Phase 1:    [==========..........] 50% (3/6 plans complete)
+Phase 1:    [================....] 83% (5/6 plans complete)
   Plan 01:  [X] Error Handling Infrastructure (ErrorModal, useRetry, AppError)
   Plan 02:  [X] STAB-01 Loop Bug Fix (hasLoaded, loading states)
   Plan 03:  [X] Vehicle CRUD Extraction (lib/store/vehicles.ts - 426 lines)
-  Plan 04:  [ ] Store.tsx Integration (wire extracted modules)
-  Plan 05:  [ ] Human verification
-  Plan 06:  [ ] Reserved
+  Plan 04:  [X] Sheets & Leads Extraction (lib/store/sheets.ts, leads.ts)
+  Plan 05:  [X] Store.tsx Integration (facade pattern - 281 lines)
+  Plan 06:  [ ] Human verification checkpoint
 Phase 2:    [ ] Not started (Registration Database Foundation)
 Phase 3:    [ ] Not started (Customer Portal - Status Tracker)
 Phase 4:    [ ] Not started (Customer Portal - Notifications & Login)
@@ -60,7 +60,7 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 |--------|-------|-------|
 | Phases Planned | 9 | 1 blocked (Phase 9) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 3 | 01-01 through 01-03 complete |
+| Plans Executed | 5 | 01-01 through 01-05 complete |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -83,6 +83,8 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 | Remove safety timer | Proper state management eliminates need for timeout | 2026-02-01 | 01-02 |
 | Setter injection pattern for extracted functions | VehicleSetters interface allows state updates from non-component code | 2026-02-04 | 01-03 |
 | Use export type for interface re-exports | TypeScript isolatedModules requires type-only exports | 2026-02-04 | 01-03 |
+| vehiclesRef pattern for closures | useRef tracks current vehicles to avoid stale state in callbacks | 2026-02-04 | 01-05 |
+| Keep updateRegistration inline | Only ~20 lines, not worth extracting to separate module | 2026-02-04 | 01-05 |
 
 ### Patterns Established
 
@@ -92,20 +94,29 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 - **Loading state pattern:** hasLoaded flag to distinguish first-load from reload
 - **Module extraction pattern:** Extract logic to lib/store/*.ts, keep Store.tsx as facade
 - **Setter injection pattern:** Pass React state setters via VehicleSetters interface
+- **Facade pattern:** Store.tsx orchestrates modules, exposes unchanged useStore() interface
 
 ### Architecture Summary (Current)
 
 ```
-lib/store/ Module Structure:
+lib/store/ Module Structure (750 lines total):
+  index.ts      - Barrel export (7 lines)
   types.ts      - VehicleState, VehicleSetters interfaces (20 lines)
   vehicles.ts   - Vehicle CRUD operations (426 lines)
                   - FALLBACK_VEHICLES constant
                   - loadVehicles, addVehicle, updateVehicle, removeVehicle
+  sheets.ts     - Google Sheets sync (229 lines)
+                  - generateOpulentCaption, parseCSVLine
+                  - syncWithGoogleSheets
+  leads.ts      - Lead management (68 lines)
+                  - loadLeads, addLead
 
-Store.tsx:
-  - Still monolithic (893 lines)
-  - Plan 04 will integrate extracted vehicle module
-  - useStore() interface unchanged for consumers
+Store.tsx (281 lines - 68% reduction from 893):
+  - Thin facade that imports from lib/store/*
+  - React state management
+  - Supabase subscriptions
+  - Auth integration
+  - useStore() interface UNCHANGED
 ```
 
 ### Known Issues
@@ -126,10 +137,11 @@ Store.tsx:
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed Plan 01-03: Extracted vehicle CRUD to lib/store/vehicles.ts (426 lines)
-- Fixed lib/store/types.ts for isolatedModules compliance
+- Executed Plan 01-05: Complete Store.tsx decomposition
+- Created lib/store/index.ts barrel export
+- Refactored Store.tsx from 893 to 281 lines (68% reduction)
+- Vite build passes successfully
 - No UI files modified (constraint preserved)
-- Store.tsx unchanged (integration in Plan 04)
 
 ### Key Constraint
 **DO NOT MODIFY these files:**
@@ -137,24 +149,26 @@ Store.tsx:
 - pages/*.tsx (Home, Login, Inventory, etc.)
 - pages/admin/*.tsx
 
-Store.tsx decomposition must be internal only - consumers should not need to change their imports.
+Store.tsx decomposition is internal only - consumers use unchanged useStore() hook.
 
 ### What Comes Next
-- Plan 04: Wire lib/store/vehicles.ts into Store.tsx
-- Plan 05: Human verification that UI still works identically
+- Plan 06: Human verification that UI works identically
+- After Phase 1: Begin Phase 2 (Registration Database Foundation)
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/01-reliability-stability/01-03-SUMMARY.md` - latest plan
+3. `.planning/phases/01-reliability-stability/01-05-SUMMARY.md` - latest plan
 4. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 Phase 1 status:
 - Error handling infrastructure (01-01) - COMPLETE (but unused)
 - Loop bug fix (01-02) - COMPLETE
 - Vehicle CRUD extraction (01-03) - COMPLETE
-- Store integration (01-04) - NEXT
+- Sheets & Leads extraction (01-04) - COMPLETE
+- Store integration (01-05) - COMPLETE
+- Human verification (01-06) - NEXT
 
 ---
 
