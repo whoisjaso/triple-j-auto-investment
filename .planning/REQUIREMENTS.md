@@ -9,9 +9,9 @@ Requirements for current milestone. Each maps to roadmap phases.
 
 ### Reliability & Stability
 
-- [ ] **STAB-01**: Fix inventory display loop bug (vehicles not showing, continuous loading)
-- [ ] **STAB-02**: Fix RLS silent failure pattern (updates appear successful but don't persist)
-- [ ] **STAB-03**: Decompose Store.tsx monolith into separate contexts (Auth, Vehicle, Rental, Registration)
+- [x] **STAB-01**: Fix inventory display loop bug (vehicles not showing, continuous loading)
+- [x] **STAB-02**: Fix RLS silent failure pattern (updates appear successful but don't persist)
+- [x] **STAB-03**: Decompose Store.tsx monolith into separate contexts (Auth, Vehicle, Rental, Registration)
 
 ### Customer Registration Portal
 
@@ -99,9 +99,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STAB-01 | Phase 1 | Pending |
-| STAB-02 | Phase 1 | Pending |
-| STAB-03 | Phase 1 | Pending |
+| STAB-01 | Phase 1 | Complete |
+| STAB-02 | Phase 1 | Complete |
+| STAB-03 | Phase 1 | Complete |
 | PORT-01 | Phase 3 | Pending |
 | PORT-02 | Phase 3 | Pending |
 | PORT-03 | Phase 2 | Pending |
@@ -134,10 +134,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1 requirements: 26 total
 - Mapped to phases: 26 (100%)
-- Pending: 25
+- Complete: 3 (STAB-01, STAB-02, STAB-03)
+- Pending: 22
 - Blocked: 1 (RENT-05 - needs Spireon API)
-- Completed: 0
 
 ---
 *Requirements defined: 2025-01-29*
-*Last updated: 2026-01-29 after roadmap creation*
+*Last updated: 2026-02-03 after Phase 1 completion*

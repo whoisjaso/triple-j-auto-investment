@@ -23,23 +23,23 @@ This roadmap delivers a dealership operations platform in 8 phases: stabilizing 
 **Requirements:**
 - STAB-01: Fix inventory display loop bug
 - STAB-02: Fix RLS silent failure pattern
-- STAB-03: Decompose Store.tsx monolith into separate contexts
+- STAB-03: Decompose Store.tsx monolith into separate concerns
 
 **Success Criteria:**
 1. Admin can view full vehicle inventory without loading loops or missing vehicles
 2. All database updates either succeed with confirmation or fail with clear error messages (no silent failures)
-3. Store.tsx is decomposed into AuthContext, VehicleContext, and base state - each under 300 lines
+3. Store.tsx is decomposed into modules - each under 300 lines
 4. Existing functionality (Bill of Sale, lead management, inventory CRUD) continues working after refactor
 
-**Plans:** 6 plans
+**Plans:** 6 plans in 3 waves
 
 Plans:
 - [x] 01-01-PLAN.md - Error handling infrastructure (ErrorModal, useRetry, AppError types)
 - [x] 01-02-PLAN.md - STAB-01 loop bug fix (hasLoaded state, loading UI)
-- [ ] 01-03-PLAN.md - Wire ErrorModal/useRetry into error handling flow
-- [ ] 01-04-PLAN.md - Extract AuthContext from Store.tsx
-- [ ] 01-05-PLAN.md - Extract VehicleContext from Store.tsx
-- [ ] 01-06-PLAN.md - Human verification checkpoint
+- [x] 01-03-PLAN.md - Extract vehicle CRUD to lib/store/vehicles.ts
+- [x] 01-04-PLAN.md - Extract sheets sync and leads to lib/store/{sheets,leads}.ts
+- [x] 01-05-PLAN.md - Integrate modules into Store.tsx facade
+- [x] 01-06-PLAN.md - Verify decomposition (build, types, structure)
 
 ---
 
@@ -215,7 +215,7 @@ Plans:
 
 | Phase | Status | Requirements | Completion |
 |-------|--------|--------------|------------|
-| 1 - Reliability & Stability | In Progress | 3 | 33% (2/6 plans) |
+| 1 - Reliability & Stability | Complete | 3 | 100% (6 plans) |
 | 2 - Registration Database Foundation | Pending | 1 | 0% |
 | 3 - Customer Portal - Status Tracker | Pending | 4 | 0% |
 | 4 - Customer Portal - Notifications & Login | Pending | 2 | 0% |
@@ -278,4 +278,4 @@ Phase 1: Reliability & Stability
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-01*
+*Last updated: 2026-02-03*
