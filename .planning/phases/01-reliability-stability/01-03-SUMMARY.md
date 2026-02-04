@@ -1,157 +1,100 @@
 ---
 phase: 01-reliability-stability
 plan: 03
-title: Error Infrastructure Wiring
-completed: 2026-02-01
-duration: ~15 minutes
-subsystem: error-handling
-tags: [react-context, error-modal, provider-pattern]
+subsystem: store-infrastructure
+tags: [typescript, refactoring, store-decomposition, vehicle-crud]
 
 dependency_graph:
-  requires:
-    - 01-01 (error handling infrastructure - ErrorModal, useRetry, AppError)
-  provides:
-    - ErrorProvider context for app-wide error display
-    - Store.lastError state for tracking errors
-    - StoreErrorBridge connecting Store errors to ErrorModal
-  affects:
-    - All future error-producing operations in Store.tsx
-    - Admin operations now show modal errors instead of browser alerts
+  requires: []
+  provides: [vehicle-crud-module, vehicle-types-module, fallback-data]
+  affects: [01-04]
 
 tech_stack:
   added: []
-  patterns:
-    - Provider-to-Provider bridge pattern (StoreErrorBridge)
-    - Context-based error handling
-    - Structured error codes (RLS, DB, NET categories)
+  patterns: [module-extraction, setter-injection]
 
-key_files:
-  created:
-    - triple-j-auto-investment-main/components/ErrorProvider.tsx
-    - triple-j-auto-investment-main/components/StoreErrorBridge.tsx
-  modified:
-    - triple-j-auto-investment-main/context/Store.tsx
-    - triple-j-auto-investment-main/App.tsx
+files:
+  key_files:
+    created:
+      - triple-j-auto-investment-main/lib/store/vehicles.ts
+    modified:
+      - triple-j-auto-investment-main/lib/store/types.ts
 
 decisions:
-  - decision: "Bridge component pattern for context-to-context communication"
-    rationale: "Store.tsx cannot use useErrorContext (contexts can't use other contexts at same level)"
-  - decision: "ErrorProvider outside StoreProvider, bridge inside"
-    rationale: "Bridge needs access to both contexts, ErrorProvider must wrap Store for this to work"
-  - decision: "showAdminDetails=true by default"
-    rationale: "This is an admin dashboard where technical details help debugging"
+  - id: setter-injection-pattern
+    choice: "Pass setters as VehicleSetters interface to extracted functions"
+    rationale: "Allows extracted functions to update React state without being React components"
+  - id: isolated-modules-compliance
+    choice: "Use export type for interface re-exports"
+    rationale: "TypeScript isolatedModules requires type-only exports for interfaces"
 
 metrics:
-  tasks_completed: 4
-  tasks_total: 4
-  commits: 4
+  tasks_completed: 2
+  tasks_total: 2
+  duration: ~24 minutes
+  started: 2026-02-04T03:07:08Z
+  completed: 2026-02-04T03:31:15Z
 ---
 
-# Phase 01 Plan 03: Error Infrastructure Wiring Summary
+# Phase 01 Plan 03: Vehicle CRUD Extraction Summary
 
-**One-liner:** Wired orphaned ErrorModal and useRetry into Store.tsx via ErrorProvider context and bridge component, replacing all alert() calls with structured errors.
+**One-liner:** Extracted vehicle CRUD operations (loadVehicles, addVehicle, updateVehicle, removeVehicle) from Store.tsx into lib/store/vehicles.ts module with setter injection pattern.
 
-## What Was Built
+## What Was Done
 
-### Task 1: ErrorProvider Context (dac7237)
-Created `ErrorProvider.tsx` that:
-- Wraps ErrorModal and provides app-wide error state
-- Exports `useErrorContext` hook for consuming errors
-- Integrates `useRetry` hook for automatic retry functionality
-- Manages retry countdown display in ErrorModal
+### Task 1: Create lib/store/types.ts with internal types
+- Fixed existing types.ts to comply with isolatedModules
+- VehicleState interface defines state shape (vehicles, isLoading, connectionError)
+- VehicleSetters interface defines React state setters passed to extracted functions
+- Re-exports Vehicle (type) and VehicleStatus (enum) for convenience
 
-### Task 2: Store.tsx Error State (b0ae389)
-Updated `Store.tsx` to:
-- Add `lastError: AppError | null` state to context
-- Add `clearLastError()` function for error clearing
-- Create `createAppError()` helper for consistent error objects
-- Replace **all 13 alert() calls** with `setLastError()` using appropriate error codes:
-  - `RLS_NO_SESSION` - not logged in
-  - `RLS_NOT_ADMIN` - not admin user
-  - `RLS_BLOCKED` - RLS policy blocked operation
-  - `DB_UNKNOWN` - general database error
-  - `DB_DUPLICATE` - duplicate VIN
-  - `DB_CONSTRAINT` - constraint violation (large images)
+### Task 2: Extract vehicle operations to lib/store/vehicles.ts
+- **FALLBACK_VEHICLES** (~90 lines): Four luxury vehicle fallback records
+- **loadVehicles()** (~85 lines): Fetches from Supabase with timeout, abort controller, Brave browser detection, fallback handling
+- **addVehicle()** (~80 lines): Session verification, admin check, field transformation, error handling
+- **updateVehicle()** (~100 lines): Session verification, admin check, RLS silent failure detection
+- **removeVehicle()** (~35 lines): Session verification, RLS failure detection
 
-### Task 3: App.tsx Integration (03fe960)
-Wired ErrorProvider into the app:
-- Import ErrorProvider from components
-- Wrap StoreProvider with ErrorProvider
-- Set `showAdminDetails={true}` for admin dashboard
+Total: 426 lines in vehicles.ts, 20 lines in types.ts
 
-### Task 4: StoreErrorBridge (8eff195)
-Created bridge component that:
-- Reads `lastError` from Store via `useStore()`
-- Passes errors to ErrorProvider via `showError()`
-- Clears Store's error after handoff (ErrorProvider owns display)
-- Renders nothing - invisible wiring component
+## Deviations from Plan
 
-## Architecture
+### Auto-fixed Issues
 
-```
-App.tsx
-  LanguageProvider
-    ErrorProvider (showAdminDetails=true)
-      [ErrorModal portal to body]
-      StoreProvider
-        StoreErrorBridge (syncs Store.lastError -> ErrorProvider)
-        Router
-          AppContent
-```
-
-**Flow:**
-1. Store operation fails -> `setLastError(createAppError(...))`
-2. StoreErrorBridge detects `lastError` change
-3. Bridge calls `showError(lastError)` on ErrorProvider
-4. Bridge calls `clearLastError()` on Store
-5. ErrorModal displays via ErrorProvider state
-6. User clicks "Dismiss" or "Try Again"
-7. ErrorModal closes
+**1. [Rule 3 - Blocking] TypeScript isolatedModules compliance**
+- **Found during:** Task 1 verification
+- **Issue:** `export { Vehicle, VehicleStatus }` fails with isolatedModules enabled
+- **Fix:** Changed to `export type { Vehicle }; export { VehicleStatus };`
+- **Files modified:** lib/store/types.ts
+- **Commit:** 296f52b
 
 ## Commits
 
 | Hash | Type | Description |
 |------|------|-------------|
-| dac7237 | feat | Create ErrorProvider context |
-| b0ae389 | feat | Add lastError to Store, replace alerts |
-| 03fe960 | feat | Wire ErrorProvider into App.tsx |
-| 8eff195 | feat | Create StoreErrorBridge |
-
-## Deviations from Plan
-
-None - plan executed exactly as written.
+| 296f52b | fix | Correct type re-export for isolatedModules |
+| c1a133d | feat | Extract vehicle CRUD operations to lib/store/vehicles.ts |
 
 ## Verification Results
 
-- [x] ErrorProvider component exists and exports useErrorContext
-- [x] App.tsx has ErrorProvider wrapping the app
-- [x] Store.tsx has lastError state and clearLastError function
-- [x] StoreErrorBridge exists and is rendered inside StoreProvider
-- [x] All alert() calls in Store.tsx replaced with setLastError()
-- [x] `npx tsc --noEmit` passes
-
-## Impact
-
-**Before:** Database errors displayed via browser `alert()` dialogs
-- No retry functionality
-- No structured error information
-- Jarring user experience
-- No error logging/tracking
-
-**After:** Errors display in styled ErrorModal
-- Structured error codes identify error source
-- Retry button for retryable errors
-- Technical details available (admin mode)
-- Copy-to-clipboard for support tickets
-- Consistent UI with rest of app
+- [x] TypeScript compiles (lib/store files pass type checks)
+- [x] Exports present: loadVehicles, addVehicle, updateVehicle, removeVehicle, FALLBACK_VEHICLES
+- [x] No UI files modified by this plan
+- [x] Store.tsx unchanged (wiring happens in Plan 04)
 
 ## Next Phase Readiness
 
-Phase 1 gap closure is now complete with this plan. The error handling infrastructure is fully wired:
-- ErrorModal displays errors (01-01)
-- useRetry handles auto-retry (01-01)
-- Store.tsx produces structured errors (01-03)
-- ErrorProvider manages display (01-03)
-- StoreErrorBridge connects the pieces (01-03)
+**Ready for Plan 04:** Store.tsx will import from lib/store/vehicles.ts and wire the extracted functions. The setter injection pattern allows Store.tsx to create wrapper functions that:
+1. Create a VehicleSetters object from its state setters
+2. Call the extracted functions with setters and callbacks
+3. Maintain the exact same useStore() interface for consumers
 
-Ready to proceed to Phase 2 (Registration Database Foundation).
+## Key Files
+
+```
+triple-j-auto-investment-main/
+  lib/
+    store/
+      types.ts      # VehicleState, VehicleSetters interfaces (20 lines)
+      vehicles.ts   # Vehicle CRUD operations (426 lines)
+```
