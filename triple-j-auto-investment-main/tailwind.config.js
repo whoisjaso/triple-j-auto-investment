@@ -40,6 +40,7 @@ export default {
         'card-lift': 'cardLift 0.3s ease-out forwards',
         'smooth-appear': 'smoothAppear 0.5s ease-out forwards',
         'scale-in': 'scaleIn 0.2s ease-out',
+        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -92,6 +93,14 @@ export default {
         scaleIn: {
           'from': { opacity: '0', transform: 'scale(0.95)' },
           'to': { opacity: '1', transform: 'scale(1)' },
+        },
+        pulseGlow: {
+          '0%, 100%': {
+            filter: 'drop-shadow(0 0 4px rgba(212, 175, 55, 0.6))'
+          },
+          '50%': {
+            filter: 'drop-shadow(0 0 12px rgba(212, 175, 55, 0.9))'
+          }
         },
       },
     },
