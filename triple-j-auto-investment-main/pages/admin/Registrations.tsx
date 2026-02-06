@@ -48,7 +48,8 @@ import {
   updateRegistrationStatus,
   updateDocumentChecklist,
   getRegistrationAudit,
-  archiveRegistration
+  archiveRegistration,
+  getTrackingLink
 } from '../../services/registrationService';
 import {
   Registration,
@@ -80,6 +81,7 @@ const Registrations: React.FC = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Confirmation dialog state
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -255,10 +257,13 @@ const Registrations: React.FC = () => {
     }
   };
 
-  // Copy tracker link
-  const copyTrackerLink = (orderId: string) => {
-    const link = `${window.location.origin}/#/track/${orderId}`;
-    navigator.clipboard.writeText(link);
+  // Copy tracker link (using token-based URL)
+  const handleCopyLink = async (registration: Registration) => {
+    const link = getTrackingLink(registration);
+    const fullUrl = `${window.location.origin}/#${link}`;
+    await navigator.clipboard.writeText(fullUrl);
+    setCopiedId(registration.id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
   // Format date
@@ -469,15 +474,19 @@ const Registrations: React.FC = () => {
                     <button
                       onClick={e => {
                         e.stopPropagation();
-                        copyTrackerLink(reg.orderId);
+                        handleCopyLink(reg);
                       }}
                       className="p-2 text-gray-500 hover:text-tj-gold transition-colors"
-                      title="Copy tracker link"
+                      title="Copy customer tracking link"
                     >
-                      <Copy size={16} />
+                      {copiedId === reg.id ? (
+                        <Check size={16} className="text-green-400" />
+                      ) : (
+                        <Copy size={16} />
+                      )}
                     </button>
                     <a
-                      href={`/#/track/${reg.orderId}`}
+                      href={`/#${getTrackingLink(reg)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={e => e.stopPropagation()}
@@ -678,13 +687,17 @@ const Registrations: React.FC = () => {
                       <div className="flex items-center gap-2 bg-black p-3 border border-gray-800">
                         <LinkIcon size={14} className="text-gray-600 shrink-0" />
                         <code className="text-tj-gold text-xs flex-1 truncate">
-                          {window.location.origin}/#/track/{reg.orderId}
+                          {window.location.origin}/#/track/{reg.orderId}-{reg.accessToken}
                         </code>
                         <button
-                          onClick={() => copyTrackerLink(reg.orderId)}
+                          onClick={() => handleCopyLink(reg)}
                           className="text-gray-500 hover:text-white transition-colors"
                         >
-                          <Copy size={14} />
+                          {copiedId === reg.id ? (
+                            <Check size={14} className="text-green-400" />
+                          ) : (
+                            <Copy size={14} />
+                          )}
                         </button>
                       </div>
                     </div>

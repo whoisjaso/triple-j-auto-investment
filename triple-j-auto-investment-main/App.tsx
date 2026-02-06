@@ -56,6 +56,7 @@ const Login = lazyWithErrorHandling(() => import('./pages/Login'), 'Login');
 const About = lazyWithErrorHandling(() => import('./pages/About'), 'About');
 const Legal = lazyWithErrorHandling(() => import('./pages/Legal'), 'Legal');
 const RegistrationTracker = lazyWithErrorHandling(() => import('./pages/RegistrationTracker'), 'Registration Tracker');
+const CustomerStatusTracker = lazyWithErrorHandling(() => import('./pages/CustomerStatusTracker'), 'Customer Status Tracker');
 
 // Admin Pages (Lazy Loaded)
 const AdminDashboard = lazyWithErrorHandling(() => import('./pages/admin/Dashboard'), 'Admin Dashboard');
@@ -468,8 +469,10 @@ const AppContent = () => {
                 <Route path="/commercial-wholesale" element={<Contact />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/legal/:section" element={<Legal />} />
+                {/* Customer tracking - token-based access (new format: /track/{orderId}-{token}) */}
+                <Route path="/track/:accessKey" element={<CustomerStatusTracker />} />
+                {/* Legacy order ID lookup - keep for admin testing */}
                 <Route path="/track" element={<RegistrationTracker />} />
-                <Route path="/track/:orderId" element={<RegistrationTracker />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
