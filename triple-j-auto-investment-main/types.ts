@@ -161,6 +161,13 @@ export interface Registration {
   vehicleModel: string;
   plateNumber?: string;
 
+  // Token-based access
+  accessToken: string;
+  tokenExpiresAt?: string;
+
+  // Vehicle type for icon
+  vehicleBodyType?: string;
+
   // Document Checklist
   docTitleFront: boolean;
   docTitleBack: boolean;

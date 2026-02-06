@@ -40,6 +40,11 @@ const transformRegistration = (data: any): Registration => ({
   vehicleMake: data.vehicle_make,
   vehicleModel: data.vehicle_model,
   plateNumber: data.plate_number,
+  // Token-based access
+  accessToken: data.access_token,
+  tokenExpiresAt: data.token_expires_at,
+  // Vehicle type for icon
+  vehicleBodyType: data.vehicle_body_type,
   // Document checklist
   docTitleFront: data.doc_title_front ?? false,
   docTitleBack: data.doc_title_back ?? false,
@@ -95,11 +100,67 @@ const transformAudit = (data: any): RegistrationAudit => ({
 });
 
 // ================================================================
-// PUBLIC API: Customer-facing (uses order_id as auth)
+// PUBLIC API: Customer-facing (token-based access)
 // ================================================================
 
 /**
+ * Parse access key from URL into orderId and token components.
+ * Format: TJ-YYYY-NNNN-{32-char-hex}
+ * Example: TJ-2026-0001-a1b2c3d4e5f67890a1b2c3d4e5f67890
+ */
+export function parseAccessKey(accessKey: string): { orderId: string; token: string } | null {
+  // Order ID format: TJ-YYYY-NNNN (13 chars) + hyphen + 32 hex chars
+  const match = accessKey.match(/^(TJ-\d{4}-\d{4})-([a-f0-9]{32})$/i);
+  if (!match) return null;
+  return { orderId: match[1].toUpperCase(), token: match[2].toLowerCase() };
+}
+
+/**
+ * Fetch registration by orderId + access token combination.
+ * Returns null for invalid token, expired token, or not found.
+ * Used by customer portal for secure link-based access.
+ */
+export async function getRegistrationByAccessKey(
+  orderId: string,
+  token: string
+): Promise<Registration | null> {
+  try {
+    const { data, error } = await supabase
+      .from('registrations')
+      .select('*')
+      .eq('order_id', orderId.toUpperCase())
+      .eq('access_token', token.toLowerCase())
+      .eq('is_archived', false)
+      .single();
+
+    if (error || !data) {
+      // Token invalid or not found - return null, not error
+      return null;
+    }
+
+    // Check expiry in application code (belt + suspenders with RLS)
+    if (data.token_expires_at && new Date(data.token_expires_at) < new Date()) {
+      return null;
+    }
+
+    return transformRegistration(data);
+  } catch (error) {
+    console.error('Error fetching registration by access key:', error);
+    return null;
+  }
+}
+
+/**
+ * Generate customer tracking link for a registration.
+ * Format: /track/{orderId}-{token}
+ */
+export function getTrackingLink(registration: Registration): string {
+  return `/track/${registration.orderId}-${registration.accessToken}`;
+}
+
+/**
  * Fetch a registration by order ID (public access for customer tracker)
+ * @deprecated Use getRegistrationByAccessKey for secure token-based access
  * Excludes archived registrations
  */
 export async function getRegistrationByOrderId(orderId: string): Promise<Registration | null> {
