@@ -121,10 +121,10 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="fixed w-full z-50">
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-black/90 to-transparent pointer-events-none h-48 transition-opacity duration-500"></div>
+    <nav className="fixed top-0 left-0 right-0 z-50">
+      <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black via-black/90 to-transparent pointer-events-none h-32 transition-opacity duration-500"></div>
 
-      <div className="border-b border-white/5 backdrop-blur-[2px] relative z-10">
+      <div className="border-b border-white/5 relative z-10">
         <div className="max-w-[1920px] mx-auto px-6 md:px-12">
           <div className="relative flex justify-between items-center h-24 md:h-32">
 
@@ -447,8 +447,8 @@ const AppContent = () => {
         <BrowserCompatibilityCheck />
       </ErrorBoundary>
       <Navbar />
-      {/* Adjusted top padding since crest is gone */}
-      <main className="flex-grow pt-32">
+      {/* Top padding matches navbar height (h-32 = 128px = pt-32) plus buffer */}
+      <main className="flex-grow pt-36">
         {/* Global Page Transition Wrapper */}
         <AnimatePresence mode="wait">
           <Suspense fallback={null}>

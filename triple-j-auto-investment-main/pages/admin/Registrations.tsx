@@ -291,7 +291,7 @@ const Registrations: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black p-4 md:p-8">
+    <div className="min-h-screen bg-black px-4 md:px-8 pb-4 md:pb-8 pt-32">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
