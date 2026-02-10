@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-06
-**Session:** Phase 3 IN PROGRESS - Customer Portal - Status Tracker (Plan 03 Task 2/3 - awaiting DB migration)
+**Last Updated:** 2026-02-10
+**Session:** Phase 4 Plan 01 complete (Notification Database Infrastructure)
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 3 (Customer Portal - Status Tracker) - Plan 02 complete, continuing.
+**Current Focus:** Phase 4 (Customer Portal - Notifications & Login) - Plan 01 complete, Plan 02 next (Edge Functions).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,9 +22,10 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 3 of 9 (Customer Portal - Status Tracker) - IN PROGRESS
-**Plan:** 2/3 complete
-**Status:** Plan 03-02 complete, ready for 03-03
+**Phase:** 4 of 9 (Customer Portal - Notifications & Login)
+**Plan:** 1 of 4 complete
+**Status:** In progress - Plan 04-01 complete, Plan 04-02 next
+**Last activity:** 2026-02-10 - Completed 04-01-PLAN.md
 
 **Progress:**
 ```
@@ -40,16 +41,22 @@ Phase 2:    [====================] 100% (3/3 plans complete) - COMPLETE
   Plan 01:  [X] Schema Migration (6-stage workflow, audit trail, RLS)
   Plan 02:  [X] TypeScript Types & Service Updates (types.ts, registrationService.ts)
   Plan 03:  [X] Admin Registrations UI (6-stage workflow, step buttons, audit history)
-Phase 3:    [=============       ] 67% (2/3 plans complete) - IN PROGRESS
+Phase 3:    [=============       ] 67% (2/3 plans complete) - CODE COMPLETE (verification deferred)
   Plan 01:  [X] Token Access Infrastructure (access_token, expiry trigger, service functions)
   Plan 02:  [X] Tracking Visualization Components (ProgressArc, ProgressRoad, VehicleIcon, etc.)
-  Plan 03:  [ ] Route Integration & Polish (App.tsx route, mobile layout, share button)
-Phase 4:    [ ] Not started (Customer Portal - Notifications & Login)
+  Plan 03:  [ ] Route Integration & Polish (code complete, verification deferred)
+Phase 4:    [=====               ] 25% (1/4 plans complete) - IN PROGRESS
+  Plan 01:  [X] Notification Database Infrastructure (queue, debounce, preferences, RLS, pg_cron)
+  Plan 02:  [ ] Edge Functions (process-notification-queue, send-notification)
+  Plan 03:  [ ] Customer Login & Dashboard (phone OTP, multi-registration view)
+  Plan 04:  [ ] Admin Notification UI & Preferences (notify checkbox, history, preference toggle)
 Phase 5:    [ ] Not started (Registration Checker)
 Phase 6:    [ ] Not started (Rental Management Core)
 Phase 7:    [ ] Not started (Plate Tracking)
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
+
+Overall:    [████████████░░░░░░░░] 60% (12/20 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -67,7 +74,7 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 | Phases Planned | 9 | 1 blocked (Phase 9) |
 | Phases Complete | 2 | Phase 1 + Phase 2 |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 11 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02 complete |
+| Plans Executed | 12 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 complete |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -109,6 +116,10 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 | hasAnimated ref for animation replay | Prevents arc/car animation replay on resize per CONTEXT.md | 2026-02-06 | 03-02 |
 | 3 vehicle icon types | sedan, suv, truck with body class mapping | 2026-02-06 | 03-02 |
 | Responsive road orientation | Horizontal on desktop, vertical on mobile via Tailwind | 2026-02-06 | 03-02 |
+| Partial unique index for debounce | PostgreSQL WHERE not supported on inline UNIQUE; CREATE UNIQUE INDEX instead | 2026-02-10 | 04-01 |
+| ON CONFLICT column+WHERE syntax | Partial unique indexes require column expression, not constraint name reference | 2026-02-10 | 04-01 |
+| SECURITY DEFINER on queue trigger | Trigger must INSERT into notification_queue regardless of caller's RLS | 2026-02-10 | 04-01 |
+| app.settings default for pg_cron | Simpler dev setup; Vault approach documented for production | 2026-02-10 | 04-01 |
 
 ### Patterns Established
 
@@ -130,6 +141,9 @@ Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 - **Token expiry trigger:** DB trigger on status change to sticker_delivered
 - **Animation replay prevention:** useRef(false) + set() vs start() in useEffect
 - **Component barrel export:** index.ts re-exports all components from directory
+- **Debounce queue pattern:** Partial unique index + ON CONFLICT upsert resets 5-min window
+- **Pending flag capture pattern:** BEFORE trigger reads NEW.pending_notify_customer, clears after capture
+- **Phone-auth RLS pattern:** auth.jwt()->>'phone' matches customer_phone for authenticated SELECT
 
 ### Architecture Summary (Current)
 
@@ -195,6 +209,14 @@ supabase/migrations/:
     - vehicle_body_type column (for car icon)
     - set_token_expiry_on_delivery() trigger
     - Updated RLS: public SELECT requires valid token
+  04_notification_system.sql (244 lines) [NEW in 04-01]
+    - notification_queue table with partial unique index for debounce
+    - 5 new columns on registration_notifications (audit enrichment)
+    - notification_pref column on registrations (sms/email/both/none)
+    - pending_notify_customer flag on registrations (admin opt-out)
+    - queue_status_notification() BEFORE UPDATE trigger with upsert debounce
+    - Phone-authenticated customer RLS policy (auth.jwt()->>'phone')
+    - pg_cron schedule: process-notification-queue every minute via pg_net
   README.md
     - Migration order, breaking changes, rollback for all migrations
 ```
@@ -207,13 +229,16 @@ supabase/migrations/:
 | RLS silent failures | Data loss without warning | Ongoing monitoring |
 | No Spireon API access | Can't build GPS feature | Phase 9 blocked |
 | TypeScript strict mode | ErrorBoundary class issues | Low priority (build works) |
-| Migration 03 not applied | Token features won't work until applied | Deploy to Supabase |
+| Migrations 03-04 not applied | Token + notification features won't work until applied | Deploy to Supabase |
 
 ### TODOs (Cross-Phase)
 
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
+- [ ] Apply migration 04_notification_system.sql to Supabase
+- [ ] Enable pg_cron and pg_net extensions in Supabase Dashboard
+- [ ] Configure app.settings.supabase_url and app.settings.service_role_key (or Vault secrets)
 - [ ] Contact Spireon for LoJack API credentials (unblocks Phase 9)
-- [ ] Verify SMS provider infrastructure (needed for Phase 4)
+- [ ] Verify SMS provider infrastructure (needed for Phase 4 Plan 02)
 - [ ] Check Supabase plan limits for document storage (Phase 5, 8)
 
 ---
@@ -221,50 +246,36 @@ supabase/migrations/:
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed Plan 03-02: Tracking Visualization Components
-- Created components/tracking/ directory with 7 files
-- VehicleIcon: 3 SVG vehicle types with body class mapping
-- ProgressArc: Circular arc with logo, stage markers, Framer Motion animation
-- ProgressRoad: Horizontal/vertical road with animated car
-- StageInfo: Stage description with milestone dates
-- LoadingCrest: Pulsing logo loading animation
-- ErrorState: 3 error types with contact info
-- Added pulse-glow animation to tailwind.config.js
-- All components use animation replay prevention pattern
-- Build passes with all changes
+- Executed Phase 4 Plan 01: Notification Database Infrastructure
+- Created 04_notification_system.sql (244 lines, 7 sections)
+- Updated migrations README.md with migration 04 documentation
+- 2 tasks, 2 commits, 0 deviations
 
-### Plan 03-02 Summary
-| Deliverable | Status | Notes |
-|-------------|--------|-------|
-| VehicleIcon | COMPLETE | sedan, suv, truck SVG icons |
-| ProgressArc | COMPLETE | Animated arc with stage markers |
-| ProgressRoad | COMPLETE | Horizontal/vertical with car animation |
-| StageInfo | COMPLETE | Stage descriptions, milestone dates |
-| LoadingCrest | COMPLETE | Pulsing logo loader |
-| ErrorState | COMPLETE | expired, invalid, not-found states |
-| Barrel export | COMPLETE | index.ts exports all 6 components |
+### Phase 4 Plan 01 Status
+| Task | Name | Commit | Status |
+|------|------|--------|--------|
+| 1 | Create notification system migration SQL | 66f8b3d | COMPLETE |
+| 2 | Update migrations README | 37ec5d2 | COMPLETE |
 
-### Phase 3 Progress
-| Plan | Focus | Commits | Status |
-|------|-------|---------|--------|
-| 03-01 | Token Access | 434189b, b1c8fb3 | COMPLETE |
-| 03-02 | Visualization Components | cbc6973, 347abe3 | COMPLETE |
-| 03-03 | Route Integration & Polish | 98b8130, a07f259 | IN PROGRESS (2/3 tasks, awaiting DB migration for verification) |
+### Phase 3 Deferred Items (Still Pending)
+- [ ] Apply migration 03_customer_portal_access.sql to Supabase
+- [ ] Run Plan 03-03 human verification checkpoint (Task 3)
+- [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. **Apply migration 03_customer_portal_access.sql** to Supabase (BLOCKING)
-2. Complete Plan 03-03 human verification checkpoint (test tracker flow)
-3. Verify phase goal achievement
-4. Begin Phase 4: Customer Portal - Notifications & Login
+1. Execute Phase 4 Plan 02: Edge Functions for SMS/email delivery
+2. Execute Phase 4 Plan 03: Customer Login & Dashboard
+3. Execute Phase 4 Plan 04: Admin Notification UI & Preferences
+4. Circle back to Phase 3 verification when DB migration is applied
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/03-customer-portal-status-tracker/03-02-SUMMARY.md` - latest plan
-4. `.planning/phases/03-customer-portal-status-tracker/03-CONTEXT.md` - phase context
+3. `.planning/phases/04-customer-portal-notifications-login/04-CONTEXT.md` - phase context
+4. `.planning/phases/04-customer-portal-notifications-login/04-01-SUMMARY.md` - just completed
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-06*
+*State updated: 2026-02-10*
