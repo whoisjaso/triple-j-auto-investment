@@ -39,7 +39,8 @@ import {
   MessageSquare,
   Link as LinkIcon,
   Loader2,
-  Send
+  Send,
+  Bell
 } from 'lucide-react';
 import {
   getAllRegistrations,
@@ -51,10 +52,12 @@ import {
   archiveRegistration,
   getTrackingLink
 } from '../../services/registrationService';
+import { getNotificationHistory } from '../../services/notificationService';
 import {
   Registration,
   RegistrationStageKey,
   RegistrationAudit,
+  RegistrationNotification,
   REGISTRATION_STAGES,
   VALID_TRANSITIONS,
   OWNERSHIP_COLORS
@@ -93,9 +96,16 @@ const Registrations: React.FC = () => {
   } | null>(null);
   const [confirmNotes, setConfirmNotes] = useState('');
 
+  // Notify customer checkbox state
+  const [notifyCustomer, setNotifyCustomer] = useState(true);
+
   // Audit history state
   const [auditHistory, setAuditHistory] = useState<RegistrationAudit[]>([]);
   const [showAuditHistory, setShowAuditHistory] = useState<string | null>(null);
+
+  // Notification history state
+  const [notificationHistory, setNotificationHistory] = useState<RegistrationNotification[]>([]);
+  const [showNotifications, setShowNotifications] = useState<string | null>(null);
 
   // Create form state
   const [createForm, setCreateForm] = useState({
@@ -160,6 +170,7 @@ const Registrations: React.FC = () => {
       requiresNotes: targetStage === 'rejected'
     });
     setConfirmNotes('');
+    setNotifyCustomer(true);
   };
 
   // Handle confirmed status change
@@ -173,7 +184,8 @@ const Registrations: React.FC = () => {
         confirmDialog.targetStage,
         {
           changeReason: confirmNotes || undefined,
-          rejectionNotes: confirmDialog.targetStage === 'rejected' ? confirmNotes : undefined
+          rejectionNotes: confirmDialog.targetStage === 'rejected' ? confirmNotes : undefined,
+          notifyCustomer: notifyCustomer
         }
       );
 
@@ -213,6 +225,13 @@ const Registrations: React.FC = () => {
     const history = await getRegistrationAudit(registrationId);
     setAuditHistory(history);
     setShowAuditHistory(registrationId);
+  };
+
+  // Load notification history for a registration
+  const loadNotificationHistory = async (registrationId: string) => {
+    const history = await getNotificationHistory(registrationId);
+    setNotificationHistory(history);
+    setShowNotifications(registrationId);
   };
 
   // Handle create registration
@@ -670,14 +689,24 @@ const Registrations: React.FC = () => {
                       <p className="text-gray-400 text-sm">{reg.notes || 'No notes'}</p>
                     </div>
 
-                    {/* Audit History Link */}
-                    <button
-                      onClick={() => loadAuditHistory(reg.id)}
-                      className="mt-4 text-gray-500 text-xs hover:text-tj-gold transition-colors flex items-center gap-1"
-                    >
-                      <Clock size={12} />
-                      View Change History
-                    </button>
+                    {/* Audit & Notification History Links */}
+                    <div className="mt-4 flex items-center gap-4">
+                      <button
+                        onClick={() => loadAuditHistory(reg.id)}
+                        className="text-gray-500 text-xs hover:text-tj-gold transition-colors flex items-center gap-1"
+                      >
+                        <Clock size={12} />
+                        View Change History
+                      </button>
+                      <button
+                        onClick={() => loadNotificationHistory(reg.id)}
+                        className="flex items-center gap-1.5 text-gray-500 hover:text-tj-gold transition-colors text-xs"
+                        title="View notification history"
+                      >
+                        <Bell size={14} />
+                        Notifications
+                      </button>
+                    </div>
 
                     {/* Tracker Link */}
                     <div className="mt-6 pt-6 border-t border-gray-800">
@@ -949,6 +978,19 @@ const Registrations: React.FC = () => {
                     rows={3}
                   />
                 </div>
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    id="notify-customer"
+                    checked={notifyCustomer}
+                    onChange={e => setNotifyCustomer(e.target.checked)}
+                    className="w-4 h-4 accent-tj-gold"
+                  />
+                  <label htmlFor="notify-customer" className="text-gray-400 text-sm">
+                    Notify customer via SMS/Email
+                  </label>
+                </div>
               </div>
 
               <div className="p-6 border-t border-gray-800 flex justify-end gap-4">
@@ -1039,6 +1081,61 @@ const Registrations: React.FC = () => {
                       </div>
                     ))}
                   </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Notification History Modal */}
+        {showNotifications && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="bg-tj-dark border border-gray-700 w-full max-w-2xl max-h-[80vh] flex flex-col">
+              <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+                <h3 className="text-white font-display text-lg tracking-wide">
+                  Notification History
+                </h3>
+                <button
+                  onClick={() => setShowNotifications(null)}
+                  className="text-gray-500 hover:text-white transition-colors"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="p-6 overflow-y-auto flex-1 space-y-3">
+                {notificationHistory.length === 0 ? (
+                  <p className="text-gray-500 text-sm">No notifications sent yet.</p>
+                ) : (
+                  notificationHistory.map(n => (
+                    <div key={n.id} className="border border-gray-800 p-4 space-y-2">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-xs px-2 py-0.5 uppercase tracking-wider ${
+                            n.channel === 'sms'
+                              ? 'bg-blue-500/20 text-blue-400'
+                              : 'bg-purple-500/20 text-purple-400'
+                          }`}>
+                            {n.channel}
+                          </span>
+                          <span className={`text-xs ${n.delivered ? 'text-green-400' : n.deliveryError ? 'text-red-400' : 'text-gray-500'}`}>
+                            {n.delivered ? 'Delivered' : n.deliveryError ? 'Failed' : 'Pending'}
+                          </span>
+                        </div>
+                        <span className="text-gray-600 text-xs">
+                          {new Date(n.sentAt).toLocaleString()}
+                        </span>
+                      </div>
+                      {n.oldStage && n.newStage && (
+                        <p className="text-gray-400 text-xs">
+                          Stage: {n.oldStage} &rarr; {n.newStage}
+                        </p>
+                      )}
+                      <p className="text-gray-300 text-sm">{n.recipient}</p>
+                      {n.deliveryError && (
+                        <p className="text-red-400/70 text-xs">Error: {n.deliveryError}</p>
+                      )}
+                    </div>
+                  ))
                 )}
               </div>
             </div>
