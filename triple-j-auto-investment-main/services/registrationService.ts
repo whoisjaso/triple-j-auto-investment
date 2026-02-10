@@ -61,6 +61,8 @@ const transformRegistration = (data: any): Registration => ({
   // Notes
   notes: data.notes,
   rejectionNotes: data.rejection_notes,
+  // Notification preference
+  notificationPref: data.notification_pref ?? 'both',
   // Metadata
   isArchived: data.is_archived ?? false,
   purchaseDate: data.purchase_date,
@@ -345,6 +347,7 @@ export async function updateRegistrationStatus(
   options?: {
     changeReason?: string;
     rejectionNotes?: string;
+    notifyCustomer?: boolean; // Controls pending_notify_customer column
   }
 ): Promise<boolean> {
   try {
@@ -366,6 +369,14 @@ export async function updateRegistrationStatus(
     // Clear rejection notes when resubmitting from rejected state
     if (newStage === 'submitted_to_dmv') {
       updateData.rejection_notes = null;
+    }
+
+    // Set pending_notify_customer for notification trigger
+    // Default to true if not explicitly set
+    if (options?.notifyCustomer !== undefined) {
+      updateData.pending_notify_customer = options.notifyCustomer;
+    } else {
+      updateData.pending_notify_customer = true;
     }
 
     const { error } = await supabase
@@ -762,6 +773,11 @@ export async function logNotification(input: {
   triggeredBy?: 'admin_action' | 'auto' | 'system';
   delivered?: boolean;
   deliveryError?: string;
+  oldStage?: string;
+  newStage?: string;
+  subject?: string;
+  templateUsed?: string;
+  providerMessageId?: string;
 }): Promise<boolean> {
   try {
     const { error } = await supabase
@@ -774,7 +790,12 @@ export async function logNotification(input: {
         message: input.message,
         triggered_by: input.triggeredBy || 'system',
         delivered: input.delivered,
-        delivery_error: input.deliveryError
+        delivery_error: input.deliveryError,
+        old_stage: input.oldStage,
+        new_stage: input.newStage,
+        subject: input.subject,
+        template_used: input.templateUsed,
+        provider_message_id: input.providerMessageId
       }]);
 
     return !error;

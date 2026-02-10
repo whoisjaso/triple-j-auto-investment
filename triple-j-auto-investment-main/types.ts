@@ -188,6 +188,9 @@ export interface Registration {
   notes?: string;
   rejectionNotes?: string;
 
+  // Notification preference
+  notificationPref: 'sms' | 'email' | 'both' | 'none';
+
   // Metadata
   isArchived: boolean;
   purchaseDate: string;
@@ -246,8 +249,16 @@ export interface RegistrationNotification {
   delivered?: boolean;
   deliveryError?: string;
   triggeredBy: 'admin_action' | 'auto' | 'system';
+  // Extended fields (Phase 4)
+  oldStage?: string;
+  newStage?: string;
+  subject?: string;
+  templateUsed?: string;
+  providerMessageId?: string;
   createdAt: string;
 }
+
+export type NotificationPreference = 'sms' | 'email' | 'both' | 'none';
 
 // Stage Configuration for UI rendering
 export interface StageConfig {
