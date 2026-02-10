@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-10
-**Session:** Phase 4 Plan 01 complete (Notification Database Infrastructure)
+**Session:** Phase 4 Plan 02 complete (Notification Delivery Edge Functions)
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 4 (Customer Portal - Notifications & Login) - Plan 01 complete, Plan 02 next (Edge Functions).
+**Current Focus:** Phase 4 (Customer Portal - Notifications & Login) - Plan 02 complete, Plan 03 next (Customer Login & Dashboard).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -23,9 +23,9 @@
 
 **Milestone:** v1 Feature Development
 **Phase:** 4 of 9 (Customer Portal - Notifications & Login)
-**Plan:** 1 of 4 complete
-**Status:** In progress - Plan 04-01 complete, Plan 04-02 next
-**Last activity:** 2026-02-10 - Completed 04-01-PLAN.md
+**Plan:** 2 of 4 complete
+**Status:** In progress - Plan 04-02 complete, Plan 04-03 next
+**Last activity:** 2026-02-10 - Completed 04-02-PLAN.md
 
 **Progress:**
 ```
@@ -45,9 +45,9 @@ Phase 3:    [=============       ] 67% (2/3 plans complete) - CODE COMPLETE (ver
   Plan 01:  [X] Token Access Infrastructure (access_token, expiry trigger, service functions)
   Plan 02:  [X] Tracking Visualization Components (ProgressArc, ProgressRoad, VehicleIcon, etc.)
   Plan 03:  [ ] Route Integration & Polish (code complete, verification deferred)
-Phase 4:    [=====               ] 25% (1/4 plans complete) - IN PROGRESS
+Phase 4:    [==========          ] 50% (2/4 plans complete) - IN PROGRESS
   Plan 01:  [X] Notification Database Infrastructure (queue, debounce, preferences, RLS, pg_cron)
-  Plan 02:  [ ] Edge Functions (process-notification-queue, send-notification)
+  Plan 02:  [X] Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe)
   Plan 03:  [ ] Customer Login & Dashboard (phone OTP, multi-registration view)
   Plan 04:  [ ] Admin Notification UI & Preferences (notify checkbox, history, preference toggle)
 Phase 5:    [ ] Not started (Registration Checker)
@@ -56,7 +56,7 @@ Phase 7:    [ ] Not started (Plate Tracking)
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [████████████░░░░░░░░] 60% (12/20 plans complete)
+Overall:    [█████████████░░░░░░░] 65% (13/20 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -74,7 +74,7 @@ Overall:    [████████████░░░░░░░░] 60% (
 | Phases Planned | 9 | 1 blocked (Phase 9) |
 | Phases Complete | 2 | Phase 1 + Phase 2 |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 12 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 complete |
+| Plans Executed | 13 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01, 04-02 complete |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -120,6 +120,9 @@ Overall:    [████████████░░░░░░░░] 60% (
 | ON CONFLICT column+WHERE syntax | Partial unique indexes require column expression, not constraint name reference | 2026-02-10 | 04-01 |
 | SECURITY DEFINER on queue trigger | Trigger must INSERT into notification_queue regardless of caller's RLS | 2026-02-10 | 04-01 |
 | app.settings default for pg_cron | Simpler dev setup; Vault approach documented for production | 2026-02-10 | 04-01 |
+| Template literal HTML over React Email JSX | Avoids deno.json JSX config and React Email npm imports; identical output | 2026-02-10 | 04-02 |
+| Mark queue items sent even on total failure | Prevents infinite retry loops; admin sees failures in audit trail | 2026-02-10 | 04-02 |
+| Email auto-fallback on SMS failure | Per CONTEXT.md auto-fallback spec; maximize delivery probability | 2026-02-10 | 04-02 |
 
 ### Patterns Established
 
@@ -144,6 +147,11 @@ Overall:    [████████████░░░░░░░░] 60% (
 - **Debounce queue pattern:** Partial unique index + ON CONFLICT upsert resets 5-min window
 - **Pending flag capture pattern:** BEFORE trigger reads NEW.pending_notify_customer, clears after capture
 - **Phone-auth RLS pattern:** auth.jwt()->>'phone' matches customer_phone for authenticated SELECT
+- **Edge Function shared helper pattern:** _shared/ directory for cross-function utilities (twilio.ts, resend.ts)
+- **Template literal email pattern:** HTML string with inline CSS for email client compatibility
+- **Queue processor pattern:** Fetch ready items, process per-item with try/catch, mark sent regardless
+- **SMS auto-fallback pattern:** Attempt email delivery when SMS fails, regardless of preference
+- **Token-validated unsubscribe:** Branded HTML response page, validates access_token before updating pref
 
 ### Architecture Summary (Current)
 
@@ -219,6 +227,18 @@ supabase/migrations/:
     - pg_cron schedule: process-notification-queue every minute via pg_net
   README.md
     - Migration order, breaking changes, rollback for all migrations
+
+supabase/functions/ (NEW in 04-02):
+  _shared/
+    twilio.ts              - sendSms() via Twilio REST API (Basic auth)
+    resend.ts              - sendEmail() via Resend REST API (Bearer auth)
+    email-templates/
+      status-update.tsx    - renderStatusUpdateEmail() - branded HTML with progress bar
+      rejection-notice.tsx - renderRejectionEmail() - red alert variant
+  process-notification-queue/
+    index.ts               - Deno.serve queue sweep: fetch ready, send SMS/email, log, mark sent
+  unsubscribe/
+    index.ts               - Deno.serve one-click unsubscribe with branded HTML response
 ```
 
 ### Known Issues
@@ -238,7 +258,9 @@ supabase/migrations/:
 - [ ] Enable pg_cron and pg_net extensions in Supabase Dashboard
 - [ ] Configure app.settings.supabase_url and app.settings.service_role_key (or Vault secrets)
 - [ ] Contact Spireon for LoJack API credentials (unblocks Phase 9)
-- [ ] Verify SMS provider infrastructure (needed for Phase 4 Plan 02)
+- [ ] Configure Twilio secrets as Edge Function env vars (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER)
+- [ ] Configure Resend API key as Edge Function secret (RESEND_API_KEY)
+- [ ] Deploy Edge Functions: `supabase functions deploy process-notification-queue` and `supabase functions deploy unsubscribe`
 - [ ] Check Supabase plan limits for document storage (Phase 5, 8)
 
 ---
@@ -246,16 +268,16 @@ supabase/migrations/:
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed Phase 4 Plan 01: Notification Database Infrastructure
-- Created 04_notification_system.sql (244 lines, 7 sections)
-- Updated migrations README.md with migration 04 documentation
-- 2 tasks, 2 commits, 0 deviations
+- Executed Phase 4 Plan 02: Notification Delivery Edge Functions
+- Created 6 files under supabase/functions/ for SMS, email, queue processing, and unsubscribe
+- 3 tasks, 3 commits, 0 deviations
 
-### Phase 4 Plan 01 Status
+### Phase 4 Plan 02 Status
 | Task | Name | Commit | Status |
 |------|------|--------|--------|
-| 1 | Create notification system migration SQL | 66f8b3d | COMPLETE |
-| 2 | Update migrations README | 37ec5d2 | COMPLETE |
+| 1 | Create shared SMS and email helpers | cdb8206 | COMPLETE |
+| 2 | Create email templates and queue processor | beadbcc | COMPLETE |
+| 3 | Create unsubscribe Edge Function | baa933c | COMPLETE |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -263,17 +285,16 @@ supabase/migrations/:
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Execute Phase 4 Plan 02: Edge Functions for SMS/email delivery
-2. Execute Phase 4 Plan 03: Customer Login & Dashboard
-3. Execute Phase 4 Plan 04: Admin Notification UI & Preferences
-4. Circle back to Phase 3 verification when DB migration is applied
+1. Execute Phase 4 Plan 03: Customer Login & Dashboard (phone OTP, multi-registration view)
+2. Execute Phase 4 Plan 04: Admin Notification UI & Preferences (notify checkbox, history)
+3. Circle back to Phase 3 verification when DB migration is applied
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
 3. `.planning/phases/04-customer-portal-notifications-login/04-CONTEXT.md` - phase context
-4. `.planning/phases/04-customer-portal-notifications-login/04-01-SUMMARY.md` - just completed
+4. `.planning/phases/04-customer-portal-notifications-login/04-02-SUMMARY.md` - just completed
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
