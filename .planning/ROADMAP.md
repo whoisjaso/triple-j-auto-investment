@@ -112,6 +112,14 @@ Plans:
 4. Notification preferences can be set (SMS, email, both, none)
 5. Notifications are throttled (no spam if admin makes multiple quick updates)
 
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 04-01-PLAN.md -- Database migration (notification queue, preferences, debounce trigger, phone-auth RLS)
+- [ ] 04-02-PLAN.md -- Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe handler)
+- [ ] 04-03-PLAN.md -- Types, services, phone utility, admin notify checkbox + notification history
+- [ ] 04-04-PLAN.md -- Customer login (phone OTP), dashboard, notification preferences UI
+
 ---
 
 ### Phase 5: Registration Checker
@@ -232,7 +240,7 @@ Plans:
 | 1 - Reliability & Stability | Complete | 3 | 100% (6 plans) |
 | 2 - Registration Database Foundation | Complete | 1 | 100% (3 plans) |
 | 3 - Customer Portal - Status Tracker | Planned | 4 | 0% (3 plans ready) |
-| 4 - Customer Portal - Notifications & Login | Pending | 2 | 0% |
+| 4 - Customer Portal - Notifications & Login | Planned | 2 | 0% (4 plans ready) |
 | 5 - Registration Checker | Pending | 6 | 0% |
 | 6 - Rental Management Core | Pending | 5 | 0% |
 | 7 - Plate Tracking | Pending | 5 | 0% |
@@ -282,7 +290,7 @@ Phase 1: Reliability & Stability
 
 ### External Dependencies
 - **Spireon/LoJack API:** Required for Phase 9. Recommend contacting vendor immediately to unblock.
-- **SMS Provider:** Required for Phase 4 (PORT-06). Verify existing infrastructure (Twilio? EmailJS SMS?).
+- **SMS Provider:** Required for Phase 4 (PORT-06). Resolved: Twilio for SMS + Supabase phone auth, Resend for email.
 
 ### Depth Calibration
 - Comprehensive depth (8-12 phases): 9 phases delivered
@@ -292,4 +300,4 @@ Phase 1: Reliability & Stability
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-05*
+*Last updated: 2026-02-10*
