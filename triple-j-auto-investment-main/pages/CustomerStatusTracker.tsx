@@ -11,7 +11,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Share2, Car } from 'lucide-react';
 import {
   ProgressArc,
@@ -25,6 +25,7 @@ import {
   getRegistrationByAccessKey
 } from '../services/registrationService';
 import { Registration, RegistrationStageKey } from '../types';
+import NotificationPreferences from '../components/NotificationPreferences';
 
 const CustomerStatusTracker: React.FC = () => {
   const { accessKey } = useParams<{ accessKey: string }>();
@@ -160,6 +161,17 @@ const CustomerStatusTracker: React.FC = () => {
         <p className="text-gray-400 text-xs mt-1">
           Order: {registration?.orderId}
         </p>
+
+        {/* Notification preferences toggle */}
+        {registration && (
+          <div className="mt-3 flex justify-center">
+            <NotificationPreferences
+              registrationId={registration.id}
+              currentPreference={registration.notificationPref}
+              compact={true}
+            />
+          </div>
+        )}
       </div>
 
       {/* Progress Arc */}
@@ -202,6 +214,17 @@ const CustomerStatusTracker: React.FC = () => {
         >
           <Share2 size={20} className="text-white" />
         </button>
+      </div>
+
+      {/* Login link for returning customers */}
+      <div className="text-center mt-8 pt-6 border-t border-gray-200">
+        <p className="text-gray-500 text-sm">
+          Have multiple registrations?{' '}
+          <Link to="/customer/login" className="text-tj-gold hover:text-gray-800 transition-colors">
+            Log in with your phone number
+          </Link>
+          {' '}to see them all.
+        </p>
       </div>
 
       {/* Footer with contact */}

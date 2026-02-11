@@ -58,6 +58,10 @@ const Legal = lazyWithErrorHandling(() => import('./pages/Legal'), 'Legal');
 const RegistrationTracker = lazyWithErrorHandling(() => import('./pages/RegistrationTracker'), 'Registration Tracker');
 const CustomerStatusTracker = lazyWithErrorHandling(() => import('./pages/CustomerStatusTracker'), 'Customer Status Tracker');
 
+// Customer Portal Pages (Lazy Loaded)
+const CustomerLogin = lazyWithErrorHandling(() => import('./pages/CustomerLogin'), 'Customer Login');
+const CustomerDashboard = lazyWithErrorHandling(() => import('./pages/CustomerDashboard'), 'Customer Dashboard');
+
 // Admin Pages (Lazy Loaded)
 const AdminDashboard = lazyWithErrorHandling(() => import('./pages/admin/Dashboard'), 'Admin Dashboard');
 const AdminInventory = lazyWithErrorHandling(() => import('./pages/admin/Inventory'), 'Admin Inventory');
@@ -473,6 +477,10 @@ const AppContent = () => {
                 <Route path="/track/:accessKey" element={<CustomerStatusTracker />} />
                 {/* Legacy order ID lookup - keep for admin testing */}
                 <Route path="/track" element={<RegistrationTracker />} />
+
+                {/* Customer Portal - phone OTP auth (NOT admin /login) */}
+                <Route path="/customer/login" element={<CustomerLogin />} />
+                <Route path="/customer/dashboard" element={<CustomerDashboard />} />
 
                 {/* Admin Routes */}
                 <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
