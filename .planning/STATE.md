@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-10
-**Session:** Phase 4 Plan 03 complete (TypeScript Types, Services & Admin UI for Notifications)
+**Session:** Phase 4 Plan 04 complete (Customer Login, Dashboard & Notification Preferences) - awaiting human verification
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 4 (Customer Portal - Notifications & Login) - Plan 03 complete, Plan 04 next (Admin Notification UI & Preferences).
+**Current Focus:** Phase 4 (Customer Portal - Notifications & Login) - All 4 plans code-complete, awaiting human verification checkpoint on Plan 04. Phase 5 next.
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -23,9 +23,9 @@
 
 **Milestone:** v1 Feature Development
 **Phase:** 4 of 9 (Customer Portal - Notifications & Login)
-**Plan:** 3 of 4 complete
-**Status:** In progress - Plan 04-03 complete, Plan 04-04 next
-**Last activity:** 2026-02-10 - Completed 04-03-PLAN.md
+**Plan:** 4 of 4 complete (code) - awaiting human verification
+**Status:** Phase 4 code complete - human verification checkpoint pending
+**Last activity:** 2026-02-10 - Completed 04-04-PLAN.md (auto tasks)
 
 **Progress:**
 ```
@@ -45,18 +45,18 @@ Phase 3:    [=============       ] 67% (2/3 plans complete) - CODE COMPLETE (ver
   Plan 01:  [X] Token Access Infrastructure (access_token, expiry trigger, service functions)
   Plan 02:  [X] Tracking Visualization Components (ProgressArc, ProgressRoad, VehicleIcon, etc.)
   Plan 03:  [ ] Route Integration & Polish (code complete, verification deferred)
-Phase 4:    [===============     ] 75% (3/4 plans complete) - IN PROGRESS
+Phase 4:    [====================] 100% (4/4 plans complete) - CODE COMPLETE (verification pending)
   Plan 01:  [X] Notification Database Infrastructure (queue, debounce, preferences, RLS, pg_cron)
   Plan 02:  [X] Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe)
   Plan 03:  [X] TypeScript Types, Services & Admin UI (notificationPref, notifyCustomer, history modal)
-  Plan 04:  [ ] Admin Notification UI & Preferences (notify checkbox, history, preference toggle)
+  Plan 04:  [X] Customer Login, Dashboard & Preferences (phone OTP, multi-reg dashboard, pref toggle)
 Phase 5:    [ ] Not started (Registration Checker)
 Phase 6:    [ ] Not started (Rental Management Core)
 Phase 7:    [ ] Not started (Plate Tracking)
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [██████████████░░░░░░] 70% (14/20 plans complete)
+Overall:    [███████████████░░░░░] 75% (15/20 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -74,7 +74,7 @@ Overall:    [██████████████░░░░░░] 70% (
 | Phases Planned | 9 | 1 blocked (Phase 9) |
 | Phases Complete | 2 | Phase 1 + Phase 2 |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 14 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01, 04-02, 04-03 complete |
+| Plans Executed | 15 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04 complete |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -126,6 +126,9 @@ Overall:    [██████████████░░░░░░] 70% (
 | Notify checkbox defaults to checked | Most status changes should notify customers; admin opts out explicitly | 2026-02-10 | 04-03 |
 | Notification history as separate modal | Different data source (registration_notifications vs registration_audit) | 2026-02-10 | 04-03 |
 | notifyCustomer defaults to true when not provided | Backward compatibility - existing code paths still trigger notifications | 2026-02-10 | 04-03 |
+| Use Link component for HashRouter navigation | Raw `<a>` tags don't work with HashRouter; React Router Link required | 2026-02-10 | 04-04 |
+| Inline snake_case mapping in CustomerDashboard | transformRegistration not exported; only map the display fields needed | 2026-02-10 | 04-04 |
+| Customer auth redirects to /customer/login | Separate from admin /login; prevents confusion between auth paths | 2026-02-10 | 04-04 |
 
 ### Patterns Established
 
@@ -158,6 +161,10 @@ Overall:    [██████████████░░░░░░] 70% (
 - **Notification service transformer pattern:** Dedicated transformNotification for registration_notifications table
 - **Notify-customer checkbox pattern:** Default-checked checkbox in confirm dialog, passes flag to service layer
 - **Notification history modal pattern:** Separate modal from audit history, channel badges, delivery status
+- **Phone OTP login pattern:** Two-step state machine (phone input -> code verify) with resend cooldown
+- **Customer auth guard pattern:** useEffect session check + redirect, onAuthStateChange listener for expiry
+- **Compact/full component mode pattern:** Single component with compact boolean prop for different UI contexts
+- **Optimistic preference update pattern:** Local state change, service call, revert on failure with feedback toast
 
 ### Architecture Summary (Current)
 
@@ -214,6 +221,27 @@ components/tracking/ (NEW in 03-02):
   LoadingCrest.tsx  - Pulsing logo loading animation (27 lines)
   ErrorState.tsx    - Expired/invalid/not-found error display (74 lines)
 
+components/NotificationPreferences.tsx (NEW in 04-04):
+  - Compact mode: gear icon with dropdown popover
+  - Full mode: toggle buttons in a row (SMS/Email/Both/None)
+  - Optimistic updates with revert on failure
+  - Feedback toast, outside-click close
+
+pages/CustomerLogin.tsx (NEW in 04-04):
+  - Two-step phone OTP flow (phone input -> code verify)
+  - signInWithOtp/verifyOtp via Supabase client
+  - normalizePhone before OTP call
+  - Resend cooldown (60s), tracking link input bridge
+  - Navigates to /customer/dashboard on success
+
+pages/CustomerDashboard.tsx (NEW in 04-04):
+  - Auth session check, redirects to /customer/login
+  - RLS-filtered registration fetch (customer_phone match)
+  - Active registrations on top, completed collapsible
+  - NotificationPreferences (compact) per registration card
+  - Mini progress bar, stage badges, View Details links
+  - Auth state change listener for session expiry
+
 pages/admin/Registrations.tsx (UPDATED in 04-03):
   - ~1145 lines with 6-stage workflow visualization
   - Step buttons for status advancement with confirmation dialogs
@@ -222,6 +250,16 @@ pages/admin/Registrations.tsx (UPDATED in 04-03):
   - Audit history modal
   - Notification history modal (channel badges, delivery status, stage transitions)
   - Stats bar: Total/In Progress/Rejected/Complete
+
+pages/CustomerStatusTracker.tsx (UPDATED in 04-04):
+  - Token-based status page with progress arc and road visualization
+  - NotificationPreferences (compact) near vehicle info header
+  - Login link to /customer/login for returning customers
+
+App.tsx (UPDATED in 04-04):
+  - /customer/login -> CustomerLogin (lazy loaded)
+  - /customer/dashboard -> CustomerDashboard (lazy loaded)
+  - /login -> Login (admin, unchanged)
 
 supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
@@ -270,7 +308,7 @@ supabase/functions/ (NEW in 04-02):
 | RLS silent failures | Data loss without warning | Ongoing monitoring |
 | No Spireon API access | Can't build GPS feature | Phase 9 blocked |
 | TypeScript strict mode | ErrorBoundary class issues | Low priority (build works) |
-| Migrations 03-04 not applied | Token + notification features won't work until applied | Deploy to Supabase |
+| Migrations 03-04 not applied | Token + notification + phone auth features won't work until applied | Deploy to Supabase |
 
 ### TODOs (Cross-Phase)
 
@@ -278,6 +316,7 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Apply migration 04_notification_system.sql to Supabase
 - [ ] Enable pg_cron and pg_net extensions in Supabase Dashboard
 - [ ] Configure app.settings.supabase_url and app.settings.service_role_key (or Vault secrets)
+- [ ] Enable Supabase phone auth with Twilio provider (for customer OTP login)
 - [ ] Contact Spireon for LoJack API credentials (unblocks Phase 9)
 - [ ] Configure Twilio secrets as Edge Function env vars (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER)
 - [ ] Configure Resend API key as Edge Function secret (RESEND_API_KEY)
@@ -289,19 +328,21 @@ supabase/functions/ (NEW in 04-02):
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed Phase 4 Plan 03: TypeScript Types, Services & Admin UI for Notifications
-- Updated types.ts (notificationPref, RegistrationNotification extended, NotificationPreference type)
-- Updated registrationService.ts (notifyCustomer option, logNotification extended fields)
-- Created notificationService.ts (getNotificationHistory, updateNotificationPreference, getNotificationPreference)
-- Created utils/phone.ts (normalizePhone E.164, formatPhone display)
-- Updated Registrations.tsx (notify checkbox, notification history modal)
-- 2 tasks, 2 commits, 0 deviations
+- Executed Phase 4 Plan 04: Customer Login, Dashboard & Notification Preferences
+- Created CustomerLogin.tsx (phone OTP two-step flow with Supabase auth)
+- Created CustomerDashboard.tsx (auth-guarded multi-registration dashboard)
+- Created NotificationPreferences.tsx (compact gear icon + full toggle modes)
+- Updated CustomerStatusTracker.tsx (notification preferences, login link)
+- Updated App.tsx (/customer/login, /customer/dashboard routes)
+- 3 tasks, 3 commits, 1 deviation (HashRouter Link fix)
 
-### Phase 4 Plan 03 Status
+### Phase 4 Plan 04 Status
 | Task | Name | Commit | Status |
 |------|------|--------|--------|
-| 1 | Update types, services, and phone utility | 994fcbf | COMPLETE |
-| 2 | Add notify checkbox and notification history to admin UI | 17692c6 | COMPLETE |
+| 1 | Create CustomerLogin page and NotificationPreferences component | a82454b | COMPLETE |
+| 2 | Create CustomerDashboard page | f790807 | COMPLETE |
+| 3 | Update CustomerStatusTracker and App.tsx routes | d5bb223 | COMPLETE |
+| 4 | Human verification checkpoint | - | PENDING |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -309,7 +350,7 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Execute Phase 4 Plan 04: Admin Notification UI & Preferences (preference toggle, notification dashboard)
+1. Complete human verification checkpoint for Phase 4 Plan 04 (Task 4)
 2. Circle back to Phase 3 verification when DB migration is applied
 3. Phase 5: Registration Checker
 
@@ -318,7 +359,7 @@ Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
 3. `.planning/phases/04-customer-portal-notifications-login/04-CONTEXT.md` - phase context
-4. `.planning/phases/04-customer-portal-notifications-login/04-03-SUMMARY.md` - just completed
+4. `.planning/phases/04-customer-portal-notifications-login/04-04-SUMMARY.md` - just completed
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
