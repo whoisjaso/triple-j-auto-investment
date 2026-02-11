@@ -19,8 +19,8 @@ Requirements for current milestone. Each maps to roadmap phases.
 - [ ] **PORT-02**: Customer access via unique link (texted/emailed after sale)
 - [ ] **PORT-03**: Admin dashboard controls to update customer registration status
 - [ ] **PORT-04**: Animated progress visualization (Golden Crest logo, car animation)
-- [ ] **PORT-05**: Customer login option for returning customers
-- [ ] **PORT-06**: SMS/Email notifications when status changes
+- [x] **PORT-05**: Customer login option for returning customers
+- [x] **PORT-06**: SMS/Email notifications when status changes
 - [ ] **PORT-07**: Stage descriptions explaining what's happening at each stage
 
 ### Registration Checker
@@ -106,8 +106,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PORT-02 | Phase 3 | Pending |
 | PORT-03 | Phase 2 | Pending |
 | PORT-04 | Phase 3 | Pending |
-| PORT-05 | Phase 4 | Pending |
-| PORT-06 | Phase 4 | Pending |
+| PORT-05 | Phase 4 | Complete |
+| PORT-06 | Phase 4 | Complete |
 | PORT-07 | Phase 3 | Pending |
 | REGC-01 | Phase 5 | Pending |
 | REGC-02 | Phase 5 | Pending |
@@ -134,10 +134,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1 requirements: 26 total
 - Mapped to phases: 26 (100%)
-- Complete: 3 (STAB-01, STAB-02, STAB-03)
-- Pending: 22
+- Complete: 5 (STAB-01, STAB-02, STAB-03, PORT-05, PORT-06)
+- Pending: 20
 - Blocked: 1 (RENT-05 - needs Spireon API)
 
 ---
 *Requirements defined: 2025-01-29*
-*Last updated: 2026-02-03 after Phase 1 completion*
+*Last updated: 2026-02-10 after Phase 4 completion*

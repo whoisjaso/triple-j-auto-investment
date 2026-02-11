@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-10
-**Session:** Phase 4 Plan 04 complete (Customer Login, Dashboard & Notification Preferences) - awaiting human verification
+**Last Updated:** 2026-02-11
+**Session:** Phase 4 complete — verified ✓, transitioning to Phase 5
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 4 (Customer Portal - Notifications & Login) - All 4 plans code-complete, awaiting human verification checkpoint on Plan 04. Phase 5 next.
+**Current Focus:** Phase 5 (Registration Checker) — Phase 4 verified, Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,10 +22,9 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 4 of 9 (Customer Portal - Notifications & Login)
-**Plan:** 4 of 4 complete (code) - awaiting human verification
-**Status:** Phase 4 code complete - human verification checkpoint pending
-**Last activity:** 2026-02-10 - Completed 04-04-PLAN.md (auto tasks)
+**Phase:** 4→5 transition (Registration Checker next)
+**Plan:** 4/4 complete — Phase 4 verified ✓
+**Status:** Phase 4 complete, moving to Phase 5.
 
 **Progress:**
 ```
@@ -45,7 +44,7 @@ Phase 3:    [=============       ] 67% (2/3 plans complete) - CODE COMPLETE (ver
   Plan 01:  [X] Token Access Infrastructure (access_token, expiry trigger, service functions)
   Plan 02:  [X] Tracking Visualization Components (ProgressArc, ProgressRoad, VehicleIcon, etc.)
   Plan 03:  [ ] Route Integration & Polish (code complete, verification deferred)
-Phase 4:    [====================] 100% (4/4 plans complete) - CODE COMPLETE (verification pending)
+Phase 4:    [====================] 100% (4/4 plans complete) - COMPLETE ✓
   Plan 01:  [X] Notification Database Infrastructure (queue, debounce, preferences, RLS, pg_cron)
   Plan 02:  [X] Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe)
   Plan 03:  [X] TypeScript Types, Services & Admin UI (notificationPref, notifyCustomer, history modal)
@@ -62,8 +61,8 @@ Overall:    [███████████████░░░░░] 75% (
 **Requirements Coverage:**
 - Total v1: 26
 - Mapped: 26 (100%)
-- Completed: 0 (feature work visible to users begins Phase 3 Plan 03)
-- Remaining: 26
+- Completed: 5 (STAB-01, STAB-02, STAB-03, PORT-05, PORT-06)
+- Remaining: 20 (+ 1 blocked)
 
 ---
 
@@ -72,9 +71,9 @@ Overall:    [███████████████░░░░░] 75% (
 | Metric | Value | Notes |
 |--------|-------|-------|
 | Phases Planned | 9 | 1 blocked (Phase 9) |
-| Phases Complete | 2 | Phase 1 + Phase 2 |
+| Phases Complete | 4 | Phase 1 + Phase 2 + Phase 4 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 15 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04 complete |
+| Plans Executed | 15 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -129,6 +128,8 @@ Overall:    [███████████████░░░░░] 75% (
 | Use Link component for HashRouter navigation | Raw `<a>` tags don't work with HashRouter; React Router Link required | 2026-02-10 | 04-04 |
 | Inline snake_case mapping in CustomerDashboard | transformRegistration not exported; only map the display fields needed | 2026-02-10 | 04-04 |
 | Customer auth redirects to /customer/login | Separate from admin /login; prevents confusion between auth paths | 2026-02-10 | 04-04 |
+| Deploy to Vercel over Dokploy/Hetzner | Simpler for static Vite/React; vercel.json already configured | 2026-02-11 | User decision |
+| Credentials configured last | Build all code first, wire up Twilio/Resend/Supabase auth at the end | 2026-02-11 | User decision |
 
 ### Patterns Established
 
@@ -263,29 +264,9 @@ App.tsx (UPDATED in 04-04):
 
 supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
-    - 6-stage workflow: sale_complete -> documents_collected ->
-      submitted_to_dmv -> dmv_processing -> sticker_ready ->
-      sticker_delivered (+ rejected branch)
-    - registration_audit table with change tracking
-    - validate_status_transition() trigger
-    - auto_set_milestone_dates() trigger
-    - is_registration_admin RLS policies
   03_customer_portal_access.sql (110 lines)
-    - access_token column (32-char hex, auto-generated)
-    - token_expires_at column (30 days after delivery)
-    - vehicle_body_type column (for car icon)
-    - set_token_expiry_on_delivery() trigger
-    - Updated RLS: public SELECT requires valid token
   04_notification_system.sql (244 lines) [NEW in 04-01]
-    - notification_queue table with partial unique index for debounce
-    - 5 new columns on registration_notifications (audit enrichment)
-    - notification_pref column on registrations (sms/email/both/none)
-    - pending_notify_customer flag on registrations (admin opt-out)
-    - queue_status_notification() BEFORE UPDATE trigger with upsert debounce
-    - Phone-authenticated customer RLS policy (auth.jwt()->>'phone')
-    - pg_cron schedule: process-notification-queue every minute via pg_net
   README.md
-    - Migration order, breaking changes, rollback for all migrations
 
 supabase/functions/ (NEW in 04-02):
   _shared/
@@ -321,6 +302,7 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Configure Twilio secrets as Edge Function env vars (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER)
 - [ ] Configure Resend API key as Edge Function secret (RESEND_API_KEY)
 - [ ] Deploy Edge Functions: `supabase functions deploy process-notification-queue` and `supabase functions deploy unsubscribe`
+- [ ] Deploy to Vercel (connect GitHub repo, set root dir to triple-j-auto-investment-main)
 - [ ] Check Supabase plan limits for document storage (Phase 5, 8)
 
 ---
@@ -328,21 +310,22 @@ supabase/functions/ (NEW in 04-02):
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed Phase 4 Plan 04: Customer Login, Dashboard & Notification Preferences
-- Created CustomerLogin.tsx (phone OTP two-step flow with Supabase auth)
-- Created CustomerDashboard.tsx (auth-guarded multi-registration dashboard)
-- Created NotificationPreferences.tsx (compact gear icon + full toggle modes)
-- Updated CustomerStatusTracker.tsx (notification preferences, login link)
-- Updated App.tsx (/customer/login, /customer/dashboard routes)
-- 3 tasks, 3 commits, 1 deviation (HashRouter Link fix)
+- Executed all 4 Phase 4 plans across 3 waves
+- Wave 1 (parallel): 04-01 DB migration + 04-02 Edge Functions
+- Wave 2: 04-03 Types, services, admin UI
+- Wave 3: 04-04 Customer login, dashboard, preferences (checkpoint approved)
+- Phase 4 verified: 5/5 must-haves passed, zero anti-patterns
+- Updated ROADMAP.md, REQUIREMENTS.md (PORT-05, PORT-06 → Complete)
+- User decision: Deploy to Vercel instead of Dokploy/Hetzner
+- User decision: Wire up credentials at the end, after all code is built
 
-### Phase 4 Plan 04 Status
-| Task | Name | Commit | Status |
-|------|------|--------|--------|
-| 1 | Create CustomerLogin page and NotificationPreferences component | a82454b | COMPLETE |
-| 2 | Create CustomerDashboard page | f790807 | COMPLETE |
-| 3 | Update CustomerStatusTracker and App.tsx routes | d5bb223 | COMPLETE |
-| 4 | Human verification checkpoint | - | PENDING |
+### Phase 4 Final Status (COMPLETE ✓)
+| Plan | Focus | Commits | Status |
+|------|-------|---------|--------|
+| 04-01 | Notification DB | 66f8b3d, 37ec5d2, c5575bf | COMPLETE |
+| 04-02 | Edge Functions | cdb8206, beadbcc, baa933c, 24f4cf2 | COMPLETE |
+| 04-03 | Types, Services, Admin UI | 994fcbf, 17692c6, 33b8cc9 | COMPLETE |
+| 04-04 | Customer Login & Dashboard | a82454b, f790807, d5bb223, 83a48bb | COMPLETE |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -350,18 +333,18 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Complete human verification checkpoint for Phase 4 Plan 04 (Task 4)
+1. Phase 5: Registration Checker (document validation for DMV submissions)
 2. Circle back to Phase 3 verification when DB migration is applied
-3. Phase 5: Registration Checker
+3. Wire up all credentials after feature code is complete
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/04-customer-portal-notifications-login/04-CONTEXT.md` - phase context
-4. `.planning/phases/04-customer-portal-notifications-login/04-04-SUMMARY.md` - just completed
+3. `.planning/phases/04-customer-portal-notifications-login/04-VERIFICATION.md` - phase verification report
+4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-10*
+*State updated: 2026-02-11*

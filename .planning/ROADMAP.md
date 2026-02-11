@@ -115,10 +115,10 @@ Plans:
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 04-01-PLAN.md -- Database migration (notification queue, preferences, debounce trigger, phone-auth RLS)
-- [ ] 04-02-PLAN.md -- Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe handler)
-- [ ] 04-03-PLAN.md -- Types, services, phone utility, admin notify checkbox + notification history
-- [ ] 04-04-PLAN.md -- Customer login (phone OTP), dashboard, notification preferences UI
+- [x] 04-01-PLAN.md -- Database migration (notification queue, preferences, debounce trigger, phone-auth RLS)
+- [x] 04-02-PLAN.md -- Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe handler)
+- [x] 04-03-PLAN.md -- Types, services, phone utility, admin notify checkbox + notification history
+- [x] 04-04-PLAN.md -- Customer login (phone OTP), dashboard, notification preferences UI
 
 ---
 
@@ -240,7 +240,7 @@ Plans:
 | 1 - Reliability & Stability | Complete | 3 | 100% (6 plans) |
 | 2 - Registration Database Foundation | Complete | 1 | 100% (3 plans) |
 | 3 - Customer Portal - Status Tracker | Planned | 4 | 0% (3 plans ready) |
-| 4 - Customer Portal - Notifications & Login | Planned | 2 | 0% (4 plans ready) |
+| 4 - Customer Portal - Notifications & Login | Complete | 2 | 100% (4 plans) |
 | 5 - Registration Checker | Pending | 6 | 0% |
 | 6 - Rental Management Core | Pending | 5 | 0% |
 | 7 - Plate Tracking | Pending | 5 | 0% |
@@ -300,4 +300,4 @@ Phase 1: Reliability & Stability
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-10*
+*Last updated: 2026-02-11*
