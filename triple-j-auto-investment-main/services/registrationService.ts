@@ -14,6 +14,7 @@ import {
   RegistrationStageKey,
   RegistrationDocument,
   RegistrationAudit,
+  CheckerResult,
   REGISTRATION_STAGES,
   VALID_TRANSITIONS
 } from '../types';
@@ -39,6 +40,7 @@ const transformRegistration = (data: any): Registration => ({
   vehicleYear: data.vehicle_year,
   vehicleMake: data.vehicle_make,
   vehicleModel: data.vehicle_model,
+  mileage: data.mileage ?? null,
   plateNumber: data.plate_number,
   // Token-based access
   accessToken: data.access_token,
@@ -63,6 +65,11 @@ const transformRegistration = (data: any): Registration => ({
   rejectionNotes: data.rejection_notes,
   // Notification preference
   notificationPref: data.notification_pref ?? 'both',
+  // Checker state
+  checkerResults: data.checker_results ?? null,
+  checkerCompletedAt: data.checker_completed_at,
+  checkerOverride: data.checker_override ?? false,
+  checkerOverrideAt: data.checker_override_at,
   // Metadata
   isArchived: data.is_archived ?? false,
   purchaseDate: data.purchase_date,
@@ -281,6 +288,7 @@ export async function createRegistration(input: {
   vehicleMake: string;
   vehicleModel: string;
   plateNumber?: string;
+  mileage?: number;
   purchaseDate?: string;
 }): Promise<Registration | null> {
   try {
@@ -312,6 +320,7 @@ export async function createRegistration(input: {
         vehicle_make: input.vehicleMake,
         vehicle_model: input.vehicleModel,
         plate_number: input.plateNumber || null,
+        mileage: input.mileage || null,
         purchase_date: input.purchaseDate || now,
         current_stage: 'sale_complete',
         sale_date: now,
@@ -453,6 +462,113 @@ export async function updateDocumentChecklist(
     return !error;
   } catch (error) {
     console.error('Error updating document checklist:', error);
+    return false;
+  }
+}
+
+// ================================================================
+// CHECKER FUNCTIONS (Registration Checker - Phase 05)
+// ================================================================
+
+/**
+ * Save checker results for a registration.
+ * Persists the full CheckerResult JSONB and updates completion timestamp.
+ * Saving fresh results always clears any prior override.
+ */
+export async function saveCheckerResults(
+  registrationId: string,
+  results: CheckerResult,
+  allPassed: boolean
+): Promise<boolean> {
+  try {
+    const updateData: Record<string, unknown> = {
+      checker_results: results,
+      checker_completed_at: allPassed ? new Date().toISOString() : null,
+      checker_override: false,
+      checker_override_at: null,
+      pending_change_reason: 'Checker results updated',
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('registrations')
+      .update(updateData)
+      .eq('id', registrationId);
+
+    if (error) {
+      console.error('Error saving checker results:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error saving checker results:', error);
+    return false;
+  }
+}
+
+/**
+ * Save checker override for a registration.
+ * Marks that admin overrode failed checks to proceed anyway.
+ */
+export async function saveCheckerOverride(
+  registrationId: string
+): Promise<boolean> {
+  try {
+    const updateData: Record<string, unknown> = {
+      checker_override: true,
+      checker_override_at: new Date().toISOString(),
+      pending_change_reason: 'Checker override confirmed',
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('registrations')
+      .update(updateData)
+      .eq('id', registrationId);
+
+    if (error) {
+      console.error('Error saving checker override:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error saving checker override:', error);
+    return false;
+  }
+}
+
+/**
+ * Update mileage on a registration.
+ * Note: The DB trigger (trg_invalidate_checker) will automatically
+ * clear checker_results when mileage changes.
+ */
+export async function updateRegistrationMileage(
+  registrationId: string,
+  mileage: number,
+  changeReason?: string
+): Promise<boolean> {
+  try {
+    const updateData: Record<string, unknown> = {
+      mileage,
+      pending_change_reason: changeReason || 'Mileage updated',
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('registrations')
+      .update(updateData)
+      .eq('id', registrationId);
+
+    if (error) {
+      console.error('Error updating mileage:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error updating mileage:', error);
     return false;
   }
 }

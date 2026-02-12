@@ -142,6 +142,16 @@ export type RegistrationStageStatus = 'in_progress' | 'complete';
 
 export type RegistrationOwnership = 'dealer' | 'state';
 
+// Checker result shape persisted as JSONB in checker_results column
+export interface CheckerResult {
+  docComplete: boolean;        // All 5 documents marked as received
+  vinFormatValid: boolean;     // VIN passes format + check digit validation
+  vinConfirmedOnDocs: Record<string, boolean>; // Admin confirmed VIN matches each doc: { 'title_front': true, 'title_back': false, ... }
+  mileageConfirmedOnDocs: Record<string, boolean>; // Admin confirmed mileage matches each doc (only docs with mileage: '130u', 'inspection')
+  surrenderedFront: boolean;   // Admin confirmed SURRENDERED stamp on title front
+  surrenderedBack: boolean;    // Admin confirmed SURRENDERED stamp on title back
+}
+
 export interface Registration {
   id: string;
   orderId: string;
@@ -190,6 +200,15 @@ export interface Registration {
 
   // Notification preference
   notificationPref: 'sms' | 'email' | 'both' | 'none';
+
+  // Mileage (for checker cross-document validation)
+  mileage?: number;
+
+  // Checker state
+  checkerResults?: CheckerResult | null;
+  checkerCompletedAt?: string;
+  checkerOverride: boolean;
+  checkerOverrideAt?: string;
 
   // Metadata
   isArchived: boolean;
