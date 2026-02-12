@@ -144,6 +144,12 @@ Plans:
 5. Document order guide shows correct webDEALER submission sequence
 6. One-click link opens webDEALER login in new tab
 
+**Plans:** 2 plans in 2 waves
+
+Plans:
+- [ ] 05-01-PLAN.md -- DB migration (mileage + checker columns, invalidation trigger), VIN validator utility, types + service layer
+- [ ] 05-02-PLAN.md -- RegistrationChecker component (all 6 REGC requirements), integration into Registrations.tsx
+
 ---
 
 ### Phase 6: Rental Management Core
@@ -241,7 +247,7 @@ Plans:
 | 2 - Registration Database Foundation | Complete | 1 | 100% (3 plans) |
 | 3 - Customer Portal - Status Tracker | Planned | 4 | 0% (3 plans ready) |
 | 4 - Customer Portal - Notifications & Login | Complete | 2 | 100% (4 plans) |
-| 5 - Registration Checker | Pending | 6 | 0% |
+| 5 - Registration Checker | Planned | 6 | 0% (2 plans ready) |
 | 6 - Rental Management Core | Pending | 5 | 0% |
 | 7 - Plate Tracking | Pending | 5 | 0% |
 | 8 - Rental Insurance Verification | Pending | 4 | 0% |
