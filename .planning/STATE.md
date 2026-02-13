@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-13
-**Session:** Phase 7 IN PROGRESS -- 07-01 and 07-02 complete (DB, types, service, admin page)
+**Session:** Phase 7 COMPLETE -- All 4 plans done (DB, admin page, rental integration, alert Edge Function)
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 7 (Plate Tracking) IN PROGRESS -- 07-01 and 07-02 complete (DB, types, service, admin page). Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 7 (Plate Tracking) COMPLETE -- All 4 plans done. Phase 3 code-complete (verification deferred). Next: Phase 8 (Rental Insurance Verification).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -28,10 +28,10 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 7 of 9 (Plate Tracking) -- IN PROGRESS
-**Plan:** 2/4 complete
-**Status:** In progress
-**Last activity:** 2026-02-13 -- Completed 07-02-PLAN.md (Plates Admin Page)
+**Phase:** 7 of 9 (Plate Tracking) -- COMPLETE
+**Plan:** 4/4 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-13 -- Completed 07-04-PLAN.md (Alert Edge Function & pg_cron)
 
 **Progress:**
 ```
@@ -66,15 +66,15 @@ Phase 6:    [====================] 100% (6/6 plans complete) - COMPLETE
   Plan 04:  [X] Booking Modal & Condition Report (RentalBookingModal.tsx, RentalConditionReport.tsx)
   Plan 05:  [X] Rental Agreement System (SignatureCapture, RentalAgreementModal, PDF generator)
   Plan 06:  [X] Payment Tracking & Dashboard (BookingDetail, payments, late fees, modal wiring)
-Phase 7:    [==========          ] 50% (2/4 plans complete) - IN PROGRESS
+Phase 7:    [====================] 100% (4/4 plans complete) - COMPLETE
   Plan 01:  [X] Database, Types & Service Layer (07_plate_tracking.sql, plateService.ts, types.ts)
   Plan 02:  [X] Plates Admin Page (Plates.tsx 1099 lines, PlateAssignmentHistory.tsx, route/nav integration)
-  Plan 03:  [ ] Rental Integration (plate selection in booking, return confirmation)
-  Plan 04:  [ ] Alert Edge Function & Nav Integration
+  Plan 03:  [X] Rental Integration (plate selection in booking, return confirmation, Plates tab)
+  Plan 04:  [X] Alert Edge Function & pg_cron (check-plate-alerts Edge Function, plate-alert.tsx email template)
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [████████████████████] 89% (25/28 plans complete)
+Overall:    [█████████████████████████] 96% (27/28 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -89,10 +89,10 @@ Overall:    [████████████████████] 89% (
 
 | Metric | Value | Notes |
 |--------|-------|-------|
-| Phases Planned | 9 | 1 blocked (Phase 9), Phase 7 in progress |
-| Phases Complete | 6 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 (Phase 3 code-complete, verification deferred) |
+| Phases Planned | 9 | 1 blocked (Phase 9), Phase 7 complete |
+| Phases Complete | 7 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 + Phase 7 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 25 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01, 07-02 |
+| Plans Executed | 27 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 through 07-04 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -188,6 +188,16 @@ Overall:    [████████████████████] 89% (
 | Accordion single-expand for plate history | Same expandedHistoryId state across both panels; follows BookingDetail pattern | 2026-02-13 | 07-02 |
 | CreditCard icon for Plates nav | Distinct from LayoutDashboard, Car, ClipboardCheck, Key icons | 2026-02-13 | 07-02 |
 | Abbreviated type badges in inventory | DLR/Tag/PMT instead of full labels to save horizontal space | 2026-02-13 | 07-02 |
+| Plate selection inline in vehicle section | Per plan guidance: do NOT change SectionKey type or SECTIONS array | 2026-02-13 | 07-03 |
+| Plate required for new bookings only | Plates assigned at creation time; editing should not re-assign | 2026-02-13 | 07-03 |
+| Graceful degradation on plate assignment | Booking succeeds even if plate assignment fails; admin warned | 2026-02-13 | 07-03 |
+| platesOut prop from parent | Fetched once by Rentals component, avoids duplicate fetches per BookingDetail | 2026-02-13 | 07-03 |
+| Plate return default checked | Per CONTEXT.md: admin unchecks only if plate wasn't physically returned | 2026-02-13 | 07-03 |
+| Batched not per-plate notification | Admin gets ONE SMS + email summary per cron run, not per-plate spam | 2026-02-13 | 07-04 |
+| Severity escalation for overdue rentals | 1-2 days = warning, 3+ days = urgent; short delays are common | 2026-02-13 | 07-04 |
+| Inventory assignment excluded from unaccounted | assignment_type='inventory' is intentional; not a missing plate | 2026-02-13 | 07-04 |
+| Upsert with ignoreDuplicates for alerts | Existing active alerts preserved; only new conditions create rows | 2026-02-13 | 07-04 |
+| pg_cron commented out for plate alerts | Same Phase 4 approach; requires manual config before activation | 2026-02-13 | 07-04 |
 
 ### Patterns Established
 
@@ -260,6 +270,12 @@ Overall:    [████████████████████] 89% (
 - **Split-view dashboard pattern:** lg:grid-cols-5 with 3/5 urgent panel and 2/5 reference panel; stacks on mobile
 - **Plate CRUD inline form pattern:** PlateForm component for both add/edit, rendered inside inventory panel
 - **Cross-page nav update pattern:** Add navItem entry + icon import to each admin page's AdminHeader independently
+- **Plate selection in booking pattern:** Inline subsection in vehicle section, auto-fetch on vehicle select, auto-select if single plate
+- **Plate return confirmation pattern:** Default-checked checkbox in return flow, graceful degradation if plate return fails
+- **Plates-out summary tab pattern:** Fourth tab in Rentals page with overdue-first sorting and link to dedicated page
+- **Plate alert Edge Function pattern:** Cron-triggered detection of 3 alert types, dedup via plate_alerts upsert, 24h cooldown
+- **Alert auto-resolve pattern:** Compare active alerts against detected conditions via Set, resolve cleared ones
+- **Batched admin notification pattern:** Collect all alerts, send ONE SMS + ONE email with summary
 
 ### Architecture Summary (Current)
 
@@ -413,17 +429,29 @@ services/plateService.ts (679 lines):
   - Photo: uploadPlatePhoto
   - Pure: calculateTagExpiry
 
+pages/admin/Rentals.tsx (UPDATED in 07-03):
+  - Extended with Plates summary tab (4 tabs: Calendar/Active/Fleet/Plates)
+  - BookingDetail plate return confirmation checkbox
+  - platesOut state management in parent component
+
+components/admin/RentalBookingModal.tsx (UPDATED in 07-03):
+  - Plate selection grid in vehicle section
+  - Auto-fetch available plates on vehicle select
+  - assignPlateToBooking call with graceful degradation
+
 supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
   03_customer_portal_access.sql (110 lines)
   04_notification_system.sql (244 lines)
   05_registration_checker.sql - 5 columns + invalidation trigger
   06_rental_schema.sql (568 lines) - btree_gist, 4 tables, EXCLUDE constraint, RLS
-  07_plate_tracking.sql (390 lines) - 3 tables, partial unique indexes, status trigger, RLS
+  07_plate_tracking.sql (442 lines) - 3 tables, partial unique indexes, status trigger, RLS, pg_cron
 
 supabase/functions/:
   _shared/ (twilio.ts, resend.ts, email-templates/)
+  _shared/email-templates/plate-alert.tsx (297 lines) - batched plate alert email/SMS templates
   process-notification-queue/index.ts
+  check-plate-alerts/index.ts (490 lines) - cron-triggered alert detection + notification
   unsubscribe/index.ts
 ```
 
@@ -449,7 +477,9 @@ supabase/functions/:
 - [ ] Contact Spireon for LoJack API credentials (unblocks Phase 9)
 - [ ] Configure Twilio secrets as Edge Function env vars (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER)
 - [ ] Configure Resend API key as Edge Function secret (RESEND_API_KEY)
-- [ ] Deploy Edge Functions: `supabase functions deploy process-notification-queue` and `supabase functions deploy unsubscribe`
+- [ ] Deploy Edge Functions: `supabase functions deploy process-notification-queue`, `supabase functions deploy unsubscribe`, and `supabase functions deploy check-plate-alerts`
+- [ ] Add Edge Function secrets for check-plate-alerts: ADMIN_PHONE, ADMIN_EMAIL
+- [ ] Uncomment and run pg_cron schedule for check-plate-alerts in Supabase SQL editor
 - [ ] Deploy to Vercel (connect GitHub repo, set root dir to triple-j-auto-investment-main)
 - [ ] Create Supabase Storage bucket 'rental-agreements' for agreement PDF uploads
 - [ ] Create Supabase Storage bucket 'rental-photos' for condition report photos
@@ -462,20 +492,22 @@ supabase/functions/:
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed 07-02: Plates admin page with split-view dashboard and cross-page navigation
-- Created Plates.tsx (1099 lines): split-view dashboard, stats bar, plate CRUD, mark-returned, overdue sorting
-- Created PlateAssignmentHistory.tsx (202 lines): vertical timeline for plate assignment history
-- Updated App.tsx: lazy import AdminPlates, /admin/plates route with ProtectedRoute
-- Updated Dashboard.tsx, Inventory.tsx, Rentals.tsx: added Plates navItem with CreditCard icon
-- Build passes with Plates chunk at 28.28 kB
+- Completed Phase 7 (Plate Tracking) -- all 4 plans executed
+- Executed 07-04: Alert Edge Function & pg_cron schedule
+- Created check-plate-alerts/index.ts (490 lines): cron-triggered detection of overdue rentals, expiring buyer's tags, unaccounted plates
+- Created plate-alert.tsx (297 lines): branded HTML email template + concise SMS builder
+- Updated 07_plate_tracking.sql (442 lines): appended pg_cron schedule (section 12, commented out)
+- Alert deduplication via plate_alerts upsert + 24h notification cooldown
+- Auto-resolve clears conditions that no longer exist
+- Batched notification: 1 SMS + 1 email per cron run
 
-### Phase 7 Status (IN PROGRESS)
+### Phase 7 Status (COMPLETE)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
 | 07-01 | Database, Types & Service Layer | 506c6ea, 69163ee | COMPLETE |
 | 07-02 | Plates Admin Page | 832940c, da78f08 | COMPLETE |
-| 07-03 | Rental Integration | -- | NOT STARTED |
-| 07-04 | Alert Edge Function & Nav | -- | NOT STARTED |
+| 07-03 | Rental Integration | 86d13f0, 9406470 | COMPLETE |
+| 07-04 | Alert Edge Function & pg_cron | ec39a02, 7cdbd51 | COMPLETE |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -483,19 +515,19 @@ supabase/functions/:
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 7 Plans 03-04: Rental integration, alert Edge Function
-2. Phase 8: Rental Insurance Verification
-3. Circle back to Phase 3 verification when DB migration is applied
-4. Wire up all credentials after feature code is complete
+1. Phase 8: Rental Insurance Verification
+2. Circle back to Phase 3 verification when DB migration is applied
+3. Wire up all credentials after feature code is complete
+4. Phase 9 blocked (Spireon API access needed)
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/07-plate-tracking/07-02-SUMMARY.md` - latest plan summary
+3. `.planning/phases/07-plate-tracking/07-04-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-13 (Phase 7 IN PROGRESS - 07-01 and 07-02 done)*
+*State updated: 2026-02-13 (Phase 7 COMPLETE - all 4 plans done)*
