@@ -80,8 +80,8 @@ Overall:    [██████████████████████�
 **Requirements Coverage:**
 - Total v1: 26
 - Mapped: 26 (100%)
-- Completed: 11 (STAB-01, STAB-02, STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06)
-- Remaining: 14 (+ 1 blocked)
+- Completed: 21 (STAB-01 through STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06, RENT-01 through RENT-04, RENT-06, PLAT-01 through PLAT-05)
+- Remaining: 4 (PORT-01 through PORT-04, PORT-07, RINS-01 through RINS-04) + 1 blocked (RENT-05)
 
 ---
 

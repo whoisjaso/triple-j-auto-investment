@@ -208,10 +208,10 @@ Plans:
 **Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 07-01-PLAN.md -- DB migration (plates, plate_assignments, plate_alerts tables, triggers, RLS), TypeScript types, plateService.ts
-- [ ] 07-02-PLAN.md -- Plates admin page (split-view dashboard), PlateAssignmentHistory, routing, nav updates
-- [ ] 07-03-PLAN.md -- Rental integration (plate selection in booking, return confirmation, Plates tab in Rentals)
-- [ ] 07-04-PLAN.md -- Alert Edge Function (check-plate-alerts), email template, pg_cron schedule
+- [x] 07-01-PLAN.md -- DB migration (plates, plate_assignments, plate_alerts tables, triggers, RLS), TypeScript types, plateService.ts
+- [x] 07-02-PLAN.md -- Plates admin page (split-view dashboard), PlateAssignmentHistory, routing, nav updates
+- [x] 07-03-PLAN.md -- Rental integration (plate selection in booking, return confirmation, Plates tab in Rentals)
+- [x] 07-04-PLAN.md -- Alert Edge Function (check-plate-alerts), email template, pg_cron schedule
 
 ---
 

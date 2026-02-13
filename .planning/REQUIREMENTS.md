@@ -34,20 +34,20 @@ Requirements for current milestone. Each maps to roadmap phases.
 
 ### Rental Management
 
-- [ ] **RENT-01**: Dual inventory model (vehicles marked as: sale-only, rental-only, or both)
-- [ ] **RENT-02**: Availability calendar showing which vehicles are available when
-- [ ] **RENT-03**: Auto-populated rental agreements (like Bill of Sale flow)
-- [ ] **RENT-04**: Customer rental tracking (who has what car, return dates, rental history)
+- [x] **RENT-01**: Dual inventory model (vehicles marked as: sale-only, rental-only, or both)
+- [x] **RENT-02**: Availability calendar showing which vehicles are available when
+- [x] **RENT-03**: Auto-populated rental agreements (like Bill of Sale flow)
+- [x] **RENT-04**: Customer rental tracking (who has what car, return dates, rental history)
 - [ ] **RENT-05**: LoJack GPS integration showing vehicle location (requires Spireon API access)
-- [ ] **RENT-06**: Deposits and payments tracking
+- [x] **RENT-06**: Deposits and payments tracking
 
 ### Plate Tracking
 
-- [ ] **PLAT-01**: Plates as first-class entity with assignment history
-- [ ] **PLAT-02**: Plate -> Vehicle assignment tracking
-- [ ] **PLAT-03**: Plate -> Rental Customer tracking (who has plate, return date)
-- [ ] **PLAT-04**: Dashboard view of all plates currently "out" with customers
-- [ ] **PLAT-05**: Alerts for unaccounted plates and overdue rentals
+- [x] **PLAT-01**: Plates as first-class entity with assignment history
+- [x] **PLAT-02**: Plate -> Vehicle assignment tracking
+- [x] **PLAT-03**: Plate -> Rental Customer tracking (who has plate, return date)
+- [x] **PLAT-04**: Dashboard view of all plates currently "out" with customers
+- [x] **PLAT-05**: Alerts for unaccounted plates and overdue rentals
 
 ### Rental Insurance Verification
 
@@ -115,17 +115,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | REGC-04 | Phase 5 | Complete |
 | REGC-05 | Phase 5 | Complete |
 | REGC-06 | Phase 5 | Complete |
-| RENT-01 | Phase 6 | Pending |
-| RENT-02 | Phase 6 | Pending |
-| RENT-03 | Phase 6 | Pending |
-| RENT-04 | Phase 6 | Pending |
+| RENT-01 | Phase 6 | Complete |
+| RENT-02 | Phase 6 | Complete |
+| RENT-03 | Phase 6 | Complete |
+| RENT-04 | Phase 6 | Complete |
 | RENT-05 | Phase 9 | Blocked |
-| RENT-06 | Phase 6 | Pending |
-| PLAT-01 | Phase 7 | Pending |
-| PLAT-02 | Phase 7 | Pending |
-| PLAT-03 | Phase 7 | Pending |
-| PLAT-04 | Phase 7 | Pending |
-| PLAT-05 | Phase 7 | Pending |
+| RENT-06 | Phase 6 | Complete |
+| PLAT-01 | Phase 7 | Complete |
+| PLAT-02 | Phase 7 | Complete |
+| PLAT-03 | Phase 7 | Complete |
+| PLAT-04 | Phase 7 | Complete |
+| PLAT-05 | Phase 7 | Complete |
 | RINS-01 | Phase 8 | Pending |
 | RINS-02 | Phase 8 | Pending |
 | RINS-03 | Phase 8 | Pending |
@@ -134,8 +134,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1 requirements: 26 total
 - Mapped to phases: 26 (100%)
-- Complete: 11 (STAB-01, STAB-02, STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06)
-- Pending: 14
+- Complete: 21 (STAB-01 through STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06, RENT-01 through RENT-04, RENT-06, PLAT-01 through PLAT-05)
+- Pending: 4 (PORT-01 through PORT-04, PORT-07, RINS-01 through RINS-04)
 - Blocked: 1 (RENT-05 - needs Spireon API)
 
 ---
