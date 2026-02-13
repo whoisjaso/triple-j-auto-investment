@@ -511,3 +511,76 @@ export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
   zelle: 'Zelle',
   cashapp: 'CashApp',
 };
+
+// ================================================================
+// PLATE TRACKING TYPES (Phase 07)
+// ================================================================
+
+export type PlateType = 'dealer' | 'buyer_tag' | 'permanent';
+
+export type PlateStatus = 'available' | 'assigned' | 'expired' | 'lost';
+
+export type PlateAssignmentType = 'rental' | 'sale' | 'inventory';
+
+export type PlateAlertType = 'overdue_rental' | 'expiring_buyer_tag' | 'unaccounted';
+
+export type PlateAlertSeverity = 'warning' | 'urgent';
+
+export interface Plate {
+  id: string;
+  plateNumber: string;
+  plateType: PlateType;
+  status: PlateStatus;
+  expirationDate?: string;
+  photoUrl?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Derived from active assignment join (optional)
+  currentAssignment?: PlateAssignment;
+}
+
+export interface PlateAssignment {
+  id: string;
+  plateId: string;
+  vehicleId?: string;
+  bookingId?: string;
+  registrationId?: string;
+  customerName?: string;
+  customerPhone?: string;
+  assignmentType: PlateAssignmentType;
+  assignedAt: string;
+  expectedReturnDate?: string;
+  returnedAt?: string;
+  returnConfirmed: boolean;
+  notes?: string;
+  createdAt: string;
+  // Optional joins
+  plate?: Plate;
+  vehicle?: Vehicle;
+}
+
+export interface PlateAlert {
+  id: string;
+  plateId: string;
+  alertType: PlateAlertType;
+  severity: PlateAlertSeverity;
+  firstDetectedAt: string;
+  lastNotifiedAt?: string;
+  resolvedAt?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export const PLATE_TYPE_LABELS: Record<PlateType, string> = {
+  dealer: 'Dealer Plate',
+  buyer_tag: "Buyer's Tag",
+  permanent: 'Permanent Plate',
+};
+
+export const PLATE_STATUS_LABELS: Record<PlateStatus, string> = {
+  available: 'Available',
+  assigned: 'Assigned',
+  expired: 'Expired',
+  lost: 'Lost',
+};
