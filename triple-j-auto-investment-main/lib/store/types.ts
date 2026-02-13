@@ -1,5 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
-import { Vehicle, VehicleStatus } from '../../types';
+import { Vehicle, VehicleStatus, RentalBooking } from '../../types';
 
 // State shape for vehicle data
 export interface VehicleState {
@@ -15,6 +15,18 @@ export interface VehicleSetters {
   setConnectionError: Dispatch<SetStateAction<string | null>>;
 }
 
+// State shape for rental data
+export interface RentalState {
+  bookings: RentalBooking[];
+  isLoadingRentals: boolean;
+}
+
+// Setters passed to rental operations
+export interface RentalSetters {
+  setBookings: Dispatch<SetStateAction<RentalBooking[]>>;
+  setIsLoadingRentals: Dispatch<SetStateAction<boolean>>;
+}
+
 // Re-export for convenience
-export type { Vehicle };
+export type { Vehicle, RentalBooking };
 export { VehicleStatus };

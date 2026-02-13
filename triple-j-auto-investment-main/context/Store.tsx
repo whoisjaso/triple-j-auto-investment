@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
-import { Vehicle, VehicleStatus, Lead, User } from '../types';
+import { Vehicle, VehicleStatus, Lead, User, RentalBooking } from '../types';
 import { supabase } from '../supabase/config';
 import { authService } from '../lib/auth';
 
@@ -19,16 +19,19 @@ import {
   loadLeads as loadLeadsModule,
   addLead as addLeadModule
 } from '../lib/store/leads';
+import { loadBookings as loadBookingsModule } from '../lib/store/rentals';
 
-// UNCHANGED: Context type interface (identical to original lines 11-29)
+// Context type interface (extended with rental state in 06-02)
 interface StoreContextType {
   vehicles: Vehicle[];
   leads: Lead[];
+  bookings: RentalBooking[];
   user: User | null;
   lastSync: Date | null;
   isLoading: boolean;
   connectionError: string | null;
   refreshVehicles: () => Promise<void>;
+  refreshBookings: () => Promise<void>;
   login: (email: string, password?: string) => Promise<boolean>;
   triggerRecovery: () => void;
   logout: () => Promise<void>;
@@ -44,12 +47,14 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  // State declarations (same as before)
+  // State declarations
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [bookings, setBookings] = useState<RentalBooking[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [lastSync, setLastSync] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingRentals, setIsLoadingRentals] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
 
   const isSyncingRef = useRef(false);
@@ -69,6 +74,10 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   const loadLeads = async () => {
     await loadLeadsModule(setLeads);
+  };
+
+  const refreshBookings = async () => {
+    await loadBookingsModule({ setBookings, setIsLoadingRentals });
   };
 
   // --- SUPABASE INITIALIZATION ---
@@ -123,6 +132,7 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       // Priority 1: Instant Load from DB
       await loadVehicles();
       await loadLeads();
+      await refreshBookings();
 
       // Priority 2: Background Sync (Fire & Forget) - DISABLED to prevent overwriting Supabase data
       // Only sync from Google Sheets if Supabase is empty (manual sync available in admin)
@@ -247,16 +257,18 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   };
 
-  // UNCHANGED: Provider value (identical shape to original)
+  // Provider value (extended with rental state in 06-02)
   return (
     <StoreContext.Provider value={{
       vehicles,
       leads,
+      bookings,
       user,
       lastSync,
       isLoading,
       connectionError,
       refreshVehicles: loadVehicles,
+      refreshBookings,
       login,
       triggerRecovery,
       logout,

@@ -5,3 +5,4 @@ export * from './types';
 export * from './vehicles';
 export * from './sheets';
 export * from './leads';
+export { loadBookings } from './rentals';
