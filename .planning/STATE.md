@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-13
-**Session:** Phase 7 IN PROGRESS -- 07-01 (plate tracking DB, types & service layer) complete
+**Session:** Phase 7 IN PROGRESS -- 07-01 through 07-03 complete (DB, types, service, admin page, rental integration)
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 7 (Plate Tracking) IN PROGRESS -- 07-01 complete (DB, types, service). Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 7 (Plate Tracking) IN PROGRESS -- 07-01 and 07-02 complete (DB, types, service, admin page). Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -17,15 +17,21 @@
 - `.planning/ROADMAP.md` - 9 phases with success criteria
 - `.planning/research/SUMMARY.md` - Technical research
 
+**Git Remote:**
+- Repository: https://github.com/whoisjaso/triple-j-auto-investment
+- Branch: master
+- Username: whoisjaso
+- Email: jobawems@gmail.com
+
 ---
 
 ## Current Position
 
 **Milestone:** v1 Feature Development
 **Phase:** 7 of 9 (Plate Tracking) -- IN PROGRESS
-**Plan:** 1/4 complete
+**Plan:** 2/4 complete
 **Status:** In progress
-**Last activity:** 2026-02-13 -- Completed 07-01-PLAN.md (Database, Types & Service Layer)
+**Last activity:** 2026-02-13 -- Completed 07-02-PLAN.md (Plates Admin Page)
 
 **Progress:**
 ```
@@ -60,15 +66,15 @@ Phase 6:    [====================] 100% (6/6 plans complete) - COMPLETE
   Plan 04:  [X] Booking Modal & Condition Report (RentalBookingModal.tsx, RentalConditionReport.tsx)
   Plan 05:  [X] Rental Agreement System (SignatureCapture, RentalAgreementModal, PDF generator)
   Plan 06:  [X] Payment Tracking & Dashboard (BookingDetail, payments, late fees, modal wiring)
-Phase 7:    [=====               ] 25% (1/4 plans complete) - IN PROGRESS
+Phase 7:    [==========          ] 50% (2/4 plans complete) - IN PROGRESS
   Plan 01:  [X] Database, Types & Service Layer (07_plate_tracking.sql, plateService.ts, types.ts)
-  Plan 02:  [ ] Plates Admin Page (dedicated /admin/plates page)
+  Plan 02:  [X] Plates Admin Page (Plates.tsx 1099 lines, PlateAssignmentHistory.tsx, route/nav integration)
   Plan 03:  [ ] Rental Integration (plate selection in booking, return confirmation)
   Plan 04:  [ ] Alert Edge Function & Nav Integration
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [████████████████████] 97% (24/28 plans complete)
+Overall:    [████████████████████] 89% (25/28 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -86,7 +92,7 @@ Overall:    [████████████████████] 97% (
 | Phases Planned | 9 | 1 blocked (Phase 9), Phase 7 in progress |
 | Phases Complete | 6 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 24 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 |
+| Plans Executed | 25 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01, 07-02 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -177,6 +183,11 @@ Overall:    [████████████████████] 97% (
 | Client-side active assignment filter | PostgREST cannot filter nested joins; transformPlate filters array for returned_at IS NULL | 2026-02-13 | 07-01 |
 | Two-step plate swap (close + create) | Partial unique index prevents double-active; if second step fails, plate is safely available | 2026-02-13 | 07-01 |
 | Zeroed time components in expiry calculation | calculateTagExpiry sets hours to 0 on both dates to avoid timezone off-by-one | 2026-02-13 | 07-01 |
+| Plate selection inline in vehicle section | Subsection within existing 'vehicle' tab, SectionKey/SECTIONS unchanged | 2026-02-13 | 07-03 |
+| Plate required for new bookings only | isVehicleValid includes selectedPlateId; edit mode exempt | 2026-02-13 | 07-03 |
+| Graceful degradation on plate assignment | Booking succeeds even if assignPlateToBooking fails; admin warned | 2026-02-13 | 07-03 |
+| platesOut prop from parent | Fetched once by Rentals component, passed to all BookingDetail instances | 2026-02-13 | 07-03 |
+| Plate return defaults to checked | Per CONTEXT.md, admin unchecks only if plate not physically returned | 2026-02-13 | 07-03 |
 
 ### Patterns Established
 
@@ -246,6 +257,9 @@ Overall:    [████████████████████] 97% (
 - **Plate service transformer pattern:** transformPlate filters nested plate_assignments array client-side for active assignment
 - **Tag expiry calculation pattern:** calculateTagExpiry zeroes time components, returns severity tier (ok/warning/urgent/expired)
 - **Two-step swap pattern:** Close active assignment, then create new one; partial unique index prevents double-active
+- **Plate selection in booking pattern:** Fetch available plates on vehicle select, auto-select if single, require selection for new bookings
+- **Plate return confirmation pattern:** Checkbox defaults checked, calls returnPlateAssignment after returnBooking, graceful degradation
+- **Plates-out summary tab pattern:** Lightweight tab in Rentals page with overdue-first sorting and link to full management page
 
 ### Architecture Summary (Current)
 
@@ -336,19 +350,18 @@ pages/CustomerStatusTracker.tsx:
 components/admin/RentalCalendar.tsx:
   - 299-line custom monthly calendar grid, status-colored bars, O(1) lookup
 
-pages/admin/Rentals.tsx (UPDATED in 06-06):
-  - 1885-line rental management hub with 3 tabs (Calendar/Active/Fleet)
-  - BookingDetail inline expansion: payments, late fees, condition reports, return flow
-  - Payment recording with Cash/Card/Zelle/CashApp toggle and running balance
-  - Late fee auto-calculation with override/waive/reset
-  - Customer running total across all bookings
+pages/admin/Rentals.tsx (UPDATED in 07-03):
+  - ~2060-line rental management hub with 4 tabs (Calendar/Active/Fleet/Plates)
+  - BookingDetail: payments, late fees, condition reports, plate return confirmation
+  - Plate return confirmation: plateReturned checkbox, calls returnPlateAssignment
+  - Plates tab: plates-out summary with overdue-first sorting, link to /admin/plates
+  - platesOut state fetched from plateService, passed as prop to BookingDetail
   - All modals wired: RentalBookingModal, RentalAgreementModal, RentalConditionReport
   - Calendar booking click -> Active Rentals detail expansion
-  - Overdue badge with red pulse animation in stats bar
 
-components/admin/RentalBookingModal.tsx:
-  - 1120-line booking modal: customer search, vehicle availability, agreement terms, review
-  - 4-section tabbed navigation, double-booking error handling
+components/admin/RentalBookingModal.tsx (UPDATED in 07-03):
+  - ~1208-line booking modal with plate selection in vehicle section
+  - 4-section tabbed navigation, auto-fetch dealer plates, assignPlateToBooking on create
 
 components/admin/RentalConditionReport.tsx:
   - 683-line condition report: 27-item checklist, photo upload, read-only view mode
@@ -436,17 +449,17 @@ supabase/functions/:
 
 ### What Was Accomplished This Session
 - Executed 07-01: Plate tracking database schema, TypeScript types, and service layer
-- Created 07_plate_tracking.sql (390 lines): 3 tables, 2 partial unique indexes, 2 triggers, RLS
-- Added Plate, PlateAssignment, PlateAlert types to types.ts (76 lines)
-- Created plateService.ts (679 lines): 15 async functions + calculateTagExpiry pure utility
-- Follows established patterns from rentalService.ts and 06_rental_schema.sql
+- Executed 07-02: Plates admin page with split-view dashboard (running in parallel)
+- Executed 07-03: Rental integration -- plate selection in booking, return confirmation, Plates tab
+- Modified RentalBookingModal.tsx: +88 lines (plate selection subsection, assignPlateToBooking)
+- Modified Rentals.tsx: +173 lines (plate return confirmation, platesOut state, Plates tab)
 
 ### Phase 7 Status (IN PROGRESS)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
 | 07-01 | Database, Types & Service Layer | 506c6ea, 69163ee | COMPLETE |
-| 07-02 | Plates Admin Page | -- | NOT STARTED |
-| 07-03 | Rental Integration | -- | NOT STARTED |
+| 07-02 | Plates Admin Page | 832940c, da78f08 | COMPLETE |
+| 07-03 | Rental Integration | 86d13f0, 9406470 | COMPLETE |
 | 07-04 | Alert Edge Function & Nav | -- | NOT STARTED |
 
 ### Phase 3 Deferred Items (Still Pending)
@@ -455,7 +468,7 @@ supabase/functions/:
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 7 Plans 02-04: Plates admin page, rental integration, alert Edge Function
+1. Phase 7 Plan 04: Alert Edge Function & Nav Integration
 2. Phase 8: Rental Insurance Verification
 3. Circle back to Phase 3 verification when DB migration is applied
 4. Wire up all credentials after feature code is complete
@@ -464,10 +477,10 @@ supabase/functions/:
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/07-plate-tracking/07-01-SUMMARY.md` - latest plan summary
+3. `.planning/phases/07-plate-tracking/07-03-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-13 (Phase 7 IN PROGRESS - 07-01 done)*
+*State updated: 2026-02-13 (Phase 7 IN PROGRESS - 07-01 through 07-03 done)*
