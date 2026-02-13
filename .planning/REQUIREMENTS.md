@@ -25,12 +25,12 @@ Requirements for current milestone. Each maps to roadmap phases.
 
 ### Registration Checker
 
-- [ ] **REGC-01**: Document completeness check (Title front/back, 130-U, Inspection, Insurance proof)
-- [ ] **REGC-02**: VIN consistency validation across all documents
-- [ ] **REGC-03**: Mileage consistency check across documents
-- [ ] **REGC-04**: SURRENDERED stamp verification (front AND back of title)
-- [ ] **REGC-05**: Document ordering guide per txDMV requirements
-- [ ] **REGC-06**: Quick link to [webDealer.txdmv.gov](https://webdealer.txdmv.gov/title/loginAuthenticateUser#) from admin dashboard
+- [x] **REGC-01**: Document completeness check (Title front/back, 130-U, Inspection, Insurance proof)
+- [x] **REGC-02**: VIN consistency validation across all documents
+- [x] **REGC-03**: Mileage consistency check across documents
+- [x] **REGC-04**: SURRENDERED stamp verification (front AND back of title)
+- [x] **REGC-05**: Document ordering guide per txDMV requirements
+- [x] **REGC-06**: Quick link to [webDealer.txdmv.gov](https://webdealer.txdmv.gov/title/loginAuthenticateUser#) from admin dashboard
 
 ### Rental Management
 
@@ -109,12 +109,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PORT-05 | Phase 4 | Complete |
 | PORT-06 | Phase 4 | Complete |
 | PORT-07 | Phase 3 | Pending |
-| REGC-01 | Phase 5 | Pending |
-| REGC-02 | Phase 5 | Pending |
-| REGC-03 | Phase 5 | Pending |
-| REGC-04 | Phase 5 | Pending |
-| REGC-05 | Phase 5 | Pending |
-| REGC-06 | Phase 5 | Pending |
+| REGC-01 | Phase 5 | Complete |
+| REGC-02 | Phase 5 | Complete |
+| REGC-03 | Phase 5 | Complete |
+| REGC-04 | Phase 5 | Complete |
+| REGC-05 | Phase 5 | Complete |
+| REGC-06 | Phase 5 | Complete |
 | RENT-01 | Phase 6 | Pending |
 | RENT-02 | Phase 6 | Pending |
 | RENT-03 | Phase 6 | Pending |
@@ -134,10 +134,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1 requirements: 26 total
 - Mapped to phases: 26 (100%)
-- Complete: 5 (STAB-01, STAB-02, STAB-03, PORT-05, PORT-06)
-- Pending: 20
+- Complete: 11 (STAB-01, STAB-02, STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06)
+- Pending: 14
 - Blocked: 1 (RENT-05 - needs Spireon API)
 
 ---
 *Requirements defined: 2025-01-29*
-*Last updated: 2026-02-10 after Phase 4 completion*
+*Last updated: 2026-02-12 after Phase 5 completion*

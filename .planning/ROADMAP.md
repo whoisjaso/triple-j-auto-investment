@@ -147,8 +147,8 @@ Plans:
 **Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 05-01-PLAN.md -- DB migration (mileage + checker columns, invalidation trigger), VIN validator utility, types + service layer
-- [ ] 05-02-PLAN.md -- RegistrationChecker component (all 6 REGC requirements), integration into Registrations.tsx
+- [x] 05-01-PLAN.md -- DB migration (mileage + checker columns, invalidation trigger), VIN validator utility, types + service layer
+- [x] 05-02-PLAN.md -- RegistrationChecker component (all 6 REGC requirements), integration into Registrations.tsx
 
 ---
 
@@ -247,7 +247,7 @@ Plans:
 | 2 - Registration Database Foundation | Complete | 1 | 100% (3 plans) |
 | 3 - Customer Portal - Status Tracker | Planned | 4 | 0% (3 plans ready) |
 | 4 - Customer Portal - Notifications & Login | Complete | 2 | 100% (4 plans) |
-| 5 - Registration Checker | Planned | 6 | 0% (2 plans ready) |
+| 5 - Registration Checker | Complete | 6 | 100% (2 plans) |
 | 6 - Rental Management Core | Pending | 5 | 0% |
 | 7 - Plate Tracking | Pending | 5 | 0% |
 | 8 - Rental Insurance Verification | Pending | 4 | 0% |
@@ -306,4 +306,4 @@ Phase 1: Reliability & Stability
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-11*
+*Last updated: 2026-02-12*

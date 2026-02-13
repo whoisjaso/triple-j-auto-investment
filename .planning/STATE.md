@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-12
-**Session:** Phase 5 plan 02 complete -- Registration Checker UI built and integrated
+**Session:** Phase 5 complete — verified ✓, transitioning to Phase 6
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 5 (Registration Checker) -- 2/2 plans complete, phase ready for verification. Phase 4 verified, Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 6 (Rental Management Core) — Phase 5 verified ✓, Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,10 +22,10 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 5 of 9 (Registration Checker)
-**Plan:** 2/2 complete -- Phase 5 code-complete
-**Status:** Phase 5 plans complete, ready for verification.
-**Last activity:** 2026-02-12 -- Completed 05-02-PLAN.md
+**Phase:** 5→6 transition (Rental Management Core next)
+**Plan:** 2/2 complete — Phase 5 verified ✓
+**Status:** Phase 5 complete, moving to Phase 6.
+**Last activity:** 2026-02-12 — Phase 5 verified (6/6 must-haves passed)
 
 **Progress:**
 ```
@@ -50,7 +50,7 @@ Phase 4:    [====================] 100% (4/4 plans complete) - COMPLETE ✓
   Plan 02:  [X] Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe)
   Plan 03:  [X] TypeScript Types, Services & Admin UI (notificationPref, notifyCustomer, history modal)
   Plan 04:  [X] Customer Login, Dashboard & Preferences (phone OTP, multi-reg dashboard, pref toggle)
-Phase 5:    [====================] 100% (2/2 plans complete) - CODE COMPLETE
+Phase 5:    [====================] 100% (2/2 plans complete) - COMPLETE ✓
   Plan 01:  [X] DB Migration, VIN Validator, Types & Service Layer
   Plan 02:  [X] Checker UI Component & Admin Integration (751-line RegistrationChecker.tsx)
 Phase 6:    [ ] Not started (Rental Management Core)
@@ -64,8 +64,8 @@ Overall:    [█████████████████░░░] 85% (
 **Requirements Coverage:**
 - Total v1: 26
 - Mapped: 26 (100%)
-- Completed: 5 (STAB-01, STAB-02, STAB-03, PORT-05, PORT-06)
-- Remaining: 20 (+ 1 blocked)
+- Completed: 11 (STAB-01, STAB-02, STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06)
+- Remaining: 14 (+ 1 blocked)
 
 ---
 
@@ -348,7 +348,7 @@ supabase/functions/ (NEW in 04-02):
 - Integrated into Registrations.tsx between Document Checklist and Stage Progress
 - Build passes, all verification checks confirmed
 
-### Phase 5 Status (CODE COMPLETE)
+### Phase 5 Status (COMPLETE ✓)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
 | 05-01 | DB Migration, VIN Validator, Types & Service | 8aa5673, 260c057 | COMPLETE |
@@ -360,10 +360,9 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 5 verification (if needed)
-2. Phase 6: Rental Management Core
-3. Circle back to Phase 3 verification when DB migration is applied
-4. Wire up all credentials after feature code is complete
+1. Phase 6: Rental Management Core (dual inventory, bookings, agreements, payments)
+2. Circle back to Phase 3 verification when DB migration is applied
+3. Wire up all credentials after feature code is complete
 
 ### If Context Is Lost
 Read these files in order:
