@@ -205,6 +205,14 @@ Plans:
 4. Dashboard shows all plates currently out with customer name and return date
 5. Alerts appear for overdue rentals and plates not returned on time
 
+**Plans:** 4 plans in 3 waves
+
+Plans:
+- [ ] 07-01-PLAN.md -- DB migration (plates, plate_assignments, plate_alerts tables, triggers, RLS), TypeScript types, plateService.ts
+- [ ] 07-02-PLAN.md -- Plates admin page (split-view dashboard), PlateAssignmentHistory, routing, nav updates
+- [ ] 07-03-PLAN.md -- Rental integration (plate selection in booking, return confirmation, Plates tab in Rentals)
+- [ ] 07-04-PLAN.md -- Alert Edge Function (check-plate-alerts), email template, pg_cron schedule
+
 ---
 
 ### Phase 8: Rental Insurance Verification
@@ -258,8 +266,8 @@ Plans:
 | 3 - Customer Portal - Status Tracker | Planned | 4 | 0% (3 plans ready) |
 | 4 - Customer Portal - Notifications & Login | Complete | 2 | 100% (4 plans) |
 | 5 - Registration Checker | Complete | 6 | 100% (2 plans) |
-| 6 - Rental Management Core | Planned | 5 | 0% (6 plans ready) |
-| 7 - Plate Tracking | Pending | 5 | 0% |
+| 6 - Rental Management Core | Complete | 5 | 100% (6 plans) |
+| 7 - Plate Tracking | Planned | 5 | 0% (4 plans ready) |
 | 8 - Rental Insurance Verification | Pending | 4 | 0% |
 | 9 - LoJack GPS Integration | Blocked | 1 | 0% |
 
@@ -316,4 +324,4 @@ Phase 1: Reliability & Stability
 ---
 
 *Roadmap created: 2026-01-29*
-*Last updated: 2026-02-12*
+*Last updated: 2026-02-13*
