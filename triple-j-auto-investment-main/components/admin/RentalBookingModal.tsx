@@ -18,6 +18,7 @@ import {
   FileText,
   CheckCircle,
   AlertCircle,
+  AlertTriangle,
   ChevronRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,6 +26,7 @@ import {
   Vehicle,
   RentalBooking,
   RentalCustomer,
+  Plate,
 } from '../../types';
 import { AddressInput } from '../AddressInput';
 import { useScrollLock } from '../../hooks/useScrollLock';
@@ -36,6 +38,7 @@ import {
   getAvailableVehicles,
   calculateBookingTotal,
 } from '../../services/rentalService';
+import { getAvailableDealerPlates, assignPlateToBooking } from '../../services/plateService';
 
 // ================================================================
 // TYPES
@@ -106,6 +109,11 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
   const [isLoadingVehicles, setIsLoadingVehicles] = useState(false);
   const [mileageOut, setMileageOut] = useState('');
   const [mileageLimit, setMileageLimit] = useState('');
+
+  // ---- Plate selection state ----
+  const [availablePlates, setAvailablePlates] = useState<Plate[]>([]);
+  const [selectedPlateId, setSelectedPlateId] = useState('');
+  const [loadingPlates, setLoadingPlates] = useState(false);
 
   // ---- Agreement terms state ----
   const [authorizedDrivers, setAuthorizedDrivers] = useState<string[]>([]);
@@ -220,6 +228,23 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
     return () => { cancelled = true; };
   }, [startDate, endDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Fetch available dealer plates when a vehicle is selected (new bookings only)
+  useEffect(() => {
+    if (!selectedVehicleId) {
+      setAvailablePlates([]);
+      setSelectedPlateId('');
+      return;
+    }
+    if (isEditMode) return; // Plates are assigned at creation time only
+    setLoadingPlates(true);
+    getAvailableDealerPlates().then(plates => {
+      setAvailablePlates(plates);
+      setLoadingPlates(false);
+      // Auto-select if only one available
+      if (plates.length === 1) setSelectedPlateId(plates[0].id);
+    }).catch(() => setLoadingPlates(false));
+  }, [selectedVehicleId, isEditMode]);
+
   // Add primary renter as first authorized driver when customer name changes
   useEffect(() => {
     if (customerName.trim() && authorizedDrivers.length === 0) {
@@ -309,6 +334,8 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
   const handleClose = () => {
     setErrorMessage(null);
     setSuccessMessage(null);
+    setAvailablePlates([]);
+    setSelectedPlateId('');
     onClose();
   };
 
@@ -375,6 +402,27 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
           setIsSubmitting(false);
           return;
         }
+
+        // Assign plate to the new booking
+        if (selectedPlateId && result.id) {
+          try {
+            await assignPlateToBooking(
+              selectedPlateId,
+              result.id,
+              selectedVehicleId,
+              customerName.trim(),
+              customerPhone.trim(),
+              endDate
+            );
+          } catch (plateErr) {
+            console.error('Plate assignment failed:', plateErr);
+            // Booking was created successfully, warn about plate assignment failure
+            // Don't block the booking creation -- graceful degradation per research
+            setSuccessMessage('Booking created, but plate assignment failed. Please assign the plate manually from the Plates page.');
+            setTimeout(() => { onBookingCreated(); handleClose(); }, 2000);
+            return;
+          }
+        }
       }
 
       setSuccessMessage(isEditMode ? 'Booking updated successfully!' : 'Booking created successfully!');
@@ -397,7 +445,7 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
 
   // ---- Form validation ----
   const isCustomerValid = !!(customerName.trim() && customerPhone.trim() && customerDL.trim() && customerAddress.trim());
-  const isVehicleValid = !!(selectedVehicleId && startDate && endDate && !dateError);
+  const isVehicleValid = !!(selectedVehicleId && startDate && endDate && !dateError && (isEditMode || selectedPlateId));
   const isFormValid = isCustomerValid && isVehicleValid;
 
   // ================================================================
@@ -761,6 +809,45 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
           />
         </div>
       </div>
+
+      {/* Plate selection (new bookings only) */}
+      {selectedVehicleId && !isEditMode && (
+        <div className="mt-6 border-t border-gray-800 pt-4">
+          <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">
+            Assign Dealer Plate <span className="text-red-500">*</span>
+          </label>
+          {loadingPlates ? (
+            <div className="text-gray-500 text-sm">Loading available plates...</div>
+          ) : availablePlates.length === 0 ? (
+            <div className="text-amber-400 text-sm flex items-center gap-2">
+              <AlertTriangle size={14} />
+              No dealer plates available. Create plates in the Plates page first.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {availablePlates.map(plate => (
+                <button
+                  key={plate.id}
+                  type="button"
+                  onClick={() => setSelectedPlateId(plate.id)}
+                  className={`p-3 border text-left text-sm transition-all ${
+                    selectedPlateId === plate.id
+                      ? 'border-tj-gold bg-tj-gold/10 text-white'
+                      : 'border-gray-700 hover:border-gray-500 text-gray-300'
+                  }`}
+                >
+                  <span className="font-bold">{plate.plateNumber}</span>
+                  {plate.expirationDate && (
+                    <span className="block text-[10px] text-gray-500 mt-1">
+                      Exp: {new Date(plate.expirationDate).toLocaleDateString()}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 
