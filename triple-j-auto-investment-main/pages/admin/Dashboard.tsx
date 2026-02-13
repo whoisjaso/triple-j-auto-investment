@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { analyzeFinancialPerformance } from '../../services/geminiService';
-import { Target, Globe, Radio, User, Phone, Mail, Clock, MessageSquare, FileText, Car, ArrowUpRight, TrendingUp, DollarSign, Activity, Wrench, Truck, PaintBucket, X, PieChart, ChevronRight, AlertTriangle, Hourglass, Calendar, LayoutDashboard, Database, LogOut, Menu, ClipboardCheck, Key } from 'lucide-react';
+import { Target, Globe, Radio, User, Phone, Mail, Clock, MessageSquare, FileText, Car, ArrowUpRight, TrendingUp, DollarSign, Activity, Wrench, Truck, PaintBucket, X, PieChart, ChevronRight, AlertTriangle, Hourglass, Calendar, LayoutDashboard, Database, LogOut, Menu, ClipboardCheck, Key, CreditCard } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 
@@ -20,6 +20,7 @@ const AdminHeader = () => {
     { path: '/admin/inventory', label: 'Inventory', icon: Car },
     { path: '/admin/registrations', label: 'Registrations', icon: ClipboardCheck },
     { path: '/admin/rentals', label: 'Rentals', icon: Key },
+    { path: '/admin/plates', label: 'Plates', icon: CreditCard },
   ];
 
   return (
