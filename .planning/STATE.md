@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-13
-**Session:** Phase 6 in progress — 06-02 (types & service layer) complete
+**Session:** Phase 6 in progress — 06-03 (rental admin page & calendar) complete
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 6 (Rental Management Core) — Plan 02 complete, 4 plans remaining. Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 6 (Rental Management Core) — Plan 03 complete, 3 plans remaining. Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -23,9 +23,9 @@
 
 **Milestone:** v1 Feature Development
 **Phase:** 6 of 9 (Rental Management Core)
-**Plan:** 2/6 complete
+**Plan:** 3/6 complete
 **Status:** In progress
-**Last activity:** 2026-02-13 — Completed 06-02-PLAN.md (TypeScript types & service layer)
+**Last activity:** 2026-02-13 — Completed 06-03-PLAN.md (Rental admin page & calendar)
 
 **Progress:**
 ```
@@ -53,14 +53,15 @@ Phase 4:    [====================] 100% (4/4 plans complete) - COMPLETE ✓
 Phase 5:    [====================] 100% (2/2 plans complete) - COMPLETE ✓
   Plan 01:  [X] DB Migration, VIN Validator, Types & Service Layer
   Plan 02:  [X] Checker UI Component & Admin Integration (751-line RegistrationChecker.tsx)
-Phase 6:    [======              ] 33% (2/6 plans complete) - IN PROGRESS
+Phase 6:    [==========          ] 50% (3/6 plans complete) - IN PROGRESS
   Plan 01:  [X] Rental Database Schema (btree_gist, EXCLUDE constraint, 4 tables, RLS)
   Plan 02:  [X] TypeScript Types & Service Layer (rentalService.ts, store module, 23 functions)
+  Plan 03:  [X] Rental Admin Page & Calendar (Rentals.tsx, RentalCalendar.tsx, 3-tab layout)
 Phase 7:    [ ] Not started (Plate Tracking)
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [████████████████░░░░] 79% (19/24 plans complete)
+Overall:    [████████████████░░░░] 83% (20/24 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -78,7 +79,7 @@ Overall:    [████████████████░░░░] 79% (
 | Phases Planned | 9 | 1 blocked (Phase 9), Phases 7-9 not yet detailed |
 | Phases Complete | 5 | Phase 1 + Phase 2 + Phase 4 + Phase 5 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 19 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01, 06-02 |
+| Plans Executed | 20 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01, 06-02, 06-03 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -148,6 +149,10 @@ Overall:    [████████████████░░░░] 79% (
 | Two-query availability check | Fetch rental vehicles + conflicting bookings separately, filter client-side (simpler than complex SQL join) | 2026-02-13 | 06-02 |
 | Weekly+daily rate calculation | Full weeks at weeklyRate, remainder at dailyRate, only when >= 7 days and weeklyRate provided | 2026-02-13 | 06-02 |
 | Late fee override semantics: null/0/>0 | null = auto-calculate, 0 = waived, > 0 = admin override (mirrors DB column design) | 2026-02-13 | 06-02 |
+| Custom calendar grid (no library) | Avoids bundle size and styling conflicts; grid-cols-7 with Tailwind sufficient | 2026-02-13 | 06-03 |
+| AdminHeader duplication per admin page | Per research pitfall #7; each page owns its navigation state | 2026-02-13 | 06-03 |
+| FleetVehicleRow as separate component | Local rate state for blur-save pattern; prevents full fleet list re-renders | 2026-02-13 | 06-03 |
+| Overdue-first sort on active rentals | Most urgent items at top for immediate admin attention | 2026-02-13 | 06-03 |
 
 ### Patterns Established
 
@@ -197,6 +202,10 @@ Overall:    [████████████████░░░░] 79% (
 - **Two-query availability pattern:** Fetch eligible vehicles, fetch conflicting bookings, client-side Set exclusion
 - **JSONB array safe parsing pattern:** Array.isArray() check before mapping JSONB arrays (authorized_drivers, permitted_states, etc.)
 - **Weekly/daily rate calculation pattern:** calculateBookingTotal uses floor division for weekly chunks with daily remainder
+- **Tab navigation pattern:** Segmented control with border-b-2 active indicator for multi-view pages
+- **Calendar grid pattern:** grid-cols-7 with useMemo date-keyed Map for O(1) booking lookup per cell
+- **Fleet vehicle row pattern:** Separate component with local state for blur-save rate inputs
+- **Inline rate editing pattern:** Input fields save on blur via service call, local state for edit-in-progress
 
 ### Architecture Summary (Current)
 
@@ -328,10 +337,30 @@ pages/CustomerStatusTracker.tsx (UPDATED in 04-04):
   - NotificationPreferences (compact) near vehicle info header
   - Login link to /customer/login for returning customers
 
-App.tsx (UPDATED in 04-04):
+components/admin/RentalCalendar.tsx (NEW in 06-03):
+  - 299-line custom monthly calendar grid (no third-party libraries)
+  - grid-cols-7 layout, month navigation (prev/next/today)
+  - Status-colored booking bars (reserved=blue, active=green, overdue=red+pulse, returned=gray)
+  - useMemo date-keyed Map for O(1) booking lookup per cell
+  - Max 4 bars per cell with +N more overflow indicator
+  - Click handlers for dates and booking bars
+
+pages/admin/Rentals.tsx (NEW in 06-03):
+  - 1028-line rental management page with 3 tabs
+  - Calendar tab: RentalCalendar + inline booking detail + quick actions
+  - Active Rentals tab: overdue-first sorted list, late fee display, return/cancel actions
+  - Fleet tab: listing type dropdown, daily/weekly rate inputs, rental fleet filter
+  - Stats bar: total bookings, active, overdue, fleet size
+  - Return vehicle dialog with mileage-in input
+  - AdminHeader with Rentals nav item
+  - Placeholder hooks for booking/agreement modals (Plans 04-05)
+
+App.tsx (UPDATED in 06-03):
+  - /admin/rentals -> AdminRentals (lazy loaded, ProtectedRoute)
   - /customer/login -> CustomerLogin (lazy loaded)
   - /customer/dashboard -> CustomerDashboard (lazy loaded)
   - /login -> Login (admin, unchanged)
+  - Navbar: desktop + mobile Rentals link with Key icon for logged-in admins
 
 supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
@@ -385,18 +414,18 @@ supabase/functions/ (NEW in 04-02):
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed 06-02: TypeScript types and rental service layer
-- Added 10 type aliases/interfaces and 2 constants to types.ts (140 lines added)
-- Created rentalService.ts with 23 exported functions (full CRUD for bookings, customers, payments, condition reports, availability, utilities)
-- Created lib/store/rentals.ts, updated lib/store/types.ts and index.ts
-- Integrated rental state into Store.tsx (bookings, refreshBookings in context)
+- Executed 06-03: Rental admin page and calendar
+- Created RentalCalendar.tsx (299 lines): custom monthly grid with booking bars
+- Created Rentals.tsx (1028 lines): 3-tab admin page (Calendar, Active Rentals, Fleet)
+- Updated App.tsx with /admin/rentals route and navbar links
+- Updated AdminHeader on Dashboard.tsx and Inventory.tsx with Rentals nav item
 
 ### Phase 6 Status (IN PROGRESS)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
 | 06-01 | Rental Database Schema | e648fcd | COMPLETE |
 | 06-02 | TypeScript Types & Service Layer | ffdfc7a, 2b76ddd | COMPLETE |
-| 06-03 | TBD | - | NOT STARTED |
+| 06-03 | Rental Admin Page & Calendar | e4de9dd, edf7950 | COMPLETE |
 | 06-04 | TBD | - | NOT STARTED |
 | 06-05 | TBD | - | NOT STARTED |
 | 06-06 | TBD | - | NOT STARTED |
@@ -407,8 +436,8 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 6 Plan 03: UI components for rental management (calendar, booking form, etc.)
-2. Continue through Phase 6 plans (agreements, payments, etc.)
+1. Phase 6 Plan 04: Booking creation modal (launched from Rentals Calendar/Active tabs)
+2. Phase 6 Plans 05-06: Agreement generation, payment tracking
 3. Circle back to Phase 3 verification when DB migration is applied
 4. Wire up all credentials after feature code is complete
 
@@ -416,10 +445,10 @@ supabase/functions/ (NEW in 04-02):
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/06-rental-management-core/06-02-SUMMARY.md` - latest plan summary
+3. `.planning/phases/06-rental-management-core/06-03-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-13*
+*State updated: 2026-02-13 (06-03 complete)*
