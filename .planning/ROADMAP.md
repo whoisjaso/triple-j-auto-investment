@@ -173,6 +173,16 @@ Plans:
 5. Deposits and payments are tracked per rental with running balance
 6. Double-booking is prevented by database constraint (not just UI warning)
 
+**Plans:** 6 plans in 4 waves
+
+Plans:
+- [ ] 06-01-PLAN.md -- Database migration (rental tables, EXCLUDE constraint, booking ID generator, RLS)
+- [ ] 06-02-PLAN.md -- TypeScript types, rentalService.ts, store module, Store.tsx integration
+- [ ] 06-03-PLAN.md -- Rentals page, RentalCalendar, active rentals, fleet management, routing
+- [ ] 06-04-PLAN.md -- RentalBookingModal (customer form, vehicle selection, date validation)
+- [ ] 06-05-PLAN.md -- Rental agreement PDF, SignatureCapture, RentalAgreementModal
+- [ ] 06-06-PLAN.md -- Payment tracking, late fees, modal integration, human verification
+
 ---
 
 ### Phase 7: Plate Tracking
@@ -248,7 +258,7 @@ Plans:
 | 3 - Customer Portal - Status Tracker | Planned | 4 | 0% (3 plans ready) |
 | 4 - Customer Portal - Notifications & Login | Complete | 2 | 100% (4 plans) |
 | 5 - Registration Checker | Complete | 6 | 100% (2 plans) |
-| 6 - Rental Management Core | Pending | 5 | 0% |
+| 6 - Rental Management Core | Planned | 5 | 0% (6 plans ready) |
 | 7 - Plate Tracking | Pending | 5 | 0% |
 | 8 - Rental Insurance Verification | Pending | 4 | 0% |
 | 9 - LoJack GPS Integration | Blocked | 1 | 0% |
