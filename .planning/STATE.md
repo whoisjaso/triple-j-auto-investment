@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-11
-**Session:** Phase 4 complete — verified ✓, transitioning to Phase 5
+**Last Updated:** 2026-02-12
+**Session:** Phase 5 plan 02 complete -- Registration Checker UI built and integrated
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 5 (Registration Checker) — Phase 4 verified, Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 5 (Registration Checker) -- 2/2 plans complete, phase ready for verification. Phase 4 verified, Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,9 +22,10 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 4→5 transition (Registration Checker next)
-**Plan:** 4/4 complete — Phase 4 verified ✓
-**Status:** Phase 4 complete, moving to Phase 5.
+**Phase:** 5 of 9 (Registration Checker)
+**Plan:** 2/2 complete -- Phase 5 code-complete
+**Status:** Phase 5 plans complete, ready for verification.
+**Last activity:** 2026-02-12 -- Completed 05-02-PLAN.md
 
 **Progress:**
 ```
@@ -49,13 +50,15 @@ Phase 4:    [====================] 100% (4/4 plans complete) - COMPLETE ✓
   Plan 02:  [X] Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe)
   Plan 03:  [X] TypeScript Types, Services & Admin UI (notificationPref, notifyCustomer, history modal)
   Plan 04:  [X] Customer Login, Dashboard & Preferences (phone OTP, multi-reg dashboard, pref toggle)
-Phase 5:    [ ] Not started (Registration Checker)
+Phase 5:    [====================] 100% (2/2 plans complete) - CODE COMPLETE
+  Plan 01:  [X] DB Migration, VIN Validator, Types & Service Layer
+  Plan 02:  [X] Checker UI Component & Admin Integration (751-line RegistrationChecker.tsx)
 Phase 6:    [ ] Not started (Rental Management Core)
 Phase 7:    [ ] Not started (Plate Tracking)
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [███████████████░░░░░] 75% (15/20 plans complete)
+Overall:    [█████████████████░░░] 85% (17/20 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -71,9 +74,9 @@ Overall:    [███████████████░░░░░] 75% (
 | Metric | Value | Notes |
 |--------|-------|-------|
 | Phases Planned | 9 | 1 blocked (Phase 9) |
-| Phases Complete | 4 | Phase 1 + Phase 2 + Phase 4 (Phase 3 code-complete, verification deferred) |
+| Phases Complete | 5 | Phase 1 + Phase 2 + Phase 4 + Phase 5 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 15 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04 |
+| Plans Executed | 17 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -130,6 +133,10 @@ Overall:    [███████████████░░░░░] 75% (
 | Customer auth redirects to /customer/login | Separate from admin /login; prevents confusion between auth paths | 2026-02-10 | 04-04 |
 | Deploy to Vercel over Dokploy/Hetzner | Simpler for static Vite/React; vercel.json already configured | 2026-02-11 | User decision |
 | Credentials configured last | Build all code first, wire up Twilio/Resend/Supabase auth at the end | 2026-02-11 | User decision |
+| Auto-compute docComplete and vinFormatValid | Reduces manual clicks; VIN validation and doc booleans are already known from registration | 2026-02-12 | 05-02 |
+| useMemo for VIN validation | Avoids re-running validation on every render; only recalculates when VIN changes | 2026-02-12 | 05-02 |
+| Override saves results then sets override flag | Ensures checker results are persisted even when overriding failed checks | 2026-02-12 | 05-02 |
+| Mileage checks require mileage to be set | allChecksPassed returns false if mileage is null, forcing admin to enter it | 2026-02-12 | 05-02 |
 
 ### Patterns Established
 
@@ -166,6 +173,11 @@ Overall:    [███████████████░░░░░] 75% (
 - **Customer auth guard pattern:** useEffect session check + redirect, onAuthStateChange listener for expiry
 - **Compact/full component mode pattern:** Single component with compact boolean prop for different UI contexts
 - **Optimistic preference update pattern:** Local state change, service call, revert on failure with feedback toast
+- **Pre-fill + confirm validation pattern:** System pre-fills VIN/mileage from DB, admin confirms via checkboxes against physical docs
+- **Auto-compute + manual-confirm pattern:** docComplete/vinFormatValid auto-computed, cross-doc confirmation requires manual checkbox clicks
+- **Checker collapsible section pattern:** Self-contained component with own state, renders inside parent's expanded row
+- **Override with confirmation pattern:** Amber "Override and Proceed" button opens dialog showing failed check count, logged via saveCheckerOverride
+- **Checker invalidation pattern:** DB trigger clears checker_results when VIN or mileage changes; UI checks registration.checkerResults on mount
 
 ### Architecture Summary (Current)
 
@@ -182,26 +194,34 @@ Store.tsx (281 lines - 68% reduction from 893):
   - React state management, Supabase subscriptions
   - Auth integration, useStore() interface UNCHANGED
 
-types.ts Registration Types (UPDATED in 04-03):
+types.ts Registration Types (UPDATED in 05-01):
   - RegistrationStageKey: 7 values (6 stages + rejected)
-  - Registration interface: 27 fields (added notificationPref)
+  - Registration interface: 32 fields (added mileage, checkerResults, checkerCompletedAt, checkerOverride, checkerOverrideAt)
+  - CheckerResult interface: docComplete, vinFormatValid, vinConfirmedOnDocs, mileageConfirmedOnDocs, surrenderedFront, surrenderedBack
   - RegistrationNotification: 16 fields (added 5 extended fields)
   - NotificationPreference type: 'sms' | 'email' | 'both' | 'none'
   - VALID_TRANSITIONS: Forward-only state machine
   - RegistrationAudit interface: Audit trail records
   - REGISTRATION_STAGES: UI configuration for 7 stages
 
-services/registrationService.ts (UPDATED in 04-03):
-  - transformRegistration: Maps 27 DB columns to TS fields (added notification_pref)
+services/registrationService.ts (UPDATED in 05-01):
+  - transformRegistration: Maps 32 DB columns to TS fields (added checker fields + mileage)
   - parseAccessKey: Parse /track/{orderId}-{token} URLs
   - getRegistrationByAccessKey: Token-based secure lookup
   - getTrackingLink: Generate customer tracking URLs
   - updateRegistrationStatus: With pending_change_reason + notifyCustomer support
   - updateDocumentChecklist: Boolean doc flags with audit
+  - saveCheckerResults: Persist CheckerResult JSONB, update completion timestamp
+  - saveCheckerOverride: Set override flag with timestamp, logged via audit trigger
+  - updateRegistrationMileage: Update mileage (triggers checker invalidation via DB trigger)
   - getRegistrationAudit: Fetch audit trail
   - logNotification: Extended with oldStage, newStage, subject, templateUsed, providerMessageId
   - archiveRegistration/restoreRegistration: Soft delete
   - Query helpers: getRegistrationsByStage, getRejectedRegistrations, etc.
+
+utils/vinValidator.ts (NEW in 05-01):
+  - validateVinFormat: 17 chars, alphanumeric, no I/O/Q
+  - validateVinCheckDigit: ISO 3779 check digit algorithm
 
 services/notificationService.ts (NEW in 04-03):
   - transformNotification: snake_case to camelCase for registration_notifications
@@ -243,8 +263,19 @@ pages/CustomerDashboard.tsx (NEW in 04-04):
   - Mini progress bar, stage badges, View Details links
   - Auth state change listener for session expiry
 
-pages/admin/Registrations.tsx (UPDATED in 04-03):
-  - ~1145 lines with 6-stage workflow visualization
+components/admin/RegistrationChecker.tsx (NEW in 05-02):
+  - 751-line self-contained pre-submission checker panel
+  - 7 sections: mileage entry, doc completeness, VIN validation, mileage confirmation,
+    SURRENDERED stamp (front+back), document ordering guide, summary+actions
+  - VIN format + ISO 3779 check digit validation (auto-computed)
+  - 5 VIN cross-doc checkboxes + Confirm All button
+  - 2 mileage cross-doc checkboxes (130-U, Inspection)
+  - Override confirmation dialog with failed check count
+  - webDEALER link gated behind allChecksPassed || checkerOverride
+
+pages/admin/Registrations.tsx (UPDATED in 05-02):
+  - ~1157 lines with 6-stage workflow visualization
+  - RegistrationChecker integrated between Document Checklist and Stage Progress
   - Step buttons for status advancement with confirmation dialogs
   - "Notify customer" checkbox in confirm dialog (default checked)
   - Document checklist (5 toggles)
@@ -266,6 +297,7 @@ supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
   03_customer_portal_access.sql (110 lines)
   04_notification_system.sql (244 lines) [NEW in 04-01]
+  05_registration_checker.sql [NEW in 05-01] - 5 columns + invalidation trigger
   README.md
 
 supabase/functions/ (NEW in 04-02):
@@ -289,12 +321,13 @@ supabase/functions/ (NEW in 04-02):
 | RLS silent failures | Data loss without warning | Ongoing monitoring |
 | No Spireon API access | Can't build GPS feature | Phase 9 blocked |
 | TypeScript strict mode | ErrorBoundary class issues | Low priority (build works) |
-| Migrations 03-04 not applied | Token + notification + phone auth features won't work until applied | Deploy to Supabase |
+| Migrations 03-05 not applied | Token + notification + phone auth + checker features won't work until applied | Deploy to Supabase |
 
 ### TODOs (Cross-Phase)
 
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
 - [ ] Apply migration 04_notification_system.sql to Supabase
+- [ ] Apply migration 05_registration_checker.sql to Supabase
 - [ ] Enable pg_cron and pg_net extensions in Supabase Dashboard
 - [ ] Configure app.settings.supabase_url and app.settings.service_role_key (or Vault secrets)
 - [ ] Enable Supabase phone auth with Twilio provider (for customer OTP login)
@@ -310,22 +343,16 @@ supabase/functions/ (NEW in 04-02):
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed all 4 Phase 4 plans across 3 waves
-- Wave 1 (parallel): 04-01 DB migration + 04-02 Edge Functions
-- Wave 2: 04-03 Types, services, admin UI
-- Wave 3: 04-04 Customer login, dashboard, preferences (checkpoint approved)
-- Phase 4 verified: 5/5 must-haves passed, zero anti-patterns
-- Updated ROADMAP.md, REQUIREMENTS.md (PORT-05, PORT-06 → Complete)
-- User decision: Deploy to Vercel instead of Dokploy/Hetzner
-- User decision: Wire up credentials at the end, after all code is built
+- Executed 05-02: RegistrationChecker UI component and admin integration
+- Created 751-line RegistrationChecker.tsx covering all 6 REGC requirements
+- Integrated into Registrations.tsx between Document Checklist and Stage Progress
+- Build passes, all verification checks confirmed
 
-### Phase 4 Final Status (COMPLETE ✓)
+### Phase 5 Status (CODE COMPLETE)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
-| 04-01 | Notification DB | 66f8b3d, 37ec5d2, c5575bf | COMPLETE |
-| 04-02 | Edge Functions | cdb8206, beadbcc, baa933c, 24f4cf2 | COMPLETE |
-| 04-03 | Types, Services, Admin UI | 994fcbf, 17692c6, 33b8cc9 | COMPLETE |
-| 04-04 | Customer Login & Dashboard | a82454b, f790807, d5bb223, 83a48bb | COMPLETE |
+| 05-01 | DB Migration, VIN Validator, Types & Service | 8aa5673, 260c057 | COMPLETE |
+| 05-02 | Checker UI Component & Admin Integration | 03b1e4d, 1e70f4f | COMPLETE |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -333,18 +360,19 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 5: Registration Checker (document validation for DMV submissions)
-2. Circle back to Phase 3 verification when DB migration is applied
-3. Wire up all credentials after feature code is complete
+1. Phase 5 verification (if needed)
+2. Phase 6: Rental Management Core
+3. Circle back to Phase 3 verification when DB migration is applied
+4. Wire up all credentials after feature code is complete
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/04-customer-portal-notifications-login/04-VERIFICATION.md` - phase verification report
+3. `.planning/phases/05-registration-checker/05-02-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-11*
+*State updated: 2026-02-12*
