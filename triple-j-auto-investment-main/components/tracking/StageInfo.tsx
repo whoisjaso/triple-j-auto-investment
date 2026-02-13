@@ -47,7 +47,7 @@ export const StageInfo: React.FC<StageInfoProps> = ({
     <div className="mt-8 text-center max-w-lg mx-auto px-4">
       {/* Rejected warning banner */}
       {isRejected && (
-        <div className="mb-4 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
+        <div className="mb-4 p-4 bg-red-900/30 border border-red-500/50">
           <p className="text-red-400 font-medium">Registration Requires Attention</p>
           {rejectionNotes && (
             <p className="text-red-300/80 text-sm mt-1">{rejectionNotes}</p>

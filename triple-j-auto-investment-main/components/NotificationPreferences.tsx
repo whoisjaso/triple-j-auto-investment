@@ -79,7 +79,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
       <div className="relative inline-block" ref={dropdownRef}>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 rounded-full text-gray-400 hover:text-tj-gold hover:bg-white/5 transition-colors"
+          className="p-2 text-gray-400 hover:text-tj-gold hover:bg-white/5 transition-colors"
           aria-label="Notification preferences"
           title="Notification preferences"
         >
@@ -87,7 +87,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
         </button>
 
         {isOpen && (
-          <div className="absolute right-0 top-full mt-1 w-52 bg-gray-900 border border-white/10 rounded-lg shadow-xl z-50">
+          <div className="absolute right-0 top-full mt-1 w-52 bg-[#0a0a0a] border border-tj-gold/20 shadow-[0_0_30px_rgba(0,0,0,0.8)] z-50">
             <div className="px-3 py-2 border-b border-white/10">
               <p className="text-[10px] uppercase tracking-widest text-gray-500">
                 Notifications
@@ -117,7 +117,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
 
         {/* Feedback toast */}
         {feedback && (
-          <div className="absolute right-0 top-full mt-1 bg-gray-800 border border-white/10 rounded px-3 py-1.5 text-xs text-gray-300 whitespace-nowrap z-50">
+          <div className="absolute right-0 top-full mt-1 bg-[#0a0a0a] border border-tj-gold/20 px-3 py-1.5 text-xs text-gray-300 whitespace-nowrap z-50">
             {feedback}
           </div>
         )}
@@ -136,9 +136,9 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
           <button
             key={option.value}
             onClick={() => handleSelect(option.value)}
-            className={`px-4 py-2 rounded text-sm font-medium transition-all ${
+            className={`px-4 py-2 text-[10px] uppercase tracking-widest font-bold transition-all ${
               pref === option.value
-                ? 'bg-tj-gold text-black'
+                ? 'bg-tj-gold text-black border border-tj-gold'
                 : 'bg-white/5 border border-white/10 text-gray-400 hover:border-tj-gold/30 hover:text-white'
             }`}
           >

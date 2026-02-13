@@ -34,13 +34,13 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ type }) => {
     <div className="text-center py-16 px-4 max-w-md mx-auto">
       <div className="mb-4">
         <Icon
-          className="mx-auto text-amber-500"
+          className="mx-auto text-tj-gold"
           size={48}
           strokeWidth={1.5}
         />
       </div>
 
-      <h2 className="text-white text-xl font-display tracking-wide mb-2">
+      <h2 className="text-white text-xl font-display tracking-wider mb-2">
         {content.title}
       </h2>
 

@@ -123,7 +123,7 @@ const CustomerStatusTracker: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-amber-50/30">
+      <div className="min-h-screen bg-gradient-to-b from-[#011c12] to-black">
         <LoadingCrest />
       </div>
     );
@@ -131,7 +131,7 @@ const CustomerStatusTracker: React.FC = () => {
 
   if (errorType) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-amber-50/30 pt-24 px-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#011c12] to-black pt-24 px-4">
         <ErrorState type={errorType} />
       </div>
     );
@@ -141,24 +141,24 @@ const CustomerStatusTracker: React.FC = () => {
   const isRejected = registration?.currentStage === 'rejected';
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-amber-50/30">
+    <div className="min-h-screen bg-gradient-to-b from-[#011c12] to-black">
       {/* Header */}
       <header className="pt-8 pb-4 text-center">
-        <h1 className="text-gray-800 text-xl font-display tracking-wide">
+        <h1 className="text-white text-xl font-display tracking-wide">
           Triple J Auto Investment
         </h1>
-        <p className="text-gray-500 text-sm mt-1">Registration Status</p>
+        <p className="text-gray-400 text-sm mt-1">Registration Status</p>
       </header>
 
       {/* Vehicle info */}
       <div className="text-center mb-6">
-        <div className="inline-flex items-center gap-2 text-gray-600 text-sm">
+        <div className="inline-flex items-center gap-2 text-gray-400 text-sm">
           <Car size={16} />
           <span>
             {registration?.vehicleYear} {registration?.vehicleMake} {registration?.vehicleModel}
           </span>
         </div>
-        <p className="text-gray-400 text-xs mt-1">
+        <p className="text-gray-500 text-xs mt-1">
           Order: {registration?.orderId}
         </p>
 
@@ -209,7 +209,7 @@ const CustomerStatusTracker: React.FC = () => {
       <div className="fixed bottom-6 right-6 md:hidden">
         <button
           onClick={handleShare}
-          className="w-12 h-12 bg-tj-gold rounded-full flex items-center justify-center shadow-lg hover:bg-amber-500 transition-colors"
+          className="w-12 h-12 bg-tj-gold flex items-center justify-center shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:bg-amber-500 transition-colors"
           aria-label="Share tracking link"
         >
           <Share2 size={20} className="text-white" />
@@ -217,10 +217,10 @@ const CustomerStatusTracker: React.FC = () => {
       </div>
 
       {/* Login link for returning customers */}
-      <div className="text-center mt-8 pt-6 border-t border-gray-200">
-        <p className="text-gray-500 text-sm">
+      <div className="text-center mt-8 pt-6 border-t border-white/10">
+        <p className="text-gray-400 text-sm">
           Have multiple registrations?{' '}
-          <Link to="/customer/login" className="text-tj-gold hover:text-gray-800 transition-colors">
+          <Link to="/customer/login" className="text-tj-gold hover:text-white transition-colors">
             Log in with your phone number
           </Link>
           {' '}to see them all.
@@ -229,7 +229,7 @@ const CustomerStatusTracker: React.FC = () => {
 
       {/* Footer with contact */}
       <footer className="mt-12 pb-8 text-center">
-        <p className="text-gray-400 text-xs">
+        <p className="text-gray-500 text-xs">
           Questions? Call{' '}
           <a href="tel:+17135550192" className="text-tj-gold hover:underline">
             (713) 555-0192
