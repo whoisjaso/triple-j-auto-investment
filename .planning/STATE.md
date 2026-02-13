@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-12
-**Session:** Phase 6 COMPLETE -- 06-06 (payment tracking & dashboard integration) complete
+**Last Updated:** 2026-02-13
+**Session:** Phase 7 IN PROGRESS -- 07-01 (plate tracking DB, types & service layer) complete
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 6 (Rental Management Core) COMPLETE. Phase 7 (Plate Tracking) is next. Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 7 (Plate Tracking) IN PROGRESS -- 07-01 complete (DB, types, service). Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,10 +22,10 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 6 of 9 (Rental Management Core) -- COMPLETE
-**Plan:** 6/6 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-12 -- Completed 06-06-PLAN.md (Payment Tracking & Dashboard)
+**Phase:** 7 of 9 (Plate Tracking) -- IN PROGRESS
+**Plan:** 1/4 complete
+**Status:** In progress
+**Last activity:** 2026-02-13 -- Completed 07-01-PLAN.md (Database, Types & Service Layer)
 
 **Progress:**
 ```
@@ -60,11 +60,15 @@ Phase 6:    [====================] 100% (6/6 plans complete) - COMPLETE
   Plan 04:  [X] Booking Modal & Condition Report (RentalBookingModal.tsx, RentalConditionReport.tsx)
   Plan 05:  [X] Rental Agreement System (SignatureCapture, RentalAgreementModal, PDF generator)
   Plan 06:  [X] Payment Tracking & Dashboard (BookingDetail, payments, late fees, modal wiring)
-Phase 7:    [ ] Not started (Plate Tracking)
+Phase 7:    [=====               ] 25% (1/4 plans complete) - IN PROGRESS
+  Plan 01:  [X] Database, Types & Service Layer (07_plate_tracking.sql, plateService.ts, types.ts)
+  Plan 02:  [ ] Plates Admin Page (dedicated /admin/plates page)
+  Plan 03:  [ ] Rental Integration (plate selection in booking, return confirmation)
+  Plan 04:  [ ] Alert Edge Function & Nav Integration
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [███████████████████░] 96% (23/24 plans complete)
+Overall:    [████████████████████] 97% (24/28 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -79,10 +83,10 @@ Overall:    [███████████████████░] 96% (
 
 | Metric | Value | Notes |
 |--------|-------|-------|
-| Phases Planned | 9 | 1 blocked (Phase 9), Phases 7-9 not yet detailed |
+| Phases Planned | 9 | 1 blocked (Phase 9), Phase 7 in progress |
 | Phases Complete | 6 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 23 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06 |
+| Plans Executed | 24 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -167,6 +171,12 @@ Overall:    [███████████████████░] 96% (
 | Pre-fill payment amount with remaining balance | Most common case is paying remaining; saves admin calculation step | 2026-02-12 | 06-06 |
 | Customer total only shown when >1 booking | Single-booking info already visible in booking detail; avoids redundancy | 2026-02-12 | 06-06 |
 | Calendar booking click navigates to Active Rentals | Connects calendar visualization to management detail view seamlessly | 2026-02-12 | 06-06 |
+| UNIQUE constraint via DO block for plates | plate_number uniqueness enforced through information_schema guard (idempotent) | 2026-02-13 | 07-01 |
+| Dedicated update_plates_updated_at function | Generic update_updated_at_column() may not exist; self-contained is safer | 2026-02-13 | 07-01 |
+| No DELETE policy on immutable tables | plate_assignments and plate_alerts are audit trails; resolve, don't delete | 2026-02-13 | 07-01 |
+| Client-side active assignment filter | PostgREST cannot filter nested joins; transformPlate filters array for returned_at IS NULL | 2026-02-13 | 07-01 |
+| Two-step plate swap (close + create) | Partial unique index prevents double-active; if second step fails, plate is safely available | 2026-02-13 | 07-01 |
+| Zeroed time components in expiry calculation | calculateTagExpiry sets hours to 0 on both dates to avoid timezone off-by-one | 2026-02-13 | 07-01 |
 
 ### Patterns Established
 
@@ -230,6 +240,12 @@ Overall:    [███████████████████░] 96% (
 - **Late fee override pattern:** Override/Waive/Reset buttons with inline form; null = auto, 0 = waived, >0 = override
 - **Customer running total pattern:** Aggregate across all bookings by customer_id; only show when >1 booking
 - **Accordion expansion pattern:** expandedBookingId state; clicking another row collapses previous
+- **Plate entity model pattern:** First-class plates table independent of vehicles/registrations, linked via plate_assignments
+- **Plate assignment history pattern:** Immutable log table with returned_at NULL = active; no DELETE RLS policy
+- **Plate status trigger pattern:** SECURITY DEFINER AFTER INSERT/UPDATE trigger auto-syncs plates.status with active assignments
+- **Plate service transformer pattern:** transformPlate filters nested plate_assignments array client-side for active assignment
+- **Tag expiry calculation pattern:** calculateTagExpiry zeroes time components, returns severity tier (ok/warning/urgent/expired)
+- **Two-step swap pattern:** Close active assignment, then create new one; partial unique index prevents double-active
 
 ### Architecture Summary (Current)
 
@@ -352,12 +368,31 @@ App.tsx:
   - /customer/login -> CustomerLogin, /customer/dashboard -> CustomerDashboard
   - Navbar: Rentals link with Key icon
 
+types.ts Plate Tracking Types (Phase 07):
+  - PlateType: 'dealer' | 'buyer_tag' | 'permanent'
+  - PlateStatus: 'available' | 'assigned' | 'expired' | 'lost'
+  - PlateAssignmentType: 'rental' | 'sale' | 'inventory'
+  - PlateAlertType, PlateAlertSeverity type aliases
+  - Plate, PlateAssignment, PlateAlert interfaces
+  - PLATE_TYPE_LABELS, PLATE_STATUS_LABELS constants
+
+services/plateService.ts (679 lines):
+  - transformPlate, transformAssignment, transformAlert, transformVehicleMinimal
+  - CRUD: getAllPlates, getPlateById, createPlate, updatePlate, deletePlate
+  - Queries: getPlatesOut, getAvailableDealerPlates
+  - Assignments: assignPlateToBooking, assignPlateToSale, returnPlateAssignment, swapPlateAssignment
+  - History: getPlateHistory
+  - Alerts: getActiveAlerts, resolveAlert
+  - Photo: uploadPlatePhoto
+  - Pure: calculateTagExpiry
+
 supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
   03_customer_portal_access.sql (110 lines)
   04_notification_system.sql (244 lines)
   05_registration_checker.sql - 5 columns + invalidation trigger
   06_rental_schema.sql (568 lines) - btree_gist, 4 tables, EXCLUDE constraint, RLS
+  07_plate_tracking.sql (390 lines) - 3 tables, partial unique indexes, status trigger, RLS
 
 supabase/functions/:
   _shared/ (twilio.ts, resend.ts, email-templates/)
@@ -373,7 +408,7 @@ supabase/functions/:
 | RLS silent failures | Data loss without warning | Ongoing monitoring |
 | No Spireon API access | Can't build GPS feature | Phase 9 blocked |
 | TypeScript strict mode | ErrorBoundary class issues | Low priority (build works) |
-| Migrations 03-06 not applied | Token + notification + phone auth + checker + rental features won't work until applied | Deploy to Supabase |
+| Migrations 03-07 not applied | Token + notification + phone auth + checker + rental + plate features won't work until applied | Deploy to Supabase |
 
 ### TODOs (Cross-Phase)
 
@@ -392,29 +427,27 @@ supabase/functions/:
 - [ ] Create Supabase Storage bucket 'rental-agreements' for agreement PDF uploads
 - [ ] Create Supabase Storage bucket 'rental-photos' for condition report photos
 - [ ] Check Supabase plan limits for document storage
+- [ ] Apply migration 07_plate_tracking.sql to Supabase
+- [ ] Create Supabase Storage bucket 'plate-photos' for plate photo uploads
 
 ---
 
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed 06-06: Payment tracking, late fee management, and full modal integration
-- Updated Rentals.tsx (1885 lines): BookingDetail inline expansion with payments, late fees, condition reports
-- Wired all modals: RentalBookingModal, RentalAgreementModal, RentalConditionReport
-- Added payment recording with Cash/Card/Zelle/CashApp and running balance
-- Added late fee auto-calculation with override/waive/reset-to-auto
-- Added customer running total across all bookings
-- Phase 6 (Rental Management Core) is now COMPLETE (6/6 plans)
+- Executed 07-01: Plate tracking database schema, TypeScript types, and service layer
+- Created 07_plate_tracking.sql (390 lines): 3 tables, 2 partial unique indexes, 2 triggers, RLS
+- Added Plate, PlateAssignment, PlateAlert types to types.ts (76 lines)
+- Created plateService.ts (679 lines): 15 async functions + calculateTagExpiry pure utility
+- Follows established patterns from rentalService.ts and 06_rental_schema.sql
 
-### Phase 6 Status (COMPLETE)
+### Phase 7 Status (IN PROGRESS)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
-| 06-01 | Rental Database Schema | e648fcd | COMPLETE |
-| 06-02 | TypeScript Types & Service Layer | ffdfc7a, 2b76ddd | COMPLETE |
-| 06-03 | Rental Admin Page & Calendar | e4de9dd, edf7950 | COMPLETE |
-| 06-04 | Booking Modal & Condition Report | 9c883ff, 38c613d | COMPLETE |
-| 06-05 | Rental Agreement System | 6021df7, ea0d61a | COMPLETE |
-| 06-06 | Payment Tracking & Dashboard | 2b1f6cf | COMPLETE |
+| 07-01 | Database, Types & Service Layer | 506c6ea, 69163ee | COMPLETE |
+| 07-02 | Plates Admin Page | -- | NOT STARTED |
+| 07-03 | Rental Integration | -- | NOT STARTED |
+| 07-04 | Alert Edge Function & Nav | -- | NOT STARTED |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -422,7 +455,7 @@ supabase/functions/:
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 7: Plate Tracking
+1. Phase 7 Plans 02-04: Plates admin page, rental integration, alert Edge Function
 2. Phase 8: Rental Insurance Verification
 3. Circle back to Phase 3 verification when DB migration is applied
 4. Wire up all credentials after feature code is complete
@@ -431,10 +464,10 @@ supabase/functions/:
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/06-rental-management-core/06-06-SUMMARY.md` - latest plan summary
+3. `.planning/phases/07-plate-tracking/07-01-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-12 (Phase 6 COMPLETE - 06-06 done)*
+*State updated: 2026-02-13 (Phase 7 IN PROGRESS - 07-01 done)*
