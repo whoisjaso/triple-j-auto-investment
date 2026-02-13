@@ -62,6 +62,7 @@ import {
   VALID_TRANSITIONS,
   OWNERSHIP_COLORS
 } from '../../types';
+import RegistrationChecker from '../../components/admin/RegistrationChecker';
 
 // Stage icons mapping for 6-stage workflow
 const STAGE_ICONS: Record<RegistrationStageKey, React.ReactNode> = {
@@ -585,6 +586,12 @@ const Registrations: React.FC = () => {
                         ))}
                       </div>
                     </div>
+
+                    {/* Pre-Submission Checker */}
+                    <RegistrationChecker
+                      registration={reg}
+                      onRefresh={loadRegistrations}
+                    />
 
                     {/* Stage Progress */}
                     <h4 className="text-white text-sm uppercase tracking-widest mb-4">Registration Progress</h4>
