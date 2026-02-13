@@ -386,4 +386,57 @@ BEGIN
   RAISE NOTICE '  - plate_assignments and plate_alerts have no DELETE policy (immutable)';
 END $$;
 
+-- ================================================================
+-- 12. PLATE ALERT CRON SCHEDULE
+-- ================================================================
+-- Runs every 30 minutes to check for overdue, expiring, and
+-- unaccounted plates via the check-plate-alerts Edge Function.
+-- Uses pg_cron + pg_net to invoke the Edge Function (same pattern
+-- as 04_notification_system.sql).
+--
+-- PREREQUISITES:
+--   1. Enable pg_cron extension: Supabase Dashboard -> Database -> Extensions -> pg_cron
+--   2. Enable pg_net extension: Supabase Dashboard -> Database -> Extensions -> pg_net
+--   3. Deploy the Edge Function: supabase functions deploy check-plate-alerts
+--   4. Add Edge Function secrets:
+--      - ADMIN_PHONE: Dealer's phone in E.164 format (e.g. +17135551234)
+--      - ADMIN_EMAIL: Dealer's email for alert notifications
+--      (Supabase Dashboard -> Edge Functions -> check-plate-alerts -> Environment Variables)
+--
+-- CONFIGURATION:
+--   The Edge Function URL and service_role_key must be accessible.
+--   Uses Approach A (app.settings) -- same as 04_notification_system.sql.
+--
+--   ALTER DATABASE postgres SET app.settings.supabase_url = 'https://YOUR_PROJECT.supabase.co';
+--   ALTER DATABASE postgres SET app.settings.service_role_key = 'YOUR_SERVICE_ROLE_KEY';
+--
+-- TODO: After deploying the Edge Function, uncomment and run:
+-- 1. Enable pg_cron and pg_net extensions in Supabase Dashboard
+-- 2. Set app.settings:
+--    ALTER DATABASE postgres SET app.settings.supabase_url = 'https://YOUR_PROJECT.supabase.co';
+--    ALTER DATABASE postgres SET app.settings.service_role_key = 'YOUR_SERVICE_ROLE_KEY';
+-- 3. Deploy: supabase functions deploy check-plate-alerts
+-- 4. Run this schedule in Supabase SQL editor
+
+-- Example (uncomment and adjust for your project):
+-- SELECT cron.schedule(
+--   'check-plate-alerts',
+--   '*/30 * * * *',  -- every 30 minutes
+--   $$
+--   SELECT net.http_post(
+--     url := current_setting('app.settings.supabase_url') || '/functions/v1/check-plate-alerts',
+--     headers := jsonb_build_object(
+--       'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key'),
+--       'Content-Type', 'application/json'
+--     ),
+--     body := '{}'::jsonb
+--   );
+--   $$
+-- );
+
+-- ================================================================
+-- ROLLBACK for cron schedule (if needed):
+--   SELECT cron.unschedule('check-plate-alerts');
+-- ================================================================
+
 COMMIT;
