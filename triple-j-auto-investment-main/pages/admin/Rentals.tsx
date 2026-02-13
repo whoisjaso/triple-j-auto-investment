@@ -531,7 +531,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
   }, [booking.startDate, booking.endDate]);
 
   return (
-    <div className="bg-[#0a0a0a] border border-gray-800 border-t-0">
+    <div className="bg-[#0a0a0a] border border-tj-gold/10 border-t-0">
       <div className="p-4 md:p-6 space-y-5">
         {/* ============ BOOKING HEADER ============ */}
         <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -734,11 +734,11 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
 
           {/* Balance summary bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <div className="bg-black/50 border border-gray-800 p-3">
+            <div className="bg-black/50 border border-tj-gold/10 p-3">
               <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-0.5">Total Cost</p>
               <p className="text-white font-mono text-sm">{formatCurrency(booking.totalCost)}</p>
             </div>
-            <div className="bg-black/50 border border-gray-800 p-3">
+            <div className="bg-black/50 border border-tj-gold/10 p-3">
               <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-0.5">Late Fees</p>
               <p className={`font-mono text-sm ${
                 lateFee && lateFee.isOverridden && lateFee.amount === 0 ? 'text-gray-500' : lateFee ? 'text-red-400' : 'text-gray-600'
@@ -746,7 +746,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
                 {lateFee ? (lateFee.isOverridden && lateFee.amount === 0 ? 'Waived' : formatCurrency(lateFee.amount)) : '$0.00'}
               </p>
             </div>
-            <div className="bg-black/50 border border-gray-800 p-3">
+            <div className="bg-black/50 border border-tj-gold/10 p-3">
               <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-0.5">Payments</p>
               <p className="text-emerald-400 font-mono text-sm">{formatCurrency(totalPayments)}</p>
             </div>
@@ -813,7 +813,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
 
           {/* Record payment form (inline) */}
           {booking.status !== 'cancelled' && (
-            <div className="bg-black/30 border border-white/5 p-4 space-y-3">
+            <div className="bg-black/30 border border-tj-gold/10 p-4 space-y-3">
               <h5 className="text-[10px] uppercase tracking-widest text-gray-500">Record Payment</h5>
               <div className="flex flex-col md:flex-row items-end gap-3">
                 <div className="w-full md:w-32">
@@ -882,7 +882,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
 
         {/* ============ CUSTOMER RUNNING TOTAL ============ */}
         {customerTotals && customerTotals.bookingCount > 1 && (
-          <div className="bg-black/30 border border-white/5 p-4">
+          <div className="bg-black/30 border border-tj-gold/10 p-4">
             <h4 className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-2">
               <Users size={12} /> Customer Total ({booking.customer?.fullName || 'Unknown'})
             </h4>
@@ -1336,6 +1336,7 @@ const Rentals: React.FC = () => {
               <p className="text-gray-500 text-sm">
                 Calendar, active rentals, and fleet management
               </p>
+              <div className="h-px w-24 bg-gradient-to-r from-tj-gold/60 to-transparent" />
             </div>
 
             <div className="flex gap-3">
@@ -1356,17 +1357,19 @@ const Rentals: React.FC = () => {
             </div>
           </div>
 
+          <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
+
           {/* Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-tj-dark border border-gray-800 p-4">
+            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
               <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total Bookings</p>
               <p className="text-white text-2xl font-mono">{stats.totalBookings}</p>
             </div>
-            <div className="bg-tj-dark border border-gray-800 p-4">
+            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
               <p className="text-emerald-400 text-[10px] uppercase tracking-widest mb-1">Active</p>
               <p className="text-emerald-400 text-2xl font-mono">{stats.activeCount}</p>
             </div>
-            <div className="bg-tj-dark border border-gray-800 p-4 relative">
+            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4 relative">
               <p className="text-red-400 text-[10px] uppercase tracking-widest mb-1">Overdue</p>
               <p className={`text-2xl font-mono ${stats.overdueCount > 0 ? 'text-red-400' : 'text-gray-600'}`}>
                 {stats.overdueCount}
@@ -1377,14 +1380,16 @@ const Rentals: React.FC = () => {
                 </span>
               )}
             </div>
-            <div className="bg-tj-dark border border-gray-800 p-4">
+            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
               <p className="text-blue-400 text-[10px] uppercase tracking-widest mb-1">Fleet Size</p>
               <p className="text-blue-400 text-2xl font-mono">{stats.fleetSize}</p>
             </div>
           </div>
 
+          <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
+
           {/* Tab Navigation */}
-          <div className="flex border-b border-gray-800 mb-6">
+          <div className="flex border-b border-tj-gold/20 mb-6">
             {([
               { key: 'calendar' as RentalTab, label: 'Calendar', icon: Calendar },
               { key: 'active' as RentalTab, label: 'Active Rentals', icon: Clock },
@@ -1449,7 +1454,7 @@ const Rentals: React.FC = () => {
           {activeTab === 'active' && !loading && (
             <div>
               {sortedActiveRentals.length === 0 ? (
-                <div className="text-center py-16 bg-tj-dark border border-gray-800">
+                <div className="text-center py-16 bg-tj-dark border border-tj-gold/10">
                   <CheckCircle className="mx-auto text-green-500 mb-4" size={48} />
                   <p className="text-gray-400 text-lg mb-2">No Active Rentals</p>
                   <p className="text-gray-600 text-sm">All vehicles are currently available.</p>
@@ -1475,7 +1480,7 @@ const Rentals: React.FC = () => {
                           className={`bg-tj-dark border p-4 md:p-5 cursor-pointer transition-colors hover:bg-white/[0.02] ${
                             booking.status === 'overdue'
                               ? 'border-red-500/50 bg-red-900/10'
-                              : isExpanded ? 'border-gray-700' : 'border-gray-800'
+                              : isExpanded ? 'border-tj-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.05)]' : 'border-gray-800 hover:border-tj-gold/20 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)]'
                           } ${isExpanded ? 'border-b-0' : ''}`}
                           onClick={() => setExpandedBookingId(isExpanded ? null : booking.id)}
                         >
@@ -1618,7 +1623,7 @@ const Rentals: React.FC = () => {
 
               {/* Fleet List */}
               {fleetVehicles.length === 0 ? (
-                <div className="text-center py-16 bg-tj-dark border border-gray-800">
+                <div className="text-center py-16 bg-tj-dark border border-tj-gold/10">
                   <Car className="mx-auto text-gray-700 mb-4" size={48} />
                   <p className="text-gray-500 mb-2">
                     {fleetFilter === 'rental'
@@ -1656,8 +1661,8 @@ const Rentals: React.FC = () => {
           {/* RETURN VEHICLE DIALOG (simple, for quick actions) */}
           {/* ============================================================ */}
           {returnDialog && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-              <div className="bg-tj-dark border border-gray-700 w-full max-w-md">
+            <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+              <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-md">
                 <div className="p-6 border-b border-gray-800 flex justify-between items-center">
                   <h3 className="text-white font-display text-lg tracking-wide">Return Vehicle</h3>
                   <button
@@ -1787,7 +1792,7 @@ const FleetVehicleRow: React.FC<FleetVehicleRowProps> = ({
   };
 
   return (
-    <div className="bg-tj-dark border border-gray-800 p-4 md:p-6">
+    <div className="bg-tj-dark border border-gray-800 hover:border-tj-gold/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)] p-4 md:p-6">
       <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
         {/* Vehicle Image */}
         <div className="w-16 h-12 bg-black/50 border border-gray-800 flex items-center justify-center shrink-0 overflow-hidden">

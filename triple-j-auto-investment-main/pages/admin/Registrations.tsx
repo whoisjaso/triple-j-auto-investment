@@ -371,29 +371,31 @@ const Registrations: React.FC = () => {
 
         {/* Stats Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-tj-dark border border-gray-800 p-4">
+          <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
             <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total</p>
             <p className="text-white text-2xl font-mono">{registrations.length}</p>
           </div>
-          <div className="bg-tj-dark border border-gray-800 p-4">
+          <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
             <p className="text-amber-400 text-[10px] uppercase tracking-widest mb-1">In Progress</p>
             <p className="text-amber-400 text-2xl font-mono">
               {registrations.filter(r => r.currentStage !== 'sticker_delivered' && r.currentStage !== 'rejected').length}
             </p>
           </div>
-          <div className="bg-tj-dark border border-gray-800 p-4">
+          <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
             <p className="text-orange-400 text-[10px] uppercase tracking-widest mb-1">Rejected</p>
             <p className="text-orange-400 text-2xl font-mono">
               {registrations.filter(r => r.currentStage === 'rejected').length}
             </p>
           </div>
-          <div className="bg-tj-dark border border-gray-800 p-4">
+          <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
             <p className="text-green-400 text-[10px] uppercase tracking-widest mb-1">Complete</p>
             <p className="text-green-400 text-2xl font-mono">
               {registrations.filter(r => r.currentStage === 'sticker_delivered').length}
             </p>
           </div>
         </div>
+
+        <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
 
         {/* Loading State */}
         {loading && (
@@ -404,7 +406,7 @@ const Registrations: React.FC = () => {
 
         {/* Empty State */}
         {!loading && filteredRegistrations.length === 0 && (
-          <div className="text-center py-16 bg-tj-dark border border-gray-800">
+          <div className="text-center py-16 bg-tj-dark border border-tj-gold/10">
             <Car className="mx-auto text-gray-700 mb-4" size={48} />
             <p className="text-gray-500 mb-4">
               {searchQuery || statusFilter !== 'all'
@@ -424,7 +426,7 @@ const Registrations: React.FC = () => {
         {!loading && filteredRegistrations.length > 0 && (
           <div className="space-y-4">
             {filteredRegistrations.map(reg => (
-              <div key={reg.id} className="bg-tj-dark border border-gray-800">
+              <div key={reg.id} className="bg-tj-dark border border-gray-800 hover:border-tj-gold/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)]">
                 {/* Header Row */}
                 <div
                   className="p-4 flex items-center gap-4 cursor-pointer hover:bg-white/5 transition-colors"
@@ -561,7 +563,7 @@ const Registrations: React.FC = () => {
 
                     {/* Document Checklist */}
                     <div className="mb-6 pb-6 border-b border-gray-800">
-                      <h4 className="text-white text-sm uppercase tracking-widest mb-4">Document Checklist</h4>
+                      <h4 className="text-[10px] uppercase tracking-widest text-tj-gold mb-4">Document Checklist</h4>
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                         {[
                           { key: 'docTitleFront', label: 'Title (Front)' },
@@ -594,7 +596,7 @@ const Registrations: React.FC = () => {
                     />
 
                     {/* Stage Progress */}
-                    <h4 className="text-white text-sm uppercase tracking-widest mb-4">Registration Progress</h4>
+                    <h4 className="text-[10px] uppercase tracking-widest text-tj-gold mb-4">Registration Progress</h4>
                     <div className="space-y-2">
                       {REGISTRATION_STAGES.filter(s => s.key !== 'rejected').map((stageConfig, index) => {
                         const isCurrent = reg.currentStage === stageConfig.key;
@@ -607,10 +609,10 @@ const Registrations: React.FC = () => {
                             key={stageConfig.key}
                             className={`flex items-center gap-4 p-3 border ${
                               isCurrent
-                                ? 'border-tj-gold/50 bg-tj-gold/10'
+                                ? 'border-tj-gold/50 bg-tj-gold/10 shadow-[0_0_15px_rgba(212,175,55,0.08)]'
                                 : isComplete
                                 ? 'border-green-500/30 bg-green-900/10'
-                                : 'border-gray-800'
+                                : 'border-white/5'
                             }`}
                           >
                             <span className="text-gray-600 text-xs font-mono w-6">{index + 1}</span>
@@ -692,7 +694,7 @@ const Registrations: React.FC = () => {
 
                     {/* Notes Section */}
                     <div className="mt-6 pt-6 border-t border-gray-800">
-                      <h4 className="text-white text-sm uppercase tracking-widest mb-2">Admin Notes</h4>
+                      <h4 className="text-[10px] uppercase tracking-widest text-tj-gold mb-2">Admin Notes</h4>
                       <p className="text-gray-400 text-sm">{reg.notes || 'No notes'}</p>
                     </div>
 
@@ -746,9 +748,9 @@ const Registrations: React.FC = () => {
 
         {/* Create Modal */}
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="bg-tj-dark border border-gray-700 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-tj-dark">
+          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+            <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-lg max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-[#080808]">
                 <h3 className="text-white font-display text-lg tracking-wide">New Registration</h3>
                 <button
                   onClick={() => setShowCreateModal(false)}
@@ -949,8 +951,8 @@ const Registrations: React.FC = () => {
 
         {/* Status Change Confirmation Dialog */}
         {confirmDialog && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="bg-tj-dark border border-gray-700 w-full max-w-md">
+          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+            <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-md">
               <div className="p-6 border-b border-gray-800">
                 <h3 className="text-white font-display text-lg tracking-wide">
                   Confirm Status Change
@@ -1035,8 +1037,8 @@ const Registrations: React.FC = () => {
 
         {/* Audit History Modal */}
         {showAuditHistory && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="bg-tj-dark border border-gray-700 w-full max-w-2xl max-h-[80vh] flex flex-col">
+          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+            <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-2xl max-h-[80vh] flex flex-col">
               <div className="p-6 border-b border-gray-800 flex justify-between items-center">
                 <h3 className="text-white font-display text-lg tracking-wide">
                   Change History
@@ -1096,8 +1098,8 @@ const Registrations: React.FC = () => {
 
         {/* Notification History Modal */}
         {showNotifications && (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-            <div className="bg-tj-dark border border-gray-700 w-full max-w-2xl max-h-[80vh] flex flex-col">
+          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
+            <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-2xl max-h-[80vh] flex flex-col">
               <div className="p-6 border-b border-gray-800 flex justify-between items-center">
                 <h3 className="text-white font-display text-lg tracking-wide">
                   Notification History
