@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-13
-**Session:** Phase 6 in progress — 06-03 (rental admin page & calendar) complete
+**Last Updated:** 2026-02-12
+**Session:** Phase 6 in progress — 06-05 (rental agreement system) complete
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 6 (Rental Management Core) — Plan 03 complete, 3 plans remaining. Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 6 (Rental Management Core) — Plan 05 complete, 1 plan remaining. Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -23,9 +23,9 @@
 
 **Milestone:** v1 Feature Development
 **Phase:** 6 of 9 (Rental Management Core)
-**Plan:** 3/6 complete
+**Plan:** 5/6 complete
 **Status:** In progress
-**Last activity:** 2026-02-13 — Completed 06-03-PLAN.md (Rental admin page & calendar)
+**Last activity:** 2026-02-12 — Completed 06-05-PLAN.md (Rental agreement system)
 
 **Progress:**
 ```
@@ -53,15 +53,18 @@ Phase 4:    [====================] 100% (4/4 plans complete) - COMPLETE ✓
 Phase 5:    [====================] 100% (2/2 plans complete) - COMPLETE ✓
   Plan 01:  [X] DB Migration, VIN Validator, Types & Service Layer
   Plan 02:  [X] Checker UI Component & Admin Integration (751-line RegistrationChecker.tsx)
-Phase 6:    [==========          ] 50% (3/6 plans complete) - IN PROGRESS
+Phase 6:    [================    ] 83% (5/6 plans complete) - IN PROGRESS
   Plan 01:  [X] Rental Database Schema (btree_gist, EXCLUDE constraint, 4 tables, RLS)
   Plan 02:  [X] TypeScript Types & Service Layer (rentalService.ts, store module, 23 functions)
   Plan 03:  [X] Rental Admin Page & Calendar (Rentals.tsx, RentalCalendar.tsx, 3-tab layout)
+  Plan 04:  [X] Booking Modal & Condition Report (RentalBookingModal.tsx, RentalConditionReport.tsx)
+  Plan 05:  [X] Rental Agreement System (SignatureCapture, RentalAgreementModal, PDF generator)
+  Plan 06:  [ ] Payment Tracking & Dashboard (not started)
 Phase 7:    [ ] Not started (Plate Tracking)
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [████████████████░░░░] 83% (20/24 plans complete)
+Overall:    [██████████████████░░] 92% (22/24 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -79,7 +82,7 @@ Overall:    [████████████████░░░░] 83% (
 | Phases Planned | 9 | 1 blocked (Phase 9), Phases 7-9 not yet detailed |
 | Phases Complete | 5 | Phase 1 + Phase 2 + Phase 4 + Phase 5 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 20 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01, 06-02, 06-03 |
+| Plans Executed | 22 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-05 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -153,6 +156,11 @@ Overall:    [████████████████░░░░] 83% (
 | AdminHeader duplication per admin page | Per research pitfall #7; each page owns its navigation state | 2026-02-13 | 06-03 |
 | FleetVehicleRow as separate component | Local rate state for blur-save pattern; prevents full fleet list re-renders | 2026-02-13 | 06-03 |
 | Overdue-first sort on active rentals | Most urgent items at top for immediate admin attention | 2026-02-13 | 06-03 |
+| Responsive canvas width via container ref | react-signature-canvas needs explicit pixel width; container ref ensures it fills parent | 2026-02-12 | 06-05 |
+| Dual signing flow (digital + manual) | Per CONTEXT.md, not all customers can sign on a screen; print-and-confirm fallback | 2026-02-12 | 06-05 |
+| Graceful storage failure handling | Save signature_data to booking even if Supabase Storage upload fails; signature is critical artifact | 2026-02-12 | 06-05 |
+| Page overflow clause handling | Estimate clause height before rendering; auto-add page if exceeds footer limit | 2026-02-12 | 06-05 |
+| Per-page footer with numbering | drawPageFooter with page X of Y after full document generation; multi-page agreement needs reference | 2026-02-12 | 06-05 |
 
 ### Patterns Established
 
@@ -206,6 +214,11 @@ Overall:    [████████████████░░░░] 83% (
 - **Calendar grid pattern:** grid-cols-7 with useMemo date-keyed Map for O(1) booking lookup per cell
 - **Fleet vehicle row pattern:** Separate component with local state for blur-save rate inputs
 - **Inline rate editing pattern:** Input fields save on blur via service call, local state for edit-in-progress
+- **Signature capture pattern:** react-signature-canvas with responsive container ref, white canvas, base64 PNG output
+- **Dual signing flow pattern:** Digital (canvas capture) or manual (print + checkbox confirm) with terms gate
+- **Rental agreement PDF pattern:** Multi-page branded document with 14 legal clauses, auto page-break handling
+- **Page overflow handling pattern:** Estimate clause height, call doc.addPage() if exceeds FOOTER_LIMIT constant
+- **Per-page footer pattern:** drawPageFooter called after all pages rendered, uses doc.setPage(i) loop for page X of Y
 
 ### Architecture Summary (Current)
 
@@ -355,6 +368,27 @@ pages/admin/Rentals.tsx (NEW in 06-03):
   - AdminHeader with Rentals nav item
   - Placeholder hooks for booking/agreement modals (Plans 04-05)
 
+components/admin/SignatureCapture.tsx (NEW in 06-05):
+  - Reusable digital signature pad (react-signature-canvas)
+  - Responsive canvas width via container ref
+  - Accept/Clear/Re-sign flows, base64 PNG output
+  - Disabled mode shows static image, mobile touch-action:none
+
+components/admin/RentalAgreementModal.tsx (NEW in 06-05):
+  - 697-line agreement review, signature, and PDF preview modal
+  - Left panel: auto-populated summary + SignatureCapture + manual signing flow
+  - Right panel: live PDF preview in iframe, print/download
+  - Uploads PDF to Supabase Storage, updates booking record
+  - Graceful fallback if storage fails (saves signature_data anyway)
+
+services/pdfService.ts (UPDATED in 06-05):
+  - Added RentalAgreementData interface (22 fields)
+  - Added generateRentalAgreementPDF: multi-page branded agreement
+  - 14 numbered legal clauses with auto page-break handling
+  - Signature image embedding via doc.addImage
+  - drawPageFooter helper with page X of Y numbering
+  - Reuses existing drawHeader, drawSection, drawDataBox, drawSecurityBackground
+
 App.tsx (UPDATED in 06-03):
   - /admin/rentals -> AdminRentals (lazy loaded, ProtectedRoute)
   - /customer/login -> CustomerLogin (lazy loaded)
@@ -407,18 +441,20 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Configure Resend API key as Edge Function secret (RESEND_API_KEY)
 - [ ] Deploy Edge Functions: `supabase functions deploy process-notification-queue` and `supabase functions deploy unsubscribe`
 - [ ] Deploy to Vercel (connect GitHub repo, set root dir to triple-j-auto-investment-main)
-- [ ] Check Supabase plan limits for document storage (Phase 5, 8)
+- [ ] Create Supabase Storage bucket 'rental-agreements' for agreement PDF uploads (Phase 6)
+- [ ] Check Supabase plan limits for document storage (Phase 5, 6, 8)
 
 ---
 
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed 06-03: Rental admin page and calendar
-- Created RentalCalendar.tsx (299 lines): custom monthly grid with booking bars
-- Created Rentals.tsx (1028 lines): 3-tab admin page (Calendar, Active Rentals, Fleet)
-- Updated App.tsx with /admin/rentals route and navbar links
-- Updated AdminHeader on Dashboard.tsx and Inventory.tsx with Rentals nav item
+- Executed 06-05: Rental agreement system (signature capture, agreement modal, PDF generator)
+- Installed react-signature-canvas and @types/react-signature-canvas
+- Created SignatureCapture.tsx: reusable digital signature pad with responsive canvas
+- Created RentalAgreementModal.tsx (697 lines): two-panel agreement review with live PDF preview
+- Added generateRentalAgreementPDF to pdfService.ts: multi-page branded agreement with 14 legal clauses
+- Added RentalAgreementData interface, formatCurrencyNum helper, drawPageFooter helper
 
 ### Phase 6 Status (IN PROGRESS)
 | Plan | Focus | Commits | Status |
@@ -426,9 +462,9 @@ supabase/functions/ (NEW in 04-02):
 | 06-01 | Rental Database Schema | e648fcd | COMPLETE |
 | 06-02 | TypeScript Types & Service Layer | ffdfc7a, 2b76ddd | COMPLETE |
 | 06-03 | Rental Admin Page & Calendar | e4de9dd, edf7950 | COMPLETE |
-| 06-04 | TBD | - | NOT STARTED |
-| 06-05 | TBD | - | NOT STARTED |
-| 06-06 | TBD | - | NOT STARTED |
+| 06-04 | Booking Modal & Condition Report | 9c883ff, 38c613d | COMPLETE |
+| 06-05 | Rental Agreement System | 6021df7, ea0d61a | COMPLETE |
+| 06-06 | Payment Tracking & Dashboard | - | NOT STARTED |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -436,8 +472,8 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 6 Plan 04: Booking creation modal (launched from Rentals Calendar/Active tabs)
-2. Phase 6 Plans 05-06: Agreement generation, payment tracking
+1. Phase 6 Plan 06: Payment tracking and rental dashboard (final plan in phase)
+2. Phase 7: Plate Tracking
 3. Circle back to Phase 3 verification when DB migration is applied
 4. Wire up all credentials after feature code is complete
 
@@ -445,10 +481,10 @@ supabase/functions/ (NEW in 04-02):
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/06-rental-management-core/06-03-SUMMARY.md` - latest plan summary
+3. `.planning/phases/06-rental-management-core/06-05-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-13 (06-03 complete)*
+*State updated: 2026-02-12 (06-05 complete)*
