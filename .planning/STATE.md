@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-12
-**Session:** Phase 6 in progress — 06-05 (rental agreement system) complete
+**Session:** Phase 6 COMPLETE -- 06-06 (payment tracking & dashboard integration) complete
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 6 (Rental Management Core) — Plan 05 complete, 1 plan remaining. Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 6 (Rental Management Core) COMPLETE. Phase 7 (Plate Tracking) is next. Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -22,10 +22,10 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 6 of 9 (Rental Management Core)
-**Plan:** 5/6 complete
-**Status:** In progress
-**Last activity:** 2026-02-12 — Completed 06-05-PLAN.md (Rental agreement system)
+**Phase:** 6 of 9 (Rental Management Core) -- COMPLETE
+**Plan:** 6/6 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-12 -- Completed 06-06-PLAN.md (Payment Tracking & Dashboard)
 
 **Progress:**
 ```
@@ -45,26 +45,26 @@ Phase 3:    [=============       ] 67% (2/3 plans complete) - CODE COMPLETE (ver
   Plan 01:  [X] Token Access Infrastructure (access_token, expiry trigger, service functions)
   Plan 02:  [X] Tracking Visualization Components (ProgressArc, ProgressRoad, VehicleIcon, etc.)
   Plan 03:  [ ] Route Integration & Polish (code complete, verification deferred)
-Phase 4:    [====================] 100% (4/4 plans complete) - COMPLETE ✓
+Phase 4:    [====================] 100% (4/4 plans complete) - COMPLETE
   Plan 01:  [X] Notification Database Infrastructure (queue, debounce, preferences, RLS, pg_cron)
   Plan 02:  [X] Edge Functions (Twilio SMS, Resend email, queue processor, unsubscribe)
   Plan 03:  [X] TypeScript Types, Services & Admin UI (notificationPref, notifyCustomer, history modal)
   Plan 04:  [X] Customer Login, Dashboard & Preferences (phone OTP, multi-reg dashboard, pref toggle)
-Phase 5:    [====================] 100% (2/2 plans complete) - COMPLETE ✓
+Phase 5:    [====================] 100% (2/2 plans complete) - COMPLETE
   Plan 01:  [X] DB Migration, VIN Validator, Types & Service Layer
   Plan 02:  [X] Checker UI Component & Admin Integration (751-line RegistrationChecker.tsx)
-Phase 6:    [================    ] 83% (5/6 plans complete) - IN PROGRESS
+Phase 6:    [====================] 100% (6/6 plans complete) - COMPLETE
   Plan 01:  [X] Rental Database Schema (btree_gist, EXCLUDE constraint, 4 tables, RLS)
   Plan 02:  [X] TypeScript Types & Service Layer (rentalService.ts, store module, 23 functions)
   Plan 03:  [X] Rental Admin Page & Calendar (Rentals.tsx, RentalCalendar.tsx, 3-tab layout)
   Plan 04:  [X] Booking Modal & Condition Report (RentalBookingModal.tsx, RentalConditionReport.tsx)
   Plan 05:  [X] Rental Agreement System (SignatureCapture, RentalAgreementModal, PDF generator)
-  Plan 06:  [ ] Payment Tracking & Dashboard (not started)
+  Plan 06:  [X] Payment Tracking & Dashboard (BookingDetail, payments, late fees, modal wiring)
 Phase 7:    [ ] Not started (Plate Tracking)
 Phase 8:    [ ] Not started (Rental Insurance Verification)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [██████████████████░░] 92% (22/24 plans complete)
+Overall:    [███████████████████░] 96% (23/24 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -80,9 +80,9 @@ Overall:    [██████████████████░░] 92% (
 | Metric | Value | Notes |
 |--------|-------|-------|
 | Phases Planned | 9 | 1 blocked (Phase 9), Phases 7-9 not yet detailed |
-| Phases Complete | 5 | Phase 1 + Phase 2 + Phase 4 + Phase 5 (Phase 3 code-complete, verification deferred) |
+| Phases Complete | 6 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 22 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-05 |
+| Plans Executed | 23 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -161,6 +161,12 @@ Overall:    [██████████████████░░] 92% (
 | Graceful storage failure handling | Save signature_data to booking even if Supabase Storage upload fails; signature is critical artifact | 2026-02-12 | 06-05 |
 | Page overflow clause handling | Estimate clause height before rendering; auto-add page if exceeds footer limit | 2026-02-12 | 06-05 |
 | Per-page footer with numbering | drawPageFooter with page X of Y after full document generation; multi-page agreement needs reference | 2026-02-12 | 06-05 |
+| BookingDetail inline expansion (not modal) | Same pattern as RegistrationChecker; keeps context visible without blocking | 2026-02-12 | 06-06 |
+| Accordion single-expand behavior | One booking expanded at a time prevents overwhelming the page | 2026-02-12 | 06-06 |
+| Late fee reset via direct Supabase query | updateBooking Partial cannot distinguish undefined from null; direct query sets null cleanly | 2026-02-12 | 06-06 |
+| Pre-fill payment amount with remaining balance | Most common case is paying remaining; saves admin calculation step | 2026-02-12 | 06-06 |
+| Customer total only shown when >1 booking | Single-booking info already visible in booking detail; avoids redundancy | 2026-02-12 | 06-06 |
+| Calendar booking click navigates to Active Rentals | Connects calendar visualization to management detail view seamlessly | 2026-02-12 | 06-06 |
 
 ### Patterns Established
 
@@ -219,6 +225,11 @@ Overall:    [██████████████████░░] 92% (
 - **Rental agreement PDF pattern:** Multi-page branded document with 14 legal clauses, auto page-break handling
 - **Page overflow handling pattern:** Estimate clause height, call doc.addPage() if exceeds FOOTER_LIMIT constant
 - **Per-page footer pattern:** drawPageFooter called after all pages rendered, uses doc.setPage(i) loop for page X of Y
+- **Booking detail expansion pattern:** BookingDetail component renders inline below row in Active Rentals, not as modal
+- **Payment recording inline pattern:** Amount (pre-filled), method toggle buttons, notes input below payment table
+- **Late fee override pattern:** Override/Waive/Reset buttons with inline form; null = auto, 0 = waived, >0 = override
+- **Customer running total pattern:** Aggregate across all bookings by customer_id; only show when >1 booking
+- **Accordion expansion pattern:** expandedBookingId state; clicking another row collapses previous
 
 ### Architecture Summary (Current)
 
@@ -229,14 +240,14 @@ lib/store/ Module Structure (~800 lines total):
   vehicles.ts   - Vehicle CRUD operations (426 lines)
   sheets.ts     - Google Sheets sync (229 lines)
   leads.ts      - Lead management (68 lines)
-  rentals.ts    - Rental booking loading (24 lines) [NEW in 06-02]
+  rentals.ts    - Rental booking loading (24 lines)
 
-Store.tsx (~295 lines - extended in 06-02):
+Store.tsx (~295 lines):
   - Thin facade that imports from lib/store/*
   - React state management, Supabase subscriptions
   - Auth integration, useStore() interface extended with bookings + refreshBookings
 
-types.ts Rental Types (NEW in 06-02):
+types.ts Rental Types:
   - ListingType: 'sale_only' | 'rental_only' | 'both'
   - RentalBookingStatus: 'reserved' | 'active' | 'returned' | 'cancelled' | 'overdue'
   - PaymentMethod: 'cash' | 'card' | 'zelle' | 'cashapp'
@@ -246,7 +257,7 @@ types.ts Rental Types (NEW in 06-02):
   - PAYMENT_METHOD_LABELS constant
   - Vehicle interface extended with listingType, dailyRate, weeklyRate, minRentalDays, maxRentalDays
 
-types.ts Registration Types (UPDATED in 05-01):
+types.ts Registration Types:
   - RegistrationStageKey: 7 values (6 stages + rejected)
   - Registration interface: 32 fields (added mileage, checkerResults, checkerCompletedAt, checkerOverride, checkerOverrideAt)
   - CheckerResult interface: docComplete, vinFormatValid, vinConfirmedOnDocs, mileageConfirmedOnDocs, surrenderedFront, surrenderedBack
@@ -256,165 +267,102 @@ types.ts Registration Types (UPDATED in 05-01):
   - RegistrationAudit interface: Audit trail records
   - REGISTRATION_STAGES: UI configuration for 7 stages
 
-services/registrationService.ts (UPDATED in 05-01):
-  - transformRegistration: Maps 32 DB columns to TS fields (added checker fields + mileage)
-  - parseAccessKey: Parse /track/{orderId}-{token} URLs
-  - getRegistrationByAccessKey: Token-based secure lookup
-  - getTrackingLink: Generate customer tracking URLs
-  - updateRegistrationStatus: With pending_change_reason + notifyCustomer support
-  - updateDocumentChecklist: Boolean doc flags with audit
-  - saveCheckerResults: Persist CheckerResult JSONB, update completion timestamp
-  - saveCheckerOverride: Set override flag with timestamp, logged via audit trigger
-  - updateRegistrationMileage: Update mileage (triggers checker invalidation via DB trigger)
-  - getRegistrationAudit: Fetch audit trail
-  - logNotification: Extended with oldStage, newStage, subject, templateUsed, providerMessageId
-  - archiveRegistration/restoreRegistration: Soft delete
+services/registrationService.ts:
+  - transformRegistration: Maps 32 DB columns to TS fields
+  - parseAccessKey, getRegistrationByAccessKey, getTrackingLink
+  - updateRegistrationStatus, updateDocumentChecklist
+  - saveCheckerResults, saveCheckerOverride, updateRegistrationMileage
+  - getRegistrationAudit, logNotification
+  - archiveRegistration/restoreRegistration
   - Query helpers: getRegistrationsByStage, getRejectedRegistrations, etc.
 
-services/rentalService.ts (NEW in 06-02):
-  - transformBooking, transformCustomer, transformPayment, transformConditionReport: snake_case -> camelCase
+services/rentalService.ts:
+  - transformBooking, transformCustomer, transformPayment, transformConditionReport
   - Booking CRUD: getAllBookings, getBookingById, getBookingsForMonth, getActiveBookings,
     createBooking, updateBooking, cancelBooking, returnBooking
   - Customer CRUD: getAllCustomers, getCustomerById, createCustomer, updateCustomer, searchCustomers
   - Payment functions: getPaymentsForBooking, createPayment, deletePayment
   - Condition reports: getConditionReports, createConditionReport
-  - Availability: getAvailableVehicles (two-query + client-side filter), updateVehicleListingType, updateVehicleRentalRates
-  - Pure utilities: calculateLateFee (override-aware), calculateBookingTotal (weekly+daily)
+  - Availability: getAvailableVehicles, updateVehicleListingType, updateVehicleRentalRates
+  - Pure utilities: calculateLateFee, calculateBookingTotal
 
-utils/vinValidator.ts (NEW in 05-01):
+utils/vinValidator.ts:
   - validateVinFormat: 17 chars, alphanumeric, no I/O/Q
   - validateVinCheckDigit: ISO 3779 check digit algorithm
 
-services/notificationService.ts (NEW in 04-03):
-  - transformNotification: snake_case to camelCase for registration_notifications
-  - getNotificationHistory: Fetch notifications for a registration
-  - updateNotificationPreference: Set sms/email/both/none pref
-  - getNotificationPreference: Get current pref
+services/notificationService.ts:
+  - transformNotification, getNotificationHistory, updateNotificationPreference, getNotificationPreference
 
-utils/phone.ts (NEW in 04-03):
-  - normalizePhone: E.164 format (+1XXXXXXXXXX) for Twilio/Supabase Auth
-  - formatPhone: Display format (XXX) XXX-XXXX
+utils/phone.ts:
+  - normalizePhone: E.164 format, formatPhone: display format
 
-components/tracking/ (NEW in 03-02):
-  index.ts          - Barrel export (6 components)
-  ProgressArc.tsx   - Circular arc with logo center, stage markers (128 lines)
-  ProgressRoad.tsx  - Horizontal/vertical road with animated car (167 lines)
-  VehicleIcon.tsx   - SVG icons for sedan, suv, truck (127 lines)
-  StageInfo.tsx     - Stage description with milestone dates (102 lines)
-  LoadingCrest.tsx  - Pulsing logo loading animation (27 lines)
-  ErrorState.tsx    - Expired/invalid/not-found error display (74 lines)
+components/tracking/:
+  index.ts, ProgressArc.tsx, ProgressRoad.tsx, VehicleIcon.tsx, StageInfo.tsx, LoadingCrest.tsx, ErrorState.tsx
 
-components/NotificationPreferences.tsx (NEW in 04-04):
-  - Compact mode: gear icon with dropdown popover
-  - Full mode: toggle buttons in a row (SMS/Email/Both/None)
-  - Optimistic updates with revert on failure
-  - Feedback toast, outside-click close
+components/NotificationPreferences.tsx:
+  - Compact + full mode, optimistic updates, feedback toast
 
-pages/CustomerLogin.tsx (NEW in 04-04):
-  - Two-step phone OTP flow (phone input -> code verify)
-  - signInWithOtp/verifyOtp via Supabase client
-  - normalizePhone before OTP call
-  - Resend cooldown (60s), tracking link input bridge
-  - Navigates to /customer/dashboard on success
+pages/CustomerLogin.tsx:
+  - Two-step phone OTP flow, normalizePhone, resend cooldown
 
-pages/CustomerDashboard.tsx (NEW in 04-04):
-  - Auth session check, redirects to /customer/login
-  - RLS-filtered registration fetch (customer_phone match)
-  - Active registrations on top, completed collapsible
-  - NotificationPreferences (compact) per registration card
-  - Mini progress bar, stage badges, View Details links
-  - Auth state change listener for session expiry
+pages/CustomerDashboard.tsx:
+  - Auth session check, RLS-filtered fetch, active/completed sections
 
-components/admin/RegistrationChecker.tsx (NEW in 05-02):
-  - 751-line self-contained pre-submission checker panel
-  - 7 sections: mileage entry, doc completeness, VIN validation, mileage confirmation,
-    SURRENDERED stamp (front+back), document ordering guide, summary+actions
-  - VIN format + ISO 3779 check digit validation (auto-computed)
-  - 5 VIN cross-doc checkboxes + Confirm All button
-  - 2 mileage cross-doc checkboxes (130-U, Inspection)
-  - Override confirmation dialog with failed check count
-  - webDEALER link gated behind allChecksPassed || checkerOverride
+components/admin/RegistrationChecker.tsx:
+  - 751-line pre-submission checker, 7 sections, VIN + mileage validation
 
-pages/admin/Registrations.tsx (UPDATED in 05-02):
-  - ~1157 lines with 6-stage workflow visualization
-  - RegistrationChecker integrated between Document Checklist and Stage Progress
-  - Step buttons for status advancement with confirmation dialogs
-  - "Notify customer" checkbox in confirm dialog (default checked)
-  - Document checklist (5 toggles)
-  - Audit history modal
-  - Notification history modal (channel badges, delivery status, stage transitions)
-  - Stats bar: Total/In Progress/Rejected/Complete
+pages/admin/Registrations.tsx:
+  - ~1157 lines, 6-stage workflow, step buttons, audit/notification history modals
 
-pages/CustomerStatusTracker.tsx (UPDATED in 04-04):
-  - Token-based status page with progress arc and road visualization
-  - NotificationPreferences (compact) near vehicle info header
-  - Login link to /customer/login for returning customers
+pages/CustomerStatusTracker.tsx:
+  - Token-based status page, progress arc + road, notification preferences
 
-components/admin/RentalCalendar.tsx (NEW in 06-03):
-  - 299-line custom monthly calendar grid (no third-party libraries)
-  - grid-cols-7 layout, month navigation (prev/next/today)
-  - Status-colored booking bars (reserved=blue, active=green, overdue=red+pulse, returned=gray)
-  - useMemo date-keyed Map for O(1) booking lookup per cell
-  - Max 4 bars per cell with +N more overflow indicator
-  - Click handlers for dates and booking bars
+components/admin/RentalCalendar.tsx:
+  - 299-line custom monthly calendar grid, status-colored bars, O(1) lookup
 
-pages/admin/Rentals.tsx (NEW in 06-03):
-  - 1028-line rental management page with 3 tabs
-  - Calendar tab: RentalCalendar + inline booking detail + quick actions
-  - Active Rentals tab: overdue-first sorted list, late fee display, return/cancel actions
-  - Fleet tab: listing type dropdown, daily/weekly rate inputs, rental fleet filter
-  - Stats bar: total bookings, active, overdue, fleet size
-  - Return vehicle dialog with mileage-in input
-  - AdminHeader with Rentals nav item
-  - Placeholder hooks for booking/agreement modals (Plans 04-05)
+pages/admin/Rentals.tsx (UPDATED in 06-06):
+  - 1885-line rental management hub with 3 tabs (Calendar/Active/Fleet)
+  - BookingDetail inline expansion: payments, late fees, condition reports, return flow
+  - Payment recording with Cash/Card/Zelle/CashApp toggle and running balance
+  - Late fee auto-calculation with override/waive/reset
+  - Customer running total across all bookings
+  - All modals wired: RentalBookingModal, RentalAgreementModal, RentalConditionReport
+  - Calendar booking click -> Active Rentals detail expansion
+  - Overdue badge with red pulse animation in stats bar
 
-components/admin/SignatureCapture.tsx (NEW in 06-05):
-  - Reusable digital signature pad (react-signature-canvas)
-  - Responsive canvas width via container ref
-  - Accept/Clear/Re-sign flows, base64 PNG output
-  - Disabled mode shows static image, mobile touch-action:none
+components/admin/RentalBookingModal.tsx:
+  - 1120-line booking modal: customer search, vehicle availability, agreement terms, review
+  - 4-section tabbed navigation, double-booking error handling
 
-components/admin/RentalAgreementModal.tsx (NEW in 06-05):
-  - 697-line agreement review, signature, and PDF preview modal
-  - Left panel: auto-populated summary + SignatureCapture + manual signing flow
-  - Right panel: live PDF preview in iframe, print/download
-  - Uploads PDF to Supabase Storage, updates booking record
-  - Graceful fallback if storage fails (saves signature_data anyway)
+components/admin/RentalConditionReport.tsx:
+  - 683-line condition report: 27-item checklist, photo upload, read-only view mode
 
-services/pdfService.ts (UPDATED in 06-05):
-  - Added RentalAgreementData interface (22 fields)
-  - Added generateRentalAgreementPDF: multi-page branded agreement
-  - 14 numbered legal clauses with auto page-break handling
-  - Signature image embedding via doc.addImage
-  - drawPageFooter helper with page X of Y numbering
-  - Reuses existing drawHeader, drawSection, drawDataBox, drawSecurityBackground
+components/admin/SignatureCapture.tsx:
+  - Reusable digital signature pad, responsive canvas, base64 PNG output
 
-App.tsx (UPDATED in 06-03):
+components/admin/RentalAgreementModal.tsx:
+  - 697-line agreement modal: two-panel layout, signature capture, live PDF preview
+
+services/pdfService.ts:
+  - generateRentalAgreementPDF: multi-page branded agreement with 14 legal clauses
+  - RentalAgreementData interface, formatCurrencyNum, drawPageFooter
+
+App.tsx:
   - /admin/rentals -> AdminRentals (lazy loaded, ProtectedRoute)
-  - /customer/login -> CustomerLogin (lazy loaded)
-  - /customer/dashboard -> CustomerDashboard (lazy loaded)
-  - /login -> Login (admin, unchanged)
-  - Navbar: desktop + mobile Rentals link with Key icon for logged-in admins
+  - /customer/login -> CustomerLogin, /customer/dashboard -> CustomerDashboard
+  - Navbar: Rentals link with Key icon
 
 supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
   03_customer_portal_access.sql (110 lines)
-  04_notification_system.sql (244 lines) [NEW in 04-01]
-  05_registration_checker.sql [NEW in 05-01] - 5 columns + invalidation trigger
-  06_rental_schema.sql (568 lines) [NEW in 06-01] - btree_gist, 4 tables, EXCLUDE constraint, RLS
-  README.md
+  04_notification_system.sql (244 lines)
+  05_registration_checker.sql - 5 columns + invalidation trigger
+  06_rental_schema.sql (568 lines) - btree_gist, 4 tables, EXCLUDE constraint, RLS
 
-supabase/functions/ (NEW in 04-02):
-  _shared/
-    twilio.ts              - sendSms() via Twilio REST API (Basic auth)
-    resend.ts              - sendEmail() via Resend REST API (Bearer auth)
-    email-templates/
-      status-update.tsx    - renderStatusUpdateEmail() - branded HTML with progress bar
-      rejection-notice.tsx - renderRejectionEmail() - red alert variant
-  process-notification-queue/
-    index.ts               - Deno.serve queue sweep: fetch ready, send SMS/email, log, mark sent
-  unsubscribe/
-    index.ts               - Deno.serve one-click unsubscribe with branded HTML response
+supabase/functions/:
+  _shared/ (twilio.ts, resend.ts, email-templates/)
+  process-notification-queue/index.ts
+  unsubscribe/index.ts
 ```
 
 ### Known Issues
@@ -441,22 +389,24 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Configure Resend API key as Edge Function secret (RESEND_API_KEY)
 - [ ] Deploy Edge Functions: `supabase functions deploy process-notification-queue` and `supabase functions deploy unsubscribe`
 - [ ] Deploy to Vercel (connect GitHub repo, set root dir to triple-j-auto-investment-main)
-- [ ] Create Supabase Storage bucket 'rental-agreements' for agreement PDF uploads (Phase 6)
-- [ ] Check Supabase plan limits for document storage (Phase 5, 6, 8)
+- [ ] Create Supabase Storage bucket 'rental-agreements' for agreement PDF uploads
+- [ ] Create Supabase Storage bucket 'rental-photos' for condition report photos
+- [ ] Check Supabase plan limits for document storage
 
 ---
 
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Executed 06-05: Rental agreement system (signature capture, agreement modal, PDF generator)
-- Installed react-signature-canvas and @types/react-signature-canvas
-- Created SignatureCapture.tsx: reusable digital signature pad with responsive canvas
-- Created RentalAgreementModal.tsx (697 lines): two-panel agreement review with live PDF preview
-- Added generateRentalAgreementPDF to pdfService.ts: multi-page branded agreement with 14 legal clauses
-- Added RentalAgreementData interface, formatCurrencyNum helper, drawPageFooter helper
+- Executed 06-06: Payment tracking, late fee management, and full modal integration
+- Updated Rentals.tsx (1885 lines): BookingDetail inline expansion with payments, late fees, condition reports
+- Wired all modals: RentalBookingModal, RentalAgreementModal, RentalConditionReport
+- Added payment recording with Cash/Card/Zelle/CashApp and running balance
+- Added late fee auto-calculation with override/waive/reset-to-auto
+- Added customer running total across all bookings
+- Phase 6 (Rental Management Core) is now COMPLETE (6/6 plans)
 
-### Phase 6 Status (IN PROGRESS)
+### Phase 6 Status (COMPLETE)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
 | 06-01 | Rental Database Schema | e648fcd | COMPLETE |
@@ -464,7 +414,7 @@ supabase/functions/ (NEW in 04-02):
 | 06-03 | Rental Admin Page & Calendar | e4de9dd, edf7950 | COMPLETE |
 | 06-04 | Booking Modal & Condition Report | 9c883ff, 38c613d | COMPLETE |
 | 06-05 | Rental Agreement System | 6021df7, ea0d61a | COMPLETE |
-| 06-06 | Payment Tracking & Dashboard | - | NOT STARTED |
+| 06-06 | Payment Tracking & Dashboard | 2b1f6cf | COMPLETE |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -472,8 +422,8 @@ supabase/functions/ (NEW in 04-02):
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 6 Plan 06: Payment tracking and rental dashboard (final plan in phase)
-2. Phase 7: Plate Tracking
+1. Phase 7: Plate Tracking
+2. Phase 8: Rental Insurance Verification
 3. Circle back to Phase 3 verification when DB migration is applied
 4. Wire up all credentials after feature code is complete
 
@@ -481,10 +431,10 @@ supabase/functions/ (NEW in 04-02):
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/06-rental-management-core/06-05-SUMMARY.md` - latest plan summary
+3. `.planning/phases/06-rental-management-core/06-06-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-12 (06-05 complete)*
+*State updated: 2026-02-12 (Phase 6 COMPLETE - 06-06 done)*
