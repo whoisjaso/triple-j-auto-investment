@@ -1,18 +1,25 @@
 /**
  * Admin Rental Management Page
  *
- * Phase 06-03: Main rental management interface with three tabs:
+ * Phase 06-06: Complete rental management hub with all modals integrated.
+ *
+ * Features:
  * - Calendar: Monthly booking visualization via RentalCalendar
- * - Active Rentals: Current renters with overdue highlighting
+ * - Active Rentals: Accordion-style booking detail with payments & late fees
  * - Fleet: Vehicle listing type controls and rental rate management
+ * - Payment recording with mixed methods and running balance
+ * - Late fee auto-calculation with admin override/waive
+ * - Customer running total across all rentals
+ * - Booking modal, agreement modal, condition report integration
  *
  * Requirements addressed:
  * - RENT-01: Dual inventory (sale_only / rental_only / both)
  * - RENT-02: Availability calendar with color-coded bookings
  * - RENT-04: Rental tracking (who has what car, when due back)
+ * - RENT-06: Deposits and payments tracked per booking
  */
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -37,14 +44,27 @@ import {
   X,
   Search,
   ChevronDown,
+  ChevronUp,
+  Trash2,
+  PenTool,
+  ClipboardList,
+  Ban,
 } from 'lucide-react';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 import RentalCalendar from '../../components/admin/RentalCalendar';
+import { RentalBookingModal } from '../../components/admin/RentalBookingModal';
+import { RentalAgreementModal } from '../../components/admin/RentalAgreementModal';
+import { RentalConditionReport } from '../../components/admin/RentalConditionReport';
 import {
   getBookingsForMonth,
   getActiveBookings,
+  getPaymentsForBooking,
+  getConditionReports,
   returnBooking,
   cancelBooking,
+  createPayment,
+  deletePayment,
+  updateBooking,
   updateVehicleListingType,
   updateVehicleRentalRates,
   calculateLateFee,
@@ -52,8 +72,12 @@ import {
 import {
   RentalBooking,
   RentalBookingStatus,
+  RentalPayment,
+  RentalConditionReport as RentalConditionReportType,
   ListingType,
+  PaymentMethod,
   Vehicle,
+  PAYMENT_METHOD_LABELS,
 } from '../../types';
 
 // ================================================================
@@ -186,6 +210,839 @@ const AdminHeader = () => {
 type RentalTab = 'calendar' | 'active' | 'fleet';
 
 // ================================================================
+// FORMAT HELPERS
+// ================================================================
+
+const formatCurrency = (amount: number): string =>
+  new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+
+const formatDate = (dateStr: string): string => {
+  if (!dateStr) return '';
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return dateStr;
+  const [yr, mo, da] = parts;
+  return `${mo}/${da}/${yr}`;
+};
+
+// ================================================================
+// BOOKING DETAIL COMPONENT (inline expansion)
+// ================================================================
+
+interface BookingDetailProps {
+  booking: RentalBooking;
+  allBookings: RentalBooking[];
+  vehicles: Vehicle[];
+  onRefresh: () => Promise<void>;
+  onOpenAgreement: (booking: RentalBooking) => void;
+  onClose: () => void;
+}
+
+const BookingDetail: React.FC<BookingDetailProps> = ({
+  booking,
+  allBookings,
+  vehicles,
+  onRefresh,
+  onOpenAgreement,
+  onClose,
+}) => {
+  // Payment state
+  const [payments, setPayments] = useState<RentalPayment[]>(booking.payments || []);
+  const [loadingPayments, setLoadingPayments] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
+  const [paymentNotes, setPaymentNotes] = useState('');
+  const [recordingPayment, setRecordingPayment] = useState(false);
+  const [deletingPaymentId, setDeletingPaymentId] = useState<string | null>(null);
+
+  // Late fee override state
+  const [showLateFeeOverride, setShowLateFeeOverride] = useState(false);
+  const [overrideAmount, setOverrideAmount] = useState('');
+  const [overrideNotes, setOverrideNotes] = useState('');
+  const [savingOverride, setSavingOverride] = useState(false);
+
+  // Condition report state
+  const [showCheckoutReport, setShowCheckoutReport] = useState(false);
+  const [showReturnReport, setShowReturnReport] = useState(false);
+  const [conditionReports, setConditionReports] = useState<RentalConditionReportType[]>([]);
+
+  // Return flow state
+  const [showReturnFlow, setShowReturnFlow] = useState(false);
+  const [returnDate, setReturnDate] = useState(new Date().toISOString().split('T')[0]);
+  const [returnMileage, setReturnMileage] = useState('');
+  const [processingReturn, setProcessingReturn] = useState(false);
+
+  // Action loading
+  const [actionLoading, setActionLoading] = useState(false);
+
+  // Load payments and condition reports
+  useEffect(() => {
+    const loadData = async () => {
+      setLoadingPayments(true);
+      try {
+        const [paymentsData, reportsData] = await Promise.all([
+          getPaymentsForBooking(booking.id),
+          getConditionReports(booking.id),
+        ]);
+        setPayments(paymentsData);
+        setConditionReports(reportsData);
+      } catch (err) {
+        console.error('Error loading booking details:', err);
+      } finally {
+        setLoadingPayments(false);
+      }
+    };
+    loadData();
+  }, [booking.id]);
+
+  // ---- Late fee calculation ----
+  const lateFee = useMemo(() => {
+    const isLate = booking.status === 'overdue' || (
+      booking.status === 'returned' && booking.actualReturnDate &&
+      new Date(booking.actualReturnDate) > new Date(booking.endDate)
+    );
+    if (!isLate) return null;
+    return calculateLateFee(
+      booking.endDate,
+      booking.actualReturnDate || null,
+      booking.dailyRate,
+      booking.lateFeeOverride ?? null
+    );
+  }, [booking]);
+
+  // ---- Balance calculations ----
+  const totalPayments = useMemo(() =>
+    payments.reduce((sum, p) => sum + p.amount, 0),
+  [payments]);
+
+  const lateFeeAmount = lateFee ? lateFee.amount : 0;
+  const grandTotal = booking.totalCost + lateFeeAmount;
+  const remainingBalance = grandTotal - totalPayments;
+
+  // ---- Customer running total ----
+  const customerTotals = useMemo(() => {
+    if (!booking.customerId) return null;
+    const customerBookings = allBookings.filter(
+      b => b.customerId === booking.customerId && b.status !== 'cancelled'
+    );
+    let totalCost = 0;
+    let totalPaid = 0;
+    customerBookings.forEach(b => {
+      totalCost += b.totalCost;
+      // Calculate late fees for each booking
+      const isLate = b.status === 'overdue' || (
+        b.status === 'returned' && b.actualReturnDate &&
+        new Date(b.actualReturnDate) > new Date(b.endDate)
+      );
+      if (isLate) {
+        const lf = calculateLateFee(
+          b.endDate,
+          b.actualReturnDate || null,
+          b.dailyRate,
+          b.lateFeeOverride ?? null
+        );
+        totalCost += lf.amount;
+      }
+      // Sum payments from joined data
+      if (b.payments) {
+        totalPaid += b.payments.reduce((s, p) => s + p.amount, 0);
+      }
+    });
+    return {
+      totalCost,
+      totalPaid,
+      outstanding: totalCost - totalPaid,
+      bookingCount: customerBookings.length,
+    };
+  }, [allBookings, booking.customerId]);
+
+  // ---- Vehicle from store ----
+  const vehicle = useMemo(() => {
+    return booking.vehicle || vehicles.find(v => v.id === booking.vehicleId);
+  }, [booking, vehicles]);
+
+  const vehicleName = vehicle
+    ? `${vehicle.year} ${vehicle.make} ${vehicle.model}`
+    : 'Unknown Vehicle';
+
+  // Pre-fill payment amount with remaining balance
+  useEffect(() => {
+    if (remainingBalance > 0 && !paymentAmount) {
+      setPaymentAmount(remainingBalance.toFixed(2));
+    }
+  }, [remainingBalance]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ---- Existing condition reports ----
+  const checkoutReport = conditionReports.find(r => r.reportType === 'checkout');
+  const returnReport = conditionReports.find(r => r.reportType === 'return');
+
+  // ---- Handlers ----
+
+  const handleRecordPayment = async () => {
+    const amount = parseFloat(paymentAmount);
+    if (isNaN(amount) || amount <= 0) return;
+
+    setRecordingPayment(true);
+    try {
+      const result = await createPayment({
+        bookingId: booking.id,
+        amount,
+        paymentMethod,
+        notes: paymentNotes.trim() || undefined,
+      });
+      if (result) {
+        setPayments(prev => [result, ...prev]);
+        setPaymentAmount('');
+        setPaymentNotes('');
+        await onRefresh();
+      }
+    } catch (err) {
+      console.error('Error recording payment:', err);
+    } finally {
+      setRecordingPayment(false);
+    }
+  };
+
+  const handleDeletePayment = async (paymentId: string) => {
+    if (!confirm('Delete this payment?')) return;
+    setDeletingPaymentId(paymentId);
+    try {
+      const success = await deletePayment(paymentId);
+      if (success) {
+        setPayments(prev => prev.filter(p => p.id !== paymentId));
+        await onRefresh();
+      }
+    } catch (err) {
+      console.error('Error deleting payment:', err);
+    } finally {
+      setDeletingPaymentId(null);
+    }
+  };
+
+  const handleLateFeeOverride = async () => {
+    const amount = parseFloat(overrideAmount);
+    if (isNaN(amount) || amount < 0) return;
+
+    setSavingOverride(true);
+    try {
+      const success = await updateBooking(booking.id, {
+        lateFeeOverride: amount,
+        lateFeeNotes: overrideNotes.trim() || undefined,
+      });
+      if (success) {
+        setShowLateFeeOverride(false);
+        await onRefresh();
+      }
+    } catch (err) {
+      console.error('Error saving late fee override:', err);
+    } finally {
+      setSavingOverride(false);
+    }
+  };
+
+  const handleWaiveLateFee = async () => {
+    setSavingOverride(true);
+    try {
+      const success = await updateBooking(booking.id, {
+        lateFeeOverride: 0,
+        lateFeeNotes: 'Waived by admin',
+      });
+      if (success) {
+        await onRefresh();
+      }
+    } catch (err) {
+      console.error('Error waiving late fee:', err);
+    } finally {
+      setSavingOverride(false);
+    }
+  };
+
+  const handleResetLateFee = async () => {
+    setSavingOverride(true);
+    try {
+      // Set override to undefined (null in DB) to revert to auto-calculate
+      const { error } = await (await import('../../supabase/config')).supabase
+        .from('rental_bookings')
+        .update({ late_fee_override: null, late_fee_notes: null, updated_at: new Date().toISOString() })
+        .eq('id', booking.id);
+      if (!error) {
+        await onRefresh();
+      }
+    } catch (err) {
+      console.error('Error resetting late fee:', err);
+    } finally {
+      setSavingOverride(false);
+    }
+  };
+
+  const handleProcessReturn = async () => {
+    if (!returnMileage) return;
+    setProcessingReturn(true);
+    try {
+      const success = await returnBooking(
+        booking.id,
+        returnDate,
+        parseInt(returnMileage, 10)
+      );
+      if (success) {
+        setShowReturnFlow(false);
+        await onRefresh();
+        // Prompt for return condition report if none exists
+        if (!returnReport) {
+          setShowReturnReport(true);
+        }
+      }
+    } catch (err) {
+      console.error('Error processing return:', err);
+    } finally {
+      setProcessingReturn(false);
+    }
+  };
+
+  const handleCancelBooking = async () => {
+    if (!confirm('Are you sure you want to cancel this booking? This cannot be undone.')) return;
+    setActionLoading(true);
+    try {
+      const success = await cancelBooking(booking.id);
+      if (success) {
+        await onRefresh();
+        onClose();
+      }
+    } catch (err) {
+      console.error('Error cancelling booking:', err);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleConditionReportComplete = async () => {
+    setShowCheckoutReport(false);
+    setShowReturnReport(false);
+    // Reload condition reports
+    const reports = await getConditionReports(booking.id);
+    setConditionReports(reports);
+    await onRefresh();
+  };
+
+  // Calculate rental duration
+  const rentalDays = useMemo(() => {
+    const start = new Date(booking.startDate);
+    const end = new Date(booking.endDate);
+    return Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
+  }, [booking.startDate, booking.endDate]);
+
+  return (
+    <div className="bg-[#0a0a0a] border border-gray-800 border-t-0">
+      <div className="p-4 md:p-6 space-y-5">
+        {/* ============ BOOKING HEADER ============ */}
+        <div className="flex flex-col md:flex-row justify-between gap-4">
+          <div className="flex items-start gap-4">
+            {/* Vehicle thumbnail */}
+            {vehicle?.imageUrl && (
+              <div className="w-20 h-14 border border-gray-800 overflow-hidden shrink-0 hidden md:block">
+                <img src={vehicle.imageUrl} alt={vehicleName} className="w-full h-full object-cover" />
+              </div>
+            )}
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-tj-gold font-mono text-sm font-bold">{booking.bookingId}</span>
+                <span className={`px-2 py-0.5 text-[10px] uppercase tracking-wider border ${
+                  booking.status === 'active' ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
+                  : booking.status === 'overdue' ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse'
+                  : booking.status === 'reserved' ? 'bg-blue-500/20 text-blue-400 border-blue-500/50'
+                  : booking.status === 'returned' ? 'bg-gray-500/20 text-gray-400 border-gray-500/50'
+                  : 'bg-gray-500/20 text-gray-400 border-gray-500/50'
+                }`}>
+                  {booking.status}
+                </span>
+              </div>
+              <p className="text-white text-sm">{vehicleName}</p>
+              <p className="text-gray-500 text-xs flex items-center gap-1">
+                <Users size={12} />
+                {booking.customer?.fullName || 'Unknown Customer'}
+                {booking.customer?.phone && <span className="ml-1 text-gray-600">| {booking.customer.phone}</span>}
+                {booking.customer?.driversLicenseNumber && (
+                  <span className="ml-1 text-gray-600">| DL: {booking.customer.driversLicenseNumber}</span>
+                )}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="self-start p-1 text-gray-500 hover:text-white transition-colors"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* ============ DATES & COST ============ */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <div>
+            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-0.5">Start</p>
+            <p className="text-white text-sm">{formatDate(booking.startDate)}</p>
+          </div>
+          <div>
+            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-0.5">End</p>
+            <p className="text-white text-sm">{formatDate(booking.endDate)}</p>
+          </div>
+          {booking.actualReturnDate && (
+            <div>
+              <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-0.5">Returned</p>
+              <p className="text-white text-sm">{formatDate(booking.actualReturnDate)}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-0.5">Duration</p>
+            <p className="text-white text-sm">{rentalDays} day{rentalDays !== 1 ? 's' : ''}</p>
+          </div>
+          <div>
+            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-0.5">Daily Rate</p>
+            <p className="text-white text-sm">{formatCurrency(booking.dailyRate)}/day</p>
+          </div>
+          {booking.weeklyRate && (
+            <div>
+              <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-0.5">Weekly Rate</p>
+              <p className="text-white text-sm">{formatCurrency(booking.weeklyRate)}/wk</p>
+            </div>
+          )}
+        </div>
+
+        {/* ============ LATE FEE MANAGEMENT ============ */}
+        {lateFee && (
+          <div className={`border p-4 space-y-3 ${
+            lateFee.amount === 0 && lateFee.isOverridden
+              ? 'border-gray-700 bg-gray-900/30'
+              : 'border-red-800/50 bg-red-900/10'
+          }`}>
+            <div className="flex items-center justify-between">
+              <h4 className="text-[10px] uppercase tracking-widest text-red-400 flex items-center gap-2">
+                <AlertTriangle size={12} /> Late Fee
+              </h4>
+              <div className="flex items-center gap-2">
+                {!lateFee.isOverridden && (
+                  <>
+                    <button
+                      onClick={() => {
+                        setOverrideAmount('');
+                        setOverrideNotes('');
+                        setShowLateFeeOverride(true);
+                      }}
+                      disabled={savingOverride}
+                      className="px-2 py-1 text-[10px] uppercase tracking-wider border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+                    >
+                      Override
+                    </button>
+                    <button
+                      onClick={handleWaiveLateFee}
+                      disabled={savingOverride}
+                      className="px-2 py-1 text-[10px] uppercase tracking-wider border border-amber-700/50 text-amber-400 hover:bg-amber-900/20 transition-colors"
+                    >
+                      Waive
+                    </button>
+                  </>
+                )}
+                {lateFee.isOverridden && (
+                  <button
+                    onClick={handleResetLateFee}
+                    disabled={savingOverride}
+                    className="px-2 py-1 text-[10px] uppercase tracking-wider border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+                  >
+                    Reset to Auto
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {lateFee.isOverridden ? (
+              <div className="text-sm">
+                {lateFee.amount === 0 ? (
+                  <p className="text-gray-500">Late fee <span className="text-amber-400 font-medium">waived</span></p>
+                ) : (
+                  <p className="text-white">
+                    Overridden: <span className="text-red-400 font-mono font-bold">{formatCurrency(lateFee.amount)}</span>
+                  </p>
+                )}
+                {booking.lateFeeNotes && (
+                  <p className="text-gray-500 text-xs mt-1">Notes: {booking.lateFeeNotes}</p>
+                )}
+                <p className="text-gray-600 text-xs mt-1">
+                  ({lateFee.days} day{lateFee.days !== 1 ? 's' : ''} overdue)
+                </p>
+              </div>
+            ) : (
+              <div className="text-sm">
+                <p className="text-white">
+                  <span className="text-gray-400">{lateFee.days} day{lateFee.days !== 1 ? 's' : ''} overdue</span>
+                  {' x '}
+                  <span className="text-gray-400">{formatCurrency(booking.dailyRate)}/day</span>
+                  {' = '}
+                  <span className="text-red-400 font-mono font-bold">{formatCurrency(lateFee.amount)}</span>
+                </p>
+              </div>
+            )}
+
+            {/* Override form */}
+            {showLateFeeOverride && (
+              <div className="flex items-end gap-3 pt-2 border-t border-red-800/30">
+                <div className="flex-1">
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Override Amount</label>
+                  <div className="relative">
+                    <DollarSign size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-600" />
+                    <input
+                      type="number"
+                      value={overrideAmount}
+                      onChange={e => setOverrideAmount(e.target.value)}
+                      className="w-full bg-black border border-gray-700 pl-6 pr-3 py-2 text-white text-sm focus:outline-none focus:border-tj-gold"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Notes</label>
+                  <input
+                    type="text"
+                    value={overrideNotes}
+                    onChange={e => setOverrideNotes(e.target.value)}
+                    className="w-full bg-black border border-gray-700 px-3 py-2 text-white text-sm focus:outline-none focus:border-tj-gold"
+                    placeholder="Reason for override"
+                  />
+                </div>
+                <button
+                  onClick={handleLateFeeOverride}
+                  disabled={savingOverride}
+                  className="px-3 py-2 bg-tj-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50"
+                >
+                  {savingOverride ? <Loader2 className="animate-spin" size={14} /> : 'Save'}
+                </button>
+                <button
+                  onClick={() => setShowLateFeeOverride(false)}
+                  className="px-3 py-2 border border-gray-700 text-gray-400 text-xs hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ============ PAYMENTS SECTION ============ */}
+        <div className="space-y-3">
+          <h4 className="text-[10px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
+            <DollarSign size={12} /> Payments
+          </h4>
+
+          {/* Balance summary bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div className="bg-black/50 border border-gray-800 p-3">
+              <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-0.5">Total Cost</p>
+              <p className="text-white font-mono text-sm">{formatCurrency(booking.totalCost)}</p>
+            </div>
+            <div className="bg-black/50 border border-gray-800 p-3">
+              <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-0.5">Late Fees</p>
+              <p className={`font-mono text-sm ${
+                lateFee && lateFee.isOverridden && lateFee.amount === 0 ? 'text-gray-500' : lateFee ? 'text-red-400' : 'text-gray-600'
+              }`}>
+                {lateFee ? (lateFee.isOverridden && lateFee.amount === 0 ? 'Waived' : formatCurrency(lateFee.amount)) : '$0.00'}
+              </p>
+            </div>
+            <div className="bg-black/50 border border-gray-800 p-3">
+              <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-0.5">Payments</p>
+              <p className="text-emerald-400 font-mono text-sm">{formatCurrency(totalPayments)}</p>
+            </div>
+            <div className={`border p-3 ${
+              remainingBalance <= 0 ? 'bg-emerald-900/10 border-emerald-800/50' : 'bg-red-900/10 border-red-800/50'
+            }`}>
+              <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-0.5">Remaining</p>
+              <p className={`font-mono text-sm font-bold ${remainingBalance <= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                {remainingBalance <= 0 ? 'PAID' : formatCurrency(remainingBalance)}
+              </p>
+            </div>
+          </div>
+
+          {/* Payment history table */}
+          {loadingPayments ? (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="animate-spin text-tj-gold" size={16} />
+            </div>
+          ) : payments.length > 0 ? (
+            <div className="border border-gray-800 overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-black/50 text-[10px] uppercase tracking-widest text-gray-500">
+                    <th className="text-left px-3 py-2">Date</th>
+                    <th className="text-left px-3 py-2">Amount</th>
+                    <th className="text-left px-3 py-2">Method</th>
+                    <th className="text-left px-3 py-2 hidden md:table-cell">Notes</th>
+                    <th className="text-right px-3 py-2 w-10"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map(payment => (
+                    <tr key={payment.id} className="border-t border-gray-800/50 hover:bg-white/5">
+                      <td className="px-3 py-2 text-gray-300">{formatDate(payment.paymentDate)}</td>
+                      <td className="px-3 py-2 text-emerald-400 font-mono">{formatCurrency(payment.amount)}</td>
+                      <td className="px-3 py-2 text-white">
+                        <span className="px-2 py-0.5 bg-white/5 border border-white/10 text-[10px] uppercase tracking-wider">
+                          {PAYMENT_METHOD_LABELS[payment.paymentMethod]}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 text-gray-500 hidden md:table-cell">{payment.notes || '-'}</td>
+                      <td className="px-3 py-2 text-right">
+                        <button
+                          onClick={() => handleDeletePayment(payment.id)}
+                          disabled={deletingPaymentId === payment.id}
+                          className="p-1 text-gray-600 hover:text-red-400 transition-colors disabled:opacity-50"
+                          title="Delete payment"
+                        >
+                          {deletingPaymentId === payment.id ? (
+                            <Loader2 className="animate-spin" size={12} />
+                          ) : (
+                            <Trash2 size={12} />
+                          )}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-gray-600 text-xs text-center py-3">No payments recorded yet</p>
+          )}
+
+          {/* Record payment form (inline) */}
+          {booking.status !== 'cancelled' && (
+            <div className="bg-black/30 border border-white/5 p-4 space-y-3">
+              <h5 className="text-[10px] uppercase tracking-widest text-gray-500">Record Payment</h5>
+              <div className="flex flex-col md:flex-row items-end gap-3">
+                <div className="w-full md:w-32">
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Amount</label>
+                  <div className="relative">
+                    <DollarSign size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-600" />
+                    <input
+                      type="number"
+                      value={paymentAmount}
+                      onChange={e => setPaymentAmount(e.target.value)}
+                      className="w-full bg-black border border-gray-700 pl-6 pr-3 py-2 text-white text-sm focus:outline-none focus:border-tj-gold"
+                      placeholder="0.00"
+                      min="0"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+
+                <div className="w-full md:w-auto">
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Method</label>
+                  <div className="flex gap-1">
+                    {(Object.entries(PAYMENT_METHOD_LABELS) as [PaymentMethod, string][]).map(([key, label]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setPaymentMethod(key)}
+                        className={`px-3 py-2 text-[10px] uppercase tracking-wider border transition-colors ${
+                          paymentMethod === key
+                            ? 'bg-tj-gold text-black border-tj-gold font-bold'
+                            : 'bg-black border-gray-700 text-gray-400 hover:border-gray-500'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex-1 w-full md:w-auto">
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Notes</label>
+                  <input
+                    type="text"
+                    value={paymentNotes}
+                    onChange={e => setPaymentNotes(e.target.value)}
+                    className="w-full bg-black border border-gray-700 px-3 py-2 text-white text-sm focus:outline-none focus:border-tj-gold"
+                    placeholder="Optional"
+                  />
+                </div>
+
+                <button
+                  onClick={handleRecordPayment}
+                  disabled={recordingPayment || !paymentAmount || parseFloat(paymentAmount) <= 0}
+                  className="px-4 py-2 bg-tj-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
+                >
+                  {recordingPayment ? (
+                    <Loader2 className="animate-spin" size={14} />
+                  ) : (
+                    <DollarSign size={14} />
+                  )}
+                  Record Payment
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* ============ CUSTOMER RUNNING TOTAL ============ */}
+        {customerTotals && customerTotals.bookingCount > 1 && (
+          <div className="bg-black/30 border border-white/5 p-4">
+            <h4 className="text-[10px] uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-2">
+              <Users size={12} /> Customer Total ({booking.customer?.fullName || 'Unknown'})
+            </h4>
+            <div className="grid grid-cols-3 gap-3 text-xs">
+              <div>
+                <p className="text-gray-500">Total across {customerTotals.bookingCount} rentals</p>
+                <p className="text-white font-mono">{formatCurrency(customerTotals.totalCost)}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Total paid</p>
+                <p className="text-emerald-400 font-mono">{formatCurrency(customerTotals.totalPaid)}</p>
+              </div>
+              <div>
+                <p className="text-gray-500">Outstanding</p>
+                <p className={`font-mono font-bold ${customerTotals.outstanding <= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {customerTotals.outstanding <= 0 ? 'CLEAR' : formatCurrency(customerTotals.outstanding)}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ============ CONDITION REPORTS (inline) ============ */}
+        {showCheckoutReport && (
+          <div className="border border-blue-800/30 p-4">
+            <RentalConditionReport
+              bookingId={booking.id}
+              reportType="checkout"
+              vehicleName={vehicleName}
+              onComplete={handleConditionReportComplete}
+              existingReport={checkoutReport}
+            />
+          </div>
+        )}
+
+        {showReturnReport && (
+          <div className="border border-amber-800/30 p-4">
+            <RentalConditionReport
+              bookingId={booking.id}
+              reportType="return"
+              vehicleName={vehicleName}
+              onComplete={handleConditionReportComplete}
+              existingReport={returnReport}
+            />
+          </div>
+        )}
+
+        {/* ============ RETURN FLOW ============ */}
+        {showReturnFlow && (booking.status === 'active' || booking.status === 'overdue') && (
+          <div className="border border-tj-gold/30 bg-tj-gold/5 p-4 space-y-3">
+            <h4 className="text-[10px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
+              <CheckCircle size={12} /> Process Return
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Return Date</label>
+                <input
+                  type="date"
+                  value={returnDate}
+                  onChange={e => setReturnDate(e.target.value)}
+                  className="w-full bg-black border border-gray-700 px-3 py-2 text-white text-sm focus:outline-none focus:border-tj-gold"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                  Mileage In <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={returnMileage}
+                  onChange={e => setReturnMileage(e.target.value)}
+                  placeholder="Current odometer"
+                  className="w-full bg-black border border-gray-700 px-3 py-2 text-white text-sm focus:outline-none focus:border-tj-gold font-mono"
+                />
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleProcessReturn}
+                disabled={processingReturn || !returnMileage}
+                className="px-4 py-2 bg-tj-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {processingReturn ? <Loader2 className="animate-spin" size={14} /> : <CheckCircle size={14} />}
+                Confirm Return
+              </button>
+              <button
+                onClick={() => setShowReturnFlow(false)}
+                className="px-4 py-2 border border-gray-700 text-gray-400 text-xs uppercase tracking-wider hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* ============ ACTIONS BAR ============ */}
+        <div className="border-t border-gray-800 pt-4 flex flex-wrap gap-2">
+          <button
+            onClick={() => onOpenAgreement(booking)}
+            className="px-3 py-2 border border-gray-700 text-gray-300 text-xs font-bold uppercase tracking-wider hover:border-tj-gold hover:text-tj-gold transition-colors flex items-center gap-2"
+          >
+            <PenTool size={12} /> Generate Agreement
+          </button>
+
+          <button
+            onClick={() => setShowCheckoutReport(!showCheckoutReport)}
+            className={`px-3 py-2 border text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors ${
+              showCheckoutReport
+                ? 'border-blue-500/50 text-blue-400 bg-blue-900/20'
+                : checkoutReport
+                ? 'border-green-700/50 text-green-400 hover:bg-green-900/10'
+                : 'border-gray-700 text-gray-300 hover:border-blue-500/50 hover:text-blue-400'
+            }`}
+          >
+            <ClipboardList size={12} /> {checkoutReport ? 'View Checkout Report' : 'Checkout Report'}
+          </button>
+
+          <button
+            onClick={() => setShowReturnReport(!showReturnReport)}
+            className={`px-3 py-2 border text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors ${
+              showReturnReport
+                ? 'border-amber-500/50 text-amber-400 bg-amber-900/20'
+                : returnReport
+                ? 'border-green-700/50 text-green-400 hover:bg-green-900/10'
+                : 'border-gray-700 text-gray-300 hover:border-amber-500/50 hover:text-amber-400'
+            }`}
+          >
+            <ClipboardList size={12} /> {returnReport ? 'View Return Report' : 'Return Report'}
+          </button>
+
+          {(booking.status === 'active' || booking.status === 'overdue') && (
+            <button
+              onClick={() => setShowReturnFlow(!showReturnFlow)}
+              className={`px-3 py-2 text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-colors ${
+                showReturnFlow
+                  ? 'bg-tj-gold text-black'
+                  : 'bg-tj-gold/10 border border-tj-gold/30 text-tj-gold hover:bg-tj-gold hover:text-black'
+              }`}
+            >
+              <ArrowRight size={12} /> Process Return
+            </button>
+          )}
+
+          {booking.status !== 'cancelled' && booking.status !== 'returned' && (
+            <button
+              onClick={handleCancelBooking}
+              disabled={actionLoading}
+              className="px-3 py-2 border border-red-700/50 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-900/20 transition-colors flex items-center gap-2 ml-auto disabled:opacity-50"
+            >
+              {actionLoading ? <Loader2 className="animate-spin" size={12} /> : <Ban size={12} />}
+              Cancel Booking
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ================================================================
 // MAIN RENTALS PAGE
 // ================================================================
 
@@ -211,17 +1068,21 @@ const Rentals: React.FC = () => {
   const [fleetFilter, setFleetFilter] = useState<'rental' | 'all'>('rental');
   const [fleetSearch, setFleetSearch] = useState('');
 
-  // Return modal state
+  // Expanded booking detail (accordion - one at a time)
+  const [expandedBookingId, setExpandedBookingId] = useState<string | null>(null);
+
+  // Modal states
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  // Agreement modal state
+  const [agreementBooking, setAgreementBooking] = useState<RentalBooking | null>(null);
+
+  // Return modal state (simple dialog for calendar tab quick actions)
   const [returnDialog, setReturnDialog] = useState<{
     bookingId: string;
     mileageIn: string;
   } | null>(null);
-
-  // Placeholder hooks for modals (created in Plans 04-05)
-  const [showBookingModal, setShowBookingModal] = useState(false);
-  const [showAgreementModal, setShowAgreementModal] = useState(false);
-  const [selectedBooking, setSelectedBooking] = useState<RentalBooking | null>(null);
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   // ================================================================
   // DATA LOADING
@@ -277,8 +1138,6 @@ const Rentals: React.FC = () => {
   // ================================================================
 
   const stats = useMemo(() => {
-    const allBookings = activeTab === 'calendar' ? calendarBookings : activeRentals;
-    // Use bookings from store for total count (or combine both)
     const allStoreBookings = bookings;
     const nonCancelled = allStoreBookings.filter(b => b.status !== 'cancelled');
     const active = allStoreBookings.filter(b => b.status === 'active');
@@ -293,7 +1152,7 @@ const Rentals: React.FC = () => {
       overdueCount: overdue.length,
       fleetSize: rentalFleet.length,
     };
-  }, [bookings, vehicles, activeTab, calendarBookings, activeRentals]);
+  }, [bookings, vehicles]);
 
   // ================================================================
   // HANDLERS
@@ -305,8 +1164,9 @@ const Rentals: React.FC = () => {
   };
 
   const handleBookingClick = (booking: RentalBooking) => {
-    setSelectedBooking(booking);
-    // For now, just expand inline - detail modal comes in later plan
+    // Switch to Active Rentals tab and expand the booking
+    setExpandedBookingId(booking.id);
+    setActiveTab('active');
   };
 
   const handleReturnBooking = async () => {
@@ -350,8 +1210,6 @@ const Rentals: React.FC = () => {
     setActionLoading(vehicleId);
     try {
       await updateVehicleListingType(vehicleId, listingType);
-      // Vehicle list will update via store refresh or we reload the page
-      // For now just wait a moment and the store should pick up the change
     } catch (error) {
       console.error('Error updating listing type:', error);
     } finally {
@@ -374,12 +1232,28 @@ const Rentals: React.FC = () => {
     }
   };
 
-  const handleRefresh = async () => {
+  const handleRefresh = useCallback(async () => {
     setLoading(true);
     await refreshBookings();
     if (activeTab === 'calendar') await loadCalendarBookings();
     if (activeTab === 'active') await loadActiveRentals();
     setLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, calendarYear, calendarMonth]);
+
+  const handleBookingCreated = async () => {
+    setShowBookingModal(false);
+    setSelectedDate(null);
+    await handleRefresh();
+  };
+
+  const handleAgreementSigned = async () => {
+    setAgreementBooking(null);
+    await handleRefresh();
+  };
+
+  const handleOpenAgreement = (booking: RentalBooking) => {
+    setAgreementBooking(booking);
   };
 
   // ================================================================
@@ -492,14 +1366,16 @@ const Rentals: React.FC = () => {
               <p className="text-emerald-400 text-[10px] uppercase tracking-widest mb-1">Active</p>
               <p className="text-emerald-400 text-2xl font-mono">{stats.activeCount}</p>
             </div>
-            <div className="bg-tj-dark border border-gray-800 p-4">
+            <div className="bg-tj-dark border border-gray-800 p-4 relative">
               <p className="text-red-400 text-[10px] uppercase tracking-widest mb-1">Overdue</p>
               <p className={`text-2xl font-mono ${stats.overdueCount > 0 ? 'text-red-400' : 'text-gray-600'}`}>
                 {stats.overdueCount}
-                {stats.overdueCount > 0 && (
-                  <AlertTriangle size={14} className="inline ml-2 mb-1 animate-pulse" />
-                )}
               </p>
+              {stats.overdueCount > 0 && (
+                <span className="absolute top-3 right-3 w-6 h-6 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
+                  {stats.overdueCount}
+                </span>
+              )}
             </div>
             <div className="bg-tj-dark border border-gray-800 p-4">
               <p className="text-blue-400 text-[10px] uppercase tracking-widest mb-1">Fleet Size</p>
@@ -547,84 +1423,23 @@ const Rentals: React.FC = () => {
                 onBookingClick={handleBookingClick}
               />
 
-              {/* Selected booking detail (inline expansion) */}
-              {selectedBooking && (
-                <div className="mt-4 bg-tj-dark border border-gray-800 p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h4 className="text-white font-display text-lg tracking-wide">
-                        {selectedBooking.bookingId}
-                      </h4>
-                      <p className="text-gray-500 text-sm">
-                        {selectedBooking.customer?.fullName || 'Unknown Customer'}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className={`px-3 py-1 text-[10px] uppercase tracking-wider border ${
-                        selectedBooking.status === 'active'
-                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
-                          : selectedBooking.status === 'overdue'
-                          ? 'bg-red-500/20 text-red-400 border-red-500/50'
-                          : selectedBooking.status === 'reserved'
-                          ? 'bg-blue-500/20 text-blue-400 border-blue-500/50'
-                          : 'bg-gray-500/20 text-gray-400 border-gray-500/50'
-                      }`}>
-                        {selectedBooking.status}
-                      </span>
-                      <button
-                        onClick={() => setSelectedBooking(null)}
-                        className="p-1 text-gray-500 hover:text-white transition-colors"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
+              {/* Selected booking detail (inline expansion from calendar click) */}
+              {expandedBookingId && (() => {
+                const calBooking = calendarBookings.find(b => b.id === expandedBookingId);
+                if (!calBooking) return null;
+                return (
+                  <div className="mt-4">
+                    <BookingDetail
+                      booking={calBooking}
+                      allBookings={bookings}
+                      vehicles={vehicles}
+                      onRefresh={handleRefresh}
+                      onOpenAgreement={handleOpenAgreement}
+                      onClose={() => setExpandedBookingId(null)}
+                    />
                   </div>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Vehicle</p>
-                      <p className="text-white">
-                        {selectedBooking.vehicle
-                          ? `${selectedBooking.vehicle.year} ${selectedBooking.vehicle.make} ${selectedBooking.vehicle.model}`
-                          : selectedBooking.vehicleId.slice(0, 8)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Dates</p>
-                      <p className="text-white">{selectedBooking.startDate} to {selectedBooking.endDate}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Daily Rate</p>
-                      <p className="text-white">${selectedBooking.dailyRate}/day</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total</p>
-                      <p className="text-tj-gold font-mono">${selectedBooking.totalCost.toLocaleString()}</p>
-                    </div>
-                  </div>
-
-                  {/* Quick actions */}
-                  {(selectedBooking.status === 'active' || selectedBooking.status === 'overdue') && (
-                    <div className="mt-4 pt-4 border-t border-gray-800 flex gap-3">
-                      <button
-                        onClick={() => setReturnDialog({ bookingId: selectedBooking.id, mileageIn: '' })}
-                        className="px-4 py-2 bg-tj-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors"
-                      >
-                        Return Vehicle
-                      </button>
-                      <button
-                        onClick={() => handleCancelBooking(selectedBooking.id)}
-                        disabled={actionLoading === selectedBooking.id}
-                        className="px-4 py-2 border border-red-500/50 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-900/20 transition-colors disabled:opacity-50"
-                      >
-                        Cancel Booking
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* RentalBookingModal will be added by Plan 04 */}
+                );
+              })()}
             </div>
           )}
 
@@ -640,9 +1455,10 @@ const Rentals: React.FC = () => {
                   <p className="text-gray-600 text-sm">All vehicles are currently available.</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-0">
                   {sortedActiveRentals.map(booking => {
                     const daysInfo = getDaysInfo(booking);
+                    const isExpanded = expandedBookingId === booking.id;
                     const lateFee = booking.status === 'overdue'
                       ? calculateLateFee(
                           booking.endDate,
@@ -653,90 +1469,104 @@ const Rentals: React.FC = () => {
                       : null;
 
                     return (
-                      <div
-                        key={booking.id}
-                        className={`bg-tj-dark border p-4 md:p-6 ${
-                          booking.status === 'overdue'
-                            ? 'border-red-500/50 bg-red-900/10'
-                            : 'border-gray-800'
-                        }`}
-                      >
-                        <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
-                          {/* Booking ID + Status */}
-                          <div className="flex items-center gap-3 min-w-0">
-                            <span className={`px-3 py-1 text-[10px] uppercase tracking-wider border whitespace-nowrap ${
-                              booking.status === 'overdue'
-                                ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse'
-                                : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
-                            }`}>
-                              {booking.status === 'overdue' ? 'OVERDUE' : 'ACTIVE'}
-                            </span>
-                            <span className="text-tj-gold font-mono text-sm">{booking.bookingId}</span>
-                          </div>
+                      <div key={booking.id}>
+                        {/* Collapsed row */}
+                        <div
+                          className={`bg-tj-dark border p-4 md:p-5 cursor-pointer transition-colors hover:bg-white/[0.02] ${
+                            booking.status === 'overdue'
+                              ? 'border-red-500/50 bg-red-900/10'
+                              : isExpanded ? 'border-gray-700' : 'border-gray-800'
+                          } ${isExpanded ? 'border-b-0' : ''}`}
+                          onClick={() => setExpandedBookingId(isExpanded ? null : booking.id)}
+                        >
+                          <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
+                            {/* Expand chevron */}
+                            <button className="text-gray-500 hidden md:block">
+                              {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                            </button>
 
-                          {/* Vehicle Info */}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-white font-medium truncate">
-                              {booking.vehicle
-                                ? `${booking.vehicle.year} ${booking.vehicle.make} ${booking.vehicle.model}`
-                                : 'Unknown Vehicle'}
-                            </p>
-                            <p className="text-gray-500 text-xs flex items-center gap-1">
-                              <Users size={12} />
-                              {booking.customer?.fullName || 'Unknown Customer'}
-                            </p>
-                          </div>
-
-                          {/* Dates */}
-                          <div className="text-sm hidden md:block">
-                            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Period</p>
-                            <p className="text-gray-300">
-                              {booking.startDate} <ArrowRight size={12} className="inline mx-1" /> {booking.endDate}
-                            </p>
-                          </div>
-
-                          {/* Days Info */}
-                          <div className="text-sm">
-                            <p className={`font-mono ${daysInfo.isOverdue ? 'text-red-400 font-bold' : 'text-gray-300'}`}>
-                              {daysInfo.label}
-                            </p>
-                          </div>
-
-                          {/* Late Fee */}
-                          {lateFee && (
-                            <div className="text-sm">
-                              <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Late Fee</p>
-                              <p className={`font-mono ${
-                                lateFee.isOverridden && lateFee.amount === 0
-                                  ? 'text-gray-500'
-                                  : 'text-red-400'
+                            {/* Booking ID + Status */}
+                            <div className="flex items-center gap-3 min-w-0">
+                              <span className={`px-3 py-1 text-[10px] uppercase tracking-wider border whitespace-nowrap ${
+                                booking.status === 'overdue'
+                                  ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse'
+                                  : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50'
                               }`}>
-                                {lateFee.isOverridden && lateFee.amount === 0
-                                  ? 'Waived'
-                                  : `$${lateFee.amount.toLocaleString()}`}
-                                {lateFee.days > 0 && (
-                                  <span className="text-gray-500 text-xs ml-1">({lateFee.days}d)</span>
-                                )}
+                                {booking.status === 'overdue' ? 'OVERDUE' : 'ACTIVE'}
+                              </span>
+                              <span className="text-tj-gold font-mono text-sm">{booking.bookingId}</span>
+                            </div>
+
+                            {/* Vehicle Info */}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-white font-medium truncate">
+                                {booking.vehicle
+                                  ? `${booking.vehicle.year} ${booking.vehicle.make} ${booking.vehicle.model}`
+                                  : 'Unknown Vehicle'}
+                              </p>
+                              <p className="text-gray-500 text-xs flex items-center gap-1">
+                                <Users size={12} />
+                                {booking.customer?.fullName || 'Unknown Customer'}
                               </p>
                             </div>
-                          )}
 
-                          {/* Actions */}
-                          <div className="flex items-center gap-2">
-                            <button
-                              onClick={() => setReturnDialog({ bookingId: booking.id, mileageIn: '' })}
-                              className="px-3 py-1.5 bg-tj-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors"
-                            >
-                              Return
-                            </button>
-                            <button
-                              onClick={() => setSelectedBooking(selectedBooking?.id === booking.id ? null : booking)}
-                              className="px-3 py-1.5 border border-gray-700 text-gray-400 text-xs font-bold uppercase tracking-wider hover:text-white hover:border-gray-500 transition-colors"
-                            >
-                              View
-                            </button>
+                            {/* Dates */}
+                            <div className="text-sm hidden md:block">
+                              <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Period</p>
+                              <p className="text-gray-300">
+                                {booking.startDate} <ArrowRight size={12} className="inline mx-1" /> {booking.endDate}
+                              </p>
+                            </div>
+
+                            {/* Days Info */}
+                            <div className="text-sm">
+                              <p className={`font-mono ${daysInfo.isOverdue ? 'text-red-400 font-bold' : 'text-gray-300'}`}>
+                                {daysInfo.label}
+                              </p>
+                            </div>
+
+                            {/* Late Fee */}
+                            {lateFee && (
+                              <div className="text-sm">
+                                <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Late Fee</p>
+                                <p className={`font-mono ${
+                                  lateFee.isOverridden && lateFee.amount === 0
+                                    ? 'text-gray-500'
+                                    : 'text-red-400'
+                                }`}>
+                                  {lateFee.isOverridden && lateFee.amount === 0
+                                    ? 'Waived'
+                                    : formatCurrency(lateFee.amount)}
+                                  {lateFee.days > 0 && (
+                                    <span className="text-gray-500 text-xs ml-1">({lateFee.days}d)</span>
+                                  )}
+                                </p>
+                              </div>
+                            )}
+
+                            {/* Quick Actions */}
+                            <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                              <button
+                                onClick={() => setReturnDialog({ bookingId: booking.id, mileageIn: '' })}
+                                className="px-3 py-1.5 bg-tj-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors"
+                              >
+                                Return
+                              </button>
+                            </div>
                           </div>
                         </div>
+
+                        {/* Expanded detail */}
+                        {isExpanded && (
+                          <BookingDetail
+                            booking={booking}
+                            allBookings={bookings}
+                            vehicles={vehicles}
+                            onRefresh={handleRefresh}
+                            onOpenAgreement={handleOpenAgreement}
+                            onClose={() => setExpandedBookingId(null)}
+                          />
+                        )}
                       </div>
                     );
                   })}
@@ -823,7 +1653,7 @@ const Rentals: React.FC = () => {
           )}
 
           {/* ============================================================ */}
-          {/* RETURN VEHICLE DIALOG */}
+          {/* RETURN VEHICLE DIALOG (simple, for quick actions) */}
           {/* ============================================================ */}
           {returnDialog && (
             <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
@@ -882,8 +1712,34 @@ const Rentals: React.FC = () => {
             </div>
           )}
 
-          {/* RentalBookingModal will be added by Plan 04 */}
-          {/* RentalAgreementModal will be added by Plan 05 */}
+          {/* ============================================================ */}
+          {/* MODALS */}
+          {/* ============================================================ */}
+
+          {/* Booking Modal */}
+          <RentalBookingModal
+            isOpen={showBookingModal}
+            onClose={() => { setShowBookingModal(false); setSelectedDate(null); }}
+            onBookingCreated={handleBookingCreated}
+            vehicles={vehicles}
+            preSelectedDate={selectedDate || undefined}
+          />
+
+          {/* Agreement Modal */}
+          {agreementBooking && agreementBooking.customer && (() => {
+            const agVehicle = agreementBooking.vehicle || vehicles.find(v => v.id === agreementBooking.vehicleId);
+            if (!agVehicle) return null;
+            return (
+              <RentalAgreementModal
+                isOpen={!!agreementBooking}
+                onClose={() => setAgreementBooking(null)}
+                booking={agreementBooking}
+                customer={agreementBooking.customer}
+                vehicle={agVehicle}
+                onAgreementSigned={handleAgreementSigned}
+              />
+            );
+          })()}
         </div>
       </div>
     </>
