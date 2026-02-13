@@ -405,7 +405,7 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
   // ================================================================
 
   const renderSectionNav = () => (
-    <div className="flex border-b border-white/10 shrink-0">
+    <div className="flex border-b border-tj-gold/20 shrink-0">
       {SECTIONS.map((sec) => (
         <button
           key={sec.key}
@@ -1073,7 +1073,7 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
             </div>
 
             {/* Footer - Next/Prev navigation */}
-            <div className="flex items-center justify-between p-4 border-t border-white/10 shrink-0">
+            <div className="flex items-center justify-between p-4 border-t border-tj-gold/20 shrink-0">
               <button
                 type="button"
                 onClick={() => {

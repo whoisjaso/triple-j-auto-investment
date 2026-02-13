@@ -81,7 +81,7 @@ export const SignatureCapture: React.FC<SignatureCaptureProps> = ({
         <label className="block text-[10px] uppercase tracking-widest text-gray-500">
           Signature (Captured)
         </label>
-        <div className="bg-white rounded p-2 border border-white/10">
+        <div className="bg-white p-2 border border-tj-gold/20">
           <img
             src={savedSignature}
             alt="Captured signature"
@@ -99,7 +99,7 @@ export const SignatureCapture: React.FC<SignatureCaptureProps> = ({
         <label className="block text-[10px] uppercase tracking-widest text-gray-500">
           Signature (Captured)
         </label>
-        <div className="bg-white rounded p-2 border border-white/10">
+        <div className="bg-white p-2 border border-tj-gold/20">
           <img
             src={savedSignature}
             alt="Captured signature"
@@ -128,7 +128,7 @@ export const SignatureCapture: React.FC<SignatureCaptureProps> = ({
       {/* Signature canvas area */}
       <div
         ref={containerRef}
-        className="relative bg-white rounded border-2 border-dashed border-gray-300 overflow-hidden"
+        className="relative bg-white border-2 border-dashed border-gray-300 overflow-hidden"
         style={{ touchAction: 'none' }}
       >
         {/* Placeholder text when empty */}

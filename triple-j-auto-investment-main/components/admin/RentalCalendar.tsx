@@ -149,9 +149,9 @@ const RentalCalendar: React.FC<RentalCalendarProps> = ({
   }
 
   return (
-    <div className="bg-black/40 border border-gray-800 rounded-none">
+    <div className="bg-black/40 border border-tj-gold/20">
       {/* Header: Month/Year with navigation */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-800">
+      <div className="flex items-center justify-between p-4 border-b border-tj-gold/20">
         <div className="flex items-center gap-3">
           <Calendar size={18} className="text-tj-gold" />
           <h3 className="text-white font-display text-lg tracking-wider">
@@ -184,7 +184,7 @@ const RentalCalendar: React.FC<RentalCalendarProps> = ({
       </div>
 
       {/* Day labels row */}
-      <div className="grid grid-cols-7 border-b border-gray-800">
+      <div className="grid grid-cols-7 border-b border-tj-gold/10">
         {DAY_LABELS.map(label => (
           <div
             key={label}
@@ -217,8 +217,8 @@ const RentalCalendar: React.FC<RentalCalendarProps> = ({
           return (
             <div
               key={dateStr}
-              className={`bg-black/40 min-h-[80px] md:min-h-[100px] p-1 cursor-pointer hover:bg-white/5 transition-colors relative ${
-                isToday ? 'ring-1 ring-tj-gold ring-inset' : ''
+              className={`bg-black/40 min-h-[80px] md:min-h-[100px] p-1 cursor-pointer hover:bg-tj-gold/[0.03] transition-all duration-200 relative ${
+                isToday ? 'ring-1 ring-tj-gold ring-inset bg-tj-gold/[0.02]' : ''
               }`}
               onClick={() => onDateClick?.(dateStr)}
             >
@@ -249,14 +249,6 @@ const RentalCalendar: React.FC<RentalCalendarProps> = ({
                     <div
                       key={booking.id}
                       className={`${colorClass} px-1 py-0.5 text-[9px] text-white truncate cursor-pointer hover:brightness-125 transition-all ${
-                        isStart && isEnd
-                          ? 'rounded'
-                          : isStart
-                          ? 'rounded-l'
-                          : isEnd
-                          ? 'rounded-r'
-                          : ''
-                      } ${
                         booking.status === 'overdue' ? 'animate-pulse' : ''
                       }`}
                       title={`${customerName} - ${vehicleLabel} (${booking.status})`}
@@ -282,10 +274,10 @@ const RentalCalendar: React.FC<RentalCalendarProps> = ({
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-4 p-3 border-t border-gray-800">
+      <div className="flex flex-wrap items-center gap-4 p-3 border-t border-tj-gold/10">
         {Object.entries(STATUS_COLORS).map(([status, colorClass]) => (
           <div key={status} className="flex items-center gap-1.5">
-            <div className={`w-3 h-2 ${colorClass} rounded-sm`} />
+            <div className={`w-3 h-2 ${colorClass}`} />
             <span className={`text-[9px] uppercase tracking-widest ${STATUS_TEXT_COLORS[status]}`}>
               {status}
             </span>

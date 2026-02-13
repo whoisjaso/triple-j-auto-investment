@@ -363,7 +363,7 @@ export const RentalConditionReport: React.FC<RentalConditionReportProps> = ({
         type="button"
         onClick={() => !isViewMode && updateItemCondition(category, itemName, rating)}
         disabled={isViewMode}
-        className={`px-3 py-1.5 text-[10px] uppercase tracking-wider font-medium border transition-all ${
+        className={`px-3 py-1.5 text-[10px] uppercase tracking-wider font-medium border transition-all duration-200 ${
           isActive
             ? `${colors.activeBg} border-transparent text-white`
             : `bg-transparent ${colors.border} ${colors.text} ${!isViewMode ? 'hover:bg-white/5' : ''} opacity-40`
@@ -393,7 +393,7 @@ export const RentalConditionReport: React.FC<RentalConditionReportProps> = ({
       </div>
 
       {/* Section 1: Odometer & Fuel */}
-      <div className="bg-black/30 border border-white/5 p-4 space-y-3">
+      <div className="bg-black/30 border border-tj-gold/10 p-4 space-y-3">
         <h4 className="text-[10px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
           <Gauge size={12} /> Odometer & Fuel
         </h4>
@@ -452,12 +452,12 @@ export const RentalConditionReport: React.FC<RentalConditionReportProps> = ({
         );
 
         return (
-          <div key={category} className="bg-black/30 border border-white/5 overflow-hidden">
+          <div key={category} className="bg-black/30 border border-tj-gold/10 overflow-hidden">
             {/* Category header */}
             <button
               type="button"
               onClick={() => toggleCategory(category)}
-              className="w-full flex items-center justify-between p-4 hover:bg-white/5 transition-colors"
+              className="w-full flex items-center justify-between p-4 hover:bg-tj-gold/[0.03] transition-colors"
             >
               <div className="flex items-center gap-2">
                 {CATEGORY_ICONS[category as CategoryKey]}
@@ -524,7 +524,7 @@ export const RentalConditionReport: React.FC<RentalConditionReportProps> = ({
       })}
 
       {/* Section 5: Photos */}
-      <div className="bg-black/30 border border-white/5 p-4 space-y-3">
+      <div className="bg-black/30 border border-tj-gold/10 p-4 space-y-3">
         <h4 className="text-[10px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
           <Camera size={12} /> Photos
         </h4>
@@ -542,7 +542,7 @@ export const RentalConditionReport: React.FC<RentalConditionReportProps> = ({
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-gray-700 hover:border-tj-gold/50 p-6 text-center cursor-pointer transition-colors"
+            className="border-2 border-dashed border-gray-700 hover:border-tj-gold/50 hover:bg-tj-gold/[0.02] p-6 text-center cursor-pointer transition-all duration-300"
           >
             <input
               ref={fileInputRef}
@@ -611,7 +611,7 @@ export const RentalConditionReport: React.FC<RentalConditionReportProps> = ({
       </div>
 
       {/* Section 6: Summary & Submit */}
-      <div className="bg-black/30 border border-white/5 p-4 space-y-3">
+      <div className="bg-black/30 border border-tj-gold/10 p-4 space-y-3">
         <h4 className="text-[10px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
           <ClipboardCheck size={12} /> Summary
         </h4>

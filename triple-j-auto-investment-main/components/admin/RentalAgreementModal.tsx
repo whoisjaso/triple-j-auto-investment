@@ -332,11 +332,11 @@ export const RentalAgreementModal: React.FC<RentalAgreementModalProps> = ({
             {/* Content */}
             <div className="flex-grow overflow-hidden flex flex-col md:flex-row">
               {/* LEFT PANEL - Agreement Summary & Signature */}
-              <div className="w-full md:w-1/2 overflow-y-auto p-4 md:p-6 space-y-5 border-r border-white/10">
+              <div className="w-full md:w-1/2 overflow-y-auto p-4 md:p-6 space-y-5 border-r border-tj-gold/10">
                 {/* Agreement Summary (read-only) */}
                 <div className="space-y-4">
                   {/* Customer Info */}
-                  <div className="bg-black/50 border border-white/10 p-4">
+                  <div className="bg-black/50 border border-tj-gold/10 p-4">
                     <h3 className="text-[10px] uppercase tracking-widest text-tj-gold mb-3 flex items-center gap-2">
                       <User size={12} /> Customer
                     </h3>
@@ -369,7 +369,7 @@ export const RentalAgreementModal: React.FC<RentalAgreementModalProps> = ({
                   </div>
 
                   {/* Vehicle Info */}
-                  <div className="bg-black/50 border border-white/10 p-4">
+                  <div className="bg-black/50 border border-tj-gold/10 p-4">
                     <h3 className="text-[10px] uppercase tracking-widest text-tj-gold mb-3 flex items-center gap-2">
                       <Car size={12} /> Vehicle
                     </h3>
@@ -406,7 +406,7 @@ export const RentalAgreementModal: React.FC<RentalAgreementModalProps> = ({
                   </div>
 
                   {/* Rental Terms */}
-                  <div className="bg-black/50 border border-white/10 p-4">
+                  <div className="bg-black/50 border border-tj-gold/10 p-4">
                     <h3 className="text-[10px] uppercase tracking-widest text-tj-gold mb-3 flex items-center gap-2">
                       <Calendar size={12} /> Rental Terms
                     </h3>
@@ -451,7 +451,7 @@ export const RentalAgreementModal: React.FC<RentalAgreementModalProps> = ({
                   </div>
 
                   {/* Authorized Drivers & Geographic */}
-                  <div className="bg-black/50 border border-white/10 p-4">
+                  <div className="bg-black/50 border border-tj-gold/10 p-4">
                     <h3 className="text-[10px] uppercase tracking-widest text-tj-gold mb-3 flex items-center gap-2">
                       <Users size={12} /> Additional Terms
                     </h3>
