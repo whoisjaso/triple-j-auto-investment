@@ -2,7 +2,7 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
-import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe } from 'lucide-react';
+import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe, Key } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
@@ -66,6 +66,7 @@ const CustomerDashboard = lazyWithErrorHandling(() => import('./pages/CustomerDa
 const AdminDashboard = lazyWithErrorHandling(() => import('./pages/admin/Dashboard'), 'Admin Dashboard');
 const AdminInventory = lazyWithErrorHandling(() => import('./pages/admin/Inventory'), 'Admin Inventory');
 const AdminRegistrations = lazyWithErrorHandling(() => import('./pages/admin/Registrations'), 'Admin Registrations');
+const AdminRentals = lazyWithErrorHandling(() => import('./pages/admin/Rentals'), 'Admin Rentals');
 
 // Utility for Map Routing
 export const openSmartMap = () => {
@@ -178,6 +179,9 @@ const Navbar = () => {
                   <Link to="/admin/registrations" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('registrations') ? 'text-tj-gold' : 'text-gray-400'}`}>
                     <ShieldCheck size={14} /> Ledger
                   </Link>
+                  <Link to="/admin/rentals" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('rentals') ? 'text-tj-gold' : 'text-gray-400'}`}>
+                    <Key size={14} /> Rentals
+                  </Link>
                   <button onClick={logout} className="text-[10px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors ml-4">Logout</button>
                 </div>
               )}
@@ -267,6 +271,14 @@ const Navbar = () => {
                     >
                       <ShieldCheck size={18} />
                       <span className="text-lg font-display tracking-widest">LEDGER</span>
+                    </Link>
+                    <Link
+                      to="/admin/rentals"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-3 text-white hover:text-tj-gold transition-colors py-2"
+                    >
+                      <Key size={18} />
+                      <span className="text-lg font-display tracking-widest">RENTALS</span>
                     </Link>
                     <button
                       onClick={() => { logout(); setIsOpen(false); }}
@@ -486,6 +498,7 @@ const AppContent = () => {
                 <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                 <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventory /></ProtectedRoute>} />
                 <Route path="/admin/registrations" element={<ProtectedRoute><AdminRegistrations /></ProtectedRoute>} />
+                <Route path="/admin/rentals" element={<ProtectedRoute><AdminRentals /></ProtectedRoute>} />
 
                 {/* 404 Catch-All */}
                 <Route path="*" element={<NotFound />} />

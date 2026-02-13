@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { generateVehicleDescription } from '../../services/geminiService';
 import { decodeVin } from '../../services/nhtsaService';
 import { Vehicle, VehicleStatus } from '../../types';
-import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer, LayoutDashboard, Car, LogOut, Menu } from 'lucide-react';
+import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer, LayoutDashboard, Car, LogOut, Menu, ClipboardCheck, Key } from 'lucide-react';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 
 // Shared Admin Header Component
@@ -19,6 +19,8 @@ const AdminHeader = () => {
   const navItems = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/admin/inventory', label: 'Inventory', icon: Car },
+    { path: '/admin/registrations', label: 'Registrations', icon: ClipboardCheck },
+    { path: '/admin/rentals', label: 'Rentals', icon: Key },
   ];
 
   return (
