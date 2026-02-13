@@ -33,6 +33,13 @@ export interface Vehicle {
   diagnostics?: string[];
   registrationStatus?: 'Pending' | 'Submitted' | 'Processing' | 'Completed';
   registrationDueDate?: string;
+
+  // Rental fields (Phase 06)
+  listingType?: ListingType;
+  dailyRate?: number;
+  weeklyRate?: number;
+  minRentalDays?: number;
+  maxRentalDays?: number;
 }
 
 export interface Lead {
@@ -370,4 +377,137 @@ export const STATUS_COLORS: Record<RegistrationStageStatus, { bg: string; text: 
 // Stage-specific colors (for rejected state)
 export const STAGE_COLORS: Record<string, { bg: string; text: string; icon: string }> = {
   rejected: { bg: 'bg-red-500/20', text: 'text-red-400', icon: 'alert-circle' }
+};
+
+// ================================================================
+// RENTAL MANAGEMENT TYPES (Phase 06)
+// ================================================================
+
+export type ListingType = 'sale_only' | 'rental_only' | 'both';
+
+export type RentalBookingStatus = 'reserved' | 'active' | 'returned' | 'cancelled' | 'overdue';
+
+export type PaymentMethod = 'cash' | 'card' | 'zelle' | 'cashapp';
+
+export type FuelLevel = 'empty' | '1/4' | '1/2' | '3/4' | 'full';
+
+export type ConditionRating = 'good' | 'fair' | 'damaged';
+
+export interface ConditionChecklistItem {
+  category: string;
+  item: string;
+  condition: ConditionRating;
+  notes: string;
+}
+
+export interface RentalCustomer {
+  id: string;
+  fullName: string;
+  phone: string;
+  email?: string;
+  driversLicenseNumber: string;
+  address: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  employerName?: string;
+  employerPhone?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RentalBooking {
+  id: string;
+  bookingId: string;
+  vehicleId: string;
+  customerId: string;
+  startDate: string;
+  endDate: string;
+  actualReturnDate?: string;
+  dailyRate: number;
+  weeklyRate?: number;
+  totalCost: number;
+  status: RentalBookingStatus;
+  agreementSigned: boolean;
+  agreementPdfUrl?: string;
+  signatureData?: string;
+  authorizedDrivers: string[];
+  outOfStatePermitted: boolean;
+  permittedStates: string[];
+  mileageOut?: number;
+  mileageIn?: number;
+  mileageLimit?: number;
+  lateFeeOverride?: number;
+  lateFeeNotes?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+  // Optional joins
+  customer?: RentalCustomer;
+  vehicle?: Vehicle;
+  payments?: RentalPayment[];
+}
+
+export interface RentalPayment {
+  id: string;
+  bookingId: string;
+  amount: number;
+  paymentMethod: PaymentMethod;
+  paymentDate: string;
+  notes?: string;
+  recordedBy?: string;
+  createdAt: string;
+}
+
+export interface RentalConditionReport {
+  id: string;
+  bookingId: string;
+  reportType: 'checkout' | 'return';
+  checklistItems: ConditionChecklistItem[];
+  fuelLevel: FuelLevel;
+  mileage: number;
+  photoUrls: string[];
+  completedBy?: string;
+  completedAt: string;
+  createdAt: string;
+}
+
+export const CONDITION_CHECKLIST_TEMPLATE: ConditionChecklistItem[] = [
+  // Exterior (13 items)
+  { category: 'Exterior', item: 'Front bumper', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Rear bumper', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Hood', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Trunk/Hatch', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Roof', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Left front fender', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Left rear fender', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Right front fender', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Right rear fender', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Windshield', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Rear window', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Left side windows', condition: 'good', notes: '' },
+  { category: 'Exterior', item: 'Right side windows', condition: 'good', notes: '' },
+  // Interior (8 items)
+  { category: 'Interior', item: 'Driver seat', condition: 'good', notes: '' },
+  { category: 'Interior', item: 'Passenger seat', condition: 'good', notes: '' },
+  { category: 'Interior', item: 'Rear seats', condition: 'good', notes: '' },
+  { category: 'Interior', item: 'Dashboard', condition: 'good', notes: '' },
+  { category: 'Interior', item: 'Steering wheel', condition: 'good', notes: '' },
+  { category: 'Interior', item: 'Floor mats/carpet', condition: 'good', notes: '' },
+  { category: 'Interior', item: 'Headliner', condition: 'good', notes: '' },
+  { category: 'Interior', item: 'Center console', condition: 'good', notes: '' },
+  // Mechanical (6 items)
+  { category: 'Mechanical', item: 'All lights working', condition: 'good', notes: '' },
+  { category: 'Mechanical', item: 'Horn', condition: 'good', notes: '' },
+  { category: 'Mechanical', item: 'Wipers', condition: 'good', notes: '' },
+  { category: 'Mechanical', item: 'AC/Heat', condition: 'good', notes: '' },
+  { category: 'Mechanical', item: 'Radio/Infotainment', condition: 'good', notes: '' },
+  { category: 'Mechanical', item: 'Spare tire/Jack', condition: 'good', notes: '' },
+];
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  cash: 'Cash',
+  card: 'Card',
+  zelle: 'Zelle',
+  cashapp: 'CashApp',
 };
