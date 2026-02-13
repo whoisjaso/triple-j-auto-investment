@@ -49,6 +49,8 @@ import {
   PenTool,
   ClipboardList,
   Ban,
+  CreditCard,
+  ExternalLink,
 } from 'lucide-react';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 import RentalCalendar from '../../components/admin/RentalCalendar';
@@ -77,8 +79,14 @@ import {
   ListingType,
   PaymentMethod,
   Vehicle,
+  Plate,
   PAYMENT_METHOD_LABELS,
+  PLATE_TYPE_LABELS,
 } from '../../types';
+import {
+  getPlatesOut,
+  returnPlateAssignment,
+} from '../../services/plateService';
 
 // ================================================================
 // ADMIN HEADER (duplicated per research guidance - pitfall #7)
@@ -96,6 +104,7 @@ const AdminHeader = () => {
     { path: '/admin/inventory', label: 'Inventory', icon: Car },
     { path: '/admin/registrations', label: 'Registrations', icon: ClipboardCheck },
     { path: '/admin/rentals', label: 'Rentals', icon: Key },
+    { path: '/admin/plates', label: 'Plates', icon: CreditCard },
   ];
 
   return (
@@ -207,7 +216,7 @@ const AdminHeader = () => {
 // TAB TYPES
 // ================================================================
 
-type RentalTab = 'calendar' | 'active' | 'fleet';
+type RentalTab = 'calendar' | 'active' | 'fleet' | 'plates';
 
 // ================================================================
 // FORMAT HELPERS
@@ -232,6 +241,7 @@ interface BookingDetailProps {
   booking: RentalBooking;
   allBookings: RentalBooking[];
   vehicles: Vehicle[];
+  platesOut: Plate[];
   onRefresh: () => Promise<void>;
   onOpenAgreement: (booking: RentalBooking) => void;
   onClose: () => void;
@@ -241,6 +251,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
   booking,
   allBookings,
   vehicles,
+  platesOut,
   onRefresh,
   onOpenAgreement,
   onClose,
@@ -270,6 +281,16 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
   const [returnDate, setReturnDate] = useState(new Date().toISOString().split('T')[0]);
   const [returnMileage, setReturnMileage] = useState('');
   const [processingReturn, setProcessingReturn] = useState(false);
+
+  // Plate return confirmation state
+  const [plateReturned, setPlateReturned] = useState(true);
+
+  // Derive plate assigned to this booking from platesOut data
+  const bookingPlate = useMemo(() => {
+    return platesOut.find(p =>
+      p.currentAssignment?.bookingId === booking.id
+    ) || null;
+  }, [platesOut, booking.id]);
 
   // Action loading
   const [actionLoading, setActionLoading] = useState(false);
@@ -484,6 +505,18 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
         parseInt(returnMileage, 10)
       );
       if (success) {
+        // Process plate return if plate was assigned to this booking
+        if (bookingPlate?.currentAssignment) {
+          try {
+            await returnPlateAssignment(
+              bookingPlate.currentAssignment.id,
+              plateReturned
+            );
+          } catch (plateErr) {
+            console.error('Plate return failed:', plateErr);
+            // Don't fail the booking return -- plate can be handled from Plates page
+          }
+        }
         setShowReturnFlow(false);
         await onRefresh();
         // Prompt for return condition report if none exists
@@ -959,6 +992,36 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
                 />
               </div>
             </div>
+
+            {/* Plate return confirmation */}
+            {bookingPlate && (
+              <div className="mt-4 border-t border-gray-800 pt-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="text-[10px] uppercase tracking-widest text-gray-400">
+                    Dealer Plate: <span className="text-white font-bold">{bookingPlate.plateNumber}</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="checkbox"
+                    checked={plateReturned}
+                    onChange={e => setPlateReturned(e.target.checked)}
+                    className="w-4 h-4 accent-tj-gold"
+                    id={`plate-returned-${booking.id}`}
+                  />
+                  <label htmlFor={`plate-returned-${booking.id}`} className="text-sm text-gray-300">
+                    Dealer plate physically returned
+                  </label>
+                </div>
+                {!plateReturned && (
+                  <p className="text-xs text-red-400 flex items-center gap-1 mt-2">
+                    <AlertTriangle size={12} />
+                    Plate will be flagged for follow-up
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="flex gap-3">
               <button
                 onClick={handleProcessReturn}
@@ -1068,6 +1131,9 @@ const Rentals: React.FC = () => {
   const [fleetFilter, setFleetFilter] = useState<'rental' | 'all'>('rental');
   const [fleetSearch, setFleetSearch] = useState('');
 
+  // Plates-out state
+  const [platesOut, setPlatesOut] = useState<Plate[]>([]);
+
   // Expanded booking detail (accordion - one at a time)
   const [expandedBookingId, setExpandedBookingId] = useState<string | null>(null);
 
@@ -1114,12 +1180,24 @@ const Rentals: React.FC = () => {
     }
   };
 
+  const loadPlatesOut = async () => {
+    try {
+      const data = await getPlatesOut();
+      setPlatesOut(data);
+    } catch (error) {
+      console.error('Error loading plates out:', error);
+    }
+  };
+
   // Load data on tab change
   useEffect(() => {
     if (activeTab === 'calendar') {
       loadCalendarBookings();
     } else if (activeTab === 'active') {
       loadActiveRentals();
+      loadPlatesOut(); // Needed for plate return confirmation in BookingDetail
+    } else if (activeTab === 'plates') {
+      loadPlatesOut();
     }
     // Fleet tab uses vehicles from store, no extra loading needed
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1236,7 +1314,11 @@ const Rentals: React.FC = () => {
     setLoading(true);
     await refreshBookings();
     if (activeTab === 'calendar') await loadCalendarBookings();
-    if (activeTab === 'active') await loadActiveRentals();
+    if (activeTab === 'active') {
+      await loadActiveRentals();
+      await loadPlatesOut();
+    }
+    if (activeTab === 'plates') await loadPlatesOut();
     setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, calendarYear, calendarMonth]);
@@ -1394,6 +1476,7 @@ const Rentals: React.FC = () => {
               { key: 'calendar' as RentalTab, label: 'Calendar', icon: Calendar },
               { key: 'active' as RentalTab, label: 'Active Rentals', icon: Clock },
               { key: 'fleet' as RentalTab, label: 'Fleet', icon: Truck },
+              { key: 'plates' as RentalTab, label: 'Plates', icon: CreditCard },
             ]).map(tab => (
               <button
                 key={tab.key}
@@ -1438,6 +1521,7 @@ const Rentals: React.FC = () => {
                       booking={calBooking}
                       allBookings={bookings}
                       vehicles={vehicles}
+                      platesOut={platesOut}
                       onRefresh={handleRefresh}
                       onOpenAgreement={handleOpenAgreement}
                       onClose={() => setExpandedBookingId(null)}
@@ -1567,6 +1651,7 @@ const Rentals: React.FC = () => {
                             booking={booking}
                             allBookings={bookings}
                             vehicles={vehicles}
+                            platesOut={platesOut}
                             onRefresh={handleRefresh}
                             onOpenAgreement={handleOpenAgreement}
                             onClose={() => setExpandedBookingId(null)}
@@ -1652,6 +1737,92 @@ const Rentals: React.FC = () => {
                       />
                     );
                   })}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* PLATES TAB */}
+          {/* ============================================================ */}
+          {activeTab === 'plates' && !loading && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xs uppercase tracking-widest text-gray-400">
+                  Plates Currently Out ({platesOut.length})
+                </h3>
+                <Link
+                  to="/admin/plates"
+                  className="text-[10px] uppercase tracking-widest text-tj-gold hover:text-white transition-colors flex items-center gap-1"
+                >
+                  Full Plate Management <ExternalLink size={10} />
+                </Link>
+              </div>
+
+              {platesOut.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <CheckCircle size={32} className="mx-auto mb-3 text-green-500/50" />
+                  <p>All plates accounted for</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {platesOut
+                    .sort((a, b) => {
+                      // Overdue first
+                      const aOverdue = a.currentAssignment?.expectedReturnDate
+                        ? new Date(a.currentAssignment.expectedReturnDate) < new Date() ? 1 : 0
+                        : 0;
+                      const bOverdue = b.currentAssignment?.expectedReturnDate
+                        ? new Date(b.currentAssignment.expectedReturnDate) < new Date() ? 1 : 0
+                        : 0;
+                      return bOverdue - aOverdue;
+                    })
+                    .map(plate => {
+                      const assignment = plate.currentAssignment;
+                      const isOverdue = assignment?.expectedReturnDate
+                        ? new Date(assignment.expectedReturnDate) < new Date()
+                        : false;
+                      const daysRemaining = assignment?.expectedReturnDate
+                        ? Math.ceil((new Date(assignment.expectedReturnDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+                        : null;
+
+                      return (
+                        <div
+                          key={plate.id}
+                          className={`p-4 border ${
+                            isOverdue ? 'border-red-500/50 bg-red-500/5' : 'border-gray-800'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <span className="font-bold text-white">{plate.plateNumber}</span>
+                              <span className="ml-2 text-[10px] px-2 py-0.5 bg-blue-500/20 text-blue-400 uppercase">
+                                {PLATE_TYPE_LABELS[plate.plateType]}
+                              </span>
+                            </div>
+                            {daysRemaining !== null && (
+                              <span className={`text-sm font-bold ${
+                                isOverdue ? 'text-red-400 animate-pulse' : 'text-green-400'
+                              }`}>
+                                {isOverdue
+                                  ? `${Math.abs(daysRemaining)} days overdue`
+                                  : `${daysRemaining} days left`}
+                              </span>
+                            )}
+                          </div>
+                          {assignment && (
+                            <div className="mt-2 text-sm text-gray-400 flex flex-wrap gap-x-4 gap-y-1">
+                              <span>{assignment.customerName}</span>
+                              <span>{assignment.customerPhone}</span>
+                              {assignment.expectedReturnDate && (
+                                <span>Return: {new Date(assignment.expectedReturnDate).toLocaleDateString()}</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  }
                 </div>
               )}
             </div>
