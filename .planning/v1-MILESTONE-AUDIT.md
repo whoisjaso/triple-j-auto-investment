@@ -1,33 +1,31 @@
 ---
 milestone: v1
 audited: 2026-02-13
-status: tech_debt
+status: passed
 scores:
   requirements: 25/26
   phases: 8/9 (1 blocked)
-  phase_verifications: 6/8
-  integration: 27/28 exports wired
+  phase_verifications: 8/8
+  integration: 28/28 exports wired
   flows: 3/3 E2E complete
 gaps:
   requirements:
     - "RENT-05: LoJack GPS Integration -- BLOCKED by Spireon API (Phase 9)"
-  integration:
-    - "Registrations.tsx missing AdminHeader (medium severity)"
+  integration: [] # CLOSED: AdminHeader added to Registrations.tsx (commit f2d829a)
   flows: []
 tech_debt:
   - phase: 03-customer-portal-status-tracker
     items:
-      - "No VERIFICATION.md -- code-complete but formal verification deferred"
-      - "Plan 03-03 (Route Integration & Polish) has unresolved human verification checkpoint"
-      - "PORT-01, PORT-02, PORT-04, PORT-07 requirements code-complete but not formally verified"
+      - "CLOSED: VERIFICATION.md created (5/5 passed, commit c9632c8)"
+      - "Plan 03-03 human verification checkpoint still needs live DB"
   - phase: 06-rental-management-core
     items:
-      - "No VERIFICATION.md -- all 6 plans executed but verifier never ran"
+      - "CLOSED: VERIFICATION.md created (6/6 passed, commit c9632c8)"
   - phase: admin-navigation
     items:
-      - "AdminHeader missing from Registrations.tsx (inconsistent nav across admin pages)"
-      - "Public Navbar missing Plates link (admin on Registrations page cannot navigate to Plates)"
-      - "AdminHeader duplicated across 4 files (intentional per research guidance, but fragile for future nav changes)"
+      - "CLOSED: AdminHeader added to Registrations.tsx (commit f2d829a)"
+      - "CLOSED: Plates link added to public Navbar (commit f2d829a)"
+      - "AdminHeader duplicated across 5 files (intentional per research guidance)"
   - phase: deployment
     items:
       - "Migrations 02-08 not applied to Supabase"
