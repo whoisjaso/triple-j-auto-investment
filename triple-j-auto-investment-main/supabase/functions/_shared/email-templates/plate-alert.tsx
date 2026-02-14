@@ -1,6 +1,6 @@
-// Plate Alert Email & SMS Templates
+// Plate & Insurance Alert Email & SMS Templates
 // Template literal HTML (not React Email JSX) per Phase 4 decision.
-// Sends a batched summary of all active plate alert conditions.
+// Sends a batched summary of all active plate and insurance alert conditions.
 
 export interface PlateAlertItem {
   plateNumber: string;
@@ -11,6 +11,15 @@ export interface PlateAlertItem {
   vehicleInfo?: string;
   daysOverdue?: number;
   daysUntilExpiry?: number;
+}
+
+// Insurance alert data (Phase 08)
+export interface InsuranceAlertItem {
+  type: 'expiring_soon' | 'expired' | 'missing_insurance';
+  severity: 'warning' | 'urgent';
+  description: string;
+  bookingId: string;  // Human-readable TJ-R-YYYY-NNNN
+  customerName?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -27,6 +36,19 @@ const ALERT_TYPE_ICONS: Record<string, string> = {
   overdue_rental: '&#9888;',      // warning sign
   expiring_buyer_tag: '&#9200;',  // clock
   unaccounted: '&#10067;',        // question mark
+};
+
+// Insurance alert display helpers (Phase 08)
+const INSURANCE_ALERT_LABELS: Record<string, string> = {
+  missing_insurance: 'Missing Insurance',
+  expired: 'Expired Insurance',
+  expiring_soon: 'Expiring Soon',
+};
+
+const INSURANCE_ALERT_ICONS: Record<string, string> = {
+  missing_insurance: '&#128737;',  // shield
+  expired: '&#10060;',            // cross mark
+  expiring_soon: '&#9200;',       // clock
 };
 
 function severityColor(severity: 'warning' | 'urgent'): { bg: string; border: string; text: string } {
@@ -144,11 +166,96 @@ function renderSection(title: string, icon: string, items: PlateAlertItem[]): st
   `;
 }
 
-export function buildPlateAlertEmail(alerts: PlateAlertItem[]): string {
-  const { overdue, expiring, unaccounted } = groupAlerts(alerts);
+// ---------------------------------------------------------------------------
+// Insurance alert email rendering (Phase 08)
+// ---------------------------------------------------------------------------
 
-  const urgentCount = alerts.filter(a => a.severity === 'urgent').length;
-  const warningCount = alerts.filter(a => a.severity === 'warning').length;
+function renderInsuranceAlertRow(alert: InsuranceAlertItem): string {
+  const colors = severityColor(alert.severity);
+  const typeLabel = INSURANCE_ALERT_LABELS[alert.type] || alert.type;
+
+  const customerInfo = alert.customerName
+    ? `<div style="font-size:13px;color:#ccc;margin-top:4px;">${alert.customerName}</div>`
+    : '';
+
+  return `
+    <tr>
+      <td style="padding:8px 0;border-bottom:1px solid #333;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+          <tr>
+            <td style="vertical-align:top;width:100%;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="
+                  font-size:15px;
+                  font-weight:bold;
+                  color:#fff;
+                  letter-spacing:0.5px;
+                ">${alert.bookingId}</span>
+                ${severityBadge(alert.severity)}
+              </div>
+              <div style="font-size:12px;color:#888;margin-top:2px;">${typeLabel}</div>
+              <div style="margin-top:4px;">
+                <span style="color:${colors.text};font-size:13px;">${alert.description}</span>
+              </div>
+              ${customerInfo}
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  `;
+}
+
+function groupInsuranceAlerts(alerts: InsuranceAlertItem[]): {
+  missing: InsuranceAlertItem[];
+  expired: InsuranceAlertItem[];
+  expiring: InsuranceAlertItem[];
+} {
+  return {
+    missing: alerts.filter(a => a.type === 'missing_insurance'),
+    expired: alerts.filter(a => a.type === 'expired'),
+    expiring: alerts.filter(a => a.type === 'expiring_soon'),
+  };
+}
+
+function renderInsuranceSection(title: string, icon: string, items: InsuranceAlertItem[]): string {
+  if (items.length === 0) return '';
+
+  return `
+    <div style="margin-bottom:24px;">
+      <div style="
+        font-size:14px;
+        font-weight:bold;
+        color:#C9A84C;
+        text-transform:uppercase;
+        letter-spacing:1px;
+        margin-bottom:12px;
+        padding-bottom:6px;
+        border-bottom:1px solid #333;
+      ">${icon} ${title} (${items.length})</div>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0">
+        ${items.map(renderInsuranceAlertRow).join('')}
+      </table>
+    </div>
+  `;
+}
+
+export function buildPlateAlertEmail(
+  alerts: PlateAlertItem[],
+  insuranceAlerts?: InsuranceAlertItem[],
+): string {
+  const { overdue, expiring, unaccounted } = groupAlerts(alerts);
+  const insAlerts = insuranceAlerts || [];
+  const hasInsurance = insAlerts.length > 0;
+  const hasPlates = alerts.length > 0;
+
+  // Combine all alerts for total count and severity summary
+  const totalAlerts = alerts.length + insAlerts.length;
+  const allSeverities = [
+    ...alerts.map(a => a.severity),
+    ...insAlerts.map(a => a.severity),
+  ];
+  const urgentCount = allSeverities.filter(s => s === 'urgent').length;
 
   const countBadge = `
     <div style="text-align:center;margin-bottom:20px;">
@@ -161,22 +268,56 @@ export function buildPlateAlertEmail(alerts: PlateAlertItem[]): string {
         background:${urgentCount > 0 ? '#3b1111' : '#3b2e11'};
         color:${urgentCount > 0 ? '#fca5a5' : '#fcd34d'};
         border:1px solid ${urgentCount > 0 ? '#ef4444' : '#f59e0b'};
-      ">${alerts.length} Active Alert${alerts.length !== 1 ? 's' : ''}${urgentCount > 0 ? ` (${urgentCount} urgent)` : ''}</span>
+      ">${totalAlerts} Active Alert${totalAlerts !== 1 ? 's' : ''}${urgentCount > 0 ? ` (${urgentCount} urgent)` : ''}</span>
     </div>
   `;
 
-  const sections = [
+  // Plate alert sections (unchanged when no insurance alerts)
+  const plateSections = hasPlates ? [
     renderSection('Overdue Rentals', ALERT_TYPE_ICONS.overdue_rental, overdue),
     renderSection('Expiring Buyer\'s Tags', ALERT_TYPE_ICONS.expiring_buyer_tag, expiring),
     renderSection('Unaccounted Plates', ALERT_TYPE_ICONS.unaccounted, unaccounted),
-  ].join('');
+  ].join('') : '';
+
+  // Insurance alert sections (Phase 08)
+  let insuranceSections = '';
+  if (hasInsurance) {
+    const { missing, expired: insExpired, expiring: insExpiring } = groupInsuranceAlerts(insAlerts);
+
+    // Add a divider between plate and insurance sections when both exist
+    const divider = hasPlates ? `
+      <div style="
+        margin:24px 0;
+        padding-top:16px;
+        border-top:2px solid #333;
+      ">
+        <div style="
+          font-size:16px;
+          font-weight:bold;
+          color:#C9A84C;
+          text-align:center;
+          letter-spacing:2px;
+          text-transform:uppercase;
+          margin-bottom:16px;
+        ">&#128737; Insurance Alerts</div>
+      </div>
+    ` : '';
+
+    insuranceSections = divider + [
+      renderInsuranceSection('Expired Insurance', INSURANCE_ALERT_ICONS.expired, insExpired),
+      renderInsuranceSection('Expiring Soon', INSURANCE_ALERT_ICONS.expiring_soon, insExpiring),
+      renderInsuranceSection('Missing Insurance', INSURANCE_ALERT_ICONS.missing_insurance, missing),
+    ].join('');
+  }
+
+  const sections = plateSections + insuranceSections;
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plate Alert Summary</title>
+  <title>${hasInsurance && !hasPlates ? 'Insurance Alert Summary' : hasInsurance ? 'Plate & Insurance Alert Summary' : 'Plate Alert Summary'}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#111;font-family:Georgia,'Times New Roman',serif;">
   <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:#111;">
@@ -208,7 +349,7 @@ export function buildPlateAlertEmail(alerts: PlateAlertItem[]): string {
                 color:#888;
                 margin-top:4px;
                 letter-spacing:1px;
-              ">Plate Alert Summary</div>
+              ">${hasInsurance && !hasPlates ? 'Insurance Alert Summary' : hasInsurance ? 'Plate & Insurance Alert Summary' : 'Plate Alert Summary'}</div>
             </td>
           </tr>
 
@@ -218,9 +359,9 @@ export function buildPlateAlertEmail(alerts: PlateAlertItem[]): string {
               ${countBadge}
               ${sections}
 
-              <!-- CTA Button -->
+              <!-- CTA Buttons -->
               <div style="text-align:center;margin:30px 0 10px;">
-                <a href="https://triplejautoinvestment.com/#/admin/plates" style="
+                ${hasPlates ? `<a href="https://triplejautoinvestment.com/#/admin/plates" style="
                   display:inline-block;
                   background-color:#C9A84C;
                   color:#1a1a1a;
@@ -230,7 +371,19 @@ export function buildPlateAlertEmail(alerts: PlateAlertItem[]): string {
                   border-radius:6px;
                   text-decoration:none;
                   letter-spacing:0.5px;
-                ">View Plates Dashboard</a>
+                  ${hasInsurance ? 'margin-right:10px;' : ''}
+                ">View Plates Dashboard</a>` : ''}
+                ${hasInsurance ? `<a href="https://triplejautoinvestment.com/#/admin/rentals" style="
+                  display:inline-block;
+                  background-color:#C9A84C;
+                  color:#1a1a1a;
+                  font-size:15px;
+                  font-weight:bold;
+                  padding:14px 32px;
+                  border-radius:6px;
+                  text-decoration:none;
+                  letter-spacing:0.5px;
+                ">View Rentals Dashboard</a>` : ''}
               </div>
             </td>
           </tr>
@@ -261,8 +414,8 @@ export function buildPlateAlertEmail(alerts: PlateAlertItem[]): string {
                 margin-top:16px;
                 line-height:1.5;
               ">
-                This is an automated plate tracking alert.<br>
-                Manage alert settings in the Plates Dashboard.
+                This is an automated ${hasInsurance ? 'plate & insurance' : 'plate'} tracking alert.<br>
+                Manage alert settings in the admin dashboard.
               </div>
             </td>
           </tr>
@@ -278,10 +431,16 @@ export function buildPlateAlertEmail(alerts: PlateAlertItem[]): string {
 // SMS template (concise, under 160 chars when possible)
 // ---------------------------------------------------------------------------
 
-export function buildPlateAlertSms(alerts: PlateAlertItem[]): string {
+export function buildPlateAlertSms(
+  alerts: PlateAlertItem[],
+  insuranceAlerts?: InsuranceAlertItem[],
+): string {
   const { overdue, expiring, unaccounted } = groupAlerts(alerts);
+  const insAlerts = insuranceAlerts || [];
 
   const parts: string[] = [];
+
+  // Plate alert counts
   if (overdue.length > 0) {
     parts.push(`${overdue.length} overdue rental${overdue.length !== 1 ? 's' : ''}`);
   }
@@ -292,6 +451,20 @@ export function buildPlateAlertSms(alerts: PlateAlertItem[]): string {
     parts.push(`${unaccounted.length} unaccounted`);
   }
 
+  // Insurance alert counts (Phase 08)
+  if (insAlerts.length > 0) {
+    const { missing, expired: insExpired, expiring: insExpiring } = groupInsuranceAlerts(insAlerts);
+    if (insExpired.length > 0) {
+      parts.push(`${insExpired.length} ins. expired`);
+    }
+    if (insExpiring.length > 0) {
+      parts.push(`${insExpiring.length} ins. expiring`);
+    }
+    if (missing.length > 0) {
+      parts.push(`${missing.length} missing ins.`);
+    }
+  }
+
   const summary = parts.join(', ');
-  return `Triple J Plate Alert: ${summary}. Check dashboard.`;
+  return `Triple J Alert: ${summary}. Check dashboard.`;
 }
