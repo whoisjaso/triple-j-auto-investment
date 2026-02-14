@@ -588,10 +588,11 @@ supabase/functions/:
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 8 verification (verify-work)
-2. Circle back to Phase 3 verification when DB migration is applied
-3. Wire up all credentials after feature code is complete
-4. Phase 9 blocked (Spireon API access needed)
+1. Phase 8 VERIFIED (5/5 must-haves passed) -- milestone nearly complete
+2. Audit milestone -- all non-blocked phases complete
+3. Circle back to Phase 3 verification when DB migration is applied
+4. Wire up all credentials after feature code is complete
+5. Phase 9 blocked (Spireon API access needed)
 
 ### If Context Is Lost
 Read these files in order:

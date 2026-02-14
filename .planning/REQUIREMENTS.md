@@ -51,10 +51,10 @@ Requirements for current milestone. Each maps to roadmap phases.
 
 ### Rental Insurance Verification
 
-- [ ] **RINS-01**: Capture insurance info (company, policy #, effective dates, coverage amounts)
-- [ ] **RINS-02**: Photo/scan upload of insurance card
-- [ ] **RINS-03**: Coverage verification against minimum requirements
-- [ ] **RINS-04**: Expiration alerts if insurance expires during rental period
+- [x] **RINS-01**: Capture insurance info (company, policy #, effective dates, coverage amounts)
+- [x] **RINS-02**: Photo/scan upload of insurance card
+- [x] **RINS-03**: Coverage verification against minimum requirements
+- [x] **RINS-04**: Expiration alerts if insurance expires during rental period
 
 ## v2 Requirements
 
@@ -126,18 +126,18 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PLAT-03 | Phase 7 | Complete |
 | PLAT-04 | Phase 7 | Complete |
 | PLAT-05 | Phase 7 | Complete |
-| RINS-01 | Phase 8 | Pending |
-| RINS-02 | Phase 8 | Pending |
-| RINS-03 | Phase 8 | Pending |
-| RINS-04 | Phase 8 | Pending |
+| RINS-01 | Phase 8 | Complete |
+| RINS-02 | Phase 8 | Complete |
+| RINS-03 | Phase 8 | Complete |
+| RINS-04 | Phase 8 | Complete |
 
 **Coverage:**
 - v1 requirements: 26 total
 - Mapped to phases: 26 (100%)
-- Complete: 21 (STAB-01 through STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06, RENT-01 through RENT-04, RENT-06, PLAT-01 through PLAT-05)
-- Pending: 4 (PORT-01 through PORT-04, PORT-07, RINS-01 through RINS-04)
+- Complete: 25 (STAB-01 through STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06, RENT-01 through RENT-04, RENT-06, PLAT-01 through PLAT-05, RINS-01 through RINS-04)
+- Pending: 0 (PORT-01 through PORT-04, PORT-07 in Phase 3 code-complete but verification deferred)
 - Blocked: 1 (RENT-05 - needs Spireon API)
 
 ---
 *Requirements defined: 2025-01-29*
-*Last updated: 2026-02-12 after Phase 5 completion*
+*Last updated: 2026-02-13 after Phase 8 completion*
