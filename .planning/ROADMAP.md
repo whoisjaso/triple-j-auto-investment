@@ -52,12 +52,16 @@ See: `.planning/milestones/v1-ROADMAP.md`
   3. Edge Functions fire on schedule -- notification queue processes and plate alerts run (verified in cron.job_run_details)
   4. File uploads work -- rental agreement PDFs, plate photos, and insurance card images save to storage and display correctly
   5. The site loads at the custom domain with valid SSL and all pages render without console errors referencing missing environment variables
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- [ ] 09-01: TBD
-- [ ] 09-02: TBD
-- [ ] 09-03: TBD
+- [ ] 09-01-PLAN.md -- Long-lead items: Resend account + domain DNS, repo private, A2P 10DLC check
+- [ ] 09-02-PLAN.md -- Supabase project creation, extensions, migrations, admin bootstrap, phone OTP
+- [ ] 09-03-PLAN.md -- Edge Functions deployment, secrets, storage buckets, cron activation
+- [ ] 09-04-PLAN.md -- Credential cleanup: delete deprecated files, remove hardcoded secrets from codebase
+- [ ] 09-05-PLAN.md -- Vercel deployment with env vars, custom domain + SSL
+- [ ] 09-06-PLAN.md -- Vehicle data migration from dev to production
+- [ ] 09-07-PLAN.md -- End-to-end smoke test on production
 
 ### Phase 10: Brand Truth
 **Goal**: Every page communicates Triple J as a trustworthy automotive investment firm -- real business data, real metrics, real story, honest positioning
@@ -226,7 +230,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 9. Production Infrastructure | v2.0 | 0/TBD | Not started | - |
+| 9. Production Infrastructure | v2.0 | 0/7 | Planning complete | - |
 | 10. Brand Truth | v2.0 | 0/TBD | Not started | - |
 | 11. Production Polish | v2.0 | 0/TBD | Not started | - |
 | 12. SEO Foundation | v2.0 | 0/TBD | Not started | - |
