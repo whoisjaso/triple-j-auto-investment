@@ -1,308 +1,193 @@
-# Research Summary
+# Project Research Summary
 
-**Project:** Triple J Auto Investment - Milestone 2 Features
-**Synthesized:** 2026-01-29
-**Overall Confidence:** MEDIUM-HIGH
-
----
+**Project:** Triple J Auto Investment -- v1.1 Production Launch & Polish
+**Domain:** Customer-facing dealership platform (React SPA + Supabase BaaS)
+**Researched:** 2026-02-13
+**Confidence:** HIGH
 
 ## Executive Summary
 
-Triple J Auto Investment is expanding a React 19 + Supabase dealership platform with three feature areas: a customer-facing registration tracker (Domino's-style 6-stage progress), a document validation system for Texas DMV submissions via webDEALER, and rental management with LoJack GPS integration. The existing stack is modern and well-suited for these additions, requiring only 5 new dependencies (pdfjs-dist, zod, react-day-picker, date-fns, nanoid).
+Triple J Auto Investment is a Texas independent used car dealership ($4K-$5K vehicles with rental fleet) that has a functionally complete 35,294 LOC codebase built on React 19, Vite 6.2, Supabase, and Tailwind 3.4. The code has never been deployed to production. The v1.1 milestone is purely a deployment and polish effort -- no new features are being built. The core challenge is orchestrating two independent services (Supabase backend and Vercel frontend) with strict ordering dependencies, while simultaneously fixing a severe brand-content mismatch where the site presents itself as a luxury dealership ("ARCHITECT REALITY", "Sovereign Vetting", subliminal messaging) despite selling budget used cars.
 
-The critical success factor is **fixing existing technical debt before adding features**. The 892-line Store.tsx monolith and known RLS silent failures create compounding risks. Research strongly recommends a "Reliability & Stability" phase first, followed by incremental feature delivery. The document validation and customer portal features are well-documented with HIGH confidence patterns. The rental management LoJack integration carries LOW confidence due to unavailable public API documentation - this requires direct Spireon contact before development.
+The recommended deployment approach is a five-stage pipeline: (1) Create fresh Supabase project with extensions, (2) Apply 9 SQL migrations in strict order, (3) Configure auth/storage/Edge Functions/cron, (4) Deploy frontend to Vercel with correct environment variables, (5) DNS cutover with pre-provisioned SSL. This ordering is non-negotiable -- the frontend embeds Supabase credentials at build time, and Edge Functions reference tables that must exist before deployment. Using MCP for SQL operations and CLI for Edge Function deployment is the right hybrid approach for a single-developer project.
 
-The core value proposition - "customers can track registration status in real-time, and paperwork goes through DMV the first time" - is achievable with the researched patterns, but only if RLS and Store decomposition issues are addressed first to prevent cascading failures.
-
----
+The two highest risks are: (1) **Committed credentials** -- real API keys, admin passwords, and Supabase keys are scattered across 30+ files in the repository including `.env.production`, documentation files, and Docker configs, all of which must be rotated before production launch; and (2) **Silent failures** -- RLS policies returning empty results instead of errors on a fresh project (the admin user must be promoted to `is_admin = true`), storage uploads failing without RLS policies, and cron jobs silently failing for weeks if `app.settings` are not configured. Every deployment stage needs an explicit verification gate.
 
 ## Key Findings
 
-### From STACK.md
+### Recommended Stack
 
-| Technology | Purpose | Confidence |
-|------------|---------|------------|
-| framer-motion 12.x (existing) | Progress tracker animations with React 19 support | HIGH |
-| pdfjs-dist 5.4.530 | Extract text from uploaded PDFs for validation | HIGH |
-| pdf-lib 1.17.1 (existing) | Read form fields from fillable PDFs | HIGH |
-| zod 3.24.x | Cross-document validation schemas | HIGH |
-| react-day-picker 9.13.0 | Rental availability calendar | HIGH |
-| date-fns 4.1.x | Date manipulation for rentals | HIGH |
-| nanoid 5.1.6 | Unique portal access tokens | HIGH |
-| Supabase Realtime (existing) | Real-time status updates | HIGH |
-| LoJack/Spireon API | GPS vehicle tracking | LOW - requires vendor contact |
+No technology changes for this milestone. The existing application stack (React 19, Supabase JS 2.87, Vite 6.2, Tailwind 3.4) is frozen. Research focused exclusively on the deployment and operations tooling layer.
 
-**Critical finding:** LoJack API access requires direct contact with Spireon. No public documentation available. Build rental core first, GPS integration last.
+**Core deployment tools:**
+- **Vercel (GitHub Integration)**: Frontend hosting -- auto-deploys on push, auto-detects Vite, handles SPA routing via existing `vercel.json` rewrites. No CLI or GitHub Actions needed for a single-developer project.
+- **Supabase MCP + CLI Hybrid**: Backend setup -- MCP for project creation, migrations, and SQL operations (can be done within Claude Code sessions); CLI for Edge Function deployment and secrets (only tool that can deploy function code).
+- **Supabase Dashboard**: Auth provider configuration -- phone auth with Twilio requires dashboard UI toggles that neither MCP nor CLI can handle.
 
-### From FEATURES.md
+**Critical plan/account requirements:**
+- Supabase **Pro plan ($25/month)** is mandatory -- free tier pauses after 7 days of inactivity
+- Twilio must be a **paid production account** -- trial accounts cannot send OTPs to unverified numbers
+- A2P 10DLC registration may be needed for Twilio SMS to avoid carrier blocking
 
-**Table Stakes (Must Build):**
-- Document completeness checklist (title, 130-U, inspection, reassignments)
-- SURRENDERED stamp placement reminder
-- Mileage consistency check across documents
-- VIN validation (17 chars, check digit, no I/O/Q)
-- 6-stage visual progress tracker with current status prominent
-- Unique link access (no login required for customers)
-- Rental availability calendar
-- Rental agreement generation
-- Vehicle status tracking (Available/Rented/Maintenance/For Sale)
+**What NOT to add:** Error tracking (Sentry), analytics (PostHog/GA4), testing frameworks (Vitest/Playwright), SSR (Next.js), Docker for Vercel, `supabase config.toml`, or `vite-plugin-vercel`. All are premature or irrelevant for a low-traffic dealership deployment milestone.
 
-**Differentiators (Should Build):**
-- Cross-document validation (VIN, name, date, mileage matching)
-- Document order enforcement (webDEALER requires specific sequence)
-- Rejection reason prevention (proactive flagging)
-- SMS notifications on stage changes
-- Dual inventory mode (same vehicle for sale AND rent)
-- Digital vehicle inspection (photo-based condition reports)
+### Expected Features
 
-**Defer to v2+:**
-- Authorization holds (payment processing complexity)
-- SPV warning system (requires external pricing data)
-- Advanced LoJack features (kill switch, geofencing)
-- Multi-language notifications
+**Must have (table stakes -- cannot launch without):**
+- Real inventory data with actual vehicle photos (empty inventory = immediate bounce)
+- Content and brand alignment -- remove fake luxury branding (SubliminalPrime, fake social proof ticker, aspirational copy) and replace with honest used car dealer content
+- Working contact pathways -- the contact form currently uses a `setTimeout` mock, not real submission
+- Mobile responsiveness verified (60%+ of car shopping is on mobile)
+- Performance fix -- 3.5-second fixed splash screen blocks all content (53% abandon at >3s)
+- Remove `user-scalable=no` from viewport meta (accessibility violation)
+- Remove 100+ `console.log` statements (security/performance leak in production)
+- End-to-end workflow verification (inquiry to AI call, registration tracker, customer login, admin workflows)
+- Legal compliance pages with real content, Texas dealer license number visible
 
-### From ARCHITECTURE.md
+**Should have (professional polish):**
+- Accurate meta tags and schema markup (currently says "Used Luxury Cars" with "$5000-$50000" range)
+- SEO foundation (React Helmet, BrowserRouter migration from HashRouter, sitemap.xml, robots.txt)
+- Real Google reviews as static social proof
+- Loading/empty/error states for all async operations
+- Retell AI prompt updates to cover rental inquiries and Spanish callers
+- Accessibility basics (alt text, color contrast, keyboard nav)
+- Consistent visual spacing, button styles, and footer content
 
-**Recommended Structure:**
-1. Extract AuthContext from Store.tsx (during customer portal work)
-2. Extract VehicleContext from Store.tsx (during rental work)
-3. Create new RentalContext for rental-specific state
-4. Create RegistrationContext for registration tracking
-5. Customer portal in same SPA with route-based separation (/portal/*)
+**Defer (v2+):**
+- Online payment processing (PCI complexity)
+- Live chat widget
+- Test drive scheduling system
+- Blog/content section
+- Comprehensive test suite
+- API key migration from VITE_ to Edge Functions
+- SSR migration (Next.js)
+- Customer account profile editing
 
-**Key Patterns:**
-- Customer access via unique link, no login required for MVP
-- RLS policy allows anon SELECT on registrations filtered by order_id
-- Document validation is pure business logic - no new Supabase tables needed
-- Separate rentals table with vehicle_id foreign key
-- Separate rental_status from sale_status (avoid single status field)
+### Architecture Approach
 
-**Database Additions:**
-- registrations: add documents_received JSONB, validation_status, validation_errors
-- vehicles: add is_rentable, rental_daily_rate, rental_status, lojack_device_id
-- rentals: new table with customer info, dates, financial tracking, status
+The deployment follows a strict five-stage pipeline where each stage must complete and be verified before the next begins. The architecture is a standard Jamstack pattern: static SPA on Vercel CDN communicating with Supabase PostgreSQL via RLS-protected APIs, with three Deno Edge Functions for server-side operations (SMS/email notifications, plate/insurance alerts, unsubscribe handling) triggered by pg_cron schedules.
 
-### From PITFALLS.md
+**Major components:**
+1. **Supabase PostgreSQL** -- 9 migrations in strict order, requiring btree_gist, pg_cron, and pg_net extensions enabled before specific migrations. `app.settings` must be configured for cron to invoke Edge Functions.
+2. **Supabase Auth** -- Email/password for admin, phone OTP via Twilio for customers. Site URL and redirect URLs must point to production domain before any auth flows work.
+3. **Supabase Storage** -- 4 private buckets (rental-agreements, rental-photos, plate-photos, insurance-cards) with admin-only RLS policies. Not created by migrations -- must be done manually.
+4. **3 Edge Functions** -- Deployed via CLI. `unsubscribe` requires `--no-verify-jwt`. All require 7 secrets set before first invocation. pg_cron invokes them via pg_net.
+5. **Vercel SPA** -- `VITE_*` variables baked in at build time. Existing `vercel.json` is production-ready. Root directory must be set to `triple-j-auto-investment-main/`.
+6. **DNS/Domain** -- Cutover from existing live site requires pre-provisioned SSL and lowered TTL.
 
-**Critical (Must Prevent):**
+### Critical Pitfalls
 
-| Pitfall | Prevention | Phase |
-|---------|------------|-------|
-| VIN mismatch across documents | Single source of truth, check-digit validation, cross-doc check | Registration Checker |
-| Original document requirement violation | Provenance tracking, explicit confirmation workflow | Registration Checker |
-| GPS tracking consent violation | Explicit separate consent form, auto-disable on sale | Rental Management |
-| RLS silent failures masking data loss | Fix error handling, session verification, never use service key in frontend | Reliability phase |
-| Unique link security weakness | Time-limited links, secondary verification, masked PII | Customer Portal |
+1. **Credentials committed to git (CRITICAL)** -- Real API keys, admin password (`adekunle12`), and Supabase keys are in 30+ files. Every committed key must be rotated. Create fresh Supabase project. Remove `VITE_ADMIN_PASSWORD` entirely from codebase.
+2. **RLS silent empty results on fresh project (CRITICAL)** -- Admin user profile defaults to `is_admin = false`. Every admin query silently returns empty arrays. Must run `UPDATE profiles SET is_admin = true` after creating admin user. This exact bug occurred during v1.
+3. **Migration ordering with extension dependencies (CRITICAL)** -- Migration 04 requires pg_cron + pg_net; migration 06 requires btree_gist. `app.settings` must be configured before migration 04 or its cron schedule silently fails forever.
+4. **Storage buckets not created (HIGH)** -- No migration creates the 4 required buckets. Without explicit bucket creation + RLS policies, all file uploads silently fail.
+5. **pg_cron jobs silently failing for weeks (HIGH)** -- Notification queue and plate alerts cron jobs fail silently if Edge Functions are not deployed, secrets are not set, or `app.settings` are misconfigured. Must verify `cron.job_run_details` within first day.
 
-**Moderate (Plan For):**
+## Implications for Roadmap
 
-| Pitfall | Prevention | Phase |
-|---------|------------|-------|
-| Notification fatigue | Tier design (SMS critical, email informational), throttling | Customer Portal |
-| Double-booking rentals | Database constraint on overlapping dates, optimistic locking | Rental Management |
-| Store.tsx monolith cascade | Extract contexts before adding features | Reliability phase |
-| Migration breaking live data | Version-controlled migrations, staging environment | All phases |
-| Form 130-U field changes | Version detection, flexible field mapping | Registration Checker |
+Based on combined research, the v1.1 milestone should be structured as 5 phases with strict ordering for the first two phases and increasing parallelism for phases 3-5.
 
----
+### Phase 1: Security Cleanup and Supabase Production Setup
+**Rationale:** Cannot deploy anything until credentials are rotated and the production Supabase project exists. This is the foundation everything else depends on. Addresses the number-one critical pitfall (committed credentials) and provides the project URL/keys needed by all subsequent phases.
+**Delivers:** Fresh Supabase project with all 9 migrations applied, extensions enabled, admin user bootstrapped, storage buckets created with RLS, Edge Functions deployed with secrets, cron schedules verified.
+**Addresses:** TS-06 (end-to-end workflow prerequisites), all deployment infrastructure dependencies
+**Avoids:** Pitfalls 1 (credentials), 2 (RLS empty results), 3 (migration ordering), 4 (storage buckets), 5 (auth config), 7 (Edge Function secrets), 12 (cron failures)
 
-## Recommended Stack
+### Phase 2: Vercel Deployment and Domain Cutover
+**Rationale:** Frontend deployment depends on having the Supabase project URL and anon key from Phase 1. Must be verified on the Vercel preview URL before touching DNS. Domain cutover is the highest-risk operational step and should happen in a dedicated focused session.
+**Delivers:** Live production site at `triplejautoinvestment.com` with SSL, connected to production Supabase.
+**Addresses:** TS-06 (end-to-end workflows verified on production infrastructure)
+**Avoids:** Pitfalls 6 (DNS downtime), 9 (wrong env vars), 10 (CSP blocking), 15 (wrong root directory)
 
-**Keep (Existing):**
-- React 19.2.0
-- TypeScript 5.8.2
-- Supabase JS 2.87.1
-- framer-motion 12.23.26
-- pdf-lib 1.17.1
-- Vite 6.2.0
-- Tailwind CSS 3.4.19
+### Phase 3: Content and Brand Realignment
+**Rationale:** The site cannot go public with luxury branding for a $4K used car lot. This is the single biggest credibility issue identified across all research. Must be completed before any customer sees the site. Content fixes are independent of infrastructure and can be done rapidly after deployment verification.
+**Delivers:** Honest, professional dealership website with real business information, accurate meta tags, removed subliminal components, functional contact pathways, and legal compliance pages.
+**Addresses:** TS-01 (real content), TS-04 (working contact paths), TS-05 (legal compliance), PD-01 (brand alignment)
+**Avoids:** Customer confusion, loss of trust, potential FTC issues with misleading luxury claims
 
-**Add (5 new dependencies):**
-```bash
-npm install pdfjs-dist@5.4.530 zod@3.24.2 react-day-picker@9.13.0 date-fns@4.1.0 nanoid@5.1.6
-```
+### Phase 4: UI/UX Polish and Performance
+**Rationale:** With infrastructure live and content fixed, this phase addresses the technical polish that separates professional from amateur. Mobile responsiveness is critical (60%+ of traffic). Performance fixes (splash screen, image optimization, console.log cleanup) directly impact bounce rates.
+**Delivers:** Production-quality UX -- fast loading, mobile-responsive, proper error handling, accessibility basics.
+**Addresses:** TS-02 (mobile), TS-03 (performance), PD-02 (visual consistency), PD-04 (accessibility), PD-05 (error handling)
+**Avoids:** High bounce rates from slow loading, broken mobile experience
 
-**Do Not Add:**
-- GSAP (already present, use framer-motion for progress tracker)
-- react-big-calendar or FullCalendar (overkill, licensing issues)
-- Moment.js (deprecated)
-- Custom auth for customers (use order_id as implicit auth)
+### Phase 5: SEO Foundation and Retell AI Polish
+**Rationale:** SEO and AI polish are important but not launch-blocking. They can be done after the site is live and customer-facing. BrowserRouter migration (from HashRouter) is the highest-complexity item and benefits from being isolated so routing bugs do not block the production launch.
+**Delivers:** Search-engine-visible pages, accurate schema markup, sitemap, robots.txt, Retell AI handling rental inquiries and Spanish callers, failure fallbacks for AI calls.
+**Addresses:** PD-03 (SEO), PD-06 (Retell AI polish)
+**Avoids:** None critical -- this phase is improvement, not risk mitigation
 
----
+### Phase Ordering Rationale
 
-## Feature Priorities
+- **Phases 1-2 are strictly sequential:** Frontend cannot build without Supabase credentials; domain cannot cutover without verified frontend.
+- **Phase 3 is sequenced after Phase 2** because content changes need to be verified on the production deployment, though code changes pushed to master auto-deploy via Vercel GitHub integration.
+- **Phases 4 and 5 can partially overlap** since they affect different parts of the codebase (UI components vs. routing/SEO).
+- **The credential rotation in Phase 1 is a hard prerequisite for everything.** No deployment should happen until every committed secret is rotated.
 
-### Phase 1: Reliability & Stability (Prerequisite)
-- Fix RLS silent failure patterns
-- Add session verification to all write operations
-- Extract AuthContext from Store.tsx
-- Address inventory display loop bug
-- Establish migration discipline
+### Research Flags
 
-### Phase 2: Customer Portal + Registration Basics
-**Features:** 6-stage tracker, unique link access, status history, mobile-responsive
-**From FEATURES.md:** Table stakes for status tracking
-**Avoid:** Over-promising real-time, notification fatigue (start minimal)
+Phases likely needing deeper research during planning:
+- **Phase 5 (BrowserRouter migration):** Complex interaction between React Router, Vercel rewrites, Supabase Auth redirect URLs (currently uses `/#/` prefix), and all existing internal links. Needs a focused investigation before execution.
+- **Phase 1 (Twilio A2P 10DLC):** Carrier registration requirements for production SMS messaging may take days or weeks to approve. Needs timeline research and early initiation.
 
-### Phase 3: Registration Checker
-**Features:** Document completeness, VIN validation, mileage consistency, SURRENDERED reminder
-**From FEATURES.md:** Table stakes + cross-document validation differentiator
-**Avoid:** OCR/scan processing (error-prone), automated DMV submission (not possible)
-
-### Phase 4: Rental Management Core
-**Features:** Availability calendar, agreement generation, customer records, deposit tracking
-**From FEATURES.md:** Table stakes for rental management
-**Avoid:** Double-booking (database constraint required), inventory state confusion
-
-### Phase 5: Rental Management Advanced
-**Features:** Dual inventory mode, digital inspection, LoJack integration (if API available)
-**From FEATURES.md:** Differentiators
-**Avoid:** GPS consent violation (build explicit consent workflow)
-
----
-
-## Build Order
-
-Based on architecture dependencies and pitfall prevention:
-
-```
-Phase 1: Reliability & Stability
-    |
-    +-- RLS fixes, Store decomposition, migration setup
-    |
-    v
-Phase 2: Customer Portal + Registration Foundation
-    |
-    +-- AuthContext extraction
-    +-- RegistrationContext creation
-    +-- Portal pages (/portal/track/:orderId)
-    +-- Real-time status subscriptions
-    |
-    v
-Phase 3: Registration Checker
-    |
-    +-- documentValidationService.ts
-    +-- VIN validation with check-digit
-    +-- Cross-document consistency checks
-    +-- Admin validation UI
-    |
-    v
-Phase 4: Rental Management Core
-    |
-    +-- VehicleContext extraction
-    +-- vehicles table rental columns
-    +-- rentals table creation
-    +-- RentalContext
-    +-- Availability calendar
-    +-- Booking workflow with DB constraints
-    |
-    v
-Phase 5: Rental Advanced + GPS
-    |
-    +-- LoJack API integration (if available)
-    +-- Digital vehicle inspection
-    +-- Consent workflow
-```
-
-**Rationale:**
-1. **Reliability first** - Research shows RLS and Store issues will compound with new features
-2. **Portal early** - Delivers customer value quickly, validates Supabase subscription patterns
-3. **Registration checker mid** - Builds on registration foundation, pure business logic
-4. **Rental last** - Most complex, requires VehicleContext extraction, GPS API uncertain
-
----
-
-## Critical Pitfalls Summary
-
-### Legal/Compliance (Address Immediately)
-1. **GPS consent violation** - Texas requires explicit written consent for post-sale tracking. Build consent workflow before LoJack integration, not after.
-2. **Original document requirements** - webDEALER rejects copies. Track document provenance.
-
-### Technical (Fix Before Features)
-1. **RLS silent failures** - 83% of exposed Supabase databases involve RLS misconfiguration. Audit and fix before adding tables.
-2. **Store.tsx monolith (892 lines)** - Will become unmaintainable. Extract during relevant feature work.
-3. **VIN mismatch cascade** - Single source of truth required. No manual VIN entry on document generation.
-
-### Operational (Design Correctly)
-1. **Double-booking** - Use database-level constraints, not app-level checks.
-2. **Notification fatigue** - Start minimal, let customers opt up.
-3. **Form 130-U changes** - Check revision date, maintain versioned field mappings.
-
----
-
-## Open Questions / Blockers
-
-### Blocking
-1. **LoJack API Access** - Must contact Spireon for dealer API credentials and documentation. Cannot estimate GPS integration effort until API is available.
-
-### Needs Resolution Before Development
-2. **PDF Worker Configuration** - pdfjs-dist requires web worker. Vite configuration needed.
-3. **Staging Environment** - Research strongly recommends staging before production migrations. Current setup unclear.
-4. **SMS Provider** - Notifications require SMS capability. Existing infrastructure status unknown.
-
-### Can Resolve During Development
-5. **Date-fns Locale** - Spanish support if needed for rental agreements.
-6. **Supabase Storage Tier** - Document uploads may exceed free tier at scale (50GB estimate at 500 rentals/year).
-
----
+Phases with standard patterns (skip research-phase):
+- **Phase 1 (Supabase setup):** Extremely well-documented in the ARCHITECTURE.md 28-step deployment checklist. Follow it step-by-step.
+- **Phase 2 (Vercel deployment):** Standard Vite-on-Vercel pattern with existing production-ready `vercel.json`.
+- **Phase 3 (Content realignment):** Business content decisions, not technical research.
+- **Phase 4 (UI polish):** Standard web performance and accessibility patterns.
 
 ## Confidence Assessment
 
-| Area | Level | Reason |
-|------|-------|--------|
-| Stack Recommendations | HIGH | All libraries verified current, official docs consulted, npm stats confirmed |
-| Texas DMV Requirements | HIGH | webDEALER user guide, 130-U documentation, TXIADA bulletins |
-| Customer Portal UX | HIGH | NN/g research, Domino's/Uber case studies, industry patterns |
-| Architecture Patterns | HIGH | Supabase official docs, codebase analysis, React best practices |
-| Rental Features | MEDIUM | Industry surveys, not Texas-specific, general patterns |
-| LoJack Integration | LOW | No public API documentation, requires vendor contact |
-| Pitfall Prevention | HIGH | Official sources, CVE documentation, industry research |
+| Area | Confidence | Notes |
+|------|------------|-------|
+| Stack | HIGH | No new technology. Deployment tooling verified against official Vercel and Supabase docs. Existing `vercel.json` confirmed production-ready by direct review. |
+| Features | HIGH | Codebase review directly confirmed all content and brand gaps. Industry research (TradePending 2025, Overfuel 2025) validates mobile-first and real-content priorities for dealerships. |
+| Architecture | HIGH | Five-stage deployment pipeline derived from hard dependency analysis of migration SQL source code and Vite build-time variable behavior. |
+| Pitfalls | HIGH | All critical pitfalls verified by direct codebase grep (30+ files with real credentials) and official Supabase troubleshooting docs. The RLS silent-failure pattern was already hit during v1 development. |
 
-### Gaps to Address During Planning
-- LoJack API capabilities and authentication
-- Existing SMS infrastructure status
-- Current Supabase plan limits
-- Staging environment setup requirements
+**Overall confidence:** HIGH
 
----
+### Gaps to Address
 
-## Sources (Aggregated)
+- **Twilio account status:** Unknown whether the existing Twilio account is paid/production-ready or still a trial. Trial accounts block real customer OTPs. Must verify before Phase 1 execution.
+- **A2P 10DLC registration:** May be required for production SMS. Registration can take days to weeks. Should initiate this process immediately in parallel with Phase 1.
+- **Resend domain verification:** Unknown if `triplejautoinvestment.com` is already verified in Resend. DNS propagation takes up to 72 hours. Should start 48+ hours before launch.
+- **EmailJS configuration:** Current service/template IDs in `.env` may be placeholders (`YOUR_SERVICE_ID`). Must verify in EmailJS dashboard before frontend deployment.
+- **Domain registrar:** Unknown where `triplejautoinvestment.com` is registered. Affects DNS cutover approach (A record vs. nameserver transfer to Vercel).
+- **Existing Supabase project:** `.env.production` references `scgmpliwlfabnpygvbsy.supabase.co`. Unclear if this contains production data needing migration or is purely dev/staging.
+- **VITE_ADMIN_PASSWORD removal:** Removing this env var may break admin login if the codebase uses it for client-side auth checks. Needs code audit during Phase 1 before removal.
+- **Retell AI Spanish support:** Unknown whether Retell supports Spanish-language voice agents. Houston is 45% Hispanic -- matters for customer experience in Phase 5.
 
-### Official Texas DMV
-- [TxDMV Form 130-U](https://www.txdmv.gov/sites/default/files/form_files/130-U.pdf)
-- [webDEALER Dealer User Guide](https://www.txdmv.gov/sites/default/files/body-files/webDEALER_Dealer_User_Guide.pdf)
-- [Motor Vehicle Sales Tax](https://comptroller.texas.gov/taxes/motor-vehicle/sales-use.php)
+## Sources
 
-### Technology Documentation
-- [Motion (framer-motion) Docs](https://motion.dev/docs/react-upgrade-guide)
-- [pdfjs-dist npm](https://www.npmjs.com/package/pdfjs-dist)
-- [React DayPicker](https://daypicker.dev/)
-- [Zod Documentation](https://zod.dev/)
-- [Supabase Realtime](https://supabase.com/docs/guides/realtime)
-- [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
+### Primary (HIGH confidence)
+- [Supabase Production Checklist](https://supabase.com/docs/guides/deployment/going-into-prod) -- deployment requirements, security hardening
+- [Supabase Phone Auth with Twilio](https://supabase.com/docs/guides/auth/phone-login/twilio) -- OTP configuration
+- [Supabase Scheduling Edge Functions](https://supabase.com/docs/guides/functions/schedule-functions) -- pg_cron + pg_net pattern
+- [Supabase Storage Access Control](https://supabase.com/docs/guides/storage/security/access-control) -- RLS for private buckets
+- [Supabase Edge Function Secrets](https://supabase.com/docs/guides/functions/secrets) -- environment variable management
+- [Supabase Edge Function Deployment](https://supabase.com/docs/guides/functions/deploy) -- CLI deployment commands
+- [Supabase RLS Troubleshooting](https://supabase.com/docs/guides/troubleshooting/why-is-my-select-returning-an-empty-data-array-and-i-have-data-in-the-table-xvOPgx) -- silent empty results
+- [Vercel Vite Framework Documentation](https://vercel.com/docs/frameworks/frontend/vite) -- build configuration
+- [Vercel Zero-Downtime DNS Migration](https://vercel.com/guides/zero-downtime-migration-for-dns) -- SSL pre-provisioning
+- [Vite Environment Variables](https://vite.dev/guide/env-and-mode) -- build-time injection behavior
+- [Supabase MCP Server](https://github.com/supabase-community/supabase-mcp) -- MCP capabilities for project management
 
-### UX Research
-- [NN/g: 16 Design Guidelines for Status Trackers](https://www.nngroup.com/articles/status-tracker-progress-update/)
-- [The Hustle: Domino's Pizza Tracker](https://thehustle.co/originals/how-the-dominos-pizza-tracker-conquered-the-business-world)
+### Secondary (MEDIUM confidence)
+- [TradePending 2025 Automotive Consumer Survey](https://tradepending.com/blog/tradepending-2025-automotive-consumer-survey/) -- mobile shopping statistics (51%+ on mobile)
+- [Overfuel 2025 Auto Groups Core Web Vitals](https://overfuel.com/resources/blog/north-americas-largest-auto-groups-still-failing-google-core-web-vitals-2025/) -- performance impact on dealership conversion
+- [NextLeft Car Dealership SEO Guide 2025](https://nextleft.com/blog/car-dealership-seo-guide-2025-rank-1-locally/) -- local SEO priorities, HashRouter as SEO killer
+- [Cars Commerce Online Reputation Best Practices](https://www.carscommerce.inc/car-dealer-online-reputation-best-practices/) -- trust signals and real reviews
+- [Clarity Voice 2026 Auto Customer Communication Guide](https://clarityvoice.com/news/2026-auto-customer-communication-game-plan-modernizing-your-dealership-or-service-shop/) -- contact pathway importance
+- [Resend Domain Verification](https://resend.com/docs/dashboard/domains/introduction) -- SPF/DKIM setup
 
-### Industry Patterns
-- [PDF Parsing Libraries 2025](https://strapi.io/blog/7-best-javascript-pdf-parsing-libraries-nodejs-2025)
-- [React Calendar Components](https://www.builder.io/blog/best-react-calendar-component-ai)
-
----
-
-## Ready for Requirements
-
-Research is complete and synthesized. The roadmapper should proceed with phase definition using the following structure:
-
-1. **Reliability & Stability** - Fix RLS, decompose Store, establish migration discipline
-2. **Customer Portal** - 6-stage tracker with real-time updates
-3. **Registration Checker** - Document validation before webDEALER submission
-4. **Rental Management Core** - Calendar, agreements, booking workflow
-5. **Rental Management Advanced** - GPS integration (pending API access), inspections
-
-**Recommendation:** Start Phase 1 immediately. Contact Spireon for LoJack API access in parallel to unblock Phase 5 estimates.
+### Codebase Analysis (HIGH confidence)
+- Direct grep confirming 30+ files with committed credentials (`.env.production`, Docker configs, documentation)
+- Migration SQL source code analysis confirming extension dependencies and ordering constraints
+- Edge Function source code analysis confirming 7 required secrets via `Deno.env.get()` calls
+- Homepage/About/Services page review confirming brand-content mismatch with $4K-$5K inventory
+- Contact.tsx review confirming `setTimeout` mock instead of real form submission
 
 ---
-
-*Synthesis completed: 2026-01-29*
+*Research completed: 2026-02-13*
+*Ready for roadmap: yes*

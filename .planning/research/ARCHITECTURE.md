@@ -1,656 +1,771 @@
-# Architecture Patterns for Milestone Features
+# Production Deployment Architecture
 
-**Domain:** Dealership operations platform - new feature integration
-**Researched:** 2025-01-29
-**Confidence:** HIGH (based on existing codebase analysis + verified patterns)
+**Domain:** React/Vite SPA on Vercel + Supabase backend (fresh production project)
+**Researched:** 2026-02-13
+**Confidence:** HIGH (based on codebase analysis, official Supabase/Vercel documentation)
 
 ## Executive Summary
 
-The existing architecture (React 19 SPA + Supabase) can accommodate all three new features without major structural changes. However, the monolithic Store.tsx (892 lines) is a critical bottleneck that must be addressed to safely add new features. The recommended approach is **progressive decomposition** - split the Store while adding features, rather than refactoring first.
+Deploying this dealership platform to production requires orchestrating two independent services (Supabase and Vercel) with a strict ordering: Supabase must be fully configured before Vercel can build, because the frontend embeds `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` at build time. The deployment is further complicated by three Edge Functions that depend on Supabase secrets, two pg_cron schedules that invoke those functions, four storage buckets with RLS policies, and a domain cutover from an existing live site.
 
-Key architectural decisions:
-1. **Customer Portal**: Same SPA with route-based separation, NOT a separate app
-2. **Document Validation**: New service module, minimal Store changes
-3. **Rental Management**: Extend existing Vehicle model, new context slice for rentals
+The recommended approach is a five-stage deployment pipeline where each stage completes and is verified before the next begins. Attempting to parallelize stages (e.g., deploying Edge Functions before migrations are applied) will cause failures because the functions reference tables that do not yet exist.
 
-## Current Architecture Assessment
-
-### What Works Well
+## Deployment Pipeline Overview
 
 ```
-[Browser] --> [React SPA / HashRouter]
-                    |
-         +-------------------+
-         |                   |
-    [Public Pages]     [Admin Pages]
-         |                   |
-         +-------------------+
-                    |
-              [StoreContext]  <-- Single source of truth
-                    |
-         +-------------------+
-         |                   |
-    [Services]         [Supabase]
-    (Email, AI)        (Auth, DB, RT)
+Stage 1: Supabase Project Creation + Extensions
+    |
+Stage 2: Database Schema (migrations in order)
+    |
+Stage 3: Supabase Configuration (auth, storage, secrets, Edge Functions, cron)
+    |
+Stage 4: Vercel Deployment (connect repo, env vars, build)
+    |
+Stage 5: Domain Cutover + Verification
 ```
-
-**Strengths:**
-- Single deployment artifact
-- Real-time subscriptions working
-- Auth flow established
-- PDF generation patterns proven
-
-### What Needs Addressing
-
-| Issue | Impact on New Features | Priority |
-|-------|------------------------|----------|
-| Store.tsx monolith (892 lines) | Adding rental state will make it unmaintainable | HIGH |
-| No customer auth separate from admin | Customer portal needs different access pattern | HIGH |
-| RLS silent failures | Document uploads could fail silently | MEDIUM |
-| No test coverage | Risky to modify shared components | MEDIUM |
-
-## Recommended Architecture
-
-### Component Boundaries
-
-```
-triple-j-auto-investment-main/
-├── App.tsx                    # Router, providers (unchanged)
-├── context/
-│   ├── AuthContext.tsx        # NEW: Split from Store - auth only
-│   ├── VehicleContext.tsx     # NEW: Split from Store - vehicles + inventory
-│   ├── RentalContext.tsx      # NEW: Rental-specific state
-│   ├── RegistrationContext.tsx # NEW: Registration tracking state
-│   └── Store.tsx              # DEPRECATED: Facade for backward compatibility
-├── services/
-│   ├── documentValidationService.ts  # NEW: Registration checker logic
-│   ├── rentalService.ts              # NEW: Rental CRUD
-│   └── [existing services]
-├── pages/
-│   ├── portal/                # NEW: Customer-facing pages
-│   │   ├── RegistrationStatus.tsx    # Replaces RegistrationTracker
-│   │   ├── CustomerLogin.tsx         # Customer auth
-│   │   └── DocumentUpload.tsx        # Customer uploads
-│   ├── admin/
-│   │   ├── RegistrationChecker.tsx   # NEW: Validation tool
-│   │   ├── RentalCalendar.tsx        # NEW: Availability view
-│   │   └── [existing admin pages]
-│   └── [existing public pages]
-└── hooks/
-    ├── useRentalAvailability.ts      # NEW: Calendar logic
-    └── useDocumentValidation.ts      # NEW: Validation logic
-```
-
-### Data Flow
-
-#### Customer Portal Flow
-
-```
-Customer Access:
-[Unique Link: /portal/track/TJ-2024-0001]
-              |
-              v
-   [Route Guard: OrderIDContext]
-              |
-              v
-    [RegistrationStatus.tsx]
-              |
-              v
-  [registrationService.ts] --> [Supabase: registrations table]
-              |                        |
-              v                        v
-     [Real-time updates]       [RLS: anon role can SELECT
-                                where order_id matches]
-```
-
-**Key Insight:** The existing `RegistrationTracker.tsx` already uses order_id lookup without requiring auth. This pattern is correct for customer access - extend it, don't change it.
-
-#### Document Validation Flow
-
-```
-Admin triggers validation:
-[RegistrationChecker.tsx]
-         |
-         v
-[documentValidationService.ts]
-         |
-    +----+----+----+----+
-    |    |    |    |    |
-    v    v    v    v    v
-[Title] [130-U] [Affidavit] [Inspection] [Cross-checks]
-    |    |    |    |    |
-    +----+----+----+----+
-         |
-         v
-   [Validation Report]
-   - Missing fields
-   - VIN mismatches
-   - Date inconsistencies
-   - Name variations
-```
-
-**No Supabase needed** for validation - it's pure business logic operating on document data already in the system.
-
-#### Rental Management Flow
-
-```
-[RentalContext.tsx]
-         |
-    +----+----+
-    |         |
-    v         v
-[Rentals]  [Availability]
-    |         |
-    v         v
-[rentalService.ts] --> [Supabase: rentals table]
-    |                          |
-    v                          v
-[VehicleContext]        [Real-time subscription]
-(extends vehicle          (calendar updates)
- with rental_status)
-```
-
-## Database Schema Extensions
-
-### registrations Table (Existing - Enhance)
-
-```sql
--- Current schema works for customer portal
--- Add columns for document tracking:
-ALTER TABLE registrations ADD COLUMN IF NOT EXISTS
-  documents_received JSONB DEFAULT '{
-    "title_front": false,
-    "title_back": false,
-    "form_130u": false,
-    "affidavit": false,
-    "inspection": false,
-    "insurance": false
-  }';
-
-ALTER TABLE registrations ADD COLUMN IF NOT EXISTS
-  validation_status TEXT DEFAULT 'pending';  -- pending, passed, failed
-
-ALTER TABLE registrations ADD COLUMN IF NOT EXISTS
-  validation_errors JSONB DEFAULT '[]';
-```
-
-### vehicles Table (Existing - Extend for Rentals)
-
-```sql
--- Add rental-related columns to existing vehicles table
-ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS
-  is_rentable BOOLEAN DEFAULT false;
-
-ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS
-  rental_daily_rate DECIMAL(10,2);
-
-ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS
-  rental_status TEXT DEFAULT 'available';  -- available, rented, maintenance
-
-ALTER TABLE vehicles ADD COLUMN IF NOT EXISTS
-  lojack_device_id TEXT;  -- For GPS tracking integration
-```
-
-### rentals Table (New)
-
-```sql
-CREATE TABLE rentals (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  vehicle_id UUID REFERENCES vehicles(id) ON DELETE CASCADE,
-
-  -- Customer info (not linked to auth.users - external customers)
-  customer_name TEXT NOT NULL,
-  customer_phone TEXT NOT NULL,
-  customer_email TEXT,
-  customer_license_number TEXT,
-  customer_address TEXT,
-
-  -- Rental period
-  start_date DATE NOT NULL,
-  end_date DATE NOT NULL,
-  actual_return_date DATE,
-
-  -- Financial
-  daily_rate DECIMAL(10,2) NOT NULL,
-  total_amount DECIMAL(10,2) NOT NULL,
-  deposit_amount DECIMAL(10,2) DEFAULT 0,
-  deposit_status TEXT DEFAULT 'pending',  -- pending, collected, returned, forfeited
-
-  -- Status
-  status TEXT DEFAULT 'reserved',  -- reserved, active, completed, cancelled
-
-  -- Mileage tracking
-  start_mileage INTEGER,
-  end_mileage INTEGER,
-
-  -- Timestamps
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  created_by UUID REFERENCES auth.users(id)
-);
-
--- Index for availability queries
-CREATE INDEX idx_rentals_vehicle_dates ON rentals(vehicle_id, start_date, end_date);
-CREATE INDEX idx_rentals_status ON rentals(status);
-```
-
-### RLS Policies
-
-```sql
--- Customer portal: Anyone can view their registration by order_id
--- (Already exists in current schema - verify it works)
-CREATE POLICY "anon_select_by_order_id" ON registrations
-  FOR SELECT
-  TO anon
-  USING (true);  -- Filter happens in query with order_id
-
--- Rentals: Admin only (authenticated + is_admin)
-CREATE POLICY "admin_all_rentals" ON rentals
-  FOR ALL
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.is_admin = true
-    )
-  );
-
--- Vehicles rental fields: Admin can update
-CREATE POLICY "admin_update_vehicles" ON vehicles
-  FOR UPDATE
-  TO authenticated
-  USING (
-    EXISTS (
-      SELECT 1 FROM profiles
-      WHERE profiles.id = auth.uid()
-      AND profiles.is_admin = true
-    )
-  );
-```
-
-## Authentication Architecture
-
-### Current Pattern (Keep)
-
-```
-Admin Auth:
-[Login Page] --> [authService.login()]
-                        |
-                        v
-               [Supabase Auth]
-                        |
-                        v
-               [profiles.is_admin check]
-                        |
-                        v
-               [StoreContext.user = { isAdmin: true }]
-```
-
-### Customer Portal Access (New - No Auth Required)
-
-```
-Customer Access (Recommended):
-[Unique Link with Order ID]
-         |
-         v
-   [Route: /portal/track/:orderId]
-         |
-         v
-   [OrderIDContext - stores orderId in memory]
-         |
-         v
-   [registrationService.getRegistrationByOrderId()]
-         |
-         v
-   [RLS allows anon SELECT on registrations]
-         |
-         v
-   [Display registration status]
-```
-
-**Why no customer login for MVP:**
-1. The order ID is already a unique, hard-to-guess identifier (format: TJ-2024-XXXX)
-2. Customers only need read access to their own registration
-3. Adding customer auth adds complexity with minimal security benefit for this use case
-4. Can add optional customer login later without breaking the link-based access
-
-### Future: Optional Customer Login
-
-If customer login is needed later:
-```sql
--- Add customer_user_id to registrations (nullable)
-ALTER TABLE registrations ADD COLUMN customer_user_id UUID REFERENCES auth.users(id);
-
--- RLS policy for logged-in customers
-CREATE POLICY "customer_select_own" ON registrations
-  FOR SELECT
-  TO authenticated
-  USING (
-    customer_user_id = auth.uid()
-    OR order_id = current_setting('app.current_order_id', true)
-  );
-```
-
-## Store.tsx Decomposition Strategy
-
-### Phase 1: Extract Auth (During Customer Portal Work)
-
-**Before:**
-```tsx
-// Store.tsx (892 lines)
-const StoreProvider = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [leads, setLeads] = useState<Lead[]>([]);
-  // ... 800+ more lines
-}
-```
-
-**After:**
-```tsx
-// AuthContext.tsx (NEW - ~150 lines)
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-
-  // Move: login, logout, getSession, onAuthStateChange
-  // Move: session verification in useEffect
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
-};
-
-// Store.tsx (MODIFIED - now ~700 lines)
-export const StoreProvider = ({ children }) => {
-  const { user } = useAuth(); // Use new AuthContext
-  // ... vehicles, leads, etc stay here for now
-};
-```
-
-### Phase 2: Extract Vehicles (During Rental Work)
-
-```tsx
-// VehicleContext.tsx (NEW - ~300 lines)
-export const VehicleProvider = ({ children }) => {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Move: loadVehicles, addVehicle, updateVehicle, removeVehicle
-  // Move: syncWithGoogleSheets
-  // Move: real-time subscription for vehicles
-
-  return (
-    <VehicleContext.Provider value={{ vehicles, isLoading, /* CRUD methods */ }}>
-      {children}
-    </VehicleContext.Provider>
-  );
-};
-```
-
-### Phase 3: Add Rental Context (New Feature)
-
-```tsx
-// RentalContext.tsx (NEW - ~200 lines)
-export const RentalProvider = ({ children }) => {
-  const [rentals, setRentals] = useState<Rental[]>([]);
-  const [availability, setAvailability] = useState<AvailabilityMap>({});
-
-  // New: loadRentals, createRental, updateRental, completeRental
-  // New: calculateAvailability(vehicleId, dateRange)
-  // New: real-time subscription for rentals
-
-  return (
-    <RentalContext.Provider value={{ rentals, availability, /* methods */ }}>
-      {children}
-    </RentalContext.Provider>
-  );
-};
-```
-
-### Provider Composition (App.tsx)
-
-```tsx
-// App.tsx
-export default function App() {
-  return (
-    <AuthProvider>
-      <LanguageProvider>
-        <VehicleProvider>
-          <RentalProvider>
-            <RegistrationProvider>
-              <Router>
-                <AppContent />
-              </Router>
-            </RegistrationProvider>
-          </RentalProvider>
-        </VehicleProvider>
-      </LanguageProvider>
-    </AuthProvider>
-  );
-}
-```
-
-## Build Order (Dependencies)
-
-### Suggested Phase Structure
-
-```
-Phase 1: Foundation + Customer Portal
-├── Extract AuthContext from Store.tsx
-├── Create RegistrationContext (refactor existing registration logic)
-├── Build customer portal pages (/portal/*)
-├── RLS verification for anon access
-└── Deliverable: Customers can track registration via link
-
-Phase 2: Document Validation
-├── Create documentValidationService.ts
-├── Build RegistrationChecker admin page
-├── Add documents_received column to registrations
-├── No context changes needed
-└── Deliverable: Admin can validate docs before webDealer submission
-
-Phase 3: Rental Management
-├── Extract VehicleContext from Store.tsx
-├── Extend vehicles table with rental columns
-├── Create rentals table
-├── Create RentalContext
-├── Build rental admin pages (calendar, agreements)
-├── Integrate LoJack API (separate service)
-└── Deliverable: Full rental workflow operational
-```
-
-### Dependency Graph
-
-```
-                    [AuthContext]
-                         |
-            +------------+------------+
-            |            |            |
-            v            v            v
-    [VehicleContext] [RentalContext] [RegistrationContext]
-            |            |            |
-            +------------+------------+
-                         |
-                         v
-                   [Services Layer]
-                         |
-            +------------+------------+
-            |            |            |
-            v            v            v
-       [Supabase]   [LoJack API]  [EmailJS]
-```
-
-## Addressing Technical Debt During Development
-
-### RLS Silent Failure Pattern
-
-**Current Problem:**
-```tsx
-// Store.tsx - update returns empty array silently when RLS blocks
-const { data, error } = await supabase.from('vehicles').update(dbUpdate).eq('id', id).select();
-if (!data || data.length === 0) {
-  // RLS blocked but no error - confusing
-}
-```
-
-**Fix (Apply During Phase 1):**
-```tsx
-// Add explicit session verification before every write operation
-const verifyAdminSession = async (): Promise<boolean> => {
-  const { data: { session } } = await supabase.auth.getSession();
-  if (!session) {
-    throw new Error('SESSION_EXPIRED');
-  }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', session.user.id)
-    .single();
-
-  if (!profile?.is_admin) {
-    throw new Error('NOT_ADMIN');
-  }
-
-  return true;
-};
-
-// Use in all write operations
-const updateVehicle = async (id: string, data: Partial<Vehicle>) => {
-  try {
-    await verifyAdminSession();
-    const { data: result, error } = await supabase
-      .from('vehicles')
-      .update(transformToSnakeCase(data))
-      .eq('id', id)
-      .select()
-      .single(); // Use .single() to get clear error if nothing updated
-
-    if (error) throw error;
-    return result;
-  } catch (err) {
-    // Clear error handling
-    if (err.message === 'SESSION_EXPIRED') {
-      // Redirect to login
-    } else if (err.message === 'NOT_ADMIN') {
-      // Show permission error
-    }
-    throw err;
-  }
-};
-```
-
-### API Keys in Frontend
-
-**Current State:** Gemini and Retell keys exposed in bundle
-
-**Recommendation:** Address in Phase 2 when adding document validation
-
-```tsx
-// Move AI calls to Supabase Edge Function
-// supabase/functions/validate-document/index.ts
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-Deno.serve(async (req) => {
-  const { documentData } = await req.json();
-
-  // API key stored in Supabase secrets, not in client bundle
-  const genAI = new GoogleGenerativeAI(Deno.env.get("GEMINI_API_KEY")!);
-  // ... validation logic
-});
-```
-
-## Anti-Patterns to Avoid
-
-### 1. Separate Customer SPA
-
-**Don't:**
-```
-/customer-portal/  <-- Separate React app
-/admin/           <-- Main app
-```
-
-**Why:** Doubles build complexity, deployment, and shared code management.
-
-**Do:** Same SPA, route-based separation with different layouts.
-
-### 2. Customer Auth Table
-
-**Don't:**
-```sql
-CREATE TABLE customer_users (
-  id UUID PRIMARY KEY,
-  email TEXT,
-  password_hash TEXT
-);
-```
-
-**Why:** Duplicates Supabase Auth, creates security maintenance burden.
-
-**Do:** Use order_id as implicit auth for MVP. If login needed later, use Supabase Auth with role metadata.
-
-### 3. Monolithic Rental Entity
-
-**Don't:**
-```tsx
-interface Vehicle {
-  // ... existing fields
-  rentals: Rental[];           // Deeply nested
-  availability: boolean[];     // Computed in entity
-  currentRenter: Customer;     // Circular reference
-}
-```
-
-**Why:** Creates tight coupling, makes queries expensive.
-
-**Do:** Separate rentals table with vehicle_id foreign key, compute availability on demand.
-
-### 4. Global State for Everything
-
-**Don't:**
-```tsx
-const GlobalContext = createContext({
-  vehicles: [],
-  rentals: [],
-  registrations: [],
-  documents: [],
-  users: [],
-  // ... 20 more fields
-});
-```
-
-**Why:** Every state change re-renders everything.
-
-**Do:** Split contexts by domain, components subscribe only to what they need.
-
-## Scalability Considerations
-
-| Concern | Current (10 vehicles) | At 100 vehicles | At 500 rentals/year |
-|---------|----------------------|-----------------|---------------------|
-| Vehicle list load | <100ms | 200-500ms | N/A |
-| Rental availability calc | N/A | <200ms | 500ms-1s |
-| Real-time subscriptions | 2 channels | 4-5 channels | Monitor quota |
-| PDF generation | <2s | <2s | <2s per doc |
-| Storage (documents) | <1GB | <5GB | 10-50GB (upgrade plan) |
-
-**Mitigation strategies:**
-- Pagination for vehicle lists (implement when > 50 vehicles)
-- Date-range filtering for rentals (implement from start)
-- Lazy load rental history (only on demand)
-- Consider Supabase Storage for document uploads (built-in CDN)
-
-## Sources
-
-- [Supabase Row Level Security Documentation](https://supabase.com/docs/guides/database/postgres/row-level-security)
-- [Supabase Custom Claims & RBAC](https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac)
-- [How to write performant React apps with Context](https://www.developerway.com/posts/how-to-write-performant-react-apps-with-context)
-- [React State Management in 2025](https://www.developerway.com/posts/react-state-management-2025)
-- [Supabase Anonymous Sign-Ins](https://supabase.com/docs/guides/auth/auth-anonymous)
-- [Setting Up Row-Level Security in Supabase for User and Admin Roles](https://dev.to/shahidkhans/setting-up-row-level-security-in-supabase-user-and-admin-2ac1)
 
 ---
 
-*Architecture research: 2025-01-29*
+## Stage 1: Supabase Project Creation and Extensions
+
+**Goal:** A running Supabase project with all required PostgreSQL extensions enabled.
+
+### 1.1 Create Production Project
+
+Via Supabase MCP or Dashboard:
+- Organization: (owner's org)
+- Project name: `triple-j-auto-production`
+- Region: `us-east-1` (closest to Houston, TX user base)
+- Database password: Generate strong password, store securely
+
+**Output needed for later stages:**
+- Project reference ID (e.g., `abcdefghijklmnop`)
+- Project URL: `https://<ref>.supabase.co`
+- Anon key (public, safe for frontend)
+- Service role key (secret, never in frontend)
+
+### 1.2 Enable Required Extensions
+
+Three PostgreSQL extensions must be enabled BEFORE migrations run. Migration 04 requires pg_cron and pg_net. Migration 06 requires btree_gist.
+
+**Order matters:** Enable all three before any migrations.
+
+```sql
+-- Enable via SQL Editor or MCP apply_migration
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+-- pg_cron and pg_net must be enabled via Dashboard:
+--   Database > Extensions > Search "pg_cron" > Enable
+--   Database > Extensions > Search "pg_net" > Enable
+```
+
+**Confidence:** HIGH -- btree_gist can be enabled via SQL. pg_cron and pg_net require Dashboard enablement on hosted Supabase (they run in a special schema managed by the platform).
+
+### 1.3 Verification Gate
+
+Before proceeding to Stage 2, verify:
+- [ ] Project URL resolves (curl returns 200)
+- [ ] Anon key works (test with supabase-js client)
+- [ ] All three extensions show as enabled in Dashboard > Database > Extensions
+
+---
+
+## Stage 2: Database Schema (Migrations)
+
+**Goal:** All 9 SQL files applied in strict order, creating the complete database schema.
+
+### 2.1 Migration Order and Dependencies
+
+```
+schema.sql                          -- Base tables: profiles, vehicles, leads + RLS + triggers
+  |
+registration_ledger.sql             -- Registrations, stages, documents, notifications tables
+  |
+02_registration_schema_update.sql   -- 6-stage workflow, audit trail, status validation
+  |
+03_customer_portal_access.sql       -- Token-based customer access, expiry trigger
+  |
+04_notification_system.sql          -- Notification queue, debounce, pg_cron schedule
+  |                                    REQUIRES: pg_cron, pg_net already enabled
+05_registration_checker.sql         -- Mileage, checker state, invalidation trigger
+  |
+06_rental_schema.sql                -- Rental tables, btree_gist exclusion constraint
+  |                                    REQUIRES: btree_gist already enabled
+07_plate_tracking.sql               -- Plates, assignments, alerts, auto-status triggers
+  |
+08_rental_insurance.sql             -- Insurance verification, insurance alerts
+```
+
+### 2.2 Critical Ordering Constraints
+
+| Migration | Hard Dependency | Fails Without |
+|-----------|----------------|---------------|
+| `04_notification_system.sql` | pg_cron, pg_net extensions | `cron.schedule()` call fails |
+| `06_rental_schema.sql` | btree_gist extension | `EXCLUDE USING gist` constraint fails |
+| `07_plate_tracking.sql` | `06_rental_schema.sql` | References `rental_bookings` table |
+| `08_rental_insurance.sql` | `06_rental_schema.sql` | References `rental_bookings` table |
+
+### 2.3 Post-Migration Configuration
+
+After all migrations are applied, two pieces of configuration must be set for pg_cron to invoke Edge Functions:
+
+```sql
+-- Option A: App settings (simpler, used in migration 04 and 07)
+ALTER DATABASE postgres SET app.settings.supabase_url = 'https://<PROJECT_REF>.supabase.co';
+ALTER DATABASE postgres SET app.settings.service_role_key = '<SERVICE_ROLE_KEY>';
+
+-- Option B: Vault (more secure, recommended by Supabase docs)
+SELECT vault.create_secret('https://<PROJECT_REF>.supabase.co', 'project_url');
+SELECT vault.create_secret('<SERVICE_ROLE_KEY>', 'service_role_key');
+```
+
+**Recommendation:** Use Option A for initial deployment because the cron SQL in migrations 04 and 07 already uses `current_setting('app.settings...')`. Migrating to Vault later requires updating the cron schedule SQL -- a separate task, not a deployment blocker.
+
+### 2.4 Cron Schedule for check-plate-alerts
+
+Migration 07 has the cron schedule commented out (it was a TODO). After Edge Functions are deployed in Stage 3, this schedule must be created:
+
+```sql
+SELECT cron.schedule(
+  'check-plate-alerts',
+  '*/30 * * * *',
+  $$
+  SELECT net.http_post(
+    url := current_setting('app.settings.supabase_url') || '/functions/v1/check-plate-alerts',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key'),
+      'Content-Type', 'application/json'
+    ),
+    body := '{}'::jsonb
+  );
+  $$
+);
+```
+
+### 2.5 Admin User Setup
+
+After migrations, create the admin user:
+
+1. Create user in Supabase Auth (Dashboard > Authentication > Users > Add User)
+   - Email: (owner's email)
+   - Password: (strong password)
+2. Promote to admin:
+   ```sql
+   UPDATE public.profiles SET is_admin = true WHERE email = '<admin_email>';
+   ```
+
+### 2.6 Verification Gate
+
+- [ ] All 9 migrations applied without errors
+- [ ] `app.settings.supabase_url` and `app.settings.service_role_key` configured
+- [ ] Admin user created and promoted
+- [ ] Cron schedule `process-notification-queue` visible in `cron.job` table
+- [ ] Tables exist: `vehicles`, `profiles`, `registrations`, `rental_bookings`, `plates`, etc.
+
+---
+
+## Stage 3: Supabase Configuration (Auth, Storage, Secrets, Edge Functions)
+
+**Goal:** All backend services configured and Edge Functions deployed.
+
+### 3.1 Auth Configuration
+
+#### 3.1.1 Site URL and Redirect URLs
+
+In Dashboard > Authentication > URL Configuration:
+
+| Setting | Value |
+|---------|-------|
+| Site URL | `https://triplejautoinvestment.com` (production domain) |
+| Redirect URLs | `https://triplejautoinvestment.com/**` |
+
+**Why this matters:** Password reset emails and email confirmations use the Site URL. If left as `localhost:3000`, users clicking email links will be redirected to a dead URL.
+
+#### 3.1.2 Email Auth Settings
+
+In Dashboard > Authentication > Settings:
+
+| Setting | Value | Rationale |
+|---------|-------|-----------|
+| Enable email confirmations | ON | Supabase production checklist requires this |
+| OTP expiry | 3600 seconds | Supabase recommendation |
+| Enable email signup | ON | For admin account creation |
+
+#### 3.1.3 Phone Auth (Twilio)
+
+In Dashboard > Authentication > Providers > Phone:
+
+| Setting | Value |
+|---------|-------|
+| Enable Phone provider | ON |
+| SMS Provider | Twilio |
+| Twilio Account SID | (from Twilio console) |
+| Twilio Auth Token | (from Twilio console) |
+| Twilio Message Service SID or Phone Number | (the Twilio number, E.164 format) |
+
+**Why phone auth is needed:** Migration 04 creates an RLS policy `"Customers can view own registrations by phone"` that matches `auth.jwt()->>'phone'`. Customer portal login uses phone OTP.
+
+#### 3.1.4 Auth Security Hardening
+
+| Setting | Value | Rationale |
+|---------|-------|-----------|
+| CAPTCHA protection | Consider enabling | Prevent signup abuse |
+| Rate limit OTP requests | Default 60s | Prevent SMS bombing |
+| JWT expiry | 3600s (default) | Reasonable for SPA |
+
+### 3.2 Storage Buckets
+
+Four storage buckets are needed. All should be **private** (admin-only access via RLS).
+
+| Bucket ID | Purpose | Public? | Used By |
+|-----------|---------|---------|---------|
+| `rental-agreements` | Signed rental agreement PDFs | No | Admin uploads |
+| `rental-photos` | Vehicle condition report photos | No | Admin uploads |
+| `plate-photos` | Plate inventory photos | No | Admin uploads |
+| `insurance-cards` | Customer insurance card images | No | Admin uploads |
+
+#### 3.2.1 Create Buckets
+
+Via SQL (can be included in a post-migration script):
+
+```sql
+INSERT INTO storage.buckets (id, name, public) VALUES ('rental-agreements', 'rental-agreements', false);
+INSERT INTO storage.buckets (id, name, public) VALUES ('rental-photos', 'rental-photos', false);
+INSERT INTO storage.buckets (id, name, public) VALUES ('plate-photos', 'plate-photos', false);
+INSERT INTO storage.buckets (id, name, public) VALUES ('insurance-cards', 'insurance-cards', false);
+```
+
+#### 3.2.2 Storage RLS Policies
+
+All buckets follow the same pattern: authenticated admins can CRUD, no public access.
+
+```sql
+-- Allow admin users to upload to any bucket
+CREATE POLICY "Admins can upload files"
+ON storage.objects FOR INSERT TO authenticated
+WITH CHECK (
+  auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true)
+);
+
+-- Allow admin users to view files from any bucket
+CREATE POLICY "Admins can view files"
+ON storage.objects FOR SELECT TO authenticated
+USING (
+  auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true)
+);
+
+-- Allow admin users to update files
+CREATE POLICY "Admins can update files"
+ON storage.objects FOR UPDATE TO authenticated
+USING (
+  auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true)
+);
+
+-- Allow admin users to delete files
+CREATE POLICY "Admins can delete files"
+ON storage.objects FOR DELETE TO authenticated
+USING (
+  auth.uid() IN (SELECT id FROM public.profiles WHERE is_admin = true)
+);
+```
+
+**Important:** Without these RLS policies, all storage operations will silently fail (Supabase Storage enforces RLS by default on private buckets).
+
+### 3.3 Edge Function Secrets
+
+Edge Functions need secrets set **before** deployment (or at least before first invocation). These are set at the project level, shared across all functions.
+
+#### 3.3.1 Required Secrets
+
+| Secret Name | Source | Used By |
+|-------------|--------|---------|
+| `TWILIO_ACCOUNT_SID` | Twilio Console | `process-notification-queue`, `check-plate-alerts` |
+| `TWILIO_AUTH_TOKEN` | Twilio Console | `process-notification-queue`, `check-plate-alerts` |
+| `TWILIO_PHONE_NUMBER` | Twilio Console (E.164) | `process-notification-queue`, `check-plate-alerts` |
+| `RESEND_API_KEY` | Resend Dashboard | `process-notification-queue`, `check-plate-alerts` |
+| `ADMIN_PHONE` | Business owner (E.164) | `check-plate-alerts` |
+| `ADMIN_EMAIL` | Business owner | `check-plate-alerts` |
+
+#### 3.3.2 Automatic Secrets (Provided by Supabase)
+
+These are automatically available in every Edge Function -- do NOT set them manually:
+
+| Secret | Auto-provided |
+|--------|---------------|
+| `SUPABASE_URL` | Yes |
+| `SUPABASE_ANON_KEY` | Yes |
+| `SUPABASE_SERVICE_ROLE_KEY` | Yes |
+
+#### 3.3.3 Optional Secret
+
+| Secret Name | Used By | Purpose |
+|-------------|---------|---------|
+| `PUBLIC_SITE_URL` | `process-notification-queue`, `unsubscribe` | Override default site URL in notification links |
+
+**Recommendation:** Set `PUBLIC_SITE_URL=https://triplejautoinvestment.com` so tracking links and unsubscribe links point to the correct domain.
+
+#### 3.3.4 Setting Secrets
+
+Via Supabase MCP or CLI:
+
+```bash
+supabase secrets set \
+  TWILIO_ACCOUNT_SID=<value> \
+  TWILIO_AUTH_TOKEN=<value> \
+  TWILIO_PHONE_NUMBER=<value> \
+  RESEND_API_KEY=<value> \
+  ADMIN_PHONE=<value> \
+  ADMIN_EMAIL=<value> \
+  PUBLIC_SITE_URL=https://triplejautoinvestment.com
+```
+
+Or via Dashboard: Edge Functions > Manage Secrets.
+
+### 3.4 Edge Function Deployment
+
+Three Edge Functions to deploy. All use Deno runtime and import from `_shared/`.
+
+| Function | Trigger | JWT Verification | Notes |
+|----------|---------|-----------------|-------|
+| `process-notification-queue` | pg_cron (every 1 min) | Service role key in header | Called by pg_net, not by users |
+| `unsubscribe` | User clicks email link | None needed (public endpoint) | Must set `--no-verify-jwt` |
+| `check-plate-alerts` | pg_cron (every 30 min) | Service role key in header | Called by pg_net, not by users |
+
+#### 3.4.1 Deployment Order
+
+Functions can be deployed in any order, but all must be deployed before cron schedules can invoke them successfully.
+
+```bash
+# Deploy all three (via Supabase CLI or MCP deploy_edge_function)
+supabase functions deploy process-notification-queue
+supabase functions deploy unsubscribe --no-verify-jwt
+supabase functions deploy check-plate-alerts
+```
+
+**Critical:** The `unsubscribe` function MUST be deployed with `--no-verify-jwt` because it is accessed directly by customers clicking an email link (no auth token available). The other two functions are invoked by pg_cron with the service role key, so they can keep JWT verification enabled.
+
+#### 3.4.2 Shared Code Structure
+
+The Edge Functions share code via `_shared/`:
+
+```
+supabase/functions/
+  _shared/
+    twilio.ts           -- SMS sending via Twilio REST API
+    resend.ts           -- Email sending via Resend REST API
+    email-templates/
+      status-update.tsx -- Registration status update email
+      rejection-notice.tsx -- DMV rejection email
+      plate-alert.tsx   -- Admin plate/insurance alert email
+  process-notification-queue/
+    index.ts
+  unsubscribe/
+    index.ts
+  check-plate-alerts/
+    index.ts
+```
+
+The `_shared/` directory is automatically bundled with each function at deploy time by the Supabase CLI.
+
+#### 3.4.3 Post-Deployment: Activate check-plate-alerts Cron
+
+After deploying the Edge Functions, create the cron schedule that was commented out in migration 07:
+
+```sql
+SELECT cron.schedule(
+  'check-plate-alerts',
+  '*/30 * * * *',
+  $$
+  SELECT net.http_post(
+    url := current_setting('app.settings.supabase_url') || '/functions/v1/check-plate-alerts',
+    headers := jsonb_build_object(
+      'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key'),
+      'Content-Type', 'application/json'
+    ),
+    body := '{}'::jsonb
+  );
+  $$
+);
+```
+
+### 3.5 Verification Gate
+
+- [ ] Phone auth test: Can send OTP to a test number
+- [ ] Storage test: Admin can upload a file to `rental-photos` bucket
+- [ ] Edge Function `unsubscribe` responds to GET request (returns HTML error page for missing params = working)
+- [ ] `process-notification-queue` responds to POST with service role key (returns `{"processed":0,"errors":0}`)
+- [ ] `check-plate-alerts` responds to POST with service role key
+- [ ] Cron jobs visible: `SELECT * FROM cron.job;` shows both schedules
+
+---
+
+## Stage 4: Vercel Deployment
+
+**Goal:** Frontend SPA built and deployed, accessible at a preview URL before domain cutover.
+
+### 4.1 Environment Variable Inventory
+
+Vercel needs all `VITE_` prefixed variables set as **build-time** environment variables. These are embedded into the JavaScript bundle at build time by Vite and are therefore **visible to end users in the browser**.
+
+#### 4.1.1 Required Variables (from new Supabase project)
+
+| Variable | Value Source | Sensitive? |
+|----------|-------------|------------|
+| `VITE_SUPABASE_URL` | New Supabase project URL | No (public) |
+| `VITE_SUPABASE_ANON_KEY` | New Supabase project anon key | No (public, RLS protects data) |
+
+#### 4.1.2 Required Variables (existing values)
+
+| Variable | Current Value | Sensitive? |
+|----------|--------------|------------|
+| `VITE_ADMIN_EMAIL` | Admin email | Low (used for admin login form) |
+| `VITE_ADMIN_PASSWORD` | Admin password | **YES - SECURITY ISSUE** |
+| `VITE_GEMINI_API_KEY` | Gemini API key | **YES - EXPOSED IN BUNDLE** |
+| `VITE_EMAILJS_SERVICE_ID` | EmailJS service ID | Low |
+| `VITE_EMAILJS_TEMPLATE_ID` | EmailJS template ID | Low |
+| `VITE_EMAILJS_PUBLIC_KEY` | EmailJS public key | No (designed to be public) |
+| `VITE_RETELL_API_KEY` | Retell API key | **YES - EXPOSED IN BUNDLE** |
+| `VITE_RETELL_OUTBOUND_AGENT_ID` | Retell agent ID | Low |
+| `VITE_RETELL_OUTBOUND_NUMBER` | Business phone number | No |
+
+#### 4.1.3 Security Warnings
+
+**CRITICAL:** Three variables are secrets that should NOT be in the frontend bundle:
+
+1. **`VITE_ADMIN_PASSWORD`** -- Hardcoded admin password is a severe security risk. This appears to be used to pre-fill a login form or for client-side auth checking. This must be removed from the codebase before production. Admin should log in with credentials known only to them, not embedded in the bundle.
+
+2. **`VITE_GEMINI_API_KEY`** -- Exposed in the bundle via `vite.config.ts` `define` block. Anyone can extract this key from the browser and use it. Should be moved to a Supabase Edge Function.
+
+3. **`VITE_RETELL_API_KEY`** -- Exposed in the bundle. Depending on Retell's security model, this may be acceptable (some APIs have client-safe keys) or may need to move server-side.
+
+**Recommendation for v1.1 deployment:** Deploy with these keys as-is to get to production quickly, but create a follow-up milestone to move them server-side. Document the risk.
+
+### 4.2 Vercel Project Setup
+
+#### 4.2.1 Connect Repository
+
+1. Import the Git repository to Vercel
+2. Set root directory to `triple-j-auto-investment-main/` (the app lives in a subdirectory)
+3. Vercel auto-detects Vite framework
+
+#### 4.2.2 Build Configuration
+
+The existing `vercel.json` is correct and sufficient:
+
+```json
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+      ]
+    }
+  ]
+}
+```
+
+**The rewrite rule is critical:** Without it, direct navigation to any route other than `/` returns a 404 because Vercel serves static files and the SPA uses client-side routing (HashRouter mitigates this, but the rewrite is a safety net).
+
+#### 4.2.3 Environment Variables in Vercel
+
+Set in Vercel Dashboard > Project > Settings > Environment Variables:
+
+- Scope: Production (and optionally Preview)
+- All `VITE_` prefixed variables from Section 4.1
+
+**Key insight:** Vercel builds happen on Vercel's servers. The `VITE_` environment variables must be set in Vercel's dashboard BEFORE the first build, otherwise the Supabase client will initialize with the placeholder URL from the code.
+
+### 4.3 Build and Preview
+
+1. Trigger a deployment (push to branch or manual deploy)
+2. Vercel produces a preview URL (e.g., `triple-j-auto-*.vercel.app`)
+3. Test at the preview URL before domain cutover
+
+### 4.4 Verification Gate
+
+- [ ] Preview URL loads the SPA
+- [ ] Admin can log in (email/password auth works against new Supabase project)
+- [ ] Public vehicle listing loads (anon SELECT works)
+- [ ] No console errors about missing Supabase URL
+- [ ] Contact form submits a lead successfully
+- [ ] SPA routing works (navigate to `/about`, refresh page, still loads)
+
+---
+
+## Stage 5: Domain Cutover
+
+**Goal:** `triplejautoinvestment.com` points to the new Vercel deployment with zero (or minimal) downtime.
+
+### 5.1 Context
+
+The project description states "Already has a live site on custom domain from previous IDE session." This means DNS records currently point somewhere else (likely DokPloy/Docker based on the Dockerfile and docker-compose.yml in the codebase).
+
+### 5.2 Pre-Cutover Checklist
+
+- [ ] New deployment verified at Vercel preview URL (Stage 4)
+- [ ] Supabase project fully configured and verified (Stage 3)
+- [ ] SSL certificate pre-provisioned on Vercel for the domain
+
+### 5.3 Zero-Downtime DNS Migration
+
+Per Vercel's official documentation:
+
+#### 5.3.1 Add Domain to Vercel Project
+
+In Vercel Dashboard > Project > Domains:
+- Add `triplejautoinvestment.com`
+- Add `www.triplejautoinvestment.com` (redirect to apex or vice versa)
+- Vercel provides the required DNS records (A record for apex, CNAME for www)
+
+#### 5.3.2 Pre-generate SSL Certificate
+
+Before changing DNS, Vercel can pre-generate the SSL certificate if you add a TXT verification record. This prevents the 30-second to 5-minute window where HTTPS would fail after DNS switch.
+
+1. Vercel provides a TXT record to add at your DNS provider
+2. Add the TXT record (does not affect current site)
+3. Vercel issues SSL certificate for the domain
+4. Verify certificate with: `curl --resolve triplejautoinvestment.com:443:76.76.21.21 https://triplejautoinvestment.com` (using Vercel's IP)
+
+#### 5.3.3 DNS Record Change
+
+At your DNS provider:
+
+1. Delete existing A/CNAME records for `triplejautoinvestment.com`
+2. Immediately add:
+   - **Apex domain:** A record pointing to `76.76.21.21` (Vercel's anycast IP)
+   - **www subdomain:** CNAME record pointing to `cname.vercel-dns.com`
+3. Ensure any Cloudflare/proxy is disabled (DNS only, no proxy)
+
+**Propagation:** TTL is typically 5 minutes on most providers. Full propagation can take up to 48 hours in edge cases, but most users see the change within minutes.
+
+### 5.4 Post-Cutover: Update Supabase Settings
+
+After DNS propagation, update Supabase to recognize the production domain:
+
+1. **Auth Site URL:** Verify `https://triplejautoinvestment.com` is set (done in Stage 3)
+2. **Auth Redirect URLs:** Verify `https://triplejautoinvestment.com/**` is in the list
+3. **Edge Function `PUBLIC_SITE_URL`:** Verify secret is set to `https://triplejautoinvestment.com`
+4. **Resend domain verification:** If using custom domain for email (`notifications@triplejautoinvestment.com`), verify the domain in Resend Dashboard with DNS records
+
+### 5.5 Verification Gate
+
+- [ ] `https://triplejautoinvestment.com` loads the new site
+- [ ] HTTPS certificate is valid (no browser warnings)
+- [ ] Admin login works at production URL
+- [ ] Phone OTP sends and verifies
+- [ ] Registration tracking links work (`/track/TJ-2026-XXXX-<token>`)
+- [ ] Unsubscribe links work (point to Supabase Edge Function URL)
+- [ ] Email notifications contain correct production URLs (not localhost or placeholder)
+
+---
+
+## Environment Variable Flow Diagram
+
+```
++------------------+     +------------------+     +------------------+
+|   Twilio Console |     |  Resend Dashboard|     | Supabase Dashboard|
++--------+---------+     +--------+---------+     +--------+---------+
+         |                         |                        |
+         v                         v                        v
++--------+---------+     +--------+---------+     +--------+---------+
+| Edge Fn Secrets  |     | Edge Fn Secrets  |     | Auto-provided    |
+| TWILIO_ACCOUNT_  |     | RESEND_API_KEY   |     | SUPABASE_URL     |
+| SID, AUTH_TOKEN, |     |                  |     | SUPABASE_ANON_KEY|
+| PHONE_NUMBER     |     |                  |     | SUPABASE_SERVICE_|
+|                  |     |                  |     | ROLE_KEY         |
++--------+---------+     +--------+---------+     +--------+---------+
+         |                         |                        |
+         +-------------------------+------------------------+
+                                   |
+                                   v
+                    +-----------------------------+
+                    |    Supabase Edge Functions   |
+                    |  process-notification-queue  |
+                    |  unsubscribe                 |
+                    |  check-plate-alerts          |
+                    +-----------------------------+
+
++------------------+     +------------------+
+| Supabase Project |     | Business Owner   |
+| URL + Anon Key   |     | Email, Phone     |
++--------+---------+     +--------+---------+
+         |                         |
+         v                         v
++--------+---------+     +--------+---------+
+| Vercel Env Vars  |     | Edge Fn Secrets  |
+| VITE_SUPABASE_   |     | ADMIN_EMAIL      |
+| URL, ANON_KEY    |     | ADMIN_PHONE      |
++--------+---------+     | PUBLIC_SITE_URL  |
+         |               +---------+--------+
+         v                         |
++--------+---------+               |
+| Vite Build       |               |
+| (embedded in JS) |               |
++--------+---------+               |
+         |                         |
+         v                         v
++--------+---------+     +---------+--------+
+| Browser (Client) |     | pg_cron -> pg_net|
+| supabase.co URL  |     | invokes Edge Fns |
+| anon key in JWT  |     | with service key |
++------------------+     +------------------+
+```
+
+---
+
+## Component Boundaries
+
+| Component | Responsibility | Depends On |
+|-----------|---------------|------------|
+| Vercel | Hosts static SPA, serves `index.html`, handles rewrites | DNS records |
+| Supabase Auth | Email/password login, Phone OTP | Twilio (for SMS) |
+| Supabase Database | All application data, RLS enforcement | Extensions (btree_gist, pg_cron, pg_net) |
+| Supabase Storage | File uploads (photos, agreements, insurance cards) | Storage RLS policies |
+| Edge Function: process-notification-queue | Sends SMS + email for registration status changes | Twilio, Resend, notification_queue table |
+| Edge Function: check-plate-alerts | Detects plate/insurance issues, alerts admin | Twilio, Resend, plates/insurance tables |
+| Edge Function: unsubscribe | Handles customer opt-out | registrations table |
+| pg_cron + pg_net | Schedules periodic Edge Function invocations | app.settings or Vault for URL/key |
+| Twilio | SMS delivery (OTP + notifications) | Account SID, Auth Token, Phone Number |
+| Resend | Email delivery (notifications) | API key, domain verification |
+| EmailJS | Contact form emails (client-side) | Public key (in browser) |
+| Retell AI | Outbound voice calls | API key (currently in browser) |
+
+---
+
+## Anti-Patterns to Avoid
+
+### 1. Running Migrations Out of Order
+
+**What goes wrong:** Foreign key constraints fail, triggers reference nonexistent tables, extensions not available for constraint types.
+
+**Prevention:** Apply migrations strictly in numbered order. Never skip a migration even if you think a table is not yet needed.
+
+### 2. Setting VITE_ Variables After Build
+
+**What goes wrong:** Vite replaces `import.meta.env.VITE_*` at build time. If variables are not set in Vercel before the build runs, the Supabase client initializes with the placeholder URL `https://placeholder.supabase.co`.
+
+**Prevention:** Set all `VITE_` environment variables in Vercel BEFORE triggering the first build. If you need to change them later, you must redeploy (rebuild).
+
+### 3. Deploying Edge Functions Before Migrations
+
+**What goes wrong:** Functions query tables like `notification_queue`, `registrations`, `plate_alerts` that do not exist yet. First invocation by pg_cron will fail silently.
+
+**Prevention:** Stage 2 (migrations) must complete before Stage 3 (Edge Functions).
+
+### 4. Forgetting Storage RLS Policies
+
+**What goes wrong:** Supabase Storage blocks all operations on private buckets without RLS policies. Uploads fail silently (no error in the Supabase client response, just empty result).
+
+**Prevention:** Always create storage RLS policies immediately after creating buckets.
+
+### 5. Using Service Role Key in Frontend
+
+**What goes wrong:** The service role key bypasses all RLS. If exposed in the frontend bundle, any user can read/write/delete all data.
+
+**Prevention:** Only use the anon key in the frontend. Service role key goes in Edge Function secrets and `app.settings` for pg_cron only.
+
+### 6. Hardcoding Admin Credentials in Frontend
+
+**What goes wrong:** The current `.env.production` contains `VITE_ADMIN_PASSWORD`. This is embedded in the JavaScript bundle and visible to anyone who opens DevTools.
+
+**Prevention:** Remove `VITE_ADMIN_PASSWORD` from the codebase. Admin should authenticate with credentials stored only in their password manager, validated server-side by Supabase Auth.
+
+---
+
+## Scalability Considerations
+
+| Concern | At Launch | At 100 Vehicles | At 1000 Rentals/Year |
+|---------|-----------|-----------------|----------------------|
+| Vercel bandwidth | Free tier sufficient | Free tier sufficient | Pro tier may be needed |
+| Supabase database | Free tier (500MB) | Pro tier (8GB) | Pro tier sufficient |
+| Edge Function invocations | ~43K/month (1/min + 48/day) | Same | Same |
+| Storage | < 1GB | 2-5GB | 10-50GB |
+| Twilio SMS costs | < $5/month | $10-30/month | $50-100/month |
+| Resend email volume | < 100/month | 200-500/month | Free tier (3K/month) |
+
+**Recommendation:** Start on Supabase Pro plan ($25/month) for production. The Free tier pauses after 1 week of inactivity, which is unacceptable for a business application.
+
+---
+
+## Deployment Checklist (Ordered)
+
+This is the complete, ordered checklist for a deployment operator:
+
+### Stage 1: Supabase Project
+- [ ] 1.1 Create Supabase project (region: us-east-1)
+- [ ] 1.2 Record: Project URL, Anon Key, Service Role Key
+- [ ] 1.3 Enable extension: btree_gist (via SQL)
+- [ ] 1.4 Enable extension: pg_cron (via Dashboard)
+- [ ] 1.5 Enable extension: pg_net (via Dashboard)
+
+### Stage 2: Database
+- [ ] 2.1 Apply `schema.sql`
+- [ ] 2.2 Apply `registration_ledger.sql`
+- [ ] 2.3 Apply `02_registration_schema_update.sql`
+- [ ] 2.4 Apply `03_customer_portal_access.sql`
+- [ ] 2.5 Apply `04_notification_system.sql`
+- [ ] 2.6 Apply `05_registration_checker.sql`
+- [ ] 2.7 Apply `06_rental_schema.sql`
+- [ ] 2.8 Apply `07_plate_tracking.sql`
+- [ ] 2.9 Apply `08_rental_insurance.sql`
+- [ ] 2.10 Set `app.settings.supabase_url` and `app.settings.service_role_key`
+- [ ] 2.11 Create admin user in Auth, promote to admin in profiles table
+
+### Stage 3: Supabase Services
+- [ ] 3.1 Set Auth Site URL to production domain
+- [ ] 3.2 Add production domain to Auth Redirect URLs
+- [ ] 3.3 Configure Twilio phone auth provider
+- [ ] 3.4 Create storage buckets (4 buckets)
+- [ ] 3.5 Apply storage RLS policies
+- [ ] 3.6 Set Edge Function secrets (7 secrets)
+- [ ] 3.7 Deploy `process-notification-queue` Edge Function
+- [ ] 3.8 Deploy `unsubscribe` Edge Function (--no-verify-jwt)
+- [ ] 3.9 Deploy `check-plate-alerts` Edge Function
+- [ ] 3.10 Create `check-plate-alerts` cron schedule (commented out in migration 07)
+- [ ] 3.11 Verify: both cron jobs visible in `cron.job`
+
+### Stage 4: Vercel
+- [ ] 4.1 Import repo to Vercel, set root directory to `triple-j-auto-investment-main/`
+- [ ] 4.2 Set all VITE_ environment variables (10 variables)
+- [ ] 4.3 Trigger build
+- [ ] 4.4 Verify at preview URL: login, vehicle list, routing
+
+### Stage 5: Domain
+- [ ] 5.1 Add domain to Vercel project
+- [ ] 5.2 Pre-generate SSL certificate (TXT record)
+- [ ] 5.3 Update DNS records (A record to Vercel IP, CNAME for www)
+- [ ] 5.4 Verify HTTPS works at production domain
+- [ ] 5.5 Full smoke test at production domain
+
+---
+
+## Sources
+
+- [Supabase Production Checklist](https://supabase.com/docs/guides/deployment/going-into-prod) -- HIGH confidence
+- [Supabase Phone Auth with Twilio](https://supabase.com/docs/guides/auth/phone-login/twilio) -- HIGH confidence
+- [Supabase Scheduling Edge Functions](https://supabase.com/docs/guides/functions/schedule-functions) -- HIGH confidence
+- [Supabase Storage Access Control](https://supabase.com/docs/guides/storage/security/access-control) -- HIGH confidence
+- [Supabase Storage Buckets Fundamentals](https://supabase.com/docs/guides/storage/buckets/fundamentals) -- HIGH confidence
+- [Supabase Edge Functions Environment Variables](https://supabase.com/docs/guides/functions/secrets) -- HIGH confidence
+- [Supabase Edge Functions Deploy](https://supabase.com/docs/guides/functions/deploy) -- HIGH confidence
+- [Vercel Vite Framework Documentation](https://vercel.com/docs/frameworks/frontend/vite) -- HIGH confidence
+- [Vercel Zero-Downtime DNS Migration](https://vercel.com/kb/guide/zero-downtime-migration) -- HIGH confidence
+- [Vercel Zero-Downtime DNS Migration (detailed)](https://vercel.com/kb/guide/zero-downtime-migration-for-dns) -- HIGH confidence
+- [Vite Environment Variables](https://vite.dev/guide/env-and-mode) -- HIGH confidence
+- [Supabase Auth Redirect URLs](https://supabase.com/docs/guides/auth/redirect-urls) -- HIGH confidence
+- [Supabase MCP Server](https://github.com/supabase-community/supabase-mcp) -- HIGH confidence
+
+---
+
+*Deployment architecture research: 2026-02-13*
