@@ -30,7 +30,7 @@ import {
  * Uses parseFloat for DECIMAL columns (dealer_coverage_daily_rate, dealer_coverage_total).
  * Uses direct assignment for INTEGER columns (bodily_injury_*, property_damage).
  */
-const transformInsurance = (data: any): RentalInsurance => ({
+export const transformInsurance = (data: any): RentalInsurance => ({
   id: data.id,
   bookingId: data.booking_id,
   insuranceType: data.insurance_type as InsuranceType,

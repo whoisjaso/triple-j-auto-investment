@@ -51,6 +51,7 @@ import {
   Ban,
   CreditCard,
   ExternalLink,
+  Shield,
 } from 'lucide-react';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 import RentalCalendar from '../../components/admin/RentalCalendar';
@@ -80,13 +81,16 @@ import {
   PaymentMethod,
   Vehicle,
   Plate,
+  InsuranceVerificationStatus,
   PAYMENT_METHOD_LABELS,
   PLATE_TYPE_LABELS,
+  INSURANCE_STATUS_LABELS,
 } from '../../types';
 import {
   getPlatesOut,
   returnPlateAssignment,
 } from '../../services/plateService';
+import InsuranceVerification from '../../components/admin/InsuranceVerification';
 
 // ================================================================
 // ADMIN HEADER (duplicated per research guidance - pitfall #7)
@@ -759,6 +763,12 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
           </div>
         )}
 
+        {/* ============ INSURANCE VERIFICATION ============ */}
+        <InsuranceVerification
+          booking={booking}
+          onRefresh={onRefresh}
+        />
+
         {/* ============ PAYMENTS SECTION ============ */}
         <div className="space-y-3">
           <h4 className="text-[10px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
@@ -1224,11 +1234,21 @@ const Rentals: React.FC = () => {
       v.listingType === 'rental_only' || v.listingType === 'both'
     );
 
+    // Count active/reserved bookings without verified or overridden insurance
+    const activeOrReserved = allStoreBookings.filter(
+      b => b.status === 'active' || b.status === 'reserved' || b.status === 'overdue'
+    );
+    const unverifiedInsurance = activeOrReserved.filter(b => {
+      const insStatus = b.insurance?.verificationStatus;
+      return insStatus !== 'verified' && insStatus !== 'overridden';
+    }).length;
+
     return {
       totalBookings: nonCancelled.length,
       activeCount: active.length,
       overdueCount: overdue.length,
       fleetSize: rentalFleet.length,
+      unverifiedInsurance,
     };
   }, [bookings, vehicles]);
 
@@ -1442,7 +1462,7 @@ const Rentals: React.FC = () => {
           <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
 
           {/* Stats Bar */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
             <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
               <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total Bookings</p>
               <p className="text-white text-2xl font-mono">{stats.totalBookings}</p>
@@ -1461,6 +1481,16 @@ const Rentals: React.FC = () => {
                   {stats.overdueCount}
                 </span>
               )}
+            </div>
+            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4 relative">
+              <p className={`text-[10px] uppercase tracking-widest mb-1 flex items-center gap-1 ${
+                stats.unverifiedInsurance > 0 ? 'text-amber-400' : 'text-gray-500'
+              }`}>
+                <Shield size={10} /> Unverified
+              </p>
+              <p className={`text-2xl font-mono ${stats.unverifiedInsurance > 0 ? 'text-amber-400' : 'text-gray-600'}`}>
+                {stats.unverifiedInsurance}
+              </p>
             </div>
             <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
               <p className="text-blue-400 text-[10px] uppercase tracking-widest mb-1">Fleet Size</p>
@@ -1575,7 +1605,7 @@ const Rentals: React.FC = () => {
                             </button>
 
                             {/* Booking ID + Status */}
-                            <div className="flex items-center gap-3 min-w-0">
+                            <div className="flex items-center gap-2 min-w-0 flex-wrap">
                               <span className={`px-3 py-1 text-[10px] uppercase tracking-wider border whitespace-nowrap ${
                                 booking.status === 'overdue'
                                   ? 'bg-red-500/20 text-red-400 border-red-500/50 animate-pulse'
@@ -1583,6 +1613,35 @@ const Rentals: React.FC = () => {
                               }`}>
                                 {booking.status === 'overdue' ? 'OVERDUE' : 'ACTIVE'}
                               </span>
+                              {/* Insurance badge */}
+                              {(() => {
+                                const ins = booking.insurance;
+                                if (!ins) {
+                                  return (
+                                    <span className="px-2 py-0.5 text-[10px] uppercase tracking-wider border bg-gray-500/20 text-gray-500 border-gray-500/50 whitespace-nowrap">
+                                      No Ins
+                                    </span>
+                                  );
+                                }
+                                const badgeColors: Record<InsuranceVerificationStatus, string> = {
+                                  pending: 'bg-gray-500/20 text-gray-400 border-gray-500/50',
+                                  verified: 'bg-green-500/20 text-green-400 border-green-500/50',
+                                  failed: 'bg-red-500/20 text-red-400 border-red-500/50',
+                                  overridden: 'bg-amber-500/20 text-amber-400 border-amber-500/50',
+                                };
+                                const badgeLabels: Record<InsuranceVerificationStatus, string> = {
+                                  pending: 'Ins: Pending',
+                                  verified: 'Ins: Verified',
+                                  failed: 'Ins: Failed',
+                                  overridden: 'Ins: Override',
+                                };
+                                return (
+                                  <span className={`px-2 py-0.5 text-[10px] uppercase tracking-wider border whitespace-nowrap flex items-center gap-1 ${badgeColors[ins.verificationStatus]}`}>
+                                    {ins.verificationStatus === 'verified' && <Shield size={9} />}
+                                    {badgeLabels[ins.verificationStatus]}
+                                  </span>
+                                );
+                              })()}
                               <span className="text-tj-gold font-mono text-sm">{booking.bookingId}</span>
                             </div>
 

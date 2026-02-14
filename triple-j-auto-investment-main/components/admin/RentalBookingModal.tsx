@@ -26,7 +26,12 @@ import {
   Vehicle,
   RentalBooking,
   RentalCustomer,
+  RentalInsurance,
+  InsuranceType,
+  InsuranceVerificationFlags,
   Plate,
+  TEXAS_MINIMUM_COVERAGE,
+  TEXAS_MINIMUM_LABEL,
 } from '../../types';
 import { AddressInput } from '../AddressInput';
 import { useScrollLock } from '../../hooks/useScrollLock';
@@ -39,6 +44,12 @@ import {
   calculateBookingTotal,
 } from '../../services/rentalService';
 import { getAvailableDealerPlates, assignPlateToBooking } from '../../services/plateService';
+import {
+  createInsurance,
+  validateInsuranceCoverage,
+  updateCustomerInsuranceCache,
+  getCustomerLastInsurance,
+} from '../../services/insuranceService';
 
 // ================================================================
 // TYPES
@@ -122,6 +133,18 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
   const [permittedStates, setPermittedStates] = useState('');
   const [adminNotes, setAdminNotes] = useState('');
 
+  // ---- Insurance state ----
+  const [insType, setInsType] = useState<InsuranceType>('customer_provided');
+  const [insCompany, setInsCompany] = useState('');
+  const [insPolicyNumber, setInsPolicyNumber] = useState('');
+  const [insEffectiveDate, setInsEffectiveDate] = useState('');
+  const [insExpirationDate, setInsExpirationDate] = useState('');
+  const [insBiPerPerson, setInsBiPerPerson] = useState('');
+  const [insBiPerAccident, setInsBiPerAccident] = useState('');
+  const [insPropertyDamage, setInsPropertyDamage] = useState('');
+  const [insDealerDailyRate, setInsDealerDailyRate] = useState('');
+  const [insPreFilled, setInsPreFilled] = useState(false);
+
   // ---- Submission state ----
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -172,6 +195,35 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
     }
     return null;
   }, [startDate, endDate, rentalDays, selectedVehicle]);
+
+  // Insurance computed values
+  const insDealerTotal = useMemo(() => {
+    const rate = parseFloat(insDealerDailyRate);
+    if (isNaN(rate) || rate <= 0) return 0;
+    return rate * rentalDays;
+  }, [insDealerDailyRate, rentalDays]);
+
+  const insValidationFlags = useMemo((): InsuranceVerificationFlags | null => {
+    if (insType !== 'customer_provided') return null;
+    if (!insCompany && !insPolicyNumber && !insExpirationDate) return null;
+    return validateInsuranceCoverage(
+      {
+        insuranceCompany: insCompany || undefined,
+        policyNumber: insPolicyNumber || undefined,
+        effectiveDate: insEffectiveDate || undefined,
+        expirationDate: insExpirationDate || undefined,
+        bodilyInjuryPerPerson: insBiPerPerson ? parseInt(insBiPerPerson, 10) : undefined,
+        bodilyInjuryPerAccident: insBiPerAccident ? parseInt(insBiPerAccident, 10) : undefined,
+        propertyDamage: insPropertyDamage ? parseInt(insPropertyDamage, 10) : undefined,
+      } as Partial<RentalInsurance>,
+      endDate
+    );
+  }, [insType, insCompany, insPolicyNumber, insEffectiveDate, insExpirationDate,
+      insBiPerPerson, insBiPerAccident, insPropertyDamage, endDate]);
+
+  const insHasIssues = insValidationFlags
+    ? !Object.values(insValidationFlags).every(Boolean)
+    : false;
 
   // ================================================================
   // EFFECTS
@@ -254,6 +306,22 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
       setAuthorizedDrivers(prev => [customerName.trim(), ...prev.slice(1)]);
     }
   }, [customerName]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Pre-fill insurance from customer's last booking when customer is selected
+  useEffect(() => {
+    if (!selectedCustomer?.id || isEditMode) return;
+    let cancelled = false;
+    getCustomerLastInsurance(selectedCustomer.id).then(cached => {
+      if (cancelled) return;
+      if (cached) {
+        if (cached.company) setInsCompany(cached.company);
+        if (cached.policyNumber) setInsPolicyNumber(cached.policyNumber);
+        if (cached.expiry) setInsExpirationDate(cached.expiry);
+        setInsPreFilled(true);
+      }
+    });
+    return () => { cancelled = true; };
+  }, [selectedCustomer?.id, isEditMode]);
 
   // ================================================================
   // HANDLERS
@@ -421,6 +489,38 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
             setSuccessMessage('Booking created, but plate assignment failed. Please assign the plate manually from the Plates page.');
             setTimeout(() => { onBookingCreated(); handleClose(); }, 2000);
             return;
+          }
+        }
+
+        // Create insurance record (soft-block: booking succeeds even if insurance fails)
+        if (result.id && (insCompany || insPolicyNumber || insType === 'dealer_coverage')) {
+          try {
+            const insResult = await createInsurance({
+              bookingId: result.id,
+              insuranceType: insType,
+              insuranceCompany: insCompany || undefined,
+              policyNumber: insPolicyNumber || undefined,
+              effectiveDate: insEffectiveDate || undefined,
+              expirationDate: insExpirationDate || undefined,
+              bodilyInjuryPerPerson: insBiPerPerson ? parseInt(insBiPerPerson, 10) : undefined,
+              bodilyInjuryPerAccident: insBiPerAccident ? parseInt(insBiPerAccident, 10) : undefined,
+              propertyDamage: insPropertyDamage ? parseInt(insPropertyDamage, 10) : undefined,
+              dealerCoverageDailyRate: insType === 'dealer_coverage' && insDealerDailyRate ? parseFloat(insDealerDailyRate) : undefined,
+              dealerCoverageTotal: insType === 'dealer_coverage' ? insDealerTotal : undefined,
+              bookingEndDate: endDate,
+            });
+
+            // Cache customer insurance for future pre-fill
+            if (insResult && insType === 'customer_provided' && customerId) {
+              await updateCustomerInsuranceCache(customerId, {
+                insuranceCompany: insCompany,
+                policyNumber: insPolicyNumber,
+                expirationDate: insExpirationDate,
+              });
+            }
+          } catch (insErr) {
+            console.error('Insurance creation failed:', insErr);
+            // Don't fail the booking -- insurance can be added from BookingDetail
           }
         }
       }
@@ -933,6 +1033,171 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
         )}
       </div>
 
+      {/* Insurance Information */}
+      <div className="bg-black/30 border border-white/5 p-4 space-y-3">
+        <label className="block text-[10px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
+          <Shield size={12} /> Insurance Information
+        </label>
+
+        {insPreFilled && (
+          <p className="text-gray-500 text-xs italic">Pre-filled from previous rental.</p>
+        )}
+
+        {/* Insurance type toggle */}
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setInsType('customer_provided')}
+            className={`flex-1 px-3 py-2 text-[10px] uppercase tracking-wider border transition-colors ${
+              insType === 'customer_provided'
+                ? 'bg-tj-gold text-black border-tj-gold font-bold'
+                : 'bg-black border-gray-700 text-gray-400 hover:border-gray-500'
+            }`}
+          >
+            Customer Insurance
+          </button>
+          <button
+            type="button"
+            onClick={() => setInsType('dealer_coverage')}
+            className={`flex-1 px-3 py-2 text-[10px] uppercase tracking-wider border transition-colors ${
+              insType === 'dealer_coverage'
+                ? 'bg-tj-gold text-black border-tj-gold font-bold'
+                : 'bg-black border-gray-700 text-gray-400 hover:border-gray-500'
+            }`}
+          >
+            Dealer Coverage
+          </button>
+        </div>
+
+        {insType === 'customer_provided' ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                  Insurance Company
+                </label>
+                <input
+                  type="text"
+                  value={insCompany}
+                  onChange={e => setInsCompany(e.target.value)}
+                  placeholder="e.g., State Farm, GEICO"
+                  className="w-full bg-black border border-gray-700 px-3 py-2.5 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                  Policy Number
+                </label>
+                <input
+                  type="text"
+                  value={insPolicyNumber}
+                  onChange={e => setInsPolicyNumber(e.target.value)}
+                  placeholder="Policy #"
+                  className="w-full bg-black border border-gray-700 px-3 py-2.5 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                  Effective Date
+                </label>
+                <input
+                  type="date"
+                  value={insEffectiveDate}
+                  onChange={e => setInsEffectiveDate(e.target.value)}
+                  className="w-full bg-black border border-gray-700 px-3 py-2.5 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                  Expiration Date
+                </label>
+                <input
+                  type="date"
+                  value={insExpirationDate}
+                  onChange={e => setInsExpirationDate(e.target.value)}
+                  className="w-full bg-black border border-gray-700 px-3 py-2.5 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                  BI / Person ($)
+                </label>
+                <input
+                  type="number"
+                  value={insBiPerPerson}
+                  onChange={e => setInsBiPerPerson(e.target.value)}
+                  placeholder={`Min: $${TEXAS_MINIMUM_COVERAGE.bodilyInjuryPerPerson.toLocaleString()}`}
+                  className="w-full bg-black border border-gray-700 px-3 py-2.5 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                  BI / Accident ($)
+                </label>
+                <input
+                  type="number"
+                  value={insBiPerAccident}
+                  onChange={e => setInsBiPerAccident(e.target.value)}
+                  placeholder={`Min: $${TEXAS_MINIMUM_COVERAGE.bodilyInjuryPerAccident.toLocaleString()}`}
+                  className="w-full bg-black border border-gray-700 px-3 py-2.5 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                  min="0"
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                  Property Dmg ($)
+                </label>
+                <input
+                  type="number"
+                  value={insPropertyDamage}
+                  onChange={e => setInsPropertyDamage(e.target.value)}
+                  placeholder={`Min: $${TEXAS_MINIMUM_COVERAGE.propertyDamage.toLocaleString()}`}
+                  className="w-full bg-black border border-gray-700 px-3 py-2.5 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            <p className="text-gray-600 text-[11px]">
+              Texas requires minimum {TEXAS_MINIMUM_LABEL} liability coverage.
+            </p>
+          </>
+        ) : (
+          <div className="space-y-2">
+            <div>
+              <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">
+                Dealer Coverage Daily Rate
+              </label>
+              <div className="relative w-40">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600 text-sm">$</span>
+                <input
+                  type="number"
+                  value={insDealerDailyRate}
+                  onChange={e => setInsDealerDailyRate(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full bg-black border border-gray-700 pl-7 pr-3 py-2.5 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
+            {insDealerTotal > 0 && (
+              <p className="text-gray-300 text-xs">
+                Dealer coverage at ${parseFloat(insDealerDailyRate).toFixed(2)}/day.
+                Total: <span className="text-tj-gold font-mono font-bold">${insDealerTotal.toFixed(2)}</span> for {rentalDays} days.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Admin notes */}
       <div>
         <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1.5">
@@ -1044,6 +1309,59 @@ export const RentalBookingModal: React.FC<RentalBookingModalProps> = ({
           )}
         </div>
       </div>
+
+      {/* Insurance summary */}
+      {(insCompany || insPolicyNumber || insType === 'dealer_coverage') && (
+        <div className="bg-black/30 border border-white/5 p-4 space-y-2">
+          <h4 className="text-[10px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
+            <Shield size={12} /> Insurance
+          </h4>
+          <div className="text-xs space-y-1">
+            <div>
+              <span className="text-gray-500">Type:</span>{' '}
+              <span className="text-white">
+                {insType === 'customer_provided' ? 'Customer Provided' : 'Dealer Coverage'}
+              </span>
+            </div>
+            {insType === 'customer_provided' ? (
+              <>
+                {insCompany && (
+                  <div>
+                    <span className="text-gray-500">Company:</span>{' '}
+                    <span className="text-white">{insCompany}</span>
+                  </div>
+                )}
+                {insPolicyNumber && (
+                  <div>
+                    <span className="text-gray-500">Policy #:</span>{' '}
+                    <span className="text-white font-mono">{insPolicyNumber}</span>
+                  </div>
+                )}
+                {insExpirationDate && (
+                  <div>
+                    <span className="text-gray-500">Expires:</span>{' '}
+                    <span className="text-white">{insExpirationDate}</span>
+                  </div>
+                )}
+              </>
+            ) : (
+              insDealerTotal > 0 && (
+                <div>
+                  <span className="text-gray-500">Coverage:</span>{' '}
+                  <span className="text-white">${parseFloat(insDealerDailyRate).toFixed(2)}/day = ${insDealerTotal.toFixed(2)}</span>
+                </div>
+              )
+            )}
+          </div>
+          {/* Soft-block warning */}
+          {insHasIssues && insType === 'customer_provided' && (
+            <div className="flex items-start gap-2 text-amber-400 text-[10px] mt-2 bg-amber-900/10 border border-amber-800/30 px-3 py-2">
+              <AlertTriangle size={12} className="shrink-0 mt-0.5" />
+              <span>Insurance issues detected. You can still create the booking and verify later.</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Submit button */}
       <button

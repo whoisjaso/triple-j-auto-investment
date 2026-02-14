@@ -23,6 +23,7 @@ import {
   ConditionChecklistItem,
   FuelLevel,
 } from '../types';
+import { transformInsurance } from './insuranceService';
 
 // ================================================================
 // DATA TRANSFORMERS (snake_case DB -> camelCase TS)
@@ -84,6 +85,7 @@ const transformBooking = (data: any): RentalBooking => ({
   payments: data.rental_payments
     ? (data.rental_payments as any[]).map(transformPayment)
     : undefined,
+  insurance: data.rental_insurance ? transformInsurance(data.rental_insurance) : undefined,
 });
 
 /**
@@ -163,7 +165,7 @@ export async function getAllBookings(): Promise<RentalBooking[]> {
   try {
     const { data, error } = await supabase
       .from('rental_bookings')
-      .select('*, rental_customers(*), rental_payments(*)')
+      .select('*, rental_customers(*), rental_payments(*), rental_insurance(*)')
       .order('start_date', { ascending: false });
 
     if (error) {
@@ -185,7 +187,7 @@ export async function getBookingById(id: string): Promise<RentalBooking | null> 
   try {
     const { data, error } = await supabase
       .from('rental_bookings')
-      .select('*, rental_customers(*), rental_payments(*)')
+      .select('*, rental_customers(*), rental_payments(*), rental_insurance(*)')
       .eq('id', id)
       .single();
 
@@ -220,7 +222,7 @@ export async function getBookingsForMonth(year: number, month: number): Promise<
     // Bookings that overlap with the month: start_date <= month_end AND end_date >= month_start
     const { data, error } = await supabase
       .from('rental_bookings')
-      .select('*, rental_customers(*), rental_payments(*)')
+      .select('*, rental_customers(*), rental_payments(*), rental_insurance(*)')
       .lte('start_date', monthEnd)
       .gte('end_date', monthStart)
       .order('start_date', { ascending: true });
@@ -244,7 +246,7 @@ export async function getActiveBookings(): Promise<RentalBooking[]> {
   try {
     const { data, error } = await supabase
       .from('rental_bookings')
-      .select('*, rental_customers(*), rental_payments(*)')
+      .select('*, rental_customers(*), rental_payments(*), rental_insurance(*)')
       .in('status', ['reserved', 'active', 'overdue'])
       .order('start_date', { ascending: true });
 
@@ -295,7 +297,7 @@ export async function createBooking(data: Partial<RentalBooking>): Promise<Renta
     const { data: result, error } = await supabase
       .from('rental_bookings')
       .insert([insertData])
-      .select('*, rental_customers(*), rental_payments(*)')
+      .select('*, rental_customers(*), rental_payments(*), rental_insurance(*)')
       .single();
 
     if (error || !result) {
