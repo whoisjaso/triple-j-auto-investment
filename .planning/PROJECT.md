@@ -58,20 +58,24 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 
 ### Active
 
-*Building toward these in v1.1 — Production Launch & Polish:*
+*Building toward these in v2.0 — Psychological Architecture & Production Launch:*
 
-- [ ] Fresh Supabase production project with all migrations applied (02-08)
-- [ ] Deploy Edge Functions (process-notification-queue, unsubscribe, check-plate-alerts)
-- [ ] Configure storage buckets (rental-agreements, rental-photos, plate-photos, insurance-cards)
-- [ ] Configure API keys and secrets (Twilio, Resend, admin phone/email)
-- [ ] Enable phone auth with Twilio provider
-- [ ] Activate pg_cron schedules for alerts
-- [ ] Deploy frontend to Vercel with custom domain
-- [ ] UI/UX polish — spacing, mobile responsiveness, visual consistency
-- [ ] Populate real content — inventory, photos, business information
-- [ ] End-to-end workflow verification — browse → inquire → AI call, registration tracking, rentals
-- [ ] Retell AI voice agent integration verified and working
-- [ ] Update Retell prompts to cover rental inquiries with dynamic messaging
+- [ ] Production infrastructure (fresh Supabase, migrations, Edge Functions, storage, auth, cron, Vercel)
+- [ ] Credential rotation and security hardening
+- [ ] SOVEREIGN framework landing experience (pattern-interrupt, authority signals, tribe signals)
+- [ ] Vehicle listing psychological architecture (identity headlines, price anchoring, Triple J Verified, vehicle stories)
+- [ ] Micro-commitment spectrum (Level 0-3: save, calculate, alerts, schedule, reserve)
+- [ ] Divine AI chat with behavioral profiling (Provider/Skeptic/First-Timer/Struggler)
+- [ ] Behavioral follow-up system (4-tier re-engagement: SMS, email, AI voice)
+- [ ] Intelligence layer (session tracking, smart recommendations, urgency calibration, attribution)
+- [ ] Owner Portal (vehicle dashboard, service reminders, value tracker, documents)
+- [ ] Family Circle referral program with rewards tracking
+- [ ] Review generation engine (personalized 3-day post-purchase)
+- [ ] SubliminalPrime refinement
+- [ ] Content alignment with automotive investment firm positioning
+- [ ] UI/UX polish (mobile-first, performance, accessibility, visual consistency)
+- [ ] SEO foundation (BrowserRouter, React Helmet, sitemap, schema markup)
+- [ ] Retell AI prompts updated for rentals with dynamic messaging + Spanish
 
 ### Out of Scope
 
@@ -81,17 +85,23 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 - Auction integration — not part of current business model
 - Automated DMV submission — manual submission via webDealer, system validates only
 
-## Current Milestone: v1.1 Production Launch & Polish
+## Current Milestone: v2.0 Psychological Architecture & Production Launch
 
-**Goal:** Get the full v1 platform live on production with a fresh Supabase backend, deployed to Vercel, polished for real customers, and Retell AI integration verified.
+**Goal:** Deploy the platform to production and implement the full SOVEREIGN psychological architecture — transforming Triple J's website from a dealership site into an influence machine that moves strangers through a behavioral funnel from skeptic to buyer to evangelist.
 
 **Target features:**
-- Fresh Supabase production project with all migrations, Edge Functions, storage, auth, and cron
-- Frontend deployed to Vercel with existing custom domain (replacing current site)
-- UI/UX cleanup across all pages for professional customer-facing experience
-- Real inventory, photos, and business info populated
-- All customer workflows verified end-to-end (browse → inquire → AI call, registration tracking, rentals)
-- Retell AI voice agent prompts updated for rental inquiries with dynamic messaging
+- Production infrastructure (fresh Supabase + Vercel with custom domain)
+- SOVEREIGN framework landing experience with FATE triggers (Focus, Authority, Tribe, Emotion)
+- Vehicle listings as micro-stories with price anchoring and Triple J Verified badges
+- 4-level micro-commitment spectrum (save → alert → schedule → reserve)
+- Divine AI chat with behavioral profiling and needs-based adaptation
+- 4-tier behavioral follow-up system (browse → save → abandon → question)
+- Intelligence layer (session tracking, recommendations, urgency calibration)
+- Owner Portal with vehicle dashboard and Family Circle referral program
+- Review generation engine and "Ready to Upgrade?" re-entry loop
+- UI/UX polish, mobile-first, performance, accessibility
+- SEO foundation (BrowserRouter, React Helmet, sitemap)
+- Retell AI updated for rentals + Spanish with SOVEREIGN-aligned prompts
 
 ## Context
 
@@ -115,7 +125,7 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 - Retell AI voice agent active — calls customers on inquiry submission
 - Long-term vision: Web2 frontend / Web3 backend (Robinhood for dealerships)
 
-**Deployment Status (v1.1 target):**
+**Deployment Status (v2.0 target):**
 - Code complete from v1, deploying to fresh Supabase production project
 - Migrations 02-08 need to be applied (in order, btree_gist before 06)
 - Edge Functions need deployment
@@ -151,5 +161,8 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 
 | Fresh Supabase project for production | Clean slate, proper config from start via MCP | — Pending |
 
+| SOVEREIGN psychological framework | Behavioral architecture for every page — influence machine, not brochure | — Pending |
+| Automotive investment firm positioning | "Not a used car lot" — luxury feel for budget vehicles builds trust | — Pending |
+
 ---
-*Last updated: 2026-02-13 after v1.1 milestone initialization*
+*Last updated: 2026-02-13 after v2.0 milestone initialization*
