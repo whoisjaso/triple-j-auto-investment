@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-13
-**Session:** Phase 7 COMPLETE -- All 4 plans done (DB, admin page, rental integration, alert Edge Function)
+**Last Updated:** 2026-02-14
+**Session:** Phase 8 IN PROGRESS -- Plan 01 complete (DB, types, service layer)
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 7 (Plate Tracking) COMPLETE -- All 4 plans done. Phase 3 code-complete (verification deferred). Next: Phase 8 (Rental Insurance Verification).
+**Current Focus:** Phase 8 (Rental Insurance Verification) IN PROGRESS -- Plan 01 complete (DB, types, service layer). Plans 02-03 remaining. Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -28,10 +28,10 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 7 of 9 (Plate Tracking) -- COMPLETE
-**Plan:** 4/4 complete
-**Status:** Phase complete
-**Last activity:** 2026-02-13 -- Completed 07-04-PLAN.md (Alert Edge Function & pg_cron)
+**Phase:** 8 of 9 (Rental Insurance Verification) -- IN PROGRESS
+**Plan:** 1/3 complete
+**Status:** In progress
+**Last activity:** 2026-02-14 -- Completed 08-01-PLAN.md (Database, Types & Service Layer)
 
 **Progress:**
 ```
@@ -71,10 +71,13 @@ Phase 7:    [====================] 100% (4/4 plans complete) - COMPLETE
   Plan 02:  [X] Plates Admin Page (Plates.tsx 1099 lines, PlateAssignmentHistory.tsx, route/nav integration)
   Plan 03:  [X] Rental Integration (plate selection in booking, return confirmation, Plates tab)
   Plan 04:  [X] Alert Edge Function & pg_cron (check-plate-alerts Edge Function, plate-alert.tsx email template)
-Phase 8:    [ ] Not started (Rental Insurance Verification)
+Phase 8:    [======                  ] 33% (1/3 plans complete) - IN PROGRESS
+  Plan 01:  [X] Database, Types & Service Layer (08_rental_insurance.sql, insuranceService.ts, types.ts)
+  Plan 02:  [ ] Insurance Verification UI
+  Plan 03:  [ ] Edge Function Extension
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [█████████████████████████] 96% (27/28 plans complete)
+Overall:    [█████████████████████████] 97% (28/29 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -89,10 +92,10 @@ Overall:    [██████████████████████�
 
 | Metric | Value | Notes |
 |--------|-------|-------|
-| Phases Planned | 9 | 1 blocked (Phase 9), Phase 7 complete |
+| Phases Planned | 9 | 1 blocked (Phase 9), Phase 8 in progress |
 | Phases Complete | 7 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 + Phase 7 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 27 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 through 07-04 |
+| Plans Executed | 28 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 through 07-04, 08-01 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -198,6 +201,12 @@ Overall:    [██████████████████████�
 | Inventory assignment excluded from unaccounted | assignment_type='inventory' is intentional; not a missing plate | 2026-02-13 | 07-04 |
 | Upsert with ignoreDuplicates for alerts | Existing active alerts preserved; only new conditions create rows | 2026-02-13 | 07-04 |
 | pg_cron commented out for plate alerts | Same Phase 4 approach; requires manual config before activation | 2026-02-13 | 07-04 |
+| INTEGER for insurance coverage amounts | Whole dollar values; avoids DECIMAL string coercion from Supabase | 2026-02-14 | 08-01 |
+| Separate insurance_alerts table | Keeps plate and insurance concerns separate; simpler migration | 2026-02-14 | 08-01 |
+| Dedicated update_insurance_updated_at function | Generic may not exist; same pattern as Phase 7 update_plates_updated_at | 2026-02-14 | 08-01 |
+| parseFloat for dealer DECIMAL columns only | Coverage INTEGER columns use direct assignment; only dealer rates are DECIMAL | 2026-02-14 | 08-01 |
+| Pure validateInsuranceCoverage function | No DB calls enables reuse in service + UI layer without side effects | 2026-02-14 | 08-01 |
+| UNIQUE constraint on rental_insurance(booking_id) | Enforces 1:1 at DB level; idempotent DO block guard | 2026-02-14 | 08-01 |
 
 ### Patterns Established
 
@@ -276,6 +285,11 @@ Overall:    [██████████████████████�
 - **Plate alert Edge Function pattern:** Cron-triggered detection of 3 alert types, dedup via plate_alerts upsert, 24h cooldown
 - **Alert auto-resolve pattern:** Compare active alerts against detected conditions via Set, resolve cleared ones
 - **Batched admin notification pattern:** Collect all alerts, send ONE SMS + ONE email with summary
+- **Insurance service transformer pattern:** transformInsurance uses parseFloat for DECIMAL (dealer rates), direct for INTEGER (coverage amounts)
+- **Dual verification flags pattern:** InsuranceVerificationFlags with 5 booleans computed by pure function, admin makes final call
+- **Customer insurance cache pattern:** last_insurance_company/policy_number/expiry on rental_customers for pre-fill, re-verified per booking
+- **Insurance card upload pattern:** insurance-cards bucket, path insurance/{bookingId}/{timestamp}.{ext}, updates card_image_url on success
+- **1:1 table relationship pattern:** UNIQUE constraint on FK column (booking_id) via DO block idempotent guard
 
 ### Architecture Summary (Current)
 
@@ -419,6 +433,17 @@ types.ts Plate Tracking Types (Phase 07):
   - Plate, PlateAssignment, PlateAlert interfaces
   - PLATE_TYPE_LABELS, PLATE_STATUS_LABELS constants
 
+types.ts Rental Insurance Types (Phase 08):
+  - InsuranceType: 'customer_provided' | 'dealer_coverage'
+  - InsuranceVerificationStatus: 'pending' | 'verified' | 'failed' | 'overridden'
+  - InsuranceAlertType, InsuranceAlertSeverity type aliases
+  - RentalInsurance interface (22 fields)
+  - InsuranceVerificationFlags interface (5 boolean flags)
+  - InsuranceAlert interface (9 fields)
+  - TEXAS_MINIMUM_COVERAGE constant (30000/60000/25000)
+  - TEXAS_MINIMUM_LABEL, INSURANCE_STATUS_LABELS constants
+  - RentalBooking.insurance optional field
+
 services/plateService.ts (679 lines):
   - transformPlate, transformAssignment, transformAlert, transformVehicleMinimal
   - CRUD: getAllPlates, getPlateById, createPlate, updatePlate, deletePlate
@@ -439,6 +464,15 @@ components/admin/RentalBookingModal.tsx (UPDATED in 07-03):
   - Auto-fetch available plates on vehicle select
   - assignPlateToBooking call with graceful degradation
 
+services/insuranceService.ts (13 functions):
+  - transformInsurance, transformInsuranceAlert
+  - CRUD: getInsuranceForBooking, createInsurance, updateInsurance
+  - Verification: verifyInsurance, failInsurance, overrideInsurance
+  - Upload: uploadInsuranceCard (insurance-cards bucket)
+  - Pure: validateInsuranceCoverage (Texas 30/60/25, zeroed-time dates)
+  - Alerts: getActiveInsuranceAlerts
+  - Customer cache: updateCustomerInsuranceCache, getCustomerLastInsurance
+
 supabase/migrations/:
   02_registration_schema_update.sql (483 lines)
   03_customer_portal_access.sql (110 lines)
@@ -446,6 +480,7 @@ supabase/migrations/:
   05_registration_checker.sql - 5 columns + invalidation trigger
   06_rental_schema.sql (568 lines) - btree_gist, 4 tables, EXCLUDE constraint, RLS
   07_plate_tracking.sql (442 lines) - 3 tables, partial unique indexes, status trigger, RLS, pg_cron
+  08_rental_insurance.sql (323 lines) - 2 tables, UNIQUE constraint, partial unique index, RLS, customer pre-fill columns
 
 supabase/functions/:
   _shared/ (twilio.ts, resend.ts, email-templates/)
@@ -463,7 +498,7 @@ supabase/functions/:
 | RLS silent failures | Data loss without warning | Ongoing monitoring |
 | No Spireon API access | Can't build GPS feature | Phase 9 blocked |
 | TypeScript strict mode | ErrorBoundary class issues | Low priority (build works) |
-| Migrations 03-07 not applied | Token + notification + phone auth + checker + rental + plate features won't work until applied | Deploy to Supabase |
+| Migrations 03-08 not applied | Token + notification + phone auth + checker + rental + plate + insurance features won't work until applied | Deploy to Supabase |
 
 ### TODOs (Cross-Phase)
 
@@ -486,28 +521,26 @@ supabase/functions/:
 - [ ] Check Supabase plan limits for document storage
 - [ ] Apply migration 07_plate_tracking.sql to Supabase
 - [ ] Create Supabase Storage bucket 'plate-photos' for plate photo uploads
+- [ ] Apply migration 08_rental_insurance.sql to Supabase
+- [ ] Create Supabase Storage bucket 'insurance-cards' for insurance card image uploads
 
 ---
 
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Completed Phase 7 (Plate Tracking) -- all 4 plans executed
-- Executed 07-04: Alert Edge Function & pg_cron schedule
-- Created check-plate-alerts/index.ts (490 lines): cron-triggered detection of overdue rentals, expiring buyer's tags, unaccounted plates
-- Created plate-alert.tsx (297 lines): branded HTML email template + concise SMS builder
-- Updated 07_plate_tracking.sql (442 lines): appended pg_cron schedule (section 12, commented out)
-- Alert deduplication via plate_alerts upsert + 24h notification cooldown
-- Auto-resolve clears conditions that no longer exist
-- Batched notification: 1 SMS + 1 email per cron run
+- Started Phase 8 (Rental Insurance Verification) -- Plan 01 complete
+- Executed 08-01: Database, Types & Service Layer
+- Created 08_rental_insurance.sql (323 lines): rental_insurance + insurance_alerts tables, RLS, customer pre-fill columns
+- Extended types.ts with RENTAL INSURANCE TYPES section (InsuranceType, RentalInsurance, InsuranceVerificationFlags, InsuranceAlert, TEXAS_MINIMUM_COVERAGE)
+- Created insuranceService.ts (13 functions): CRUD, verification, upload, pure validation, alerts, customer cache
 
-### Phase 7 Status (COMPLETE)
+### Phase 8 Status (IN PROGRESS)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
-| 07-01 | Database, Types & Service Layer | 506c6ea, 69163ee | COMPLETE |
-| 07-02 | Plates Admin Page | 832940c, da78f08 | COMPLETE |
-| 07-03 | Rental Integration | 86d13f0, 9406470 | COMPLETE |
-| 07-04 | Alert Edge Function & pg_cron | ec39a02, 7cdbd51 | COMPLETE |
+| 08-01 | Database, Types & Service Layer | b6350e5, 2f3edba | COMPLETE |
+| 08-02 | Insurance Verification UI | -- | NOT STARTED |
+| 08-03 | Edge Function Extension | -- | NOT STARTED |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -515,19 +548,20 @@ supabase/functions/:
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 8: Rental Insurance Verification
-2. Circle back to Phase 3 verification when DB migration is applied
-3. Wire up all credentials after feature code is complete
-4. Phase 9 blocked (Spireon API access needed)
+1. Phase 8 Plan 02: Insurance Verification UI (InsuranceVerification.tsx, booking modal integration, badges)
+2. Phase 8 Plan 03: Edge Function Extension (extend check-plate-alerts with insurance expiry detection)
+3. Circle back to Phase 3 verification when DB migration is applied
+4. Wire up all credentials after feature code is complete
+5. Phase 9 blocked (Spireon API access needed)
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/07-plate-tracking/07-04-SUMMARY.md` - latest plan summary
+3. `.planning/phases/08-rental-insurance-verification/08-01-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-13 (Phase 7 COMPLETE - all 4 plans done)*
+*State updated: 2026-02-14 (Phase 8 Plan 01 complete)*
