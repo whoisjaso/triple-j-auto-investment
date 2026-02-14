@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-14
-**Session:** Phase 8 IN PROGRESS -- Plan 01 complete (DB, types, service layer)
+**Session:** Phase 8 IN PROGRESS -- Plans 01, 03 complete (DB + Edge Function). Plan 02 remaining.
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 8 (Rental Insurance Verification) IN PROGRESS -- Plan 01 complete (DB, types, service layer). Plans 02-03 remaining. Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 8 (Rental Insurance Verification) IN PROGRESS -- Plans 01+03 complete (DB, types, service, Edge Function). Plan 02 remaining. Phase 3 code-complete (verification deferred).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -29,9 +29,9 @@
 
 **Milestone:** v1 Feature Development
 **Phase:** 8 of 9 (Rental Insurance Verification) -- IN PROGRESS
-**Plan:** 1/3 complete
+**Plan:** 2/3 complete (01 + 03; 02 pending)
 **Status:** In progress
-**Last activity:** 2026-02-14 -- Completed 08-01-PLAN.md (Database, Types & Service Layer)
+**Last activity:** 2026-02-14 -- Completed 08-03-PLAN.md (Edge Function Extension)
 
 **Progress:**
 ```
@@ -71,13 +71,13 @@ Phase 7:    [====================] 100% (4/4 plans complete) - COMPLETE
   Plan 02:  [X] Plates Admin Page (Plates.tsx 1099 lines, PlateAssignmentHistory.tsx, route/nav integration)
   Plan 03:  [X] Rental Integration (plate selection in booking, return confirmation, Plates tab)
   Plan 04:  [X] Alert Edge Function & pg_cron (check-plate-alerts Edge Function, plate-alert.tsx email template)
-Phase 8:    [======                  ] 33% (1/3 plans complete) - IN PROGRESS
+Phase 8:    [=============           ] 67% (2/3 plans complete) - IN PROGRESS
   Plan 01:  [X] Database, Types & Service Layer (08_rental_insurance.sql, insuranceService.ts, types.ts)
   Plan 02:  [ ] Insurance Verification UI
-  Plan 03:  [ ] Edge Function Extension
+  Plan 03:  [X] Edge Function Extension (check-plate-alerts + plate-alert.tsx extended with insurance detection)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [█████████████████████████] 97% (28/29 plans complete)
+Overall:    [█████████████████████████] 97% (29/30 plans complete)
 ```
 
 **Requirements Coverage:**
@@ -95,7 +95,7 @@ Overall:    [██████████████████████�
 | Phases Planned | 9 | 1 blocked (Phase 9), Phase 8 in progress |
 | Phases Complete | 7 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 + Phase 7 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 28 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 through 07-04, 08-01 |
+| Plans Executed | 29 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 through 07-04, 08-01, 08-03 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -207,6 +207,10 @@ Overall:    [██████████████████████�
 | parseFloat for dealer DECIMAL columns only | Coverage INTEGER columns use direct assignment; only dealer rates are DECIMAL | 2026-02-14 | 08-01 |
 | Pure validateInsuranceCoverage function | No DB calls enables reuse in service + UI layer without side effects | 2026-02-14 | 08-01 |
 | UNIQUE constraint on rental_insurance(booking_id) | Enforces 1:1 at DB level; idempotent DO block guard | 2026-02-14 | 08-01 |
+| DetectedInsuranceAlert interface inside handler | Scoped to handler function; not needed externally | 2026-02-14 | 08-03 |
+| SMS prefix "Triple J Alert:" (generic) | Covers both plate-only and insurance-only notifications | 2026-02-14 | 08-03 |
+| Dual CTA buttons in combined email | Plates Dashboard + Rentals Dashboard when both alert types present | 2026-02-14 | 08-03 |
+| Shield icon for insurance section | Universally associated with protection/insurance; distinct from plate icons | 2026-02-14 | 08-03 |
 
 ### Patterns Established
 
@@ -290,6 +294,9 @@ Overall:    [██████████████████████�
 - **Customer insurance cache pattern:** last_insurance_company/policy_number/expiry on rental_customers for pre-fill, re-verified per booking
 - **Insurance card upload pattern:** insurance-cards bucket, path insurance/{bookingId}/{timestamp}.{ext}, updates card_image_url on success
 - **1:1 table relationship pattern:** UNIQUE constraint on FK column (booking_id) via DO block idempotent guard
+- **Insurance alert detection pattern:** Cron-triggered detection of 3 insurance alert types, dedup via insurance_alerts upsert, 24h cooldown
+- **Combined batched notification pattern:** Single SMS + email covers both plate and insurance alerts; subject/title adapts to which types present
+- **Backward-compatible template extension pattern:** Optional parameter added to template functions; undefined/empty produces identical output
 
 ### Architecture Summary (Current)
 
@@ -484,9 +491,9 @@ supabase/migrations/:
 
 supabase/functions/:
   _shared/ (twilio.ts, resend.ts, email-templates/)
-  _shared/email-templates/plate-alert.tsx (297 lines) - batched plate alert email/SMS templates
+  _shared/email-templates/plate-alert.tsx (471 lines) - batched plate + insurance alert email/SMS templates
   process-notification-queue/index.ts
-  check-plate-alerts/index.ts (490 lines) - cron-triggered alert detection + notification
+  check-plate-alerts/index.ts (768 lines) - cron-triggered plate + insurance alert detection + combined notification
   unsubscribe/index.ts
 ```
 
@@ -529,18 +536,19 @@ supabase/functions/:
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Started Phase 8 (Rental Insurance Verification) -- Plan 01 complete
+- Phase 8 (Rental Insurance Verification) -- Plans 01 and 03 complete
 - Executed 08-01: Database, Types & Service Layer
-- Created 08_rental_insurance.sql (323 lines): rental_insurance + insurance_alerts tables, RLS, customer pre-fill columns
-- Extended types.ts with RENTAL INSURANCE TYPES section (InsuranceType, RentalInsurance, InsuranceVerificationFlags, InsuranceAlert, TEXAS_MINIMUM_COVERAGE)
-- Created insuranceService.ts (13 functions): CRUD, verification, upload, pure validation, alerts, customer cache
+- Executed 08-03: Edge Function Extension
+- Extended check-plate-alerts/index.ts (490 -> 768 lines) with insurance detection: 3 alert types, dedup upsert, auto-resolve, 24h cooldown
+- Extended plate-alert.tsx (297 -> 471 lines) with InsuranceAlertItem, insurance email sections, combined SMS counts
+- Combined plate + insurance in single batched notification (1 SMS + 1 email)
 
 ### Phase 8 Status (IN PROGRESS)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
 | 08-01 | Database, Types & Service Layer | b6350e5, 2f3edba | COMPLETE |
 | 08-02 | Insurance Verification UI | -- | NOT STARTED |
-| 08-03 | Edge Function Extension | -- | NOT STARTED |
+| 08-03 | Edge Function Extension | 32f3a80, 17d98b3 | COMPLETE |
 
 ### Phase 3 Deferred Items (Still Pending)
 - [ ] Apply migration 03_customer_portal_access.sql to Supabase
@@ -549,19 +557,18 @@ supabase/functions/:
 
 ### What Comes Next
 1. Phase 8 Plan 02: Insurance Verification UI (InsuranceVerification.tsx, booking modal integration, badges)
-2. Phase 8 Plan 03: Edge Function Extension (extend check-plate-alerts with insurance expiry detection)
-3. Circle back to Phase 3 verification when DB migration is applied
-4. Wire up all credentials after feature code is complete
-5. Phase 9 blocked (Spireon API access needed)
+2. Circle back to Phase 3 verification when DB migration is applied
+3. Wire up all credentials after feature code is complete
+4. Phase 9 blocked (Spireon API access needed)
 
 ### If Context Is Lost
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/08-rental-insurance-verification/08-01-SUMMARY.md` - latest plan summary
+3. `.planning/phases/08-rental-insurance-verification/08-03-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-14 (Phase 8 Plan 01 complete)*
+*State updated: 2026-02-14 (Phase 8 Plan 03 complete)*
