@@ -58,12 +58,20 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 
 ### Active
 
-*Building toward these in next milestone:*
+*Building toward these in v1.1 — Production Launch & Polish:*
 
-- [ ] Deploy to production (migrations, Edge Functions, storage, API keys)
-- [ ] LoJack GPS integration for rental vehicle location (requires Spireon API)
-- [ ] Comprehensive test coverage
-- [ ] Move API keys to backend/edge functions
+- [ ] Fresh Supabase production project with all migrations applied (02-08)
+- [ ] Deploy Edge Functions (process-notification-queue, unsubscribe, check-plate-alerts)
+- [ ] Configure storage buckets (rental-agreements, rental-photos, plate-photos, insurance-cards)
+- [ ] Configure API keys and secrets (Twilio, Resend, admin phone/email)
+- [ ] Enable phone auth with Twilio provider
+- [ ] Activate pg_cron schedules for alerts
+- [ ] Deploy frontend to Vercel with custom domain
+- [ ] UI/UX polish — spacing, mobile responsiveness, visual consistency
+- [ ] Populate real content — inventory, photos, business information
+- [ ] End-to-end workflow verification — browse → inquire → AI call, registration tracking, rentals
+- [ ] Retell AI voice agent integration verified and working
+- [ ] Update Retell prompts to cover rental inquiries with dynamic messaging
 
 ### Out of Scope
 
@@ -72,6 +80,18 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 - Multi-location support — single dealership operation
 - Auction integration — not part of current business model
 - Automated DMV submission — manual submission via webDealer, system validates only
+
+## Current Milestone: v1.1 Production Launch & Polish
+
+**Goal:** Get the full v1 platform live on production with a fresh Supabase backend, deployed to Vercel, polished for real customers, and Retell AI integration verified.
+
+**Target features:**
+- Fresh Supabase production project with all migrations, Edge Functions, storage, auth, and cron
+- Frontend deployed to Vercel with existing custom domain (replacing current site)
+- UI/UX cleanup across all pages for professional customer-facing experience
+- Real inventory, photos, and business info populated
+- All customer workflows verified end-to-end (browse → inquire → AI call, registration tracking, rentals)
+- Retell AI voice agent prompts updated for rental inquiries with dynamic messaging
 
 ## Context
 
@@ -84,6 +104,7 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 - 8 database migrations (02-08) ready to apply
 - 5 admin pages: Dashboard, Inventory, Registrations, Rentals, Plates
 - 3 customer pages: StatusTracker, Login, Dashboard
+- Existing site live on custom domain (built in separate IDE session)
 
 **Business Operations:**
 - Texas-based independent auto dealer (Triple J Auto Investment)
@@ -91,15 +112,18 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 - Active rental fleet with plate tracking and insurance verification
 - Uses LoJack for vehicle tracking on rental/financed vehicles
 - Registration calculation: [Vehicle Price] x 6.25% + $250
+- Retell AI voice agent active — calls customers on inquiry submission
+- Long-term vision: Web2 frontend / Web3 backend (Robinhood for dealerships)
 
-**Deployment Status:**
-- Code complete, not yet deployed to production
-- Migrations 02-08 need to be applied to Supabase
+**Deployment Status (v1.1 target):**
+- Code complete from v1, deploying to fresh Supabase production project
+- Migrations 02-08 need to be applied (in order, btree_gist before 06)
 - Edge Functions need deployment
 - Storage buckets need creation
 - API keys (Twilio, Resend) need configuration
 - Phone auth needs enabling
 - pg_cron schedules need activation
+- Frontend needs Vercel deployment with custom domain
 
 ## Constraints
 
@@ -125,5 +149,7 @@ The Domino's Pizza Tracker principle: people don't mind waiting when they unders
 | Soft-block insurance verification | Don't block business operations | ✓ Good — booking succeeds, admin verifies later |
 | Vercel over Dokploy | Simpler for static Vite/React SPA | — Pending deployment |
 
+| Fresh Supabase project for production | Clean slate, proper config from start via MCP | — Pending |
+
 ---
-*Last updated: 2026-02-13 after v1 milestone*
+*Last updated: 2026-02-13 after v1.1 milestone initialization*
