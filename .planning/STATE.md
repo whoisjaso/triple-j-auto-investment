@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-14
-**Session:** Phase 8 IN PROGRESS -- Plans 01, 03 complete (DB + Edge Function). Plan 02 remaining.
+**Session:** Phase 8 COMPLETE -- All 3 plans done (DB + Types + Service, UI, Edge Function).
 
 ---
 
@@ -9,7 +9,7 @@
 
 **Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
 
-**Current Focus:** Phase 8 (Rental Insurance Verification) IN PROGRESS -- Plans 01+03 complete (DB, types, service, Edge Function). Plan 02 remaining. Phase 3 code-complete (verification deferred).
+**Current Focus:** Phase 8 (Rental Insurance Verification) COMPLETE -- All 3 plans done. Phase 3 code-complete (verification deferred). Phase 9 blocked (Spireon API).
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -28,10 +28,10 @@
 ## Current Position
 
 **Milestone:** v1 Feature Development
-**Phase:** 8 of 9 (Rental Insurance Verification) -- IN PROGRESS
-**Plan:** 2/3 complete (01 + 03; 02 pending)
-**Status:** In progress
-**Last activity:** 2026-02-14 -- Completed 08-03-PLAN.md (Edge Function Extension)
+**Phase:** 8 of 9 (Rental Insurance Verification) -- COMPLETE
+**Plan:** 3/3 complete
+**Status:** Phase complete
+**Last activity:** 2026-02-14 -- Completed 08-02-PLAN.md (Insurance Verification UI)
 
 **Progress:**
 ```
@@ -71,20 +71,20 @@ Phase 7:    [====================] 100% (4/4 plans complete) - COMPLETE
   Plan 02:  [X] Plates Admin Page (Plates.tsx 1099 lines, PlateAssignmentHistory.tsx, route/nav integration)
   Plan 03:  [X] Rental Integration (plate selection in booking, return confirmation, Plates tab)
   Plan 04:  [X] Alert Edge Function & pg_cron (check-plate-alerts Edge Function, plate-alert.tsx email template)
-Phase 8:    [=============           ] 67% (2/3 plans complete) - IN PROGRESS
+Phase 8:    [====================] 100% (3/3 plans complete) - COMPLETE
   Plan 01:  [X] Database, Types & Service Layer (08_rental_insurance.sql, insuranceService.ts, types.ts)
-  Plan 02:  [ ] Insurance Verification UI
+  Plan 02:  [X] Insurance Verification UI (InsuranceVerification.tsx, booking modal, badges, stats)
   Plan 03:  [X] Edge Function Extension (check-plate-alerts + plate-alert.tsx extended with insurance detection)
 Phase 9:    [ ] Blocked (LoJack GPS Integration - needs Spireon API)
 
-Overall:    [█████████████████████████] 97% (29/30 plans complete)
+Overall:    [██████████████████████████] 100% (30/30 plans complete)
 ```
 
 **Requirements Coverage:**
 - Total v1: 26
 - Mapped: 26 (100%)
-- Completed: 21 (STAB-01 through STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06, RENT-01 through RENT-04, RENT-06, PLAT-01 through PLAT-05)
-- Remaining: 4 (PORT-01 through PORT-04, PORT-07, RINS-01 through RINS-04) + 1 blocked (RENT-05)
+- Completed: 25 (STAB-01 through STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06, RENT-01 through RENT-04, RENT-06, PLAT-01 through PLAT-05, RINS-01 through RINS-04)
+- Remaining: 5 (PORT-01 through PORT-04, PORT-07) + 1 blocked (RENT-05)
 
 ---
 
@@ -92,10 +92,10 @@ Overall:    [██████████████████████�
 
 | Metric | Value | Notes |
 |--------|-------|-------|
-| Phases Planned | 9 | 1 blocked (Phase 9), Phase 8 in progress |
-| Phases Complete | 7 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 + Phase 7 (Phase 3 code-complete, verification deferred) |
+| Phases Planned | 9 | 1 blocked (Phase 9) |
+| Phases Complete | 8 | Phase 1 + Phase 2 + Phase 4 + Phase 5 + Phase 6 + Phase 7 + Phase 8 (Phase 3 code-complete, verification deferred) |
 | Requirements | 26 | 100% mapped |
-| Plans Executed | 29 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 through 07-04, 08-01, 08-03 |
+| Plans Executed | 30 | 01-01 through 01-06, 02-01 through 02-03, 03-01, 03-02, 04-01 through 04-04, 05-01, 05-02, 06-01 through 06-06, 07-01 through 07-04, 08-01 through 08-03 |
 | Blockers | 1 | Spireon API access |
 
 ---
@@ -211,6 +211,12 @@ Overall:    [██████████████████████�
 | SMS prefix "Triple J Alert:" (generic) | Covers both plate-only and insurance-only notifications | 2026-02-14 | 08-03 |
 | Dual CTA buttons in combined email | Plates Dashboard + Rentals Dashboard when both alert types present | 2026-02-14 | 08-03 |
 | Shield icon for insurance section | Universally associated with protection/insurance; distinct from plate icons | 2026-02-14 | 08-03 |
+| Insurance subsection inside terms, not new tab | Per plan guidance: do NOT change SectionKey or SECTIONS (Phase 7 established pattern) | 2026-02-14 | 08-02 |
+| Join insurance in booking queries | Avoids N+1 queries; insurance data available for badges and stats without separate fetch | 2026-02-14 | 08-02 |
+| Soft-block: booking succeeds with insurance warnings | Per CONTEXT.md, don't block business operations; admin verifies later from BookingDetail | 2026-02-14 | 08-02 |
+| 5-column stats grid for rentals | Unverified count is critical business metric alongside existing 4 stats | 2026-02-14 | 08-02 |
+| Insurance badge inline with status badge | Compact visual indicator without crowding; text-[10px] with abbreviated labels | 2026-02-14 | 08-02 |
+| InsuranceVerification above payments in BookingDetail | Insurance should be verified before money changes hands per plan guidance | 2026-02-14 | 08-02 |
 
 ### Patterns Established
 
@@ -297,6 +303,11 @@ Overall:    [██████████████████████�
 - **Insurance alert detection pattern:** Cron-triggered detection of 3 insurance alert types, dedup via insurance_alerts upsert, 24h cooldown
 - **Combined batched notification pattern:** Single SMS + email covers both plate and insurance alerts; subject/title adapts to which types present
 - **Backward-compatible template extension pattern:** Optional parameter added to template functions; undefined/empty produces identical output
+- **Insurance verification inline panel pattern:** InsuranceVerification.tsx self-contained component rendered inside BookingDetail expansion (not modal), same pattern as RegistrationChecker
+- **Insurance badge on booking row pattern:** Inline IIFE rendering abbreviated status badge (No Ins/Ins: Pending/Verified/Failed/Override) next to booking status
+- **Insurance pre-fill in booking modal pattern:** getCustomerLastInsurance on customer select, "Pre-filled from previous rental" notice, updateCustomerInsuranceCache on create
+- **Soft-block booking creation pattern:** Amber warning on insurance validation issues, booking still succeeds, admin verifies later from BookingDetail
+- **Insurance join in booking queries pattern:** rental_insurance(*) added to all booking selects, transformBooking maps via imported transformInsurance
 
 ### Architecture Summary (Current)
 
@@ -387,9 +398,12 @@ pages/CustomerStatusTracker.tsx:
 components/admin/RentalCalendar.tsx:
   - 299-line custom monthly calendar grid, status-colored bars, O(1) lookup
 
-pages/admin/Rentals.tsx (UPDATED in 06-06):
-  - 1885-line rental management hub with 3 tabs (Calendar/Active/Fleet)
-  - BookingDetail inline expansion: payments, late fees, condition reports, return flow
+pages/admin/Rentals.tsx (UPDATED in 08-02):
+  - ~2135-line rental management hub with 4 tabs (Calendar/Active/Fleet/Plates)
+  - BookingDetail inline expansion: insurance verification, payments, late fees, condition reports, return flow
+  - InsuranceVerification panel rendered above payments in BookingDetail
+  - Insurance badges on Active Rentals rows (No Ins/Pending/Verified/Failed/Override)
+  - Unverified insurance stat in 5-column stats bar with Shield icon
   - Payment recording with Cash/Card/Zelle/CashApp toggle and running balance
   - Late fee auto-calculation with override/waive/reset
   - Customer running total across all bookings
@@ -397,9 +411,12 @@ pages/admin/Rentals.tsx (UPDATED in 06-06):
   - Calendar booking click -> Active Rentals detail expansion
   - Overdue badge with red pulse animation in stats bar
 
-components/admin/RentalBookingModal.tsx:
-  - 1120-line booking modal: customer search, vehicle availability, agreement terms, review
+components/admin/RentalBookingModal.tsx (UPDATED in 08-02):
+  - ~1380-line booking modal: customer search, vehicle availability, agreement terms + insurance, review
   - 4-section tabbed navigation, double-booking error handling
+  - Insurance capture subsection in terms: type toggle, customer fields, dealer rate, pre-fill from last booking
+  - Insurance summary in review with soft-block amber warning on validation issues
+  - Post-booking insurance creation with updateCustomerInsuranceCache
 
 components/admin/RentalConditionReport.tsx:
   - 683-line condition report: 27-item checklist, photo upload, read-only view mode
@@ -461,15 +478,26 @@ services/plateService.ts (679 lines):
   - Photo: uploadPlatePhoto
   - Pure: calculateTagExpiry
 
-pages/admin/Rentals.tsx (UPDATED in 07-03):
+pages/admin/Rentals.tsx (UPDATED in 07-03, 08-02):
   - Extended with Plates summary tab (4 tabs: Calendar/Active/Fleet/Plates)
-  - BookingDetail plate return confirmation checkbox
+  - BookingDetail plate return confirmation checkbox + InsuranceVerification panel
   - platesOut state management in parent component
+  - Insurance badges on booking rows, unverified stats in 5-column grid
 
 components/admin/RentalBookingModal.tsx (UPDATED in 07-03):
   - Plate selection grid in vehicle section
   - Auto-fetch available plates on vehicle select
   - assignPlateToBooking call with graceful degradation
+
+components/admin/InsuranceVerification.tsx (NEW in 08-02):
+  - 705-line inline panel rendered in BookingDetail (same pattern as RegistrationChecker)
+  - 4 sections: Insurance Info Display/Edit, System Verification Flags, Admin Actions, Card Upload
+  - Supports customer_provided (6 fields) and dealer_coverage (daily rate + auto total)
+  - 5 verification flags via validateInsuranceCoverage (Texas 30/60/25 minimums)
+  - Admin actions: verify (green), reject (red), override (amber with notes), revoke
+  - Insurance card upload: image/PDF, thumbnail preview, View Full link, Replace button
+  - Pre-fill from customer's last insurance when no record exists
+  - Collapsible section with status badge
 
 services/insuranceService.ts (13 functions):
   - transformInsurance, transformInsuranceAlert
@@ -536,18 +564,22 @@ supabase/functions/:
 ## Session Continuity
 
 ### What Was Accomplished This Session
-- Phase 8 (Rental Insurance Verification) -- Plans 01 and 03 complete
-- Executed 08-01: Database, Types & Service Layer
-- Executed 08-03: Edge Function Extension
-- Extended check-plate-alerts/index.ts (490 -> 768 lines) with insurance detection: 3 alert types, dedup upsert, auto-resolve, 24h cooldown
-- Extended plate-alert.tsx (297 -> 471 lines) with InsuranceAlertItem, insurance email sections, combined SMS counts
-- Combined plate + insurance in single batched notification (1 SMS + 1 email)
+- Phase 8 (Rental Insurance Verification) -- ALL 3 PLANS COMPLETE
+- Executed 08-01: Database, Types & Service Layer (migration, insuranceService.ts, types)
+- Executed 08-02: Insurance Verification UI (InsuranceVerification.tsx, booking modal, badges, stats)
+- Executed 08-03: Edge Function Extension (check-plate-alerts + plate-alert.tsx with insurance detection)
+- Created InsuranceVerification.tsx (705 lines) - inline panel in BookingDetail
+- Extended RentalBookingModal.tsx (+260 lines) - insurance capture in Agreement section with pre-fill
+- Extended Rentals.tsx (+75 lines) - insurance badges, unverified stats, InsuranceVerification render
+- Extended rentalService.ts - rental_insurance(*) join in all booking queries
+- Extended check-plate-alerts/index.ts (490 -> 768 lines) with insurance alert detection
+- Extended plate-alert.tsx (297 -> 471 lines) with combined plate + insurance notifications
 
-### Phase 8 Status (IN PROGRESS)
+### Phase 8 Status (COMPLETE)
 | Plan | Focus | Commits | Status |
 |------|-------|---------|--------|
 | 08-01 | Database, Types & Service Layer | b6350e5, 2f3edba | COMPLETE |
-| 08-02 | Insurance Verification UI | -- | NOT STARTED |
+| 08-02 | Insurance Verification UI | f6f4e72, a764c1b | COMPLETE |
 | 08-03 | Edge Function Extension | 32f3a80, 17d98b3 | COMPLETE |
 
 ### Phase 3 Deferred Items (Still Pending)
@@ -556,7 +588,7 @@ supabase/functions/:
 - [ ] Write 03-03-SUMMARY.md after verification passes
 
 ### What Comes Next
-1. Phase 8 Plan 02: Insurance Verification UI (InsuranceVerification.tsx, booking modal integration, badges)
+1. Phase 8 verification (verify-work)
 2. Circle back to Phase 3 verification when DB migration is applied
 3. Wire up all credentials after feature code is complete
 4. Phase 9 blocked (Spireon API access needed)
@@ -565,10 +597,10 @@ supabase/functions/:
 Read these files in order:
 1. `.planning/STATE.md` (this file) - current position
 2. `.planning/ROADMAP.md` - phase structure and success criteria
-3. `.planning/phases/08-rental-insurance-verification/08-03-SUMMARY.md` - latest plan summary
+3. `.planning/phases/08-rental-insurance-verification/08-02-SUMMARY.md` - latest plan summary
 4. `.planning/REQUIREMENTS.md` - requirement traceability
 5. Original code from: https://github.com/whoisjaso/triple-j-auto-investment
 
 ---
 
-*State updated: 2026-02-14 (Phase 8 Plan 03 complete)*
+*State updated: 2026-02-14 (Phase 8 COMPLETE -- all 3 plans done)*
