@@ -1,11 +1,14 @@
-# Requirements: Triple J Auto Investment
+# Requirements Archive: v1 Feature Development
 
-**Defined:** 2025-01-29
-**Core Value:** Customers can track their registration status in real-time, and paperwork goes through DMV the first time.
+**Archived:** 2026-02-13
+**Status:** SHIPPED
+
+This is the archived requirements specification for v1.
+For current requirements, see `.planning/REQUIREMENTS.md` (created for next milestone).
+
+---
 
 ## v1 Requirements
-
-Requirements for current milestone. Each maps to roadmap phases.
 
 ### Reliability & Stability
 
@@ -15,13 +18,13 @@ Requirements for current milestone. Each maps to roadmap phases.
 
 ### Customer Registration Portal
 
-- [ ] **PORT-01**: 6-stage progress tracker with visual progress bar
-- [ ] **PORT-02**: Customer access via unique link (texted/emailed after sale)
-- [ ] **PORT-03**: Admin dashboard controls to update customer registration status
-- [ ] **PORT-04**: Animated progress visualization (Golden Crest logo, car animation)
+- [x] **PORT-01**: 6-stage progress tracker with visual progress bar
+- [x] **PORT-02**: Customer access via unique link (texted/emailed after sale)
+- [x] **PORT-03**: Admin dashboard controls to update customer registration status
+- [x] **PORT-04**: Animated progress visualization (Golden Crest logo, car animation)
 - [x] **PORT-05**: Customer login option for returning customers
 - [x] **PORT-06**: SMS/Email notifications when status changes
-- [ ] **PORT-07**: Stage descriptions explaining what's happening at each stage
+- [x] **PORT-07**: Stage descriptions explaining what's happening at each stage
 
 ### Registration Checker
 
@@ -30,7 +33,7 @@ Requirements for current milestone. Each maps to roadmap phases.
 - [x] **REGC-03**: Mileage consistency check across documents
 - [x] **REGC-04**: SURRENDERED stamp verification (front AND back of title)
 - [x] **REGC-05**: Document ordering guide per txDMV requirements
-- [x] **REGC-06**: Quick link to [webDealer.txdmv.gov](https://webdealer.txdmv.gov/title/loginAuthenticateUser#) from admin dashboard
+- [x] **REGC-06**: Quick link to webDealer.txdmv.gov from admin dashboard
 
 ### Rental Management
 
@@ -38,7 +41,7 @@ Requirements for current milestone. Each maps to roadmap phases.
 - [x] **RENT-02**: Availability calendar showing which vehicles are available when
 - [x] **RENT-03**: Auto-populated rental agreements (like Bill of Sale flow)
 - [x] **RENT-04**: Customer rental tracking (who has what car, return dates, rental history)
-- [ ] **RENT-05**: LoJack GPS integration showing vehicle location (requires Spireon API access)
+- [ ] **RENT-05**: LoJack GPS integration showing vehicle location — BLOCKED (Spireon API access required)
 - [x] **RENT-06**: Deposits and payments tracking
 
 ### Plate Tracking
@@ -56,9 +59,7 @@ Requirements for current milestone. Each maps to roadmap phases.
 - [x] **RINS-03**: Coverage verification against minimum requirements
 - [x] **RINS-04**: Expiration alerts if insurance expires during rental period
 
-## v2 Requirements
-
-Deferred to future milestone. Tracked but not in current roadmap.
+## v2 Requirements (Deferred)
 
 ### Advanced Validation
 
@@ -81,8 +82,6 @@ Deferred to future milestone. Tracked but not in current roadmap.
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
-
 | Feature | Reason |
 |---------|--------|
 | Mobile native app | Web-first, mobile-responsive is sufficient for v1 |
@@ -93,22 +92,20 @@ Explicitly excluded. Documented to prevent scope creep.
 | Real-time LoJack tracking refresh | GPS location on-demand is sufficient; continuous tracking adds complexity |
 | Customer self-service document upload | Admin uploads documents; customer portal is read-only for status |
 
-## Traceability
-
-Which phases cover which requirements. Updated during roadmap creation.
+## Traceability (Final)
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | STAB-01 | Phase 1 | Complete |
 | STAB-02 | Phase 1 | Complete |
 | STAB-03 | Phase 1 | Complete |
-| PORT-01 | Phase 3 | Pending |
-| PORT-02 | Phase 3 | Pending |
-| PORT-03 | Phase 2 | Pending |
-| PORT-04 | Phase 3 | Pending |
+| PORT-01 | Phase 3 | Complete |
+| PORT-02 | Phase 3 | Complete |
+| PORT-03 | Phase 2 | Complete |
+| PORT-04 | Phase 3 | Complete |
 | PORT-05 | Phase 4 | Complete |
 | PORT-06 | Phase 4 | Complete |
-| PORT-07 | Phase 3 | Pending |
+| PORT-07 | Phase 3 | Complete |
 | REGC-01 | Phase 5 | Complete |
 | REGC-02 | Phase 5 | Complete |
 | REGC-03 | Phase 5 | Complete |
@@ -119,7 +116,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RENT-02 | Phase 6 | Complete |
 | RENT-03 | Phase 6 | Complete |
 | RENT-04 | Phase 6 | Complete |
-| RENT-05 | Phase 9 | Blocked |
+| RENT-05 | Phase 9 | Blocked (Spireon API) |
 | RENT-06 | Phase 6 | Complete |
 | PLAT-01 | Phase 7 | Complete |
 | PLAT-02 | Phase 7 | Complete |
@@ -131,13 +128,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RINS-03 | Phase 8 | Complete |
 | RINS-04 | Phase 8 | Complete |
 
-**Coverage:**
-- v1 requirements: 26 total
-- Mapped to phases: 26 (100%)
-- Complete: 25 (STAB-01 through STAB-03, PORT-05, PORT-06, REGC-01 through REGC-06, RENT-01 through RENT-04, RENT-06, PLAT-01 through PLAT-05, RINS-01 through RINS-04)
-- Pending: 0 (PORT-01 through PORT-04, PORT-07 in Phase 3 code-complete but verification deferred)
-- Blocked: 1 (RENT-05 - needs Spireon API)
+## Milestone Summary
+
+**Shipped:** 25 of 26 v1 requirements
+**Adjusted:** PORT-01/02/04/07 originally "Pending" in traceability but code-complete (verification added during audit)
+**Blocked:** RENT-05 (LoJack GPS) — requires Spireon API access, isolated in Phase 9
 
 ---
-*Requirements defined: 2025-01-29*
-*Last updated: 2026-02-13 after Phase 8 completion*
+*Archived: 2026-02-13 as part of v1 milestone completion*
