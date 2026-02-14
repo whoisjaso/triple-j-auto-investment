@@ -234,6 +234,13 @@ Plans:
 4. Alert appears if customer's insurance will expire during rental period
 5. Rental cannot be completed without insurance verification (soft block with override)
 
+**Plans:** 3 plans in 2 waves
+
+Plans:
+- [ ] 08-01-PLAN.md -- DB migration (rental_insurance, insurance_alerts tables, RLS, triggers), TypeScript types, insuranceService.ts
+- [ ] 08-02-PLAN.md -- InsuranceVerification component, RentalBookingModal insurance section, Rentals.tsx badges/stats
+- [ ] 08-03-PLAN.md -- Extend check-plate-alerts Edge Function with insurance expiry detection, email/SMS template updates
+
 ---
 
 ### Phase 9: LoJack GPS Integration
@@ -267,8 +274,8 @@ Plans:
 | 4 - Customer Portal - Notifications & Login | Complete | 2 | 100% (4 plans) |
 | 5 - Registration Checker | Complete | 6 | 100% (2 plans) |
 | 6 - Rental Management Core | Complete | 5 | 100% (6 plans) |
-| 7 - Plate Tracking | Planned | 5 | 0% (4 plans ready) |
-| 8 - Rental Insurance Verification | Pending | 4 | 0% |
+| 7 - Plate Tracking | Complete | 5 | 100% (4 plans) |
+| 8 - Rental Insurance Verification | Planned | 4 | 0% (3 plans ready) |
 | 9 - LoJack GPS Integration | Blocked | 1 | 0% |
 
 **Total:** 26 requirements across 9 phases
