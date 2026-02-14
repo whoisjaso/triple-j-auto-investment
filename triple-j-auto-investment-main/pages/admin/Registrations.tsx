@@ -11,6 +11,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/Store';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Clock,
   FileText,
@@ -40,7 +41,12 @@ import {
   Link as LinkIcon,
   Loader2,
   Send,
-  Bell
+  Bell,
+  LayoutDashboard,
+  Key,
+  CreditCard,
+  LogOut,
+  Menu
 } from 'lucide-react';
 import {
   getAllRegistrations,
@@ -63,6 +69,98 @@ import {
   OWNERSHIP_COLORS
 } from '../../types';
 import RegistrationChecker from '../../components/admin/RegistrationChecker';
+
+// Admin Navigation Header Component (duplicated per admin page per research guidance)
+const AdminHeader = () => {
+  const { logout } = useStore();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navItems = [
+    { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { path: '/admin/inventory', label: 'Inventory', icon: Car },
+    { path: '/admin/registrations', label: 'Registrations', icon: ClipboardCheck },
+    { path: '/admin/rentals', label: 'Rentals', icon: Key },
+    { path: '/admin/plates', label: 'Plates', icon: CreditCard },
+  ];
+
+  return (
+    <header className="bg-black backdrop-blur-md border-b border-tj-gold/30 sticky top-0 z-[100] shadow-lg">
+      <div className="max-w-[1800px] mx-auto px-4 md:px-8">
+        <div className="flex items-center justify-between h-16 md:h-20">
+          <Link to="/" className="flex items-center group">
+            <img
+              src="/GoldTripleJLogo.png"
+              alt="Triple J Auto Investment"
+              className="w-12 h-12 md:w-14 md:h-14 object-contain transition-transform group-hover:scale-110 drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]"
+            />
+          </Link>
+
+          <nav className="hidden md:flex items-center gap-2">
+            {navItems.map(item => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold transition-all border ${location.pathname === item.path
+                    ? 'bg-tj-gold text-black border-tj-gold'
+                    : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/5'
+                  }`}
+              >
+                <item.icon size={14} />
+                {item.label}
+              </Link>
+            ))}
+
+            <div className="h-6 w-px bg-gray-700 mx-2" />
+
+            <button
+              onClick={() => { logout(); navigate('/'); }}
+              className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all"
+            >
+              <LogOut size={14} />
+              Logout
+            </button>
+          </nav>
+
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-white hover:text-tj-gold transition-colors"
+          >
+            <Menu size={24} />
+          </button>
+        </div>
+
+        {mobileMenuOpen && (
+          <nav className="md:hidden border-t border-white/10 py-4 space-y-2">
+            {navItems.map(item => (
+              <Link
+                key={item.path}
+                to={item.path}
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold transition-all ${location.pathname === item.path
+                    ? 'bg-tj-gold/10 text-tj-gold border-l-2 border-tj-gold'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                <item.icon size={18} />
+                {item.label}
+              </Link>
+            ))}
+
+            <button
+              onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }}
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all"
+            >
+              <LogOut size={18} />
+              Logout
+            </button>
+          </nav>
+        )}
+      </div>
+    </header>
+  );
+};
 
 // Stage icons mapping for 6-stage workflow
 const STAGE_ICONS: Record<RegistrationStageKey, React.ReactNode> = {
@@ -311,7 +409,9 @@ const Registrations: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black px-4 md:px-8 pb-4 md:pb-8 pt-32">
+    <>
+    <AdminHeader />
+    <div className="min-h-screen bg-black px-4 md:px-8 pb-4 md:pb-8 pt-4 md:pt-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -1152,6 +1252,7 @@ const Registrations: React.FC = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

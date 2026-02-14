@@ -183,6 +183,9 @@ const Navbar = () => {
                   <Link to="/admin/rentals" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('rentals') ? 'text-tj-gold' : 'text-gray-400'}`}>
                     <Key size={14} /> Rentals
                   </Link>
+                  <Link to="/admin/plates" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('plates') ? 'text-tj-gold' : 'text-gray-400'}`}>
+                    <CreditCard size={14} /> Plates
+                  </Link>
                   <button onClick={logout} className="text-[10px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors ml-4">Logout</button>
                 </div>
               )}
