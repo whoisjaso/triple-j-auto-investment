@@ -446,6 +446,7 @@ export interface RentalBooking {
   customer?: RentalCustomer;
   vehicle?: Vehicle;
   payments?: RentalPayment[];
+  insurance?: RentalInsurance;
 }
 
 export interface RentalPayment {
@@ -583,4 +584,75 @@ export const PLATE_STATUS_LABELS: Record<PlateStatus, string> = {
   assigned: 'Assigned',
   expired: 'Expired',
   lost: 'Lost',
+};
+
+// ================================================================
+// RENTAL INSURANCE TYPES (Phase 08)
+// ================================================================
+
+export type InsuranceType = 'customer_provided' | 'dealer_coverage';
+
+export type InsuranceVerificationStatus = 'pending' | 'verified' | 'failed' | 'overridden';
+
+export type InsuranceAlertType = 'expiring_soon' | 'expired' | 'coverage_below_minimum' | 'missing_insurance';
+
+export type InsuranceAlertSeverity = 'warning' | 'urgent';
+
+export interface RentalInsurance {
+  id: string;
+  bookingId: string;
+  insuranceType: InsuranceType;
+  insuranceCompany?: string;
+  policyNumber?: string;
+  effectiveDate?: string;
+  expirationDate?: string;
+  bodilyInjuryPerPerson?: number;
+  bodilyInjuryPerAccident?: number;
+  propertyDamage?: number;
+  cardImageUrl?: string;
+  verificationStatus: InsuranceVerificationStatus;
+  verifiedBy?: string;
+  verifiedAt?: string;
+  verificationNotes?: string;
+  coverageMeetsMinimum: boolean;
+  expiresDuringRental: boolean;
+  dealerCoverageDailyRate?: number;
+  dealerCoverageTotal?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface InsuranceVerificationFlags {
+  hasRequiredFields: boolean;
+  coverageMeetsMinimum: boolean;
+  policyNotExpired: boolean;
+  noExpiryDuringRental: boolean;
+  cardImageUploaded: boolean;
+}
+
+export interface InsuranceAlert {
+  id: string;
+  bookingId: string;
+  alertType: InsuranceAlertType;
+  severity: InsuranceAlertSeverity;
+  firstDetectedAt: string;
+  lastNotifiedAt?: string;
+  resolvedAt?: string;
+  notes?: string;
+  createdAt: string;
+}
+
+export const TEXAS_MINIMUM_COVERAGE = {
+  bodilyInjuryPerPerson: 30000,
+  bodilyInjuryPerAccident: 60000,
+  propertyDamage: 25000,
+} as const;
+
+export const TEXAS_MINIMUM_LABEL = '30/60/25';
+
+export const INSURANCE_STATUS_LABELS: Record<InsuranceVerificationStatus, string> = {
+  pending: 'Pending',
+  verified: 'Verified',
+  failed: 'Failed',
+  overridden: 'Overridden',
 };
