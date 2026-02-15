@@ -72,11 +72,13 @@ Plans:
   2. The About page shows the real dealership story, team information, and location photos from 8774 Almeda Genoa
   3. Footer on every page displays correct business info including Texas dealer license P171632, consistent across English and Spanish
   4. All social proof metrics reference real data (actual families served, actual Google review quotes) -- no fabricated counters
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 10-01: TBD
-- [ ] 10-02: TBD
+- [ ] 10-01-PLAN.md -- Rewrite translations.ts (complete bilingual content overhaul) and Home.tsx (remove subliminal components, fake social proof)
+- [ ] 10-02-PLAN.md -- Rewrite About, Services, and FAQ pages with honest content and bilingual support
+- [ ] 10-03-PLAN.md -- Rewrite footer (App.tsx) and all secondary pages (Finance, PaymentOptions, Legal, Policies, NotFound, VinLookup, Login, Inventory)
+- [ ] 10-04-PLAN.md -- Fix fallback vehicles, AI prompts, caption generator, phone number standardization, and codebase-wide jargon sweep
 
 ### Phase 11: Production Polish
 **Goal**: The site feels production-grade on every device -- fast, responsive, accessible, and graceful when things go wrong
@@ -231,7 +233,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 9. Production Infrastructure | v2.0 | 0/7 | Planning complete | - |
-| 10. Brand Truth | v2.0 | 0/TBD | Not started | - |
+| 10. Brand Truth | v2.0 | 0/4 | Planning complete | - |
 | 11. Production Polish | v2.0 | 0/TBD | Not started | - |
 | 12. SEO Foundation | v2.0 | 0/TBD | Not started | - |
 | 13. Focus Capture | v2.0 | 0/TBD | Not started | - |
