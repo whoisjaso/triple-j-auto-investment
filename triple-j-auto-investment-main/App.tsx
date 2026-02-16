@@ -545,10 +545,12 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">
-      {/* Skip to content - first focusable element for keyboard users */}
+      {/* Skip to content - hidden off-screen, slides in on keyboard focus */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[99999] focus:bg-tj-gold focus:text-black focus:px-6 focus:py-3 focus:font-bold focus:text-xs focus:uppercase focus:tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-white focus:shadow-lg"
+        style={{ position: 'absolute', left: '-9999px', top: 'auto', width: '1px', height: '1px', overflow: 'hidden' }}
+        onFocus={(e) => { e.currentTarget.style.cssText = 'position:fixed;top:16px;left:16px;z-index:99999;background:#D4AF37;color:#000;padding:12px 24px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:0.3em;outline:2px solid #fff;box-shadow:0 4px 20px rgba(0,0,0,0.5);width:auto;height:auto;overflow:visible;'; }}
+        onBlur={(e) => { e.currentTarget.style.cssText = 'position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;'; }}
       >
         {t.polish.skipToContent}
       </a>

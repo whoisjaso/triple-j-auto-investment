@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 import { BillOfSaleData } from '../types';
 import { getCountyFromAddress } from '../utils/texasCountyLookup';
 
@@ -686,8 +686,12 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         const pdfDoc = await PDFDocument.load(formBytes);
         const form = pdfDoc.getForm();
 
-        // Helper to safely set text field - tries multiple field name variants
-        const setTextField = (fieldName: string, value: string) => {
+        // Embed Times New Roman (TimesRoman is the standard PDF equivalent)
+        const timesFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
+        const timesBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+
+        // Helper to safely set text field - uses Times New Roman, black ink, sized to fit
+        const setTextField = (fieldName: string, value: string, fontSize?: number) => {
             // Try the exact field name first, then try with/without extra spaces
             const variants = [
                 fieldName,
@@ -699,6 +703,9 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
                 try {
                     const field = form.getTextField(name);
                     field.setText(value || '');
+                    // Times New Roman font, pure black, sized to fit the box
+                    field.defaultUpdateAppearances(timesFont);
+                    field.updateAppearances(timesFont);
                     return; // Success, stop trying variants
                 } catch {
                     continue; // Try next variant
@@ -786,20 +793,23 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         setTextField('Date', formatDateUS(data.date));
         setTextField('Seller  Name', data.sellerName || 'Triple J Auto Investment LLC');
 
-        // Tax Calculation
+        // Sale price only — sales tax left blank for county tax office to calculate
         const salePrice = parseFloat(data.amount?.replace(/[^0-9.]/g, '') || '0');
-        const salesTax = salePrice * 0.0625; // Texas 6.25%
-
         setTextField('Sales Price Minus Rebate Amount', formatCurrency(salePrice.toString()));
-        setTextField('Taxable Amount', formatCurrency(salePrice.toString()));
-        setTextField('25% Tax on Taxable Amount', formatCurrency(salesTax.toString()));
-        setTextField('Amount of Tax and Penalty Due', formatCurrency(salesTax.toString()));
 
         // Check the $28/$33 application fee checkbox
         checkBox('$28 or $33 Application Fee for Texas Title - contact your county for the correct fee');
 
-        // Flatten form to prevent further editing (makes it look cleaner)
-        // form.flatten(); // Uncomment if you want the form to be non-editable
+        // Set all text fields to pure black ink with Times New Roman
+        const allFields = form.getFields();
+        for (const field of allFields) {
+            try {
+                const textField = form.getTextField(field.getName());
+                textField.updateAppearances(timesFont);
+            } catch {
+                // Skip non-text fields (checkboxes, etc.)
+            }
+        }
 
         // Generate output
         const filledPdfBytes = await pdfDoc.save();

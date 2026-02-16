@@ -270,7 +270,7 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-6"
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-0 md:p-4"
         >
           {/* Backdrop */}
           <motion.div
@@ -283,31 +283,31 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
             initial={{ scale: 0.95, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.95, y: 20 }}
-            className="relative w-full max-w-[95vw] h-[95vh] bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
+            className="relative w-full h-full md:max-w-[95vw] md:h-[95vh] bg-[#080808] border-0 md:border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] overflow-hidden flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 md:p-6 border-b border-white/10 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center">
-                  <FileText className="text-tj-gold" size={20} />
+            <div className="flex items-center justify-between p-3 md:p-5 border-b border-white/10 shrink-0">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center shrink-0">
+                  <FileText className="text-tj-gold" size={18} />
                 </div>
                 <div>
-                  <h2 className="font-display text-xl text-white tracking-wider">Document Generator</h2>
-                  <p className="text-[11px] text-gray-400 uppercase tracking-wider">Bill of Sale & Registration</p>
+                  <h2 className="font-display text-base md:text-xl text-white tracking-wider">Document Generator</h2>
+                  <p className="text-[10px] md:text-[11px] text-gray-400 uppercase tracking-wider hidden md:block">Bill of Sale & Registration</p>
                 </div>
               </div>
               <button
                 onClick={handleClose}
-                className="text-gray-500 hover:text-white p-2 transition-colors"
+                className="text-gray-400 hover:text-white p-2 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               >
-                <X size={24} />
+                <X size={22} />
               </button>
             </div>
 
-            {/* Content - Side by Side Layout */}
+            {/* Content - Stacked on mobile, side-by-side on desktop */}
             <div className="flex-grow overflow-hidden flex flex-col md:flex-row">
               {/* LEFT PANEL - Form */}
-              <div className="w-full md:w-[38%] overflow-y-auto p-4 md:p-5 space-y-4 border-r border-white/10">
+              <div className="w-full md:w-[38%] overflow-y-auto p-3 md:p-5 space-y-3 md:space-y-4 border-b md:border-b-0 md:border-r border-white/10">
 
               {/* Vehicle Selection */}
               <div className="bg-black/50 border border-white/10 p-3">
@@ -609,33 +609,33 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
               </div>
 
               {/* RIGHT PANEL - Preview */}
-              <div className="w-full md:w-[62%] flex flex-col bg-black/30">
+              <div className="w-full min-h-[50vh] md:min-h-0 md:w-[62%] flex flex-col bg-black/30">
                 {previewUrl ? (
                   <>
                     {/* Preview Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-white/10 shrink-0">
-                      <div className="flex items-center gap-3">
-                        <FileText className="text-tj-gold" size={18} />
-                        <span className="text-white font-medium text-sm">{previewDocName}</span>
+                    <div className="flex items-center justify-between p-3 md:p-4 border-b border-white/10 shrink-0">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="text-tj-gold shrink-0" size={16} />
+                        <span className="text-white font-medium text-xs md:text-sm truncate">{previewDocName}</span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 md:gap-2 shrink-0">
                         <button
                           onClick={handlePrint}
-                          className="flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs uppercase tracking-widest transition-colors border border-white/10"
+                          className="flex items-center gap-1.5 px-2.5 md:px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-[10px] md:text-xs uppercase tracking-wider transition-colors border border-white/10 min-h-[44px]"
                         >
                           <Printer size={14} />
-                          Print
+                          <span className="hidden sm:inline">Print</span>
                         </button>
                         <button
                           onClick={handleDownload}
-                          className="flex items-center gap-2 px-3 py-2 bg-tj-gold hover:bg-white text-black text-xs uppercase tracking-widest font-bold transition-colors"
+                          className="flex items-center gap-1.5 px-2.5 md:px-3 py-2 bg-tj-gold hover:bg-white text-black text-[10px] md:text-xs uppercase tracking-wider font-bold transition-colors min-h-[44px]"
                         >
                           <Download size={14} />
-                          Download
+                          <span className="hidden sm:inline">Download</span>
                         </button>
                         <button
                           onClick={clearPreview}
-                          className="p-2 text-gray-500 hover:text-white transition-colors"
+                          className="p-2 text-gray-400 hover:text-white transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
                         >
                           <X size={18} />
                         </button>
@@ -643,7 +643,7 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                     </div>
 
                     {/* PDF Viewer */}
-                    <div className="flex-grow relative min-h-[400px]">
+                    <div className="flex-grow relative min-h-[300px] md:min-h-[400px]">
                       <iframe
                         src={previewUrl}
                         className="absolute inset-0 w-full h-full border-0"
@@ -653,12 +653,12 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                   </>
                 ) : (
                   /* Empty State */
-                  <div className="flex-grow flex flex-col items-center justify-center p-8 text-center min-h-[400px]">
-                    <div className="w-20 h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-4">
-                      <FileX className="text-gray-600" size={32} />
+                  <div className="flex-grow flex flex-col items-center justify-center p-6 md:p-8 text-center min-h-[200px] md:min-h-[400px]">
+                    <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-3 md:mb-4">
+                      <FileX className="text-gray-600" size={28} />
                     </div>
-                    <h3 className="text-white font-medium mb-2">No Document Selected</h3>
-                    <p className="text-gray-500 text-sm max-w-xs">
+                    <h3 className="text-white font-medium mb-1.5 text-sm md:text-base">No Document Selected</h3>
+                    <p className="text-gray-400 text-xs md:text-sm max-w-xs">
                       Fill in the form and click a document button to generate a preview
                     </p>
                   </div>
