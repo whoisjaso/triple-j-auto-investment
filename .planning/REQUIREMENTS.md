@@ -125,6 +125,19 @@ Requirements for v2.0 Psychological Architecture & Production Launch. Organized 
 - [x] **SEO-05**: Schema markup accurate to actual business (LocalBusiness, AutoDealer, correct price range)
 - [x] **SEO-06**: OG/meta tags accurate per page (not "Used Luxury Cars $5000-$50000")
 
+### GEO/AEO (AI Search Engine Optimization)
+
+- [x] **GEO-01**: AI crawler access -- robots.txt allows GPTBot, ClaudeBot, PerplexityBot, ChatGPT-User, Google-Extended, Applebot-Extended, Amazonbot
+- [x] **GEO-02**: FinancialProduct schema for Buy Here Pay Here in-house financing
+- [x] **GEO-03**: Service schema for car rentals with Houston areaServed
+- [x] **GEO-04**: Entity signals -- sameAs, knowsLanguage, additionalType on AutoDealer schema
+- [x] **GEO-05**: hreflang tags for bilingual content (en, es, x-default) on every page
+- [x] **GEO-06**: Expanded BreadcrumbList covering all 10 public pages
+- [x] **GEO-07**: Conversational FAQ expansion (20+ questions) targeting AI search queries in English and Spanish
+- [x] **GEO-08**: Answer capsule content format on Finance and Services pages for AI citation
+- [x] **GEO-09**: FAQ schema matching expanded content (23 EN + 10 ES questions)
+- [x] **GEO-10**: Branded attribution and specific data points in content for AI extractability
+
 ## v3.0 Requirements
 
 Deferred to future release. Tracked but not in current roadmap.
@@ -214,6 +227,16 @@ Deferred to future release. Tracked but not in current roadmap.
 | SEO-04 | Phase 12: SEO Foundation | Complete |
 | SEO-05 | Phase 12: SEO Foundation | Complete |
 | SEO-06 | Phase 12: SEO Foundation | Complete |
+| GEO-01 | Phase 12: SEO Foundation | Complete |
+| GEO-02 | Phase 12: SEO Foundation | Complete |
+| GEO-03 | Phase 12: SEO Foundation | Complete |
+| GEO-04 | Phase 12: SEO Foundation | Complete |
+| GEO-05 | Phase 12: SEO Foundation | Complete |
+| GEO-06 | Phase 12: SEO Foundation | Complete |
+| GEO-07 | Phase 12: SEO Foundation | Complete |
+| GEO-08 | Phase 12: SEO Foundation | Complete |
+| GEO-09 | Phase 12: SEO Foundation | Complete |
+| GEO-10 | Phase 12: SEO Foundation | Complete |
 | LAND-01 | Phase 13: Focus Capture | Pending |
 | LAND-02 | Phase 13: Focus Capture | Pending |
 | LAND-03 | Phase 13: Focus Capture | Pending |
@@ -264,8 +287,8 @@ Deferred to future release. Tracked but not in current roadmap.
 | PORTAL-06 | Phase 19: Retention Engine | Pending |
 
 **Coverage:**
-- v2.0 requirements: 85 total
-- Mapped to phases: 85
+- v2.0 requirements: 95 total (85 original + 10 GEO/AEO)
+- Mapped to phases: 95
 - Unmapped: 0
 
 ---
