@@ -134,9 +134,13 @@ export const StoreProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       await loadLeads();
       await refreshBookings();
 
-      // Priority 2: Background Sync (Fire & Forget) - DISABLED to prevent overwriting Supabase data
-      // Only sync from Google Sheets if Supabase is empty (manual sync available in admin)
-      console.log("Auto-sync disabled. Use manual sync in admin panel if needed.");
+      // Priority 2: Background Sync (Fire & Forget) - Ensures Google Sheets data is reflected
+      console.log("Running background sync from Google Sheets...");
+      syncWithGoogleSheets(true).then(result => {
+        console.log("Background sync result:", result);
+      }).catch(err => {
+        console.warn("Background sync failed:", err);
+      });
     };
 
     initializeData();

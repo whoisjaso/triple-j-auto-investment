@@ -72,14 +72,16 @@ export const analyzeFinancialPerformance = async (financialData: string): Promis
       4. **Strategic Directive**: Give me a bulletproof, high-level command to fix the leak.
 
       OUTPUT FORMAT (Markdown):
-      ### 🛡️ PROFIT VECTOR ANALYSIS
+      ### PROFIT VECTOR ANALYSIS
       (Analyze what is working. Be specific about Make/Model/Year or Strategy. Mention ROI.)
 
-      ### ⚠️ EFFICIENCY LEAKAGE (CRITICAL)
+      ### EFFICIENCY LEAKAGE (CRITICAL)
       (Identify the specific expense column—Towing, Mech, or Cosmetic—that is statistically too high. Name the specific cars that dragged us down and the specific dollar amount lost to friction.)
 
-      ### ⚔️ TACTICAL DIRECTIVE
+      ### TACTICAL DIRECTIVE
       (1 ruthless, bold command to the owner. Max 20 words. e.g., "STOP BUYING HIGH-MILEAGE RANGE ROVERS. MECHANICAL COSTS ARE UNSUSTAINABLE.")
+
+      IMPORTANT: Do NOT use any emojis or special characters in your response. Keep it clean text and markdown only.
       
       Tone: Cold, Mathematical, High-Frequency Trading style. No fluff. Pure Signal.
     `;
