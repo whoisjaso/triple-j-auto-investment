@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/Store';
-import { ArrowRight, Diamond, Brain, Zap, Fingerprint, Target, Activity, Crosshair, Wifi, ChevronDown, Phone } from 'lucide-react';
+import { ArrowRight, Diamond, Heart, Zap, Fingerprint, Target, Activity, Star, ChevronDown, Phone } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 
-// --- PSYCHOLOGICAL UTILITIES ---
+// --- TEXT ANIMATION ---
 
 const DecryptText = ({ text, delay = 0, speed = 30 }: { text: string, delay?: number, speed?: number }) => {
    const [display, setDisplay] = useState('');
-   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&';
+   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
    useEffect(() => {
       let iteration = 0;
@@ -29,7 +30,7 @@ const DecryptText = ({ text, delay = 0, speed = 30 }: { text: string, delay?: nu
                clearInterval(interval);
             }
 
-            iteration += 1 / 2; // Faster decoding for short attention spans
+            iteration += 1 / 2;
          }, speed);
          return () => clearInterval(interval);
       }, delay);
@@ -38,44 +39,6 @@ const DecryptText = ({ text, delay = 0, speed = 30 }: { text: string, delay?: nu
 
    return <span>{display}</span>;
 };
-
-// Subliminal Flash Component - Primes the user's brain
-const SubliminalPrime = () => {
-   const [word, setWord] = useState('');
-   const [visible, setVisible] = useState(false);
-   const words = ['AUTHORITY', 'CONTROL', 'LEGACY', 'DOMINION', 'SOVEREIGNTY'];
-
-   useEffect(() => {
-      // Flash a random word every few seconds for 100ms
-      const interval = setInterval(() => {
-         if (Math.random() > 0.7) {
-            setWord(words[Math.floor(Math.random() * words.length)]);
-            setVisible(true);
-            setTimeout(() => setVisible(false), 150); // Subconscious flash speed
-         }
-      }, 4000);
-      return () => clearInterval(interval);
-   }, []);
-
-   if (!visible) return null;
-
-   return (
-      <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none mix-blend-overlay">
-         <motion.h2
-            initial={{ opacity: 0, scale: 2 }}
-            animate={{ opacity: 0.1, scale: 1.5 }}
-            exit={{ opacity: 0 }}
-            className="text-[20vw] font-display font-black text-white tracking-tighter uppercase"
-         >
-            {word}
-         </motion.h2>
-      </div>
-   );
-};
-
-import { useLanguage } from '../context/LanguageContext';
-
-// ... (imports remain same)
 
 const Home = () => {
    const { vehicles } = useStore();
@@ -91,14 +54,13 @@ const Home = () => {
    const mouseX = useSpring(0, { stiffness: 50, damping: 20 });
    const mouseY = useSpring(0, { stiffness: 50, damping: 20 });
 
-   // Get Top 3 Available Assets for "The Arsenal"
-   const featuredAssets = vehicles
+   // Get Top 3 Available Vehicles for Featured section
+   const featuredVehicles = vehicles
       .filter(v => v.status === 'Available')
       .sort((a, b) => b.price - a.price)
       .slice(0, 3);
 
-   // Fallback if no assets
-   const hasAssets = featuredAssets.length > 0;
+   const hasVehicles = featuredVehicles.length > 0;
 
    useEffect(() => {
       const handleMouseMove = (e: MouseEvent) => {
@@ -132,11 +94,9 @@ const Home = () => {
          exit={{ opacity: 0 }}
          className="bg-black overflow-hidden font-sans selection:bg-tj-gold selection:text-black"
       >
-         <SubliminalPrime />
 
-         {/* --- HERO SECTION: THE SIGNAL --- */}
+         {/* --- HERO SECTION --- */}
          <div className="relative h-screen flex flex-col justify-center items-center overflow-hidden">
-            {/* ... (background remains) */}
             <div className="absolute inset-0 pointer-events-none">
                <motion.div
                   className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2830&auto=format&fit=crop')] bg-cover bg-center"
@@ -164,7 +124,7 @@ const Home = () => {
                      transition={{ duration: 1, type: "spring", bounce: 0.4 }}
                      className="block origin-bottom"
                   >
-                     {t.home.hero.title1}
+                     <DecryptText text={t.home.hero.title1} delay={300} speed={40} />
                   </motion.span>
                   <motion.span
                      initial={{ opacity: 0, rotateX: -90 }}
@@ -172,11 +132,11 @@ const Home = () => {
                      transition={{ duration: 1, delay: 0.2, type: "spring", bounce: 0.4 }}
                      className="block text-transparent bg-clip-text bg-gradient-to-b from-tj-gold via-yellow-600 to-transparent origin-top"
                   >
-                     {t.home.hero.title2}
+                     <DecryptText text={t.home.hero.title2} delay={600} speed={40} />
                   </motion.span>
                </h1>
 
-               {/* Action Trigger */}
+               {/* Subtitle & CTAs */}
                <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -184,7 +144,7 @@ const Home = () => {
                   className="flex flex-col items-center gap-6"
                >
                   <p className="text-sm md:text-lg text-gray-400 font-serif italic max-w-xl">
-                     "{t.home.hero.subtitle}"
+                     {t.home.hero.subtitle}
                   </p>
 
                   <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
@@ -201,7 +161,7 @@ const Home = () => {
                      >
                         <span className="relative z-10 flex items-center gap-3">
                            <Phone size={14} className="group-hover:animate-pulse" />
-                           Call Now
+                           {t.home.hero.callNow}
                         </span>
                         <div className="absolute inset-0 bg-tj-gold/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
                      </a>
@@ -222,14 +182,14 @@ const Home = () => {
             </motion.div>
          </div>
 
-         {/* --- SUBCONSCIOUS TICKER (Infinite Marquee) --- */}
+         {/* --- TICKER (Infinite Marquee) --- */}
          <div className="bg-tj-gold text-black py-3 border-y border-black overflow-hidden relative z-20 select-none">
             <div className="animate-marquee whitespace-nowrap flex items-center font-display font-black tracking-[0.2em] text-xs md:text-sm will-change-transform">
                {Array(3).fill(null).map((_, i) => (
                   <React.Fragment key={i}>
                      {t.home.ticker.map((text, idx) => (
                         <React.Fragment key={idx}>
-                           <span className="mx-8">{text}</span> <Crosshair size={12} />
+                           <span className="mx-8">{text}</span> <Star size={12} />
                         </React.Fragment>
                      ))}
                   </React.Fragment>
@@ -237,8 +197,8 @@ const Home = () => {
             </div>
          </div>
 
-         {/* --- THE ARSENAL --- */}
-         {hasAssets && (
+         {/* --- FEATURED VEHICLES --- */}
+         {hasVehicles && (
             <section className="py-24 bg-[#050505] relative overflow-hidden border-b border-white/10">
                <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent"></div>
 
@@ -266,7 +226,7 @@ const Home = () => {
                      viewport={{ once: true, margin: "-100px" }}
                      className="grid grid-cols-1 md:grid-cols-3 gap-6"
                   >
-                     {featuredAssets.map((vehicle, idx) => (
+                     {featuredVehicles.map((vehicle, idx) => (
                         <motion.div variants={itemVariants} key={vehicle.id}>
                            <Link to="/inventory" className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden border border-white/10 bg-gray-900 cursor-pointer block">
                               <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 backdrop-blur px-3 py-1 rounded-full border border-green-500/30">
@@ -312,7 +272,7 @@ const Home = () => {
             </section>
          )}
 
-         {/* --- DOCTRINE PILLARS --- */}
+         {/* --- VALUE PILLARS --- */}
          <section className="py-24 px-6 max-w-[1920px] mx-auto bg-black">
             <div className="flex items-end justify-between mb-16 border-b border-white/10 pb-6">
                <h2 className="text-white font-display text-4xl md:text-5xl tracking-tighter">
@@ -389,56 +349,38 @@ const Home = () => {
             </div>
          </section>
 
-         {/* --- LIVE SIGNALS (Social Proof) --- */}
+         {/* --- DEALERSHIP INFO TICKER --- */}
          <section className="bg-tj-dark border-y border-white/10 py-12 overflow-hidden relative">
-            {/* ... (keep as is for now, maybe translate signals later if needed) */}
             <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-tj-dark to-transparent z-10"></div>
             <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-tj-dark to-transparent z-10"></div>
 
             <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
                <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-900/50 rounded-full animate-pulse">
                   <Activity size={12} className="text-green-500" />
-                  <span className="text-[9px] uppercase tracking-widest text-green-400">Intercepted Transmissions</span>
+                  <span className="text-[9px] uppercase tracking-widest text-green-400">{t.home.signals.label}</span>
                </div>
             </div>
 
             <div className="flex gap-8 animate-marquee whitespace-nowrap items-center">
-               {/* Keep signals hardcoded or fetch from DB later */}
-               {[
-                  "ASSET SECURED: 2021 G-WAGON (HOUSTON)",
-                  "DOMINION ESTABLISHED: SECTOR 7",
-                  "ROLLS ROYCE WRAITH: DEPLOYED",
-                  "CLIENT IDENTITY: VERIFIED",
-                  "TRANSACTION VELOCITY: < 24 HOURS",
-                  "LAMBORGHINI HURACAN: ALLOCATED",
-                  "STATUS: SOVEREIGN"
-               ].map((signal, i) => (
+               {t.home.signals.items.map((item, i) => (
                   <div key={i} className="flex items-center gap-4 bg-black/40 border border-white/5 px-6 py-3 rounded">
                      <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping"></div>
-                     <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{signal}</span>
+                     <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{item}</span>
                   </div>
                ))}
-               {[
-                  "ASSET SECURED: 2021 G-WAGON (HOUSTON)",
-                  "DOMINION ESTABLISHED: SECTOR 7",
-                  "ROLLS ROYCE WRAITH: DEPLOYED",
-                  "CLIENT IDENTITY: VERIFIED",
-                  "TRANSACTION VELOCITY: < 24 HOURS",
-                  "LAMBORGHINI HURACAN: ALLOCATED",
-                  "STATUS: SOVEREIGN"
-               ].map((signal, i) => (
+               {t.home.signals.items.map((item, i) => (
                   <div key={`dup-${i}`} className="flex items-center gap-4 bg-black/40 border border-white/5 px-6 py-3 rounded">
                      <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping"></div>
-                     <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{signal}</span>
+                     <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{item}</span>
                   </div>
                ))}
             </div>
          </section>
 
-         {/* --- SYSTEM ARCHITECTURE --- */}
+         {/* --- WHAT SETS US APART --- */}
          <section className="py-20 px-6 max-w-[1600px] mx-auto">
             <div className="text-center mb-16">
-               <h2 className="font-display text-sm text-tj-gold tracking-[0.5em] uppercase mb-4">System Architecture</h2>
+               <h2 className="font-display text-sm text-tj-gold tracking-[0.5em] uppercase mb-4">{t.home.architecture}</h2>
                <div className="w-px h-16 bg-gradient-to-b from-tj-gold to-transparent mx-auto"></div>
             </div>
 
@@ -467,7 +409,7 @@ const Home = () => {
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse"></div>
 
                   <div className="mb-8 text-tj-gold transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_30px_rgba(212,175,55,1)] relative z-10">
-                     <Brain size={32} className="group-hover:animate-gold-pulse" />
+                     <Heart size={32} className="group-hover:animate-gold-pulse" />
                   </div>
 
                   <h3 className="font-display text-xl text-white mb-4 tracking-widest relative z-10 group-hover:text-tj-gold transition-colors">{t.home.cards.psych.title}</h3>
@@ -500,7 +442,7 @@ const Home = () => {
             </div>
          </section>
 
-         {/* --- INVENTORY TEASER --- */}
+         {/* --- INVENTORY CTA --- */}
          <section className="h-[70vh] relative flex items-center justify-center overflow-hidden border-t border-white/10 group">
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center grayscale brightness-50 group-hover:brightness-75 group-hover:grayscale-0 transition-all duration-[1.5s] ease-out transform group-hover:scale-105"></div>
             <div className="absolute inset-0 bg-black/60 group-hover:bg-black/30 transition-colors duration-700"></div>
