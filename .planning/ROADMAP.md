@@ -29,7 +29,7 @@ See: `.planning/milestones/v1-ROADMAP.md`
 - Decimal phases (9.1, 9.2): Urgent insertions if needed (marked with INSERTED)
 
 - [ ] **Phase 9: Production Infrastructure** - Deploy to production with fresh Supabase, Vercel, and credential rotation
-- [ ] **Phase 10: Brand Truth** - Align all content with "automotive investment firm" positioning using real business data
+- [x] **Phase 10: Brand Truth** - Align all content with "automotive investment firm" positioning using real business data
 - [ ] **Phase 11: Production Polish** - Mobile-first verification, performance, accessibility, and production-grade error handling
 - [ ] **Phase 12: SEO Foundation** - BrowserRouter migration, meta tags, sitemap, and schema markup for search visibility
 - [ ] **Phase 13: Focus Capture** - SOVEREIGN landing experience with pattern-interrupt, authority, and tribe signals
@@ -235,7 +235,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 9. Production Infrastructure | v2.0 | 0/7 | Planning complete | - |
-| 10. Brand Truth | v2.0 | 4/6 | Gap closure planned | - |
+| 10. Brand Truth | v2.0 | 6/6 | Complete | 2026-02-15 |
 | 11. Production Polish | v2.0 | 0/TBD | Not started | - |
 | 12. SEO Foundation | v2.0 | 0/TBD | Not started | - |
 | 13. Focus Capture | v2.0 | 0/TBD | Not started | - |
