@@ -616,7 +616,7 @@ export default function App() {
       <StoreProvider>
         <Router>
           <ScrollToTop />
-          <SplashScreen duration={3500}>
+          <SplashScreen duration={1200}>
             <AppContent />
           </SplashScreen>
         </Router>
