@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+import { PDFDocument, StandardFonts, rgb, PDFName, PDFHexString } from 'pdf-lib';
 import { BillOfSaleData } from '../types';
 import { getCountyFromAddress } from '../utils/texasCountyLookup';
 
@@ -113,14 +113,14 @@ const drawHeader = (doc: jsPDF, title: string, subtitle: string, logoBase64?: st
     }
 
     // Document Title (centered below logo area)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(11);
+    doc.setFont("times", "bold");
+    doc.setFontSize(13);
     doc.setTextColor(C_WHITE[0], C_WHITE[1], C_WHITE[2]);
     doc.text(title.toUpperCase(), PAGE_WIDTH / 2, MARGIN + 38, { align: "center" });
 
-    // Subtitle (small, elegant)
+    // Subtitle (elegant)
     doc.setFont("times", "italic");
-    doc.setFontSize(7);
+    doc.setFontSize(8);
     doc.setTextColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
     doc.text(subtitle, PAGE_WIDTH / 2, MARGIN + 43, { align: "center" });
 
@@ -129,19 +129,19 @@ const drawHeader = (doc: jsPDF, title: string, subtitle: string, logoBase64?: st
 
 const drawSection = (doc: jsPDF, label: string, y: number) => {
     doc.setFillColor(C_GRAY[0], C_GRAY[1], C_GRAY[2]);
-    doc.rect(MARGIN, y, CONTENT_WIDTH, 6, 'F');
+    doc.rect(MARGIN, y, CONTENT_WIDTH, 7, 'F');
 
     doc.setDrawColor(C_DARK[0], C_DARK[1], C_DARK[2]);
     doc.setLineWidth(0.2);
     doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
-    doc.line(MARGIN, y + 6, PAGE_WIDTH - MARGIN, y + 6);
+    doc.line(MARGIN, y + 7, PAGE_WIDTH - MARGIN, y + 7);
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(8);
+    doc.setFont("times", "bold");
+    doc.setFontSize(9);
     doc.setTextColor(C_DARK[0], C_DARK[1], C_DARK[2]);
-    doc.text(label.toUpperCase(), MARGIN + 2, y + 4.2);
+    doc.text(label.toUpperCase(), MARGIN + 3, y + 5);
 
-    return y + 8;
+    return y + 9;
 };
 
 const drawDataBox = (doc: jsPDF, label: string, value: string, x: number, y: number, w: number, h: number, options: { mono?: boolean, align?: 'left'|'center'|'right' } = {}) => {
@@ -151,14 +151,14 @@ const drawDataBox = (doc: jsPDF, label: string, value: string, x: number, y: num
     doc.rect(x, y, w, h);
 
     // Label
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(5);
-    doc.setTextColor(120, 120, 120);
-    doc.text(label.toUpperCase(), x + 1.5, y + 2.5);
+    doc.setFont("times", "bold");
+    doc.setFontSize(6);
+    doc.setTextColor(100, 100, 100);
+    doc.text(label.toUpperCase(), x + 1.5, y + 3);
 
     // Value
     doc.setFont(options.mono ? "courier" : "times", "bold");
-    doc.setFontSize(9);
+    doc.setFontSize(10);
     doc.setTextColor(0, 0, 0);
 
     const valX = options.align === 'center' ? x + (w/2) : options.align === 'right' ? x + w - 2 : x + 2;
@@ -186,25 +186,25 @@ const drawFooter = (doc: jsPDF) => {
     doc.line(MARGIN, y, PAGE_WIDTH - MARGIN, y);
 
     // Company info (left)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(6);
+    doc.setFont("times", "bold");
+    doc.setFontSize(7);
     doc.setTextColor(C_WHITE[0], C_WHITE[1], C_WHITE[2]);
     doc.text("TRIPLE J AUTO INVESTMENT LLC", MARGIN + 3, y + 4);
 
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(5);
+    doc.setFont("times", "normal");
+    doc.setFontSize(6);
     doc.setTextColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
     doc.text("8774 ALMEDA GENOA RD, HOUSTON, TX 77075", MARGIN + 3, y + 7);
 
     // Center - Dealer License
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(5);
+    doc.setFont("times", "bold");
+    doc.setFontSize(6);
     doc.setTextColor(C_GOLD[0], C_GOLD[1], C_GOLD[2]);
     doc.text("TX DEALER LICENSE: P171632", PAGE_WIDTH / 2, y + 5.5, { align: "center" });
 
     // Right side - Date
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(5);
+    doc.setFont("times", "normal");
+    doc.setFontSize(6);
     doc.setTextColor(C_WHITE[0], C_WHITE[1], C_WHITE[2]);
     doc.text(`Generated: ${new Date().toLocaleDateString('en-US')}`, PAGE_WIDTH - MARGIN - 3, y + 5.5, { align: "right" });
 };
@@ -686,35 +686,61 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         const pdfDoc = await PDFDocument.load(formBytes);
         const form = pdfDoc.getForm();
 
-        // Embed Times New Roman (TimesRoman is the standard PDF equivalent)
+        // Embed Times New Roman (the standard PDF equivalent)
         const timesFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
-        const timesBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
 
-        // Helper to safely set text field - uses Times New Roman, black ink, sized to fit
-        const setTextField = (fieldName: string, value: string, fontSize?: number) => {
-            // Try the exact field name first, then try with/without extra spaces
+        // Helper: force a text field to pure black Times New Roman ink
+        const forceBlackAppearance = (field: ReturnType<typeof form.getTextField>) => {
+            try {
+                // Get the current DA string from the field's dictionary
+                const acro = field.acroField;
+                const rawDA = acro.dict.get(PDFName.of('DA'));
+                let daStr = rawDA ? rawDA.toString() : '';
+
+                // Strip any existing color commands (RGB, grayscale, CMYK)
+                daStr = daStr
+                    .replace(/[\d.]+\s+[\d.]+\s+[\d.]+\s+rg/g, '')  // RGB color
+                    .replace(/[\d.]+\s+[\d.]+\s+[\d.]+\s+[\d.]+\s+k/g, '') // CMYK
+                    .replace(/[\d.]+\s+g(?=\s|$)/g, '')              // Grayscale
+                    .replace(/\(\s*\)/g, '')                          // Empty parens
+                    .trim();
+
+                // Append pure black (0 0 0 rg = RGB black)
+                daStr = daStr + ' 0 0 0 rg';
+
+                // Write the modified DA back
+                acro.dict.set(PDFName.of('DA'), PDFHexString.fromText(daStr));
+
+                // Rebuild appearance stream with Times font and black color
+                field.updateAppearances(timesFont);
+            } catch {
+                // Fallback: just try updateAppearances
+                try { field.updateAppearances(timesFont); } catch {}
+            }
+        };
+
+        // Helper to safely set text field with Times New Roman and pure black ink
+        const setTextField = (fieldName: string, value: string) => {
             const variants = [
                 fieldName,
-                fieldName.replace(/\s{2,}/g, ' '),  // Remove double spaces
-                fieldName.replace(/\s/g, '  '),     // Add double spaces between words
+                fieldName.replace(/\s{2,}/g, ' '),
+                fieldName.replace(/\s/g, '  '),
             ];
 
             for (const name of variants) {
                 try {
                     const field = form.getTextField(name);
                     field.setText(value || '');
-                    // Times New Roman font, pure black, sized to fit the box
-                    field.defaultUpdateAppearances(timesFont);
-                    field.updateAppearances(timesFont);
-                    return; // Success, stop trying variants
+                    field.setFontSize(0); // Auto-size to fit the box
+                    forceBlackAppearance(field);
+                    return;
                 } catch {
-                    continue; // Try next variant
+                    continue;
                 }
             }
-            console.warn(`Field not found (tried variants): ${fieldName}`);
         };
 
-        // Helper to safely check checkbox - tries multiple field name variants
+        // Helper to safely check checkbox
         const checkBox = (fieldName: string) => {
             const variants = [
                 fieldName,
@@ -731,7 +757,6 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
                     continue;
                 }
             }
-            console.warn(`Checkbox not found (tried variants): ${fieldName}`);
         };
 
         // --- FILL FORM FIELDS ---
@@ -761,7 +786,6 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
 
         // Applicant Photo ID Information
         if (data.applicantIdType && data.applicantIdNumber) {
-            // Map ID type to form field checkbox names
             const idTypeCheckboxMap: Record<string, string> = {
                 'US_DRIVERS_LICENSE': 'US Drivers License',
                 'US_PASSPORT': 'US Passport',
@@ -775,7 +799,6 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
             if (checkboxName) {
                 checkBox(checkboxName);
             }
-            // Set ID number field
             setTextField('17 Applicant ID Number', data.applicantIdNumber || '');
         }
 
@@ -793,21 +816,21 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         setTextField('Date', formatDateUS(data.date));
         setTextField('Seller  Name', data.sellerName || 'Triple J Auto Investment LLC');
 
-        // Sale price only — sales tax left blank for county tax office to calculate
+        // Sale price only — leave tax fields blank for county tax office
         const salePrice = parseFloat(data.amount?.replace(/[^0-9.]/g, '') || '0');
         setTextField('Sales Price Minus Rebate Amount', formatCurrency(salePrice.toString()));
 
         // Check the $28/$33 application fee checkbox
         checkBox('$28 or $33 Application Fee for Texas Title - contact your county for the correct fee');
 
-        // Set all text fields to pure black ink with Times New Roman
+        // Final pass: force ALL text fields to black ink Times New Roman
         const allFields = form.getFields();
-        for (const field of allFields) {
+        for (const f of allFields) {
             try {
-                const textField = form.getTextField(field.getName());
-                textField.updateAppearances(timesFont);
+                const tf = form.getTextField(f.getName());
+                forceBlackAppearance(tf);
             } catch {
-                // Skip non-text fields (checkboxes, etc.)
+                // Skip checkboxes, radio buttons, etc.
             }
         }
 
