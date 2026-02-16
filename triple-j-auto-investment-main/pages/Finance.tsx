@@ -1,7 +1,17 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { DollarSign, Calculator, Shield, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useStore } from '../context/Store';
 import { useLanguage } from '../context/LanguageContext';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+  })
+};
 
 const Finance = () => {
   const { addLead } = useStore();
@@ -38,22 +48,37 @@ const Finance = () => {
 
         {/* Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 mb-6 text-tj-gold text-xs uppercase tracking-[0.4em]">
+          <motion.div
+            className="inline-flex items-center gap-2 mb-6 text-tj-gold text-xs uppercase tracking-[0.4em]"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <DollarSign size={16} />
             <span>{t.finance.badge}</span>
-          </div>
-          <h1 className="text-6xl md:text-8xl font-display text-white tracking-tight mb-6">
+          </motion.div>
+          <motion.h1
+            className="text-6xl md:text-8xl font-display text-white tracking-tight mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             {t.finance.title}
-          </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          </motion.h1>
+          <motion.p
+            className="text-gray-400 text-lg max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             {t.finance.subtitle}
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
 
           {/* Benefit 1 */}
-          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all">
+          <motion.div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all" variants={fadeUp} custom={0} initial="hidden" animate="visible">
             <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
               <Calculator size={24} />
             </div>
@@ -61,10 +86,10 @@ const Finance = () => {
             <p className="text-gray-400 text-sm leading-relaxed">
               {t.finance.options.step1Desc}
             </p>
-          </div>
+          </motion.div>
 
           {/* Benefit 2 */}
-          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all">
+          <motion.div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all" variants={fadeUp} custom={1} initial="hidden" animate="visible">
             <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
               <TrendingUp size={24} />
             </div>
@@ -72,10 +97,10 @@ const Finance = () => {
             <p className="text-gray-400 text-sm leading-relaxed">
               {t.finance.options.step2Desc}
             </p>
-          </div>
+          </motion.div>
 
           {/* Benefit 3 */}
-          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all">
+          <motion.div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all" variants={fadeUp} custom={2} initial="hidden" animate="visible">
             <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
               <Shield size={24} />
             </div>
@@ -83,14 +108,20 @@ const Finance = () => {
             <p className="text-gray-400 text-sm leading-relaxed">
               {t.finance.options.step3Desc}
             </p>
-          </div>
+          </motion.div>
 
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
           {/* Application Form */}
-          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 relative">
+          <motion.div
+            className="bg-tj-dark border border-white/10 p-6 md:p-8 relative"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.6 }}
+          >
             <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
 
             {status === 'submitted' ? (
@@ -237,13 +268,13 @@ const Finance = () => {
                 </form>
               </>
             )}
-          </div>
+          </motion.div>
 
           {/* Info Sidebar */}
           <div className="space-y-8">
 
             {/* Requirements */}
-            <div className="bg-black border border-white/10 p-6 md:p-8">
+            <motion.div className="bg-black border border-white/10 p-6 md:p-8" variants={fadeUp} custom={0} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
               <h3 className="text-white font-display text-xl mb-6 flex items-center gap-2">
                 <CheckCircle size={20} className="text-tj-gold" />
                 {t.finance.requirements.title.toUpperCase()}
@@ -256,10 +287,10 @@ const Finance = () => {
                   </li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
 
             {/* Rates */}
-            <div className="bg-black border border-white/10 p-6 md:p-8">
+            <motion.div className="bg-black border border-white/10 p-6 md:p-8" variants={fadeUp} custom={1} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
               <h3 className="text-white font-display text-xl mb-6">{t.finance.rates.title.toUpperCase()}</h3>
               <div className="space-y-4">
                 <div className="border-b border-white/5 pb-4">
@@ -287,10 +318,10 @@ const Finance = () => {
               <p className="text-xs text-gray-400 mt-6">
                 {t.finance.rates.disclaimer}
               </p>
-            </div>
+            </motion.div>
 
             {/* Warning */}
-            <div className="bg-red-900/10 border border-red-900/30 p-6">
+            <motion.div className="bg-red-900/10 border border-red-900/30 p-6" variants={fadeUp} custom={2} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
               <h4 className="text-red-500 font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2">
                 <AlertTriangle size={16} />
                 {t.finance.importantNotice.title}
@@ -298,13 +329,19 @@ const Finance = () => {
               <p className="text-gray-400 text-xs leading-relaxed">
                 {t.finance.importantNotice.content}
               </p>
-            </div>
+            </motion.div>
 
           </div>
         </div>
 
         {/* CTA */}
-        <div className="mt-16 text-center">
+        <motion.div
+          className="mt-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
           <h3 className="text-white font-display text-2xl mb-4">{t.finance.cta.title}</h3>
           <p className="text-gray-400 mb-4">{t.finance.cta.desc}</p>
           <p className="text-tj-gold text-sm mb-6">{t.finance.cta.phone}</p>
@@ -314,7 +351,7 @@ const Finance = () => {
           >
             {t.finance.cta.button}
           </a>
-        </div>
+        </motion.div>
 
       </div>
     </div>
