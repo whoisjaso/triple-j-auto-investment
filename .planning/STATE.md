@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-16
-**Session:** Phase 11 plan 05 complete (accessibility basics -- WCAG AA contrast, keyboard nav, focus traps, ARIA)
+**Session:** Phase 11 plan 07 complete (BLOCKER gap closure -- viewport zoom + splash screen LCP)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 11 - Production Polish (5/6 plans complete)
+**Current focus:** Phase 11 - Production Polish (7/8 plans complete, gap closure)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 11 of 19 (Production Polish)
-**Plan:** 5 of 6 completed (11-01, 11-02, 11-03, 11-04, 11-05)
+**Plan:** 7 of 8 completed (11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07)
 **Status:** In progress
-**Last activity:** 2026-02-16 -- Completed 11-05-PLAN.md (accessibility basics: WCAG AA contrast, keyboard nav, focus traps, ARIA attributes)
+**Last activity:** 2026-02-16 -- Completed 11-07-PLAN.md (BLOCKER gap closure: viewport zoom restrictions removed, splash screen LCP reduced to 1.7s)
 
-Progress: [█████████████░] 93% (13/14 plans completed across v2.0 so far)
+Progress: [███████████████░] 94% (15/16 plans completed across v2.0 so far)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05)
+- Total plans completed: 15 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -103,6 +103,8 @@ Progress: [█████████████░] 93% (13/14 plans complete
 - **[11-05]** Modal containers use tabIndex={-1} with focus:outline-none (programmatic focus targets only)
 - **[11-05]** Login.tsx keeps bare outline-none because parent group-focus-within provides visible focus via border change
 - **[11-05]** Admin pages excluded from accessibility fixes (out of scope for Phase 11)
+- **[11-07]** Viewport meta keeps viewport-fit=cover (iPhone notch) while removing only the zoom-blocking attributes (maximum-scale, user-scalable)
+- **[11-07]** Splash screen reduced to 1200ms display + 500ms fade = 1.7s total (was 4.3s), well under 2.5s LCP target
 
 ### Completed Work (Phase 9)
 
@@ -126,6 +128,8 @@ Progress: [█████████████░] 93% (13/14 plans complete
 - **11-03 (complete):** Mobile responsiveness across 8 pages at 375px viewport. Footer social icons/legal links/quick links 44px touch targets. Mobile language toggle 44px target. VinLookup responsive grid and VIN input sizing. Finance form grid mobile stacking. About map iframe mobile height. Responsive padding on all form containers and cards (p-6 sm:p-10/p-12). CustomerLogin button touch targets.
 - **11-04 (complete):** Visual consistency across all 13 customer-facing pages + footer. Canonical spacing scale (py-16 md:py-24 standard, py-20 md:py-32 hero). Card padding standardized to p-6 md:p-8. All CTA buttons use py-4 px-8 text-xs tracking-[0.3em]. Page horizontal padding standardized to px-4 md:px-6. Footer quick links upgraded to py-3. Zero tracking-[0.2em] on any button element.
 - **11-05 (complete):** WCAG AA accessibility basics. Color contrast: text-gray-500/600 replaced with text-gray-400 across all customer-facing pages. Alt text: fixed generic "Detail" alt on Inventory modal, added year/make/model to featured vehicles. Skip-to-content link as first focusable element (bilingual). FAQ accordion: aria-expanded/aria-controls/role="region". Focus trapping on Inventory modal, ImageGallery, ImageLightbox. Mobile menu Escape key. Visible focus indicators (focus:ring-2 focus:ring-tj-gold/50) on all customer-facing inputs.
+- **11-06 (complete):** Framer-motion animations on admin and customer pages. Google Sheets sync overhaul. Dashboard ledger modal z-index fix. AI emoji removal from Gemini service.
+- **11-07 (complete):** BLOCKER gap closure. Viewport meta: removed maximum-scale=1.0 and user-scalable=no for WCAG 1.4.4 compliance (pinch-to-zoom enabled). SplashScreen: reduced from 4.3s to 1.7s total (1.2s splash + 0.5s fade) for LCP under 2.5s target. Both BLOCKER gaps from 11-VERIFICATION.md resolved.
 
 ### Remaining Phase 9 Work
 
@@ -142,7 +146,7 @@ None -- Phase 10 is fully complete (all original plans + gap closure plans).
 
 ### Remaining Phase 11 Work
 
-- **11-06:** Performance optimization / final polish items
+- **11-08:** WCAG AA contrast fixes on Inventory and VinLookup pages (gap closure)
 
 ### Blockers/Concerns
 
@@ -157,6 +161,6 @@ None -- Phase 10 is fully complete (all original plans + gap closure plans).
 ## Session Continuity
 
 **Last session:** 2026-02-16
-**Stopped at:** Completed 11-05-PLAN.md (accessibility basics)
+**Stopped at:** Completed 11-07-PLAN.md (BLOCKER gap closure)
 **Resume file:** None
-**Resume:** Phase 11 plan 05 complete. WCAG AA color contrast (text-gray-400 minimum), skip-to-content link, FAQ accordion keyboard support, focus trapping on 3 modal/lightbox components, Escape closes mobile menu, visible focus indicators on all inputs. Next: 11-06 (performance optimization / final polish).
+**Resume:** Completed 11-07: (1) Removed viewport zoom restrictions (maximum-scale=1.0, user-scalable=no) for WCAG 1.4.4, (2) Reduced splash screen from 4.3s to 1.7s (1200ms display + 500ms fade) for LCP under 2.5s. Both BLOCKER gaps from 11-VERIFICATION.md resolved. Next: 11-08 gap closure (WCAG contrast on Inventory/VinLookup), then Phase 11 complete.
