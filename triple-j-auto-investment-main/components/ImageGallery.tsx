@@ -151,7 +151,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
           className="fixed inset-0 z-[99999] flex flex-col bg-black focus:outline-none"
           style={{ touchAction: 'none' }}
         >
@@ -159,7 +159,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.15, duration: 0.3 }}
             className="absolute top-0 left-0 right-0 z-20 p-4 bg-gradient-to-b from-black/80 via-black/40 to-transparent"
           >
             <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -192,7 +192,13 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
           </motion.div>
 
           {/* Main Image Area with Swipe */}
-          <div className="flex-grow relative overflow-hidden">
+          <motion.div
+            className="flex-grow relative overflow-hidden"
+            initial={{ scale: 0.85, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          >
             <AnimatePresence initial={false} custom={direction} mode="popLayout">
               <motion.div
                 key={currentIndex}
@@ -266,14 +272,14 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
 
           {/* Thumbnail Strip */}
           {images.length > 1 && (
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.15 }}
+              transition={{ delay: 0.2, duration: 0.3 }}
               className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
             >
               <div className="flex justify-center gap-2 overflow-x-auto py-2 px-4 scrollbar-none">

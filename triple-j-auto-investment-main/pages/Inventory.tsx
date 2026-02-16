@@ -15,10 +15,11 @@ type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'y
 interface VehicleCardProps {
   vehicle: Vehicle;
   onClick: () => void;
+  onImageClick: (imgIndex: number) => void;
 }
 
 // --- VEHICLE CARD COMPONENT (With Carousel) ---
-const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
+const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClick }) => {
   const { t, lang } = useLanguage();
   const [imgIndex, setImgIndex] = useState(0);
   const images = [vehicle.imageUrl, ...(vehicle.gallery || [])].filter(Boolean);
@@ -31,6 +32,13 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
   const prevImg = (e: React.MouseEvent) => {
     e.stopPropagation();
     setImgIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (vehicle.status !== VehicleStatus.SOLD) {
+      onImageClick(imgIndex);
+    }
   };
 
   return (
@@ -52,8 +60,11 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
         </div>
       </div>
 
-      {/* Image Carousel Area */}
-      <div className="relative aspect-[4/3] overflow-hidden border-b border-white/5 group/image bg-gray-900">
+      {/* Image Carousel Area - Clickable for fullscreen */}
+      <div
+        className="relative aspect-[4/3] overflow-hidden border-b border-white/5 group/image bg-gray-900 cursor-zoom-in"
+        onClick={handleImageClick}
+      >
         {vehicle.status === VehicleStatus.SOLD && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
             <div className="transform -rotate-12 bg-tj-gold border-y-4 border-white shadow-[0_0_50px_rgba(0,0,0,0.8)] w-[120%] flex justify-center py-3">
@@ -74,6 +85,16 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
           loading="lazy"
           className={`w-full h-full object-cover transition-all duration-1000 ${vehicle.status === VehicleStatus.SOLD ? 'grayscale opacity-40' : 'opacity-80 group-hover:opacity-100 group-hover:scale-105'}`}
         />
+
+        {/* Fullscreen hint overlay */}
+        {vehicle.status !== VehicleStatus.SOLD && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/0 group-hover/image:bg-black/20 transition-all duration-300 pointer-events-none">
+            <div className="opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 bg-black/70 backdrop-blur-sm px-3 py-2 flex items-center gap-2 border border-white/20">
+              <ZoomIn size={14} className="text-tj-gold" />
+              <span className="text-[9px] uppercase tracking-widest text-white/90">Tap to view</span>
+            </div>
+          </div>
+        )}
 
         {/* Carousel Controls (Improved Visibility on Mobile) */}
         {images.length > 1 && vehicle.status !== VehicleStatus.SOLD && (
@@ -187,9 +208,14 @@ const Inventory = () => {
   // Modal Carousel State
   const [modalImgIndex, setModalImgIndex] = useState(0);
 
-  // Lightbox State
+  // Lightbox State (from within the detail modal)
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  // Card-level fullscreen image viewer state (direct from inventory grid)
+  const [cardGalleryImages, setCardGalleryImages] = useState<string[]>([]);
+  const [cardGalleryIndex, setCardGalleryIndex] = useState(0);
+  const [cardGalleryOpen, setCardGalleryOpen] = useState(false);
 
   // Accessibility: refs for focus management
   const modalRef = useRef<HTMLDivElement>(null);
@@ -265,6 +291,14 @@ const Inventory = () => {
     requestAnimationFrame(() => {
       triggerRef.current?.focus();
     });
+  }, []);
+
+  // Open fullscreen image viewer directly from inventory card
+  const handleCardImageClick = useCallback((vehicle: Vehicle, imgIndex: number) => {
+    const images = [vehicle.imageUrl, ...(vehicle.gallery || [])].filter(Boolean);
+    setCardGalleryImages(images);
+    setCardGalleryIndex(imgIndex);
+    setCardGalleryOpen(true);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -578,6 +612,7 @@ const Inventory = () => {
                   key={vehicle.id}
                   vehicle={vehicle}
                   onClick={() => handleOpenModal(vehicle)}
+                  onImageClick={(imgIndex) => handleCardImageClick(vehicle, imgIndex)}
                 />
               ))}
             </AnimatePresence>
@@ -1001,12 +1036,20 @@ const Inventory = () => {
         document.body
       )}
 
-      {/* Full-Screen Swipeable Image Gallery */}
+      {/* Full-Screen Swipeable Image Gallery (from detail modal) */}
       <ImageGallery
         images={modalImages}
         initialIndex={lightboxIndex}
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
+      />
+
+      {/* Full-Screen Image Gallery (direct from inventory card) */}
+      <ImageGallery
+        images={cardGalleryImages}
+        initialIndex={cardGalleryIndex}
+        isOpen={cardGalleryOpen}
+        onClose={() => setCardGalleryOpen(false)}
       />
     </div>
   );
