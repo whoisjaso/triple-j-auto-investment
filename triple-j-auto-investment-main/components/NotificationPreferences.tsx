@@ -108,7 +108,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
               </button>
             ))}
             <div className="px-3 py-2 border-t border-white/10">
-              <p className="text-[9px] text-gray-600">
+              <p className="text-[9px] text-gray-400">
                 Login verification codes are always sent regardless of this setting.
               </p>
             </div>
@@ -146,7 +146,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
           </button>
         ))}
       </div>
-      <p className="text-[10px] text-gray-600">
+      <p className="text-[10px] text-gray-400">
         Login verification codes are always sent regardless of this setting.
       </p>
 

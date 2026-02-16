@@ -71,7 +71,7 @@ const NotFound = () => {
         </div>
 
         <div className="bg-black/50 border border-white/10 p-6 backdrop-blur-md">
-          <p className="text-center text-xs uppercase tracking-widest text-gray-600">
+          <p className="text-center text-xs uppercase tracking-widest text-gray-400">
             Error 404 | <Link to="/" className="text-tj-gold hover:text-white transition-colors">{t.common.backToHome}</Link>
           </p>
         </div>

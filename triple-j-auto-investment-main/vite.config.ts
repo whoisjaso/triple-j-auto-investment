@@ -19,6 +19,12 @@ export default defineConfig(({ mode }) => {
         '@': path.resolve(__dirname, '.'),
       }
     },
+    // Strip all console.* and debugger statements in production builds
+    ...(mode === 'production' && {
+      esbuild: {
+        drop: ['console', 'debugger'],
+      }
+    }),
     build: {
       rollupOptions: {
         output: {
@@ -28,13 +34,7 @@ export default defineConfig(({ mode }) => {
             'vendor-supabase': ['@supabase/supabase-js'],
           }
         }
-      },
-      // Strip all console.* and debugger statements in production builds
-      ...(mode === 'production' && {
-        esbuild: {
-          drop: ['console', 'debugger'],
-        }
-      })
+      }
     }
   };
 });

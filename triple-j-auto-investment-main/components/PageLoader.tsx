@@ -11,7 +11,7 @@ export const PageLoader = () => {
           alt="Triple J Auto Investment"
           className="w-16 h-16 mx-auto animate-pulse mb-4"
         />
-        <p className="text-gray-600 text-xs uppercase tracking-widest">
+        <p className="text-gray-400 text-xs uppercase tracking-widest">
           {t.common.loading}
         </p>
       </div>

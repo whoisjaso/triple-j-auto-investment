@@ -49,7 +49,7 @@ const PaymentOptions = () => {
                   ))}
                 </ul>
               </div>
-              <div className="text-xs text-gray-600">
+              <div className="text-xs text-gray-400">
                 <strong className="text-white">Note:</strong> {t.paymentOptions.cashAdvantages.irsNote}
               </div>
             </div>

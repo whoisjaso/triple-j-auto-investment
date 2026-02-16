@@ -261,7 +261,7 @@ const CustomerLogin: React.FC = () => {
         {/* Divider */}
         <div className="flex items-center gap-4 my-8">
           <div className="flex-1 h-px bg-white/10" />
-          <span className="text-gray-600 text-[10px] uppercase tracking-widest">or</span>
+          <span className="text-gray-400 text-[10px] uppercase tracking-widest">or</span>
           <div className="flex-1 h-px bg-white/10" />
         </div>
 

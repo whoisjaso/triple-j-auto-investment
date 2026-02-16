@@ -116,7 +116,7 @@ const RegistrationTracker: React.FC = () => {
       case 'blocked':
         return <AlertCircle className="text-red-400" size={20} />;
       default:
-        return <Circle className="text-gray-600" size={20} />;
+        return <Circle className="text-gray-500" size={20} />;
     }
   };
 
@@ -194,14 +194,14 @@ const RegistrationTracker: React.FC = () => {
                   <h2 className="text-white text-xl font-display tracking-wide">
                     {registration.vehicleYear} {registration.vehicleMake} {registration.vehicleModel}
                   </h2>
-                  <p className="text-gray-600 text-xs font-mono mt-1">
+                  <p className="text-gray-400 text-xs font-mono mt-1">
                     VIN: {registration.vin.slice(0, 11)}******
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
                   <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Order</p>
                   <p className="text-tj-gold font-mono tracking-wider">{registration.orderId}</p>
-                  <p className="text-gray-600 text-xs mt-1">
+                  <p className="text-gray-400 text-xs mt-1">
                     Purchased {formatDate(registration.purchaseDate)}
                   </p>
                 </div>
@@ -297,7 +297,7 @@ const RegistrationTracker: React.FC = () => {
                           )}
 
                           {status === 'waiting' && (
-                            <p className="text-gray-600 text-xs">{stageConfig.description}</p>
+                            <p className="text-gray-400 text-xs">{stageConfig.description}</p>
                           )}
 
                           {/* Expected Duration */}
@@ -341,7 +341,7 @@ const RegistrationTracker: React.FC = () => {
                   <span className="text-white text-sm">(832) 400-9760</span>
                   <ChevronRight
                     size={14}
-                    className="text-gray-600 group-hover:text-tj-gold ml-auto transition-colors"
+                    className="text-gray-400 group-hover:text-tj-gold ml-auto transition-colors"
                   />
                 </a>
                 <a
@@ -354,7 +354,7 @@ const RegistrationTracker: React.FC = () => {
                   </span>
                   <ChevronRight
                     size={14}
-                    className="text-gray-600 group-hover:text-tj-gold ml-auto transition-colors"
+                    className="text-gray-400 group-hover:text-tj-gold ml-auto transition-colors"
                   />
                 </a>
               </div>
@@ -374,7 +374,7 @@ const RegistrationTracker: React.FC = () => {
         {!searched && !urlOrderId && (
           <div className="text-center py-16 border border-gray-800/50 bg-white/[0.02]">
             <Shield className="mx-auto text-gray-700 mb-4" size={48} />
-            <p className="text-gray-600 text-sm mb-2">Enter your order ID above to track your registration</p>
+            <p className="text-gray-400 text-sm mb-2">Enter your order ID above to track your registration</p>
             <p className="text-gray-700 text-xs">
               Your order ID was provided in your purchase confirmation
             </p>
