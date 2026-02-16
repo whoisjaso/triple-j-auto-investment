@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-16
-**Session:** Phase 10 gap closure complete (all 6 plans done)
+**Session:** Phase 11 plan 01 complete (production polish infrastructure)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 10 - Brand Truth (VERIFIED COMPLETE -- 4/4 must-haves passed)
+**Current focus:** Phase 11 - Production Polish (1/6 plans complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -30,17 +30,17 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
-**Phase:** 10 of 19 (Brand Truth)
-**Plan:** 6 of 6 completed (10-01, 10-02, 10-03, 10-04, 10-05, 10-06)
-**Status:** Phase complete
-**Last activity:** 2026-02-16 -- Completed 10-06-PLAN.md (bilingual gap closure for Finance, PaymentOptions, Policies, VinLookup)
+**Phase:** 11 of 19 (Production Polish)
+**Plan:** 1 of 6 completed (11-01)
+**Status:** In progress
+**Last activity:** 2026-02-16 -- Completed 11-01-PLAN.md (production polish infrastructure: console stripping, error/loading/offline components, maintenance page, translation keys)
 
-Progress: [████████░░] 80% (8/10 plans completed across v2.0)
+Progress: [█████████░] 90% (9/10 plans completed across v2.0 so far)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06)
+- Total plans completed: 9 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -80,6 +80,11 @@ Progress: [████████░░] 80% (8/10 plans completed across v2.0
 - **[10-06]** VIN validation error codes kept as technical strings (not translated) -- universal technical codes
 - **[10-06]** Bold text in translated paragraphs uses split-string pattern (introBefore/introHighlight/introAfter)
 - **[10-06]** Payment methods in policies stored as {method, detail} object arrays matching services.list pattern
+- **[11-01]** Console stripping uses esbuild.drop conditional on production mode, preserving dev console output
+- **[11-01]** ErrorBoundary wraps main+Suspense block (not entire AppContent) so Navbar/Footer remain visible during page crashes
+- **[11-01]** OfflineBanner renders above Navbar with z-[9999] to ensure visibility regardless of page content
+- **[11-01]** Maintenance page is fully static HTML with inline CSS (no build dependencies) and stacks both languages
+- **[11-01]** lazyWithErrorHandling fallback UI updated from bg-tj-green to bg-black to match site dark aesthetic
 
 ### Completed Work (Phase 9)
 
@@ -96,6 +101,10 @@ Progress: [████████░░] 80% (8/10 plans completed across v2.0
 - **10-05 (complete):** Rewrote all index.html meta tags (title, description, keywords), OG tags (og:title, og:description), and schema.org structured data (description, slogan, priceRange, paymentAccepted, hasOfferCatalog). Zero instances of "luxury", "Sovereign", "Kingdom", or "Identity Precedes Results" remain. All BLOCKER-severity gaps from 10-VERIFICATION.md resolved.
 - **10-06 (complete):** Added 350+ bilingual translation keys for Finance, PaymentOptions, Policies, VinLookup. Wired all 4 pages to translation system (43+39+25+30 = 137 new t.* references). Replaced all VinLookup terminal/hacker jargon with professional language. Zero hardcoded English user-facing content remains on any page. All WARNING-severity gaps from 10-VERIFICATION.md resolved.
 
+### Completed Work (Phase 11) -- IN PROGRESS
+
+- **11-01 (complete):** Console stripping via esbuild.drop (conditional on production mode). ErrorBoundary repositioned to wrap Routes/Suspense block. PageLoader component as branded Suspense fallback. useOnlineStatus hook + OfflineBanner + ConnectionErrorBanner. Static bilingual maintenance.html. 30 polish translation keys in en+es for loading/empty/error/accessibility.
+
 ### Remaining Phase 9 Work
 
 - **09-01:** Long-lead items (Resend DNS, repo private, A2P 10DLC) -- 100% manual
@@ -108,6 +117,14 @@ Progress: [████████░░] 80% (8/10 plans completed across v2.0
 ### Remaining Phase 10 Work
 
 None -- Phase 10 is fully complete (all original plans + gap closure plans).
+
+### Remaining Phase 11 Work
+
+- **11-02:** Mobile responsiveness (375px-414px viewport fixes across all pages)
+- **11-03:** Loading states (skeletons, empty states, form submission states)
+- **11-04:** Error handling (Supabase error surfacing, form error states)
+- **11-05:** Visual consistency (spacing, buttons, cards standardization)
+- **11-06:** Accessibility basics (alt text, ARIA, keyboard nav, contrast)
 
 ### Blockers/Concerns
 
@@ -122,6 +139,6 @@ None -- Phase 10 is fully complete (all original plans + gap closure plans).
 ## Session Continuity
 
 **Last session:** 2026-02-16
-**Stopped at:** Phase 10 verification passed (4/4 must-haves). ROADMAP and REQUIREMENTS updated.
+**Stopped at:** Completed 11-01-PLAN.md (production polish infrastructure)
 **Resume file:** None
-**Resume:** Phase 10 verified complete. All customer-facing content is honest, bilingual, and jargon-free across every page. Next: Phase 11 (Production Polish) — mobile-first, performance, accessibility, error handling.
+**Resume:** Phase 11 plan 01 complete. All infrastructure components (PageLoader, OfflineBanner, ConnectionErrorBanner, useOnlineStatus, maintenance page, translation keys) are in place. Next: 11-02 (mobile responsiveness) or 11-03 (loading/empty states).
