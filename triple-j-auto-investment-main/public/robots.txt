@@ -10,5 +10,62 @@ Disallow: /login
 Disallow: /customer/
 Disallow: /track
 
+# AI Search Engine Crawlers (GEO/AEO)
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
+User-agent: Claude-Web
+Allow: /
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
 # Sitemap location
 Sitemap: https://triplejautoinvestment.com/sitemap.xml
