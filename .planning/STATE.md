@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 10 of 19 (Brand Truth)
-**Plan:** 2 of 4 completed (10-01, 10-02)
+**Plan:** 3 of 4 completed (10-01, 10-02, 10-04)
 **Status:** In progress
-**Last activity:** 2026-02-15 -- Completed 10-02-PLAN.md (About, Services, FAQ page rewrites)
+**Last activity:** 2026-02-15 -- Completed 10-04-PLAN.md (support file cleanup, phone standardization, jargon sweep)
 
-Progress: [████░░░░░░] 40% (4/10 plans completed across v2.0)
+Progress: [█████░░░░░] 50% (5/10 plans completed across v2.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4 (v2.0: 09-03, 09-04, 10-01, 10-02)
+- Total plans completed: 5 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-04)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -67,6 +67,9 @@ Progress: [████░░░░░░] 40% (4/10 plans completed across v2.0
 - **[10-02]** "Logistics Coordination" (out-of-state shipping) removed as unverified service
 - **[10-02]** FAQ switched from 5 English-only categories to flat bilingual list from t.faq.questions[]
 - **[10-02]** "What We Don't Do" section added to translations as t.services.dontDo for proper bilingual support
+- **[10-04]** Admin-only "Sovereign CFO" prompt in geminiService.ts kept unchanged (not customer-facing)
+- **[10-04]** Phone numbers standardized to (832) 400-9760 across entire codebase including emailService.ts and pdfService.ts
+- **[10-04]** Codebase-wide jargon sweep confirms zero SOVEREIGN framework terminology in customer-facing content
 
 ### Completed Work (Phase 9)
 
@@ -78,6 +81,7 @@ Progress: [████░░░░░░] 40% (4/10 plans completed across v2.0
 
 - **10-01 (complete):** Rewrote translations.ts (376 to 808 lines) with honest bilingual content. All SOVEREIGN jargon replaced. 9 new sections added (about, finance, policies, legal, notFound, vinLookup, paymentOptions, expanded faq+services). Rewrote Home.tsx: removed SubliminalPrime component, removed fake Live Signals ticker, replaced with honest dealership info. All homepage content now from translations.
 - **10-02 (complete):** Rewrote About.tsx (329 to 313 lines), Services.tsx (186 to 85 lines), FAQ.tsx (206 to 100 lines). All three pages fully bilingual via t.about.*/t.services.*/t.faq.* keys. Added services.dontDo to translations.ts. Vehicle sales and rentals on Services page. Zero SOVEREIGN jargon on any page.
+- **10-04 (complete):** Replaced FALLBACK_VEHICLES (Rolls-Royce $289K, Mercedes G63 $215K, Lamborghini $265K, Range Rover $85K) with realistic pre-owned vehicles (Honda Accord $6.5K, Toyota Camry $5.2K, Ford Fusion $4.8K, Chevy Equinox $3.9K). Renamed generateOpulentCaption to generateVehicleCaption with honest templates. Rewrote Gemini AI prompt for honest descriptions. Fixed SovereignCrest alt text. Standardized ALL phone numbers to (832) 400-9760 (5 files). Fixed jargon in VinLookup.tsx, Inventory.tsx, LuxuryHero.tsx. Codebase-wide sweep: zero customer-facing jargon.
 
 ### Remaining Phase 9 Work
 
@@ -90,8 +94,7 @@ Progress: [████░░░░░░] 40% (4/10 plans completed across v2.0
 
 ### Remaining Phase 10 Work
 
-- **10-03:** Finance, VinLookup, PaymentOptions, Policies, Legal, NotFound page rewrites
-- **10-04:** Support file cleanup (vehicles.ts, sheets.ts, geminiService.ts, SovereignCrest.tsx)
+- **10-03:** Finance, VinLookup, PaymentOptions, Policies, Legal, NotFound page rewrites (wire to translations for bilingual support)
 
 ### Blockers/Concerns
 
@@ -106,6 +109,6 @@ Progress: [████░░░░░░] 40% (4/10 plans completed across v2.0
 ## Session Continuity
 
 **Last session:** 2026-02-15
-**Stopped at:** Completed 10-02-PLAN.md. About.tsx, Services.tsx, FAQ.tsx fully rewritten with honest bilingual content. 4 of 6 main content pages now clean (Home, About, Services, FAQ).
+**Stopped at:** Completed 10-04-PLAN.md. Support files cleaned, phone numbers standardized, codebase-wide jargon sweep complete. Only 10-03 remains for Phase 10.
 **Resume file:** None
-**Resume:** Continue with 10-03 (Finance/VinLookup/PaymentOptions/Policies/Legal/NotFound page rewrites) or 10-04 (support file cleanup). All translation keys for remaining pages are already in translations.ts.
+**Resume:** Continue with 10-03 (Finance/VinLookup/PaymentOptions/Policies/Legal/NotFound page rewrites to wire bilingual content from translations.ts). All translation keys already exist from 10-01.
