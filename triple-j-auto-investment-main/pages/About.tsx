@@ -1,8 +1,18 @@
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Heart, Shield, Users, ArrowRight, Star, MapPin, Navigation, Clock, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+  })
+};
 
 const About = () => {
   const { t } = useLanguage();
@@ -30,7 +40,7 @@ const About = () => {
         </div>
 
         <div className="relative z-10 max-w-6xl mx-auto text-center">
-          <div className="inline-block mb-10 animate-fade-in">
+          <motion.div className="inline-block mb-10" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
              <div className="px-8 py-3 border border-tj-gold/30 bg-black/60 backdrop-blur-md shadow-[0_0_30px_rgba(212,175,55,0.1)] relative group">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-tj-gold/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
                 <div className="absolute top-0 left-0 w-1 h-1 bg-tj-gold"></div>
@@ -42,19 +52,19 @@ const About = () => {
                    {t.about.hero.badge}
                 </p>
              </div>
-          </div>
+          </motion.div>
 
-          <h1 className="font-display text-6xl md:text-9xl leading-none tracking-tighter mb-12 animate-slide-up text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-100 to-gray-400 drop-shadow-2xl relative z-10">
+          <motion.h1 className="font-display text-6xl md:text-9xl leading-none tracking-tighter mb-12 text-transparent bg-clip-text bg-gradient-to-b from-white via-gray-100 to-gray-400 drop-shadow-2xl relative z-10" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}>
             {t.about.hero.title}
-          </h1>
+          </motion.h1>
 
-          <div className="flex flex-col md:flex-row items-center justify-center gap-12 animate-slide-up relative" style={{animationDelay: '0.2s'}}>
+          <motion.div className="flex flex-col md:flex-row items-center justify-center gap-12 relative" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.4 }}>
             <div className="h-px w-24 bg-gradient-to-r from-transparent via-tj-gold/60 to-transparent hidden md:block"></div>
             <p className="text-lg md:text-2xl text-gray-300 max-w-2xl mx-auto font-serif italic leading-relaxed text-center drop-shadow-lg">
               {t.about.hero.subtitle}
             </p>
             <div className="h-px w-24 bg-gradient-to-r from-transparent via-tj-gold/60 to-transparent hidden md:block"></div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -69,7 +79,7 @@ const About = () => {
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-24 items-center relative z-10">
 
           {/* Image Card */}
-          <div className="order-2 md:order-1 relative group perspective-1000">
+          <motion.div className="order-2 md:order-1 relative group perspective-1000" initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7 }}>
             <div className="absolute -inset-2 bg-tj-gold/10 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition duration-1000"></div>
             <div className="relative aspect-[4/5] bg-tj-dark border border-tj-gold/30 p-3 shadow-[0_0_30px_rgba(0,0,0,0.8)] group-hover:border-tj-gold/60 group-hover:shadow-[0_0_50px_rgba(212,175,55,0.15)] transition-all duration-700">
                <div className="absolute inset-0 bg-tj-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-20 mix-blend-overlay"></div>
@@ -86,10 +96,10 @@ const About = () => {
                  <p className="font-display text-2xl text-white tracking-wide">{t.about.hero.title}</p>
                </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* Text Content */}
-          <div className="order-1 md:order-2">
+          <motion.div className="order-1 md:order-2" initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true, amount: 0.3 }} transition={{ duration: 0.7, delay: 0.2 }}>
             <div className="flex items-center gap-4 mb-8">
                <div className="h-px w-12 bg-tj-gold shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
                <h3 className="text-tj-gold text-xs font-bold tracking-[0.4em] uppercase drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]">
@@ -112,7 +122,7 @@ const About = () => {
                 {t.about.story.p2}
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -122,12 +132,12 @@ const About = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-tj-green/50 to-black/80"></div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div className="text-center mb-24">
+          <motion.div className="text-center mb-24" variants={fadeUp} custom={0} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.3 }}>
             <div className="inline-flex items-center justify-center p-6 border border-tj-gold/30 bg-black/50 rounded-full mb-10 shadow-[0_0_40px_rgba(212,175,55,0.1)] backdrop-blur-md">
                <Heart className="text-tj-gold" size={32} />
             </div>
             <h2 className="text-5xl md:text-7xl font-display text-white mb-6 tracking-tight">{t.about.values.title}</h2>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
@@ -135,7 +145,7 @@ const About = () => {
               { id: '02', icon: Heart, title: t.about.values.v2Title, text: t.about.values.v2Desc },
               { id: '03', icon: Users, title: t.about.values.v3Title, text: t.about.values.v3Desc }
             ].map((card, i) => (
-              <div key={i} className="bg-black/60 p-6 md:p-8 group relative overflow-hidden border border-tj-gold/10 hover:border-tj-gold/60 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.5)] hover:-translate-y-2">
+              <motion.div key={i} className="bg-black/60 p-6 md:p-8 group relative overflow-hidden border border-tj-gold/10 hover:border-tj-gold/60 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.5)] hover:-translate-y-2" variants={fadeUp} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true, amount: 0.2 }}>
                 <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold/0 group-hover:bg-tj-gold transition-colors duration-500"></div>
 
                 <div className="absolute -right-12 -bottom-12 text-tj-gold/5 group-hover:text-tj-gold/10 transition-colors duration-700 transform group-hover:scale-110 group-hover:rotate-12">
@@ -149,7 +159,7 @@ const About = () => {
                     {card.text}
                   </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -161,7 +171,7 @@ const About = () => {
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">
-            <div className="flex flex-col justify-center">
+            <motion.div className="flex flex-col justify-center" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
                <h2 className="font-display text-5xl md:text-7xl text-white leading-none mb-12">
                  {t.about.story.title}
                </h2>
@@ -174,10 +184,10 @@ const About = () => {
                    </p>
                  </div>
                </div>
-            </div>
+            </motion.div>
 
             {/* Info Card */}
-            <div className="bg-tj-green/10 backdrop-blur-md border border-tj-gold/20 p-6 md:p-8 relative shadow-2xl group hover:border-tj-gold/40 hover:bg-tj-green/20 transition-all duration-700">
+            <motion.div className="bg-tj-green/10 backdrop-blur-md border border-tj-gold/20 p-6 md:p-8 relative shadow-2xl group hover:border-tj-gold/40 hover:bg-tj-green/20 transition-all duration-700" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }}>
               <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-tj-gold/40"></div>
               <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-tj-gold/40"></div>
 
@@ -213,7 +223,7 @@ const About = () => {
                     <span className="text-white text-sm">{t.about.location.closed}</span>
                 </li>
               </ul>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -221,7 +231,7 @@ const About = () => {
        {/* SECTION 4: Visit Us (Map) */}
        <section className="py-20 bg-tj-dark border-t border-tj-gold/10 relative overflow-hidden">
           <div className="max-w-[1800px] mx-auto px-6">
-              <div className="flex flex-col md:flex-row items-start md:items-stretch gap-0 md:gap-12 border border-tj-gold/20">
+              <motion.div className="flex flex-col md:flex-row items-start md:items-stretch gap-0 md:gap-12 border border-tj-gold/20" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.7 }}>
 
                   {/* Left: Location Info */}
                   <div className="w-full md:w-1/3 bg-black p-6 md:p-8 flex flex-col justify-center relative overflow-hidden group">
@@ -290,7 +300,7 @@ const About = () => {
                        <div className="absolute top-8 left-8 w-4 h-4 border-t-2 border-l-2 border-tj-gold/50 pointer-events-none z-20"></div>
                        <div className="absolute bottom-8 right-8 w-4 h-4 border-b-2 border-r-2 border-tj-gold/50 pointer-events-none z-20"></div>
                   </div>
-              </div>
+              </motion.div>
           </div>
        </section>
 
@@ -298,7 +308,7 @@ const About = () => {
       <section className="py-20 md:py-32 bg-tj-green text-center px-4 md:px-6 relative overflow-hidden border-t border-tj-gold/30">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10"></div>
 
-        <div className="relative z-10 max-w-4xl mx-auto">
+        <motion.div className="relative z-10 max-w-4xl mx-auto" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
           <div className="flex justify-center mb-6">
               <Star className="text-tj-gold fill-tj-gold animate-pulse" size={24} />
           </div>
@@ -316,7 +326,7 @@ const About = () => {
               <ArrowRight size={16} className="relative z-10 group-hover:translate-x-2 transition-transform" />
             </Link>
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );
