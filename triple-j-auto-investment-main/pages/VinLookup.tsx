@@ -273,7 +273,7 @@ const VinLookup = () => {
                       <p className="text-white text-2xl tracking-widest font-display border-l-2 border-tj-gold pl-4">{result.Make || 'UNKNOWN'}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-[9px] uppercase tracking-[0.2em] mb-2">Model Designation</p>
+                      <p className="text-gray-500 text-[9px] uppercase tracking-[0.2em] mb-2">Model</p>
                       <p className="text-white text-2xl tracking-widest font-display border-l-2 border-tj-gold pl-4">{result.Model || 'UNKNOWN'}</p>
                     </div>
                     <div>

@@ -1,0 +1,315 @@
+import React, { useState } from 'react';
+import { DollarSign, Calculator, Shield, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
+import { useStore } from '../context/Store';
+import { useLanguage } from '../context/LanguageContext';
+
+const Finance = () => {
+  const { addLead } = useStore();
+  const { t } = useLanguage();
+  const [form, setForm] = useState({
+    name: '', phone: '', email: '', vehicleInterest: '',
+    estimatedPrice: '', downPayment: '', creditScore: 'good'
+  });
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'submitted'>('idle');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('submitting');
+
+    setTimeout(() => {
+      addLead({
+        id: Math.random().toString(36).substr(2, 9),
+        name: form.name,
+        email: form.email,
+        phone: form.phone,
+        interest: `Financing Inquiry: ${form.vehicleInterest} - Est. $${form.estimatedPrice}`,
+        date: new Date().toISOString(),
+        status: 'New'
+      });
+      setStatus('submitted');
+    }, 1500);
+  };
+
+  return (
+    <div className="min-h-screen bg-black pt-40 pb-20 px-6">
+      <div className="max-w-7xl mx-auto">
+
+        {/* Header */}
+        <div className="text-center mb-20">
+          <div className="inline-flex items-center gap-2 mb-6 text-tj-gold text-xs uppercase tracking-[0.4em]">
+            <DollarSign size={16} />
+            <span>{t.finance.badge}</span>
+          </div>
+          <h1 className="text-6xl md:text-8xl font-display text-white tracking-tight mb-6">
+            {t.finance.title}
+          </h1>
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+            {t.finance.subtitle}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
+
+          {/* Benefit 1 */}
+          <div className="bg-tj-dark border border-white/10 p-8 hover:border-tj-gold/50 transition-all">
+            <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
+              <Calculator size={24} />
+            </div>
+            <h3 className="text-white font-display text-xl mb-3">{t.finance.options.step1Title}</h3>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              {t.finance.options.step1Desc}
+            </p>
+          </div>
+
+          {/* Benefit 2 */}
+          <div className="bg-tj-dark border border-white/10 p-8 hover:border-tj-gold/50 transition-all">
+            <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
+              <TrendingUp size={24} />
+            </div>
+            <h3 className="text-white font-display text-xl mb-3">{t.finance.options.step2Title}</h3>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              {t.finance.options.step2Desc}
+            </p>
+          </div>
+
+          {/* Benefit 3 */}
+          <div className="bg-tj-dark border border-white/10 p-8 hover:border-tj-gold/50 transition-all">
+            <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
+              <Shield size={24} />
+            </div>
+            <h3 className="text-white font-display text-xl mb-3">{t.finance.options.step3Title}</h3>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              {t.finance.options.step3Desc}
+            </p>
+          </div>
+
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+          {/* Application Form */}
+          <div className="bg-tj-dark border border-white/10 p-12">
+            <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
+
+            {status === 'submitted' ? (
+              <div className="text-center py-20">
+                <div className="w-20 h-20 mx-auto border border-tj-gold rounded-full flex items-center justify-center mb-6 bg-tj-gold/10">
+                  <CheckCircle className="text-tj-gold" size={40} />
+                </div>
+                <h3 className="text-2xl font-display text-white mb-4">{t.contact.form.sent}</h3>
+                <p className="text-gray-400 mb-8">
+                  {t.finance.cta.desc}
+                </p>
+                <button
+                  onClick={() => setStatus('idle')}
+                  className="text-tj-gold text-xs uppercase tracking-widest hover:text-white transition-colors"
+                >
+                  {t.contact.form.reset}
+                </button>
+              </div>
+            ) : (
+              <>
+                <h2 className="text-white font-display text-2xl mb-2">{t.finance.options.title}</h2>
+                <p className="text-gray-500 text-xs uppercase tracking-widest mb-8">{t.finance.intro}</p>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.name}</label>
+                    <input
+                      required
+                      type="text"
+                      value={form.name}
+                      onChange={e => setForm({...form, name: e.target.value})}
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.phone}</label>
+                      <input
+                        required
+                        type="tel"
+                        value={form.phone}
+                        onChange={e => setForm({...form, phone: e.target.value})}
+                        className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.email}</label>
+                      <input
+                        type="email"
+                        value={form.email}
+                        onChange={e => setForm({...form, email: e.target.value})}
+                        className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.inventory.modal.form.name}</label>
+                    <input
+                      required
+                      type="text"
+                      value={form.vehicleInterest}
+                      onChange={e => setForm({...form, vehicleInterest: e.target.value})}
+                      placeholder="e.g., 2018 Honda Civic"
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.common.price}</label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <input
+                          required
+                          type="number"
+                          value={form.estimatedPrice}
+                          onChange={e => setForm({...form, estimatedPrice: e.target.value})}
+                          className="w-full bg-black border border-gray-700 p-4 pl-8 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">Down Payment</label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <input
+                          required
+                          type="number"
+                          value={form.downPayment}
+                          onChange={e => setForm({...form, downPayment: e.target.value})}
+                          className="w-full bg-black border border-gray-700 p-4 pl-8 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">Credit Profile</label>
+                    <select
+                      value={form.creditScore}
+                      onChange={e => setForm({...form, creditScore: e.target.value})}
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors appearance-none"
+                    >
+                      <option value="excellent">Excellent (750+)</option>
+                      <option value="good">Good (700-749)</option>
+                      <option value="fair">Fair (650-699)</option>
+                      <option value="poor">Below 650</option>
+                    </select>
+                  </div>
+
+                  <div className="bg-white/5 border border-white/10 p-4 text-xs text-gray-400">
+                    <p className="mb-2">
+                      <AlertTriangle size={14} className="inline mr-2 text-tj-gold" />
+                      By submitting, you authorize a soft credit inquiry which does not impact your credit score.
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={status === 'submitting'}
+                    className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors disabled:opacity-50"
+                  >
+                    {status === 'submitting' ? t.contact.form.submitting : t.inventory.modal.submit}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+
+          {/* Info Sidebar */}
+          <div className="space-y-8">
+
+            {/* Requirements */}
+            <div className="bg-black border border-white/10 p-8">
+              <h3 className="text-white font-display text-xl mb-6 flex items-center gap-2">
+                <CheckCircle size={20} className="text-tj-gold" />
+                REQUIREMENTS
+              </h3>
+              <ul className="space-y-4 text-gray-400 text-sm">
+                <li className="flex items-start gap-3">
+                  <span className="text-tj-gold">&bull;</span>
+                  <span>Valid driver's license or government-issued ID</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-tj-gold">&bull;</span>
+                  <span>Proof of income (pay stubs or bank statements)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-tj-gold">&bull;</span>
+                  <span>Proof of residence (utility bill or lease agreement)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-tj-gold">&bull;</span>
+                  <span>Insurance coverage confirmation</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Rates */}
+            <div className="bg-black border border-white/10 p-8">
+              <h3 className="text-white font-display text-xl mb-6">ESTIMATED RATES</h3>
+              <div className="space-y-4">
+                <div className="border-b border-white/5 pb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs uppercase tracking-widest text-gray-500">Excellent Credit</span>
+                    <span className="text-tj-gold font-mono text-lg">4.9% - 6.9%</span>
+                  </div>
+                  <p className="text-xs text-gray-600">750+ score, 20%+ down</p>
+                </div>
+                <div className="border-b border-white/5 pb-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs uppercase tracking-widest text-gray-500">Good Credit</span>
+                    <span className="text-white font-mono text-lg">7.9% - 10.9%</span>
+                  </div>
+                  <p className="text-xs text-gray-600">700-749 score, 15%+ down</p>
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs uppercase tracking-widest text-gray-500">Fair Credit</span>
+                    <span className="text-white font-mono text-lg">11.9% - 16.9%</span>
+                  </div>
+                  <p className="text-xs text-gray-600">650-699 score, 25%+ down required</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-600 mt-6">
+                *Rates subject to change. Final APR determined by lender based on full credit profile.
+              </p>
+            </div>
+
+            {/* Warning */}
+            <div className="bg-red-900/10 border border-red-900/30 p-6">
+              <h4 className="text-red-500 font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2">
+                <AlertTriangle size={16} />
+                Important Notice
+              </h4>
+              <p className="text-gray-400 text-xs leading-relaxed">
+                Financing is subject to approval by third-party lenders. Triple J Auto Investment does not provide direct financing. We are a dealership, not a bank.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className="mt-16 text-center">
+          <h3 className="text-white font-display text-2xl mb-4">{t.finance.cta.title}</h3>
+          <p className="text-gray-400 mb-4">{t.finance.cta.desc}</p>
+          <p className="text-tj-gold text-sm mb-6">{t.finance.cta.phone}</p>
+          <a
+            href="/contact"
+            className="inline-block bg-tj-gold text-black font-bold px-8 py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors"
+          >
+            {t.finance.cta.button}
+          </a>
+        </div>
+
+      </div>
+    </div>
+  );
+};
+
+export default Finance;

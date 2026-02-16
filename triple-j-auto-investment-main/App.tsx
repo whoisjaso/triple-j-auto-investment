@@ -137,7 +137,7 @@ const Navbar = () => {
             {/* Left Axis: Operational */}
             <div className="hidden md:flex flex-1 items-center justify-start space-x-10 pl-12">
               <NavLink to="/inventory" label={t.nav.inventory} />
-              <NavLink to="/vin" label="INTEL" />
+              <NavLink to="/vin" label={t.vinLookup.badge} />
             </div>
 
             {/* CENTER AXIS: OFFICIAL LOGO */}
@@ -227,10 +227,10 @@ const Navbar = () => {
           <div className="flex flex-col items-center gap-8 w-full px-8">
             {/* Public Navigation Links */}
             {[
-              { to: "/", label: t.nav.home.toUpperCase(), sub: "ORIGIN POINT" },
-              { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "ACQUIRE ASSETS" },
-              { to: "/vin", label: "INTEL", sub: "DEEP DATA ANALYSIS" },
-              { to: "/about", label: t.nav.about.toUpperCase(), sub: "THE PHILOSOPHY" }
+              { to: "/", label: t.nav.home.toUpperCase(), sub: "" },
+              { to: "/inventory", label: t.nav.inventory.toUpperCase(), sub: "" },
+              { to: "/vin", label: t.vinLookup.title, sub: "" },
+              { to: "/about", label: t.nav.about.toUpperCase(), sub: "" }
             ].map((link) => (
               <div key={link.to} className="w-full text-center group">
                 <Link
@@ -240,9 +240,11 @@ const Navbar = () => {
                 >
                   {link.label}
                 </Link>
-                <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors">
-                  {link.sub}
-                </p>
+                {link.sub && (
+                  <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors">
+                    {link.sub}
+                  </p>
+                )}
               </div>
             ))}
 
