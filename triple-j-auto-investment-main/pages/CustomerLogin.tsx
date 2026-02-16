@@ -276,7 +276,7 @@ const CustomerLogin: React.FC = () => {
               value={trackingLink}
               onChange={(e) => setTrackingLink(e.target.value)}
               placeholder="Paste your access key or link"
-              className="flex-1 bg-white/5 border border-white/10 rounded px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:border-tj-gold/50 focus:outline-none transition-colors"
+              className="flex-1 bg-white/5 border border-white/10 rounded px-4 py-2.5 text-white text-sm placeholder-gray-600 focus:border-tj-gold/50 focus:outline-none focus:ring-1 focus:ring-tj-gold/30 transition-colors"
               onKeyDown={(e) => e.key === 'Enter' && handleTrackingGo()}
             />
             <button

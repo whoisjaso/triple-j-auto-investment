@@ -109,6 +109,8 @@ const Navbar = () => {
     }
   };
 
+  const menuToggleRef = React.useRef<HTMLButtonElement>(null);
+
   React.useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -121,6 +123,19 @@ const Navbar = () => {
       document.body.style.overflow = '';
       document.body.style.touchAction = '';
     };
+  }, [isOpen]);
+
+  // Escape key closes mobile menu
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+        menuToggleRef.current?.focus();
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen]);
 
   const NavLink = ({ to, label }: { to: string, label: string }) => (
@@ -213,6 +228,7 @@ const Navbar = () => {
               </button>
 
               <button
+                ref={menuToggleRef}
                 onClick={() => setIsOpen(!isOpen)}
                 className={`group relative p-3 border transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] overflow-hidden ${isOpen ? 'border-tj-gold text-tj-gold bg-black' : 'border-white/10 text-white bg-black/50 backdrop-blur'}`}
                 aria-label={isOpen ? 'Close menu' : 'Open menu'}

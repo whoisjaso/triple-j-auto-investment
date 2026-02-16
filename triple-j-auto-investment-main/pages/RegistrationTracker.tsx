@@ -158,7 +158,7 @@ const RegistrationTracker: React.FC = () => {
                 onChange={(e) => setOrderIdInput(e.target.value.toUpperCase())}
                 onKeyPress={handleKeyPress}
                 placeholder="TJ-2024-0001"
-                className="w-full bg-black border border-gray-700 px-4 py-3 text-white font-mono tracking-wider focus:outline-none focus:border-tj-gold transition-colors placeholder-gray-700"
+                className="w-full bg-black border border-gray-700 px-4 py-3 text-white font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-tj-gold/50 focus:border-tj-gold transition-colors placeholder-gray-700"
               />
             </div>
             <button

@@ -139,7 +139,7 @@ const Finance = () => {
                       type="text"
                       value={form.name}
                       onChange={e => setForm({...form, name: e.target.value})}
-                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                     />
                   </div>
 
@@ -151,7 +151,7 @@ const Finance = () => {
                         type="tel"
                         value={form.phone}
                         onChange={e => setForm({...form, phone: e.target.value})}
-                        className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                        className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                       />
                     </div>
                     <div>
@@ -160,7 +160,7 @@ const Finance = () => {
                         type="email"
                         value={form.email}
                         onChange={e => setForm({...form, email: e.target.value})}
-                        className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                        className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                       />
                     </div>
                   </div>
@@ -173,7 +173,7 @@ const Finance = () => {
                       value={form.vehicleInterest}
                       onChange={e => setForm({...form, vehicleInterest: e.target.value})}
                       placeholder={t.finance.form.vehiclePlaceholder}
-                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                     />
                   </div>
 
@@ -187,7 +187,7 @@ const Finance = () => {
                           type="number"
                           value={form.estimatedPrice}
                           onChange={e => setForm({...form, estimatedPrice: e.target.value})}
-                          className="w-full bg-black border border-gray-700 p-4 pl-8 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                          className="w-full bg-black border border-gray-700 p-4 pl-8 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                         />
                       </div>
                     </div>
@@ -200,7 +200,7 @@ const Finance = () => {
                           type="number"
                           value={form.downPayment}
                           onChange={e => setForm({...form, downPayment: e.target.value})}
-                          className="w-full bg-black border border-gray-700 p-4 pl-8 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                          className="w-full bg-black border border-gray-700 p-4 pl-8 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                         />
                       </div>
                     </div>
@@ -211,7 +211,7 @@ const Finance = () => {
                     <select
                       value={form.creditScore}
                       onChange={e => setForm({...form, creditScore: e.target.value})}
-                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors appearance-none"
+                      className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors appearance-none"
                     >
                       <option value="excellent">{t.finance.form.creditExcellent}</option>
                       <option value="good">{t.finance.form.creditGood}</option>

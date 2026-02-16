@@ -97,7 +97,7 @@ const Contact = () => {
                     type="text"
                     value={form.name}
                     onChange={e => setForm({ ...form, name: e.target.value })}
-                    className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                    className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                     placeholder={t.contact.form.placeholders.name}
                   />
                 </div>
@@ -109,7 +109,7 @@ const Contact = () => {
                     type="tel"
                     value={form.phone}
                     onChange={e => setForm({ ...form, phone: e.target.value })}
-                    className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                    className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                     placeholder={t.contact.form.placeholders.phone}
                   />
                 </div>
@@ -120,7 +120,7 @@ const Contact = () => {
                     type="email"
                     value={form.email}
                     onChange={e => setForm({ ...form, email: e.target.value })}
-                    className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                    className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                     placeholder={t.contact.form.placeholders.email}
                   />
                 </div>
@@ -132,7 +132,7 @@ const Contact = () => {
                     value={form.message}
                     onChange={e => setForm({ ...form, message: e.target.value })}
                     rows={5}
-                    className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                    className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                     placeholder={t.contact.form.placeholders.message}
                   />
                 </div>

@@ -37,7 +37,7 @@ const FAQ = () => {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder={t.faq.searchPlaceholder}
-              className="w-full bg-tj-dark border border-white/10 pl-12 pr-4 py-4 text-white focus:border-tj-gold outline-none transition-colors"
+              className="w-full bg-tj-dark border border-white/10 pl-12 pr-4 py-4 text-white focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
             />
           </div>
         </div>
@@ -48,15 +48,17 @@ const FAQ = () => {
             {t.faq.noResults} "{searchQuery}"
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4" role="list">
             {filteredFaqs.map((faq: { q: string; a: string }, idx: number) => {
               const isOpen = openIndex === idx;
 
               return (
-                <div key={idx} className="bg-tj-dark border border-white/10 overflow-hidden hover:border-tj-gold/30 transition-colors">
+                <div key={idx} className="bg-tj-dark border border-white/10 overflow-hidden hover:border-tj-gold/30 transition-colors" role="listitem">
                   <button
                     onClick={() => setOpenIndex(isOpen ? null : idx)}
-                    className="w-full text-left p-6 flex justify-between items-center gap-4 group"
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-answer-${idx}`}
+                    className="w-full text-left p-6 flex justify-between items-center gap-4 group focus:outline-none focus:ring-2 focus:ring-tj-gold focus:ring-offset-2 focus:ring-offset-black"
                   >
                     <h3 className="text-white font-medium text-lg group-hover:text-tj-gold transition-colors">
                       {faq.q}
@@ -67,6 +69,9 @@ const FAQ = () => {
                     />
                   </button>
                   <div
+                    id={`faq-answer-${idx}`}
+                    role="region"
+                    aria-labelledby={`faq-question-${idx}`}
                     className={`overflow-hidden transition-all duration-300 ${isOpen ? 'max-h-96' : 'max-h-0'}`}
                   >
                     <div className="px-6 pb-6 text-gray-400 leading-relaxed border-t border-white/5 pt-4">
@@ -86,7 +91,7 @@ const FAQ = () => {
           </p>
           <a
             href="/contact"
-            className="inline-block bg-tj-gold text-black font-bold px-8 py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors"
+            className="inline-block bg-tj-gold text-black font-bold px-8 py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors focus:outline-none focus:ring-2 focus:ring-tj-gold focus:ring-offset-2 focus:ring-offset-black"
           >
             {t.faq.contactCta}
           </a>

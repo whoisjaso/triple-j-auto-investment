@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../context/Store';
 import { VehicleStatus, Vehicle } from '../types';
@@ -191,6 +191,10 @@ const Inventory = () => {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
+  // Accessibility: refs for focus management
+  const modalRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+
   // Use scroll lock hook for modal only (ImageGallery handles its own lock)
   // When lightbox is open, let ImageGallery handle scroll lock to avoid double-locking
   useScrollLock(!!selectedVehicle && !lightboxOpen);
@@ -244,18 +248,24 @@ const Inventory = () => {
     }
   });
 
-  const handleOpenModal = (vehicle: Vehicle) => {
+  const handleOpenModal = useCallback((vehicle: Vehicle) => {
+    // Store trigger element for focus restoration
+    triggerRef.current = document.activeElement as HTMLElement;
     setSelectedVehicle(vehicle);
     setLeadForm({ name: '', email: '', phone: '' });
     setSubmitStatus('idle');
     setFormError('');
     setModalTab('overview');
     setModalImgIndex(0);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setSelectedVehicle(null);
-  };
+    // Restore focus to the element that opened the modal
+    requestAnimationFrame(() => {
+      triggerRef.current?.focus();
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -329,17 +339,41 @@ const Inventory = () => {
   const nextModalImg = () => setModalImgIndex(prev => (prev + 1) % modalImages.length);
   const prevModalImg = () => setModalImgIndex(prev => (prev === 0 ? modalImages.length - 1 : prev - 1));
 
-  // Key press handler for gallery
+  // Focus modal on open
   useEffect(() => {
+    if (selectedVehicle && modalRef.current) {
+      modalRef.current.focus();
+    }
+  }, [selectedVehicle]);
+
+  // Key press handler for gallery + focus trap
+  useEffect(() => {
+    if (!selectedVehicle) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!selectedVehicle) return;
       if (e.key === 'ArrowRight') nextModalImg();
       if (e.key === 'ArrowLeft') prevModalImg();
       if (e.key === 'Escape') handleCloseModal();
+      // Focus trap: cycle Tab within modal
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedVehicle, modalImages.length]);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [selectedVehicle, modalImages.length, handleCloseModal]);
 
   return (
     <div className="bg-black min-h-screen px-4 md:px-6 pb-20 relative">
@@ -386,7 +420,7 @@ const Inventory = () => {
                 placeholder={t.inventory.searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-black border border-white/10 pl-12 pr-4 py-4 text-white placeholder-gray-500 text-sm focus:border-tj-gold focus:outline-none transition-colors"
+                className="w-full bg-black border border-white/10 pl-12 pr-4 py-4 text-white placeholder-gray-500 text-sm focus:border-tj-gold focus:outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
               />
               {searchTerm && (
                 <button
@@ -403,7 +437,7 @@ const Inventory = () => {
               <div className="flex items-center gap-4 bg-tj-dark border border-white/10 p-1 w-full md:w-auto">
                 <div className="relative group w-full">
                   <select
-                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[200px]"
+                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-tj-gold/50 focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[200px]"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
                   >
@@ -424,7 +458,7 @@ const Inventory = () => {
               <div className="flex items-center gap-4 bg-tj-dark border border-white/10 p-1 w-full md:w-auto">
                 <div className="relative group w-full">
                   <select
-                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[160px]"
+                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-tj-gold/50 focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[160px]"
                     value={makeFilter}
                     onChange={(e) => setMakeFilter(e.target.value)}
                   >
@@ -444,7 +478,7 @@ const Inventory = () => {
               <div className="flex items-center gap-4 bg-tj-dark border border-white/10 p-1 w-full md:w-auto">
                 <div className="relative group w-full">
                   <select
-                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[160px]"
+                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-tj-gold/50 focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[160px]"
                     value={filter}
                     onChange={(e) => setFilter(e.target.value as any)}
                   >
@@ -567,21 +601,28 @@ const Inventory = () => {
               <motion.div
                 className="absolute inset-0 bg-black/95 backdrop-blur-xl"
                 onClick={handleCloseModal}
+                aria-hidden="true"
               ></motion.div>
 
               {/* Modal Container - FULL SCREEN ON MOBILE */}
               <motion.div
+                ref={modalRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label={`${selectedVehicle.year} ${selectedVehicle.make} ${selectedVehicle.model} details`}
+                tabIndex={-1}
                 initial={{ scale: 0.95, y: 20 }}
                 animate={{ scale: 1, y: 0 }}
                 exit={{ scale: 0.95, y: 20 }}
-                className="relative w-full h-screen md:h-[85vh] md:max-h-[800px] max-w-7xl bg-[#080808] md:border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] flex flex-col md:flex-row overflow-hidden md:rounded-sm"
+                className="relative w-full h-screen md:h-[85vh] md:max-h-[800px] max-w-7xl bg-[#080808] md:border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] flex flex-col md:flex-row overflow-hidden md:rounded-sm focus:outline-none"
                 style={{ height: 'calc(var(--vh, 1vh) * 100)', maxHeight: '100vh' }}
               >
 
                 {/* Close Button - Optimized Touch Target */}
                 <button
                   onClick={handleCloseModal}
-                  className="absolute top-4 right-4 z-30 text-white hover:text-tj-gold bg-black/80 backdrop-blur-md rounded-full p-4 md:p-3 border border-white/10 hover:border-tj-gold transition-all shadow-lg active:scale-90"
+                  aria-label="Close vehicle details"
+                  className="absolute top-4 right-4 z-30 text-white hover:text-tj-gold bg-black/80 backdrop-blur-md rounded-full p-4 md:p-3 border border-white/10 hover:border-tj-gold transition-all shadow-lg active:scale-90 focus:outline-none focus:ring-2 focus:ring-tj-gold"
                 >
                   <X size={24} />
                 </button>
@@ -865,7 +906,7 @@ const Inventory = () => {
                                   type="text"
                                   value={leadForm.name}
                                   onChange={e => setLeadForm({ ...leadForm, name: e.target.value })}
-                                  className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                                  className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                                   placeholder="Full Name / Nombre Completo"
                                 />
                               </div>
@@ -876,7 +917,7 @@ const Inventory = () => {
                                   type="tel"
                                   value={leadForm.phone}
                                   onChange={e => handlePhoneChange(e.target.value)}
-                                  className={`w-full bg-black border p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors font-mono ${
+                                  className={`w-full bg-black border p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors font-mono ${
                                     submitStatus === 'error' && formError.includes('phone') ? 'border-red-500' : 'border-gray-700'
                                   }`}
                                   placeholder="(832) 400-9760"
@@ -889,7 +930,7 @@ const Inventory = () => {
                                   type="email"
                                   value={leadForm.email}
                                   onChange={e => setLeadForm({ ...leadForm, email: e.target.value })}
-                                  className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                                  className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
                                   placeholder="email@address.com"
                                 />
                               </div>

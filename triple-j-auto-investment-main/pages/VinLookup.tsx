@@ -159,7 +159,7 @@ const VinLookup = () => {
                       onKeyDown={(e) => e.key === 'Enter' && handlePreFill()}
                       placeholder={t.vinLookup.placeholder}
                       maxLength={17}
-                      className={`w-full bg-black border ${error ? 'border-red-500 text-red-500 focus:border-red-500' : 'border-gray-700 text-white focus:border-tj-gold'} px-3 sm:px-4 py-3 pr-10 sm:pr-12 text-sm sm:text-lg font-mono focus:outline-none tracking-[0.05em] sm:tracking-[0.1em] placeholder-gray-800 transition-colors`}
+                      className={`w-full bg-black border ${error ? 'border-red-500 text-red-500 focus:border-red-500' : 'border-gray-700 text-white focus:border-tj-gold'} px-3 sm:px-4 py-3 pr-10 sm:pr-12 text-sm sm:text-lg font-mono focus:outline-none focus:ring-2 focus:ring-tj-gold/50 tracking-[0.05em] sm:tracking-[0.1em] placeholder-gray-800 transition-colors`}
                       spellCheck="false"
                     />
                     <button
@@ -183,7 +183,7 @@ const VinLookup = () => {
                           readOnly
                           value={vehicleDetails.make}
                           placeholder="---"
-                          className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-white focus:outline-none focus:border-tj-gold/50 transition-colors"
+                          className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-tj-gold/30 focus:border-tj-gold/50 transition-colors"
                        />
                      </div>
                      <div>
@@ -193,7 +193,7 @@ const VinLookup = () => {
                           readOnly
                           value={vehicleDetails.year}
                           placeholder="---"
-                          className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-tj-gold focus:outline-none focus:border-tj-gold/50 transition-colors"
+                          className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-tj-gold focus:outline-none focus:ring-1 focus:ring-tj-gold/30 focus:border-tj-gold/50 transition-colors"
                        />
                      </div>
                   </div>
@@ -204,7 +204,7 @@ const VinLookup = () => {
                         readOnly
                         value={vehicleDetails.model}
                         placeholder={t.vinLookup.fields.waitingForInput}
-                        className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-white focus:outline-none focus:border-tj-gold/50 transition-colors"
+                        className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-tj-gold/30 focus:border-tj-gold/50 transition-colors"
                      />
                   </div>
                 </div>
