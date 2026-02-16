@@ -18,6 +18,7 @@ import { LogOut, ChevronDown, ChevronRight, Car, ExternalLink } from 'lucide-rea
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabase/config';
 import { formatPhone } from '../utils/phone';
+import { useLanguage } from '../context/LanguageContext';
 import NotificationPreferences from '../components/NotificationPreferences';
 import { RegistrationStageKey, NotificationPreference, REGISTRATION_STAGES } from '../types';
 
@@ -64,6 +65,7 @@ const getStageBadgeClasses = (stage: RegistrationStageKey): string => {
 
 const CustomerDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [registrations, setRegistrations] = useState<DashboardRegistration[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -206,9 +208,9 @@ const CustomerDashboard: React.FC = () => {
           {registrations.length === 0 && !error && (
             <div className="text-center py-16">
               <Car size={48} className="text-gray-700 mx-auto mb-4" />
-              <h2 className="font-display text-lg text-gray-400 mb-2">No Registrations Found</h2>
+              <h2 className="font-display text-lg text-gray-400 mb-2">{t.polish.emptyDashboard}</h2>
               <p className="text-gray-600 text-sm max-w-sm mx-auto">
-                No registrations found for this phone number. If you recently purchased a vehicle, your registration may still be processing.
+                {t.polish.emptyDashboardSubtext}
               </p>
             </div>
           )}

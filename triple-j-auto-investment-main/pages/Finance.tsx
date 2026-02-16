@@ -10,14 +10,14 @@ const Finance = () => {
     name: '', phone: '', email: '', vehicleInterest: '',
     estimatedPrice: '', downPayment: '', creditScore: 'good'
   });
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'submitted'>('idle');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'submitted' | 'error'>('idle');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
 
-    setTimeout(() => {
-      addLead({
+    try {
+      await addLead({
         id: Math.random().toString(36).substr(2, 9),
         name: form.name,
         email: form.email,
@@ -27,7 +27,9 @@ const Finance = () => {
         status: 'New'
       });
       setStatus('submitted');
-    }, 1500);
+    } catch (error) {
+      setStatus('error');
+    }
   };
 
   return (
@@ -105,6 +107,23 @@ const Finance = () => {
                   className="text-tj-gold text-xs uppercase tracking-widest hover:text-white transition-colors"
                 >
                   {t.contact.form.reset}
+                </button>
+              </div>
+            ) : status === 'error' ? (
+              <div className="text-center py-20">
+                <div className="w-20 h-20 mx-auto border border-red-500/30 rounded-full flex items-center justify-center mb-6 bg-red-900/10">
+                  <AlertTriangle className="text-red-400" size={40} />
+                </div>
+                <h3 className="text-2xl font-display text-white mb-4">{t.polish.errorFormSubmit}</h3>
+                <p className="text-gray-400 mb-2">
+                  {t.polish.errorCallUs}{' '}
+                  <a href="tel:+18324009760" className="text-tj-gold hover:text-white transition-colors">{t.common.phone}</a>
+                </p>
+                <button
+                  onClick={() => setStatus('idle')}
+                  className="mt-6 text-[10px] uppercase tracking-widest bg-tj-gold text-black hover:bg-white px-8 py-3 transition-all font-bold"
+                >
+                  {t.polish.errorTryAgain}
                 </button>
               </div>
             ) : (

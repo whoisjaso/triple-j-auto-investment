@@ -1,11 +1,12 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Heart, Shield, Users, ArrowRight, Star, MapPin, Navigation, Clock, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
 
 const About = () => {
   const { t } = useLanguage();
+  const [mapLoaded, setMapLoaded] = useState(false);
 
   return (
     <div className="bg-tj-green min-h-screen text-white overflow-x-hidden font-sans selection:bg-tj-gold selection:text-black">
@@ -261,6 +262,16 @@ const About = () => {
 
                   {/* Right: Interactive Map */}
                   <div className="w-full md:w-2/3 min-h-[500px] relative bg-gray-900 group">
+                       {/* Map skeleton placeholder */}
+                       {!mapLoaded && (
+                         <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-900">
+                           <div className="text-center">
+                             <MapPin size={32} className="text-gray-700 mx-auto mb-3 animate-pulse" />
+                             <p className="text-gray-600 text-xs uppercase tracking-widest">{t.common.loading}</p>
+                           </div>
+                         </div>
+                       )}
+
                        <div className="absolute inset-0 pointer-events-none z-10 mix-blend-overlay bg-tj-gold/10 group-hover:bg-transparent transition-colors duration-700"></div>
 
                        <iframe
@@ -273,6 +284,7 @@ const About = () => {
                            referrerPolicy="no-referrer-when-downgrade"
                            className="absolute inset-0 w-full h-full opacity-80 group-hover:opacity-100 transition-opacity duration-500"
                            title="Triple J Auto Investment Location"
+                           onLoad={() => setMapLoaded(true)}
                        ></iframe>
 
                        <div className="absolute top-8 left-8 w-4 h-4 border-t-2 border-l-2 border-tj-gold/50 pointer-events-none z-20"></div>
