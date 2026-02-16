@@ -126,7 +126,7 @@ const VinLookup = () => {
               <Terminal size={24} />
               {t.vinLookup.title}
             </h1>
-            <p className="text-gray-600 text-xs uppercase tracking-widest">{t.vinLookup.subtitle}</p>
+            <p className="text-gray-400 text-xs uppercase tracking-widest">{t.vinLookup.subtitle}</p>
           </div>
           <div className="text-right">
              <div className="text-green-500 text-xs animate-pulse">● ONLINE</div>
@@ -146,7 +146,7 @@ const VinLookup = () => {
                   <div className="flex justify-between items-center mb-4">
                     <label className={`block text-[10px] uppercase tracking-[0.3em] ${error ? 'text-red-500' : 'text-tj-gold'}`}>{t.vinLookup.badge} (VIN)</label>
                     {vin.length > 0 && (
-                      <span className={`text-[10px] ${vin.length === 17 ? 'text-green-500' : 'text-gray-600'}`}>
+                      <span className={`text-[10px] ${vin.length === 17 ? 'text-green-500' : 'text-gray-400'}`}>
                         {vin.length}/17
                       </span>
                     )}
@@ -177,7 +177,7 @@ const VinLookup = () => {
                 <div className="grid grid-cols-1 gap-4">
                   <div className="grid grid-cols-2 gap-4">
                      <div>
-                       <label className="block text-[8px] uppercase tracking-widest text-gray-500 mb-1">{t.vinLookup.fields.make}</label>
+                       <label className="block text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.vinLookup.fields.make}</label>
                        <input
                           type="text"
                           readOnly
@@ -187,7 +187,7 @@ const VinLookup = () => {
                        />
                      </div>
                      <div>
-                       <label className="block text-[8px] uppercase tracking-widest text-gray-500 mb-1">{t.vinLookup.fields.year}</label>
+                       <label className="block text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.vinLookup.fields.year}</label>
                        <input
                           type="text"
                           readOnly
@@ -198,7 +198,7 @@ const VinLookup = () => {
                      </div>
                   </div>
                   <div>
-                     <label className="block text-[8px] uppercase tracking-widest text-gray-500 mb-1">{t.vinLookup.fields.model}</label>
+                     <label className="block text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.vinLookup.fields.model}</label>
                      <input
                         type="text"
                         readOnly
@@ -229,7 +229,7 @@ const VinLookup = () => {
 
             {/* System Logs */}
             <div className="bg-black border border-gray-800 p-6 h-[200px] font-mono text-xs overflow-y-auto scrollbar-none">
-               <div className="mb-4 text-gray-500 uppercase tracking-widest border-b border-gray-800 pb-2">{t.vinLookup.fields.dataStream}</div>
+               <div className="mb-4 text-gray-400 uppercase tracking-widest border-b border-gray-800 pb-2">{t.vinLookup.fields.dataStream}</div>
                <div className="space-y-2 text-green-500/80">
                   <div className="opacity-50">{'>'} {t.vinLookup.logs.initializing}</div>
                   {logs.map((log, i) => (
@@ -246,7 +246,7 @@ const VinLookup = () => {
               <div className="h-full flex items-center justify-center border border-gray-800 bg-white/5 opacity-50 min-h-[500px]">
                 <div className="text-center">
                    <Database size={48} className="mx-auto text-gray-700 mb-4 animate-pulse" />
-                   <p className="text-gray-600 tracking-widest text-xs">{t.vinLookup.placeholder}</p>
+                   <p className="text-gray-400 tracking-widest text-xs">{t.vinLookup.placeholder}</p>
                 </div>
               </div>
             ) : (
@@ -269,19 +269,19 @@ const VinLookup = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-12 relative z-10">
                     <div>
-                      <p className="text-gray-500 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.manufacturer}</p>
+                      <p className="text-gray-400 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.manufacturer}</p>
                       <p className="text-white text-2xl tracking-widest font-display border-l-2 border-tj-gold pl-4">{result.Make || 'UNKNOWN'}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.model}</p>
+                      <p className="text-gray-400 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.model}</p>
                       <p className="text-white text-2xl tracking-widest font-display border-l-2 border-tj-gold pl-4">{result.Model || 'UNKNOWN'}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.year}</p>
+                      <p className="text-gray-400 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.year}</p>
                       <p className="text-tj-gold text-2xl tracking-widest font-mono border-l-2 border-gray-700 pl-4">{result.ModelYear || 'UNKNOWN'}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.bodyType}</p>
+                      <p className="text-gray-400 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.bodyType}</p>
                       <p className="text-white text-sm tracking-widest font-mono border-l-2 border-gray-700 pl-4 leading-relaxed flex items-center h-full uppercase">{result.BodyClass || 'N/A'}</p>
                     </div>
                   </div>
@@ -294,19 +294,19 @@ const VinLookup = () => {
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
                         <div>
-                            <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.trimLevel}</p>
+                            <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.trimLevel}</p>
                             <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.Trim || 'Base'}</p>
                         </div>
                         <div>
-                            <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.series}</p>
+                            <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.series}</p>
                             <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.Series || 'N/A'}</p>
                         </div>
                         <div>
-                            <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.transmission}</p>
+                            <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.transmission}</p>
                             <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.TransmissionStyle || 'Standard'}</p>
                         </div>
                         <div>
-                            <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.doors}</p>
+                            <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.doors}</p>
                             <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.Doors ? `${result.Doors} ${t.vinLookup.resultLabels.doors}` : 'N/A'}</p>
                         </div>
                     </div>
@@ -323,19 +323,19 @@ const VinLookup = () => {
 
                    <div className="grid grid-cols-2 md:grid-cols-3 gap-8 relative z-10">
                      <div className="bg-tj-dark/50 p-4 border border-white/5">
-                        <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Activity size={10}/> {t.vinLookup.resultLabels.cylinders}</p>
+                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Activity size={10}/> {t.vinLookup.resultLabels.cylinders}</p>
                         <p className="text-white text-lg font-mono">{result.EngineCylinders || 'UNK'}</p>
                      </div>
                      <div className="bg-tj-dark/50 p-4 border border-white/5">
-                        <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Gauge size={10}/> {t.vinLookup.resultLabels.horsepower}</p>
+                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Gauge size={10}/> {t.vinLookup.resultLabels.horsepower}</p>
                         <p className="text-white text-lg font-mono">{result.EngineHP ? `${result.EngineHP} HP` : 'N/A'}</p>
                      </div>
                      <div className="bg-tj-dark/50 p-4 border border-white/5">
-                        <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Zap size={10}/> {t.vinLookup.resultLabels.drivetrain}</p>
+                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Zap size={10}/> {t.vinLookup.resultLabels.drivetrain}</p>
                         <p className="text-tj-gold text-lg font-mono">{result.DriveType || 'N/A'}</p>
                      </div>
                      <div className="col-span-2 md:col-span-3 pt-4 border-t border-gray-900/50">
-                        <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.fuelSystem}</p>
+                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.fuelSystem}</p>
                         <p className="text-white text-xs tracking-wider font-mono">{result.FuelType || t.vinLookup.resultLabels.standardCombustion}</p>
                      </div>
                    </div>
@@ -344,14 +344,14 @@ const VinLookup = () => {
                 {/* Manufacturing Origin */}
                 <div className="bg-gray-900 border border-gray-800 p-6 flex justify-between items-center">
                    <div>
-                      <p className="text-gray-500 text-[10px] tracking-widest mb-1">{t.vinLookup.resultLabels.manufacturingOrigin.toUpperCase()}</p>
+                      <p className="text-gray-400 text-[10px] tracking-widest mb-1">{t.vinLookup.resultLabels.manufacturingOrigin.toUpperCase()}</p>
                       <div className="flex items-center gap-3">
                         <Globe size={16} className="text-blue-500" />
                         <span className="text-white tracking-wider uppercase">{result.PlantCountry || 'N/A'}</span>
                       </div>
                    </div>
                    <div className="text-right">
-                      <p className="text-gray-500 text-[10px] tracking-widest mb-1">{t.vinLookup.resultLabels.mfgEntity.toUpperCase()}</p>
+                      <p className="text-gray-400 text-[10px] tracking-widest mb-1">{t.vinLookup.resultLabels.mfgEntity.toUpperCase()}</p>
                       <span className="text-gray-300 text-xs uppercase">{result.Manufacturer || 'UNKNOWN'}</span>
                    </div>
                 </div>

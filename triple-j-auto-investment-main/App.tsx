@@ -38,7 +38,7 @@ const lazyWithErrorHandling = (importFn: () => Promise<any>, pageName: string) =
               <p className="text-gray-400 mb-2">
                 Failed to load the {pageName} page.
               </p>
-              <p className="text-gray-500 text-sm mb-8">
+              <p className="text-gray-400 text-sm mb-8">
                 Please refresh the page or call us at (832) 400-9760.
               </p>
               <button
@@ -252,7 +252,7 @@ const Navbar = () => {
                   {link.label}
                 </Link>
                 {link.sub && (
-                  <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors">
+                  <p className="text-[9px] text-gray-400 uppercase tracking-[0.3em] mt-1 group-hover:text-tj-gold/60 transition-colors">
                     {link.sub}
                   </p>
                 )}
@@ -308,7 +308,7 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <p className="text-[9px] text-gray-500 uppercase tracking-[0.3em] mb-4 text-center">Dealer Portal</p>
+                  <p className="text-[9px] text-gray-400 uppercase tracking-[0.3em] mb-4 text-center">Dealer Portal</p>
                   <Link
                     to="/login"
                     onClick={() => setIsOpen(false)}
@@ -325,7 +325,7 @@ const Navbar = () => {
           <div className="absolute bottom-12">
             <button
               onClick={toggleLang}
-              className="text-gray-500 hover:text-tj-gold px-6 py-2 text-[10px] uppercase tracking-widest transition-colors"
+              className="text-gray-400 hover:text-tj-gold px-6 py-2 text-[10px] uppercase tracking-widest transition-colors"
             >
               {lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}
             </button>
@@ -340,7 +340,7 @@ const Footer = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-black text-gray-600 py-20 border-t border-white/5 relative overflow-hidden">
+    <footer className="bg-black text-gray-400 py-20 border-t border-white/5 relative overflow-hidden">
       {/* Background Crest Watermark */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.03]">
         <img
@@ -363,20 +363,20 @@ const Footer = () => {
             />
             <div>
               <p className="text-white font-display text-lg tracking-wider leading-tight">TRIPLE J</p>
-              <p className="text-gray-500 text-[10px] uppercase tracking-widest">Auto Investment</p>
+              <p className="text-gray-400 text-[10px] uppercase tracking-widest">Auto Investment</p>
             </div>
           </div>
-          <p className="text-xs text-gray-500 italic mb-6">{t.footer.tagline}</p>
+          <p className="text-xs text-gray-400 italic mb-6">{t.footer.tagline}</p>
 
           {/* Social Media Links */}
           <div className="mb-6">
-            <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-3">{t.footer.followUs}</p>
+            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3">{t.footer.followUs}</p>
             <div className="flex items-center gap-2">
               <a
                 href="https://www.facebook.com/thetriplejauto"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-tj-gold transition-colors p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="text-gray-400 hover:text-tj-gold transition-colors p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Facebook"
               >
                 <Facebook size={20} />
@@ -385,7 +385,7 @@ const Footer = () => {
                 href="https://x.com/thetriplejauto"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-tj-gold transition-colors p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="text-gray-400 hover:text-tj-gold transition-colors p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="X (Twitter)"
               >
                 <Twitter size={20} />
@@ -393,7 +393,7 @@ const Footer = () => {
             </div>
           </div>
 
-          <p className="text-[10px] uppercase tracking-widest text-gray-600 mt-auto">
+          <p className="text-[10px] uppercase tracking-widest text-gray-400 mt-auto">
             &copy; {new Date().getFullYear()} {t.footer.copyright}. {t.footer.rights}
           </p>
         </div>
@@ -422,7 +422,7 @@ const Footer = () => {
               <Clock size={14} className="text-tj-gold" />
               <div>
                 <p>{t.footer.hoursDetail}</p>
-                <p className="text-gray-600 text-xs">{t.footer.closed}</p>
+                <p className="text-gray-400 text-xs">{t.footer.closed}</p>
               </div>
             </div>
           </div>
@@ -435,11 +435,11 @@ const Footer = () => {
           </h3>
           <div className="mb-6 w-full">
             <div className="flex justify-between items-center border-b border-white/5 pb-3 mb-3">
-              <span className="text-[10px] uppercase tracking-widest text-gray-500">{t.footer.dealerLicense}</span>
+              <span className="text-[10px] uppercase tracking-widest text-gray-400">{t.footer.dealerLicense}</span>
               <span className="font-mono text-tj-gold text-sm">P171632</span>
             </div>
           </div>
-          <ul className="space-y-1 text-[10px] uppercase tracking-widest text-gray-500 w-full">
+          <ul className="space-y-1 text-[10px] uppercase tracking-widest text-gray-400 w-full">
             <li><Link to="/legal/dmv" className="hover:text-tj-gold transition-colors block py-3">Texas DMV</Link></li>
             <li><Link to="/legal/privacy" className="hover:text-tj-gold transition-colors block py-3">{t.footer.privacy}</Link></li>
             <li><Link to="/legal/terms" className="hover:text-tj-gold transition-colors block py-3">{t.footer.terms}</Link></li>
@@ -456,7 +456,7 @@ const Footer = () => {
             <li><Link to="/services" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.nav.services}</Link></li>
             <li><Link to="/vin" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.vinLookup.title}</Link></li>
             <li><Link to="/contact" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.footer.contact}</Link></li>
-            <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-600 flex items-center gap-2 py-2"><Lock size={10} /> {t.nav.login}</Link></li>
+            <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-400 flex items-center gap-2 py-2"><Lock size={10} /> {t.nav.login}</Link></li>
           </ul>
         </div>
 
@@ -505,7 +505,7 @@ class ErrorBoundary extends React.Component<
             <p className="text-gray-400 mb-2">
               We're sorry, but this page encountered an error.
             </p>
-            <p className="text-gray-500 text-sm mb-8">
+            <p className="text-gray-400 text-sm mb-8">
               Please reload the page or contact us at (832) 400-9760.
             </p>
             <button
@@ -525,15 +525,23 @@ class ErrorBoundary extends React.Component<
 
 const AppContent = () => {
   const location = useLocation();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">
+      {/* Skip to content - first focusable element for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[99999] focus:bg-tj-gold focus:text-black focus:px-6 focus:py-3 focus:font-bold focus:text-xs focus:uppercase focus:tracking-[0.3em]"
+      >
+        {t.polish.skipToContent}
+      </a>
       <OfflineBanner />
       <BrowserCompatibilityCheck />
       <Navbar />
       <ErrorBoundary>
         {/* Top padding matches navbar height (h-32 = 128px = pt-32) plus buffer */}
-        <main className="flex-grow pt-36">
+        <main id="main-content" className="flex-grow pt-36">
           <ConnectionErrorBanner />
           {/* Global Page Transition Wrapper */}
           <AnimatePresence mode="wait">

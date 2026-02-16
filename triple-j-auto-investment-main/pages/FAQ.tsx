@@ -31,7 +31,7 @@ const FAQ = () => {
 
           {/* Search */}
           <div className="relative max-w-lg mx-auto">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               value={searchQuery}
@@ -44,7 +44,7 @@ const FAQ = () => {
 
         {/* FAQ List */}
         {filteredFaqs.length === 0 ? (
-          <div className="text-center py-20 text-gray-600">
+          <div className="text-center py-20 text-gray-400">
             {t.faq.noResults} "{searchQuery}"
           </div>
         ) : (

@@ -163,7 +163,7 @@ const CustomerDashboard: React.FC = () => {
             alt="Triple J"
             className="w-16 h-16 mx-auto mb-4 animate-pulse"
           />
-          <p className="text-gray-500 text-sm">Loading your registrations...</p>
+          <p className="text-gray-400 text-sm">Loading your registrations...</p>
         </div>
       </div>
     );
@@ -179,14 +179,14 @@ const CustomerDashboard: React.FC = () => {
               Your Registrations
             </h1>
             {phone && (
-              <p className="text-gray-500 text-sm mt-1">
+              <p className="text-gray-400 text-sm mt-1">
                 {formatPhone(phone)}
               </p>
             )}
           </div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-2 text-gray-500 hover:text-red-400 transition-colors text-sm"
+            className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition-colors text-sm"
           >
             <LogOut size={16} />
             <span className="hidden sm:inline">Log Out</span>
@@ -209,7 +209,7 @@ const CustomerDashboard: React.FC = () => {
             <div className="text-center py-16">
               <Car size={48} className="text-gray-700 mx-auto mb-4" />
               <h2 className="font-display text-lg text-gray-400 mb-2">{t.polish.emptyDashboard}</h2>
-              <p className="text-gray-600 text-sm max-w-sm mx-auto">
+              <p className="text-gray-400 text-sm max-w-sm mx-auto">
                 {t.polish.emptyDashboardSubtext}
               </p>
             </div>
@@ -240,7 +240,7 @@ const CustomerDashboard: React.FC = () => {
             <section>
               <button
                 onClick={() => setShowCompleted(!showCompleted)}
-                className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-gray-500 font-bold mb-3 hover:text-gray-300 transition-colors"
+                className="flex items-center gap-2 text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-3 hover:text-gray-300 transition-colors"
               >
                 {showCompleted ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
                 Completed ({completed.length})
@@ -304,10 +304,10 @@ const RegistrationCard: React.FC<RegistrationCardProps> = ({
       {/* Top row: Vehicle + Preferences */}
       <div className="flex items-start justify-between mb-3">
         <div>
-          <h3 className={`font-display text-base tracking-wide ${muted ? 'text-gray-500' : 'text-white'}`}>
+          <h3 className={`font-display text-base tracking-wide ${muted ? 'text-gray-400' : 'text-white'}`}>
             {registration.vehicleYear} {registration.vehicleMake} {registration.vehicleModel}
           </h3>
-          <p className="text-gray-600 text-xs mt-0.5">
+          <p className="text-gray-400 text-xs mt-0.5">
             Order: {registration.orderId}
           </p>
         </div>
@@ -349,7 +349,7 @@ const RegistrationCard: React.FC<RegistrationCardProps> = ({
         to={`/track/${registration.orderId}-${registration.accessToken}`}
         className={`inline-flex items-center gap-1.5 text-sm transition-colors ${
           muted
-            ? 'text-gray-600 hover:text-gray-400'
+            ? 'text-gray-400 hover:text-gray-400'
             : 'text-tj-gold hover:text-white'
         }`}
       >
