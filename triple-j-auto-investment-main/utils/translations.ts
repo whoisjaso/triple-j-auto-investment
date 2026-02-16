@@ -51,7 +51,18 @@ export const t = {
             learnMore: "Learn More",
             getDirections: "Get Directions",
             sendMessage: "Send Message",
-            viewInventory: "View Inventory"
+            viewInventory: "View Inventory",
+            forRent: "For Rent",
+            forSale: "For Sale",
+            saleAndRental: "Sale & Rental",
+            perDay: "/day",
+            perWeek: "/week",
+            bookNow: "Book Now",
+            rentalRates: "Rental Rates",
+            dailyRate: "Daily Rate",
+            weeklyRate: "Weekly Rate",
+            allListings: "All Listings",
+            listingType: "Type"
         },
         home: {
             hero: {
@@ -147,7 +158,60 @@ export const t = {
                     name: "Full Name",
                     phone: "Phone Number",
                     email: "Email Address"
-                }
+                },
+                specs: {
+                    make: "Make",
+                    model: "Model",
+                    exterior: "Exterior",
+                    interior: "Interior",
+                    paintFinish: "Paint Finish",
+                    bodyIntegrity: "Body Integrity",
+                    glassOptics: "Glass / Optics",
+                    inspected: "Inspected",
+                    upholstery: "Upholstery",
+                    controlsElectronics: "Controls & Electronics",
+                    climateSystem: "Climate System",
+                    functional: "Functional"
+                },
+                conditionReport: "Condition Report",
+                viewFullReport: "View Full Report",
+                noIssues: "No major issues reported",
+                moreNoted: "more noted",
+                transparencyProtocol: "Transparency Protocol",
+                transparencyDesc: "We provide complete diagnostic transparency. Every issue found during inspection is documented below.",
+                diagnosticLog: "Diagnostic Log",
+                noFaultsLogged: "No Faults Logged",
+                location: "Location",
+                allSet: "YOU'RE ALL SET",
+                advisorMsg: "Our advisor Divine will call you shortly about the",
+                callUsNow: "Call Us Now",
+                backToInventory: "Back to Inventory",
+                fullscreen: "Fullscreen",
+                aiAgent: "AI Agent Available"
+            },
+            rental: {
+                badge: "AVAILABLE FOR RENT",
+                ratesLabel: "Rental Rates",
+                inquireRates: "Call for Rates",
+                tabLabel: "Rent",
+                formSubtitle: "Interested in renting this vehicle? Submit your info and our team will call you to discuss rental terms, availability, and requirements.",
+                successTitle: "INQUIRY RECEIVED",
+                successMsg: "Our team will call you shortly to discuss rental details for this",
+                disclaimer: "Rentals require a valid driver's license, proof of insurance, and a security deposit. Rates are subject to availability.",
+                submitButton: "Send Rental Inquiry"
+            },
+            sortOptions: {
+                priceHighLow: "Price: High-Low",
+                priceLowHigh: "Price: Low-High",
+                yearNewest: "Year: Newest",
+                yearOldest: "Year: Oldest",
+                mileageLowHigh: "Mileage: Low-High",
+                allMakes: "All Makes"
+            },
+            formErrors: {
+                invalidPhone: "Please enter a valid 10-digit phone number",
+                nameRequired: "Please enter your name",
+                genericError: "Something went wrong. Please call us directly at (832) 400-9760"
             }
         },
         contact: {
@@ -212,35 +276,95 @@ export const t = {
             questions: [
                 {
                     q: "What types of vehicles do you sell?",
-                    a: "We specialize in reliable, pre-owned vehicles in the $3,000 to $8,000 range. Our inventory includes sedans, SUVs, trucks, and more -- all inspected and ready to drive."
+                    a: "Triple J Auto Investment sells reliable pre-owned sedans, SUVs, and trucks priced from $3,000 to $8,000. Every vehicle on our lot is inspected before listing. We focus on dependable, everyday vehicles for Houston families -- not luxury cars, but honest transportation you can count on."
+                },
+                {
+                    q: "Can I buy a car with bad credit in Houston?",
+                    a: "Yes, you can buy a car with bad credit at Triple J Auto Investment in Houston. We offer financing options for buyers with all credit situations, including low scores and no credit history. Visit us at 8774 Almeda Genoa Road or call (832) 400-9760 to discuss your options -- we work with your budget, not against it."
+                },
+                {
+                    q: "What is Buy Here Pay Here financing?",
+                    a: "Buy Here Pay Here means the dealership finances your vehicle directly -- no bank involved, no waiting for approval. At Triple J Auto Investment, we handle the entire process in-house. You choose your vehicle, bring your documents, make a down payment, and drive home the same day. Payments are made directly to Triple J, making it simple and straightforward."
+                },
+                {
+                    q: "How much is a down payment at Triple J Auto Investment?",
+                    a: "Down payments at Triple J Auto Investment start at $1,000. The exact amount depends on the vehicle you choose and your budget. We work with you to find a down payment that makes sense so you can drive away without breaking the bank. Call (832) 400-9760 to discuss your specific situation."
+                },
+                {
+                    q: "Do I need a credit check to buy a car at Triple J?",
+                    a: "No, Triple J Auto Investment does not require a traditional credit check for in-house financing. We focus on your ability to make payments, not your credit score. Bring a valid ID, proof of income, and proof of residence -- that is all you need to get started."
+                },
+                {
+                    q: "What documents do I need to buy a car?",
+                    a: "To buy a car at Triple J Auto Investment, you need three documents: a valid driver's license or government-issued ID, proof of income (pay stubs or bank statements), and proof of residence (utility bill or lease agreement). Insurance coverage confirmation is also required before you drive off the lot."
+                },
+                {
+                    q: "How does in-house financing work?",
+                    a: "In-house financing at Triple J Auto Investment means we finance your vehicle directly -- no third-party bank or lender involved. You choose a vehicle from our lot, provide your documents, make a down payment starting at $1,000, and drive home the same day. You make weekly or bi-weekly payments directly to Triple J. No credit check required."
+                },
+                {
+                    q: "What cars can I get for under $5,000 in Houston?",
+                    a: "Triple J Auto Investment regularly stocks reliable used cars under $5,000 in Houston. Our inventory includes sedans like Honda Accords, Toyota Camrys, and Ford Fusions -- all inspected and ready to drive. Visit our lot at 8774 Almeda Genoa Road or browse our website to see current availability."
+                },
+                {
+                    q: "What is the cheapest car at Triple J Auto Investment?",
+                    a: "Triple J Auto Investment carries pre-owned vehicles starting around $3,000. Our inventory changes regularly, so the most affordable options vary. All vehicles are inspected before listing regardless of price. Check our inventory page or call (832) 400-9760 for the latest available vehicles at the lowest prices."
+                },
+                {
+                    q: "Do you have SUVs or trucks under $8,000?",
+                    a: "Yes, Triple J Auto Investment carries SUVs and trucks priced under $8,000. Our inventory includes popular models like the Chevy Equinox, Ford Explorer, and Toyota 4Runner when available. Every vehicle is inspected before being listed. Browse our inventory online or visit us at 8774 Almeda Genoa Road in Houston."
+                },
+                {
+                    q: "How much does it cost to rent a car in Houston?",
+                    a: "Triple J Auto Investment offers affordable vehicle rentals in Houston by the week or month -- no long-term contracts required. Rates depend on the vehicle and rental period. Call (832) 400-9760 for current rental rates and availability. We are located at 8774 Almeda Genoa Road, Houston, TX 77075."
+                },
+                {
+                    q: "Can I rent a car without a credit card in Houston?",
+                    a: "Yes, Triple J Auto Investment offers vehicle rentals in Houston without requiring a credit card. You will need a valid driver's license, proof of insurance, and a security deposit. Contact us at (832) 400-9760 to discuss rental requirements and reserve a vehicle."
+                },
+                {
+                    q: "Do you offer weekly or monthly car rentals?",
+                    a: "Yes, Triple J Auto Investment offers both weekly and monthly vehicle rentals in Houston. No long-term contracts are required -- rent for as long as you need. A valid driver's license, proof of insurance, and a security deposit are required. Call (832) 400-9760 for rates and availability."
+                },
+                {
+                    q: "Is Triple J Auto Investment a licensed dealer?",
+                    a: "Yes, Triple J Auto Investment is a fully licensed Texas auto dealer. Our Texas Dealer License number is P171632. We operate from our permanent lot at 8774 Almeda Genoa Road, Houston, TX 77075, and comply with all Texas Department of Motor Vehicles regulations."
+                },
+                {
+                    q: "How do I know a used car is reliable?",
+                    a: "Every vehicle at Triple J Auto Investment is inspected before being listed for sale. We provide vehicle history information and full condition transparency -- any issues found during inspection are documented and disclosed. You can also use our free VIN lookup tool to check a vehicle's history, or arrange your own independent inspection before buying."
+                },
+                {
+                    q: "What happens after I buy a car from Triple J?",
+                    a: "After you purchase a vehicle from Triple J Auto Investment, we submit all required title and registration paperwork to the Texas DMV within 48 hours. You receive temporary tags valid for 60 days while the state processes your permanent plates. You are responsible for obtaining insurance before driving off the lot."
                 },
                 {
                     q: "Do you offer financing?",
-                    a: "Yes, we offer financing options to help you get on the road. Contact us to discuss payment plans that work for your budget."
+                    a: "Yes, Triple J Auto Investment offers in-house financing with no credit check required. Down payments start at $1,000, and payments are made directly to Triple J. We also work with third-party lenders for buyers who prefer traditional financing. Call (832) 400-9760 to discuss options."
                 },
                 {
                     q: "Do you rent vehicles?",
-                    a: "Yes, we offer vehicle rentals in addition to sales. Contact us for availability, pricing, and rental terms."
+                    a: "Yes, Triple J Auto Investment offers affordable vehicle rentals in Houston by the week or month. No long-term contracts required. You need a valid driver's license, proof of insurance, and a security deposit. Call (832) 400-9760 for current rates and availability."
                 },
                 {
                     q: "Where are you located?",
-                    a: "We're located at 8774 Almeda Genoa Road, Houston, Texas 77075. We're easy to find and happy to help when you visit."
+                    a: "Triple J Auto Investment is located at 8774 Almeda Genoa Road, Houston, Texas 77075. We serve families across Houston, South Houston, Pasadena, Pearland, and surrounding areas. Open Monday through Saturday, 9:00 AM to 6:00 PM."
                 },
                 {
                     q: "What are your business hours?",
-                    a: "We're open Monday through Saturday, 9:00 AM to 6:00 PM. We're closed on Sundays."
+                    a: "Triple J Auto Investment is open Monday through Saturday, 9:00 AM to 6:00 PM. We are closed on Sundays. Call (832) 400-9760 during business hours or visit us at 8774 Almeda Genoa Road, Houston, TX 77075."
                 },
                 {
                     q: "Do you speak Spanish?",
-                    a: "Yes! We're fully bilingual. Our team speaks both English and Spanish to serve the Houston community."
+                    a: "Yes, Triple J Auto Investment is fully bilingual. Our team speaks both English and Spanish to serve the Houston community. Hablamos espanol -- visitenos en 8774 Almeda Genoa Road o llamenos al (832) 400-9760."
                 },
                 {
                     q: "Can I trade in my current vehicle?",
-                    a: "Yes, we accept trade-ins. Bring your vehicle in for a fair assessment and we'll apply the value toward your next purchase."
+                    a: "Yes, Triple J Auto Investment accepts trade-ins. Bring your vehicle to our lot at 8774 Almeda Genoa Road for a fair assessment, and we will apply the value toward your next purchase. Call (832) 400-9760 to schedule an evaluation."
                 },
                 {
                     q: "Are your vehicles inspected?",
-                    a: "Every vehicle on our lot goes through an inspection process before being listed for sale. We want you to drive away with confidence."
+                    a: "Yes, every vehicle at Triple J Auto Investment goes through an inspection process before being listed for sale. We document any issues found and provide full condition transparency so you can buy with confidence."
                 }
             ]
         },
@@ -519,6 +643,18 @@ export const t = {
                 plant: "Plant",
                 mfgEntity: "Manufacturer",
                 verified: "Verified"
+            },
+            vinLabel: "Vehicle Identification Number",
+            decode: "DECODE",
+            decodeAnother: "Decode Another VIN",
+            baseTrim: "Base",
+            doorSuffix: "Door",
+            errors: {
+                lettersOnly: "Only letters and numbers are allowed",
+                forbiddenChar: "is not allowed in VINs (I, O, Q are prohibited)",
+                exactLength: "VIN must be exactly 17 characters",
+                currently: "currently",
+                noData: "No vehicle data found for this VIN. Please check the number and try again."
             }
         },
         paymentOptions: {
@@ -673,7 +809,18 @@ export const t = {
             learnMore: "Mas Informacion",
             getDirections: "Como Llegar",
             sendMessage: "Enviar Mensaje",
-            viewInventory: "Ver Inventario"
+            viewInventory: "Ver Inventario",
+            forRent: "En Renta",
+            forSale: "En Venta",
+            saleAndRental: "Venta y Renta",
+            perDay: "/dia",
+            perWeek: "/semana",
+            bookNow: "Reservar",
+            rentalRates: "Tarifas de Renta",
+            dailyRate: "Tarifa Diaria",
+            weeklyRate: "Tarifa Semanal",
+            allListings: "Todos",
+            listingType: "Tipo"
         },
         home: {
             hero: {
@@ -769,7 +916,60 @@ export const t = {
                     name: "Nombre Completo",
                     phone: "Numero de Telefono",
                     email: "Correo Electronico"
-                }
+                },
+                specs: {
+                    make: "Marca",
+                    model: "Modelo",
+                    exterior: "Exterior",
+                    interior: "Interior",
+                    paintFinish: "Acabado de Pintura",
+                    bodyIntegrity: "Integridad de Carroceria",
+                    glassOptics: "Vidrios / Optica",
+                    inspected: "Inspeccionado",
+                    upholstery: "Tapiceria",
+                    controlsElectronics: "Controles y Electronica",
+                    climateSystem: "Sistema de Clima",
+                    functional: "Funcional"
+                },
+                conditionReport: "Reporte de Condicion",
+                viewFullReport: "Ver Reporte Completo",
+                noIssues: "Sin problemas importantes reportados",
+                moreNoted: "mas registrados",
+                transparencyProtocol: "Protocolo de Transparencia",
+                transparencyDesc: "Proporcionamos transparencia completa en diagnosticos. Cada problema encontrado durante la inspeccion esta documentado a continuacion.",
+                diagnosticLog: "Registro de Diagnostico",
+                noFaultsLogged: "Sin Fallas Registradas",
+                location: "Ubicacion",
+                allSet: "TODO LISTO",
+                advisorMsg: "Nuestra asesora Divine le llamara pronto sobre el",
+                callUsNow: "Llamenos Ahora",
+                backToInventory: "Volver al Inventario",
+                fullscreen: "Pantalla Completa",
+                aiAgent: "Agente de IA Disponible"
+            },
+            rental: {
+                badge: "DISPONIBLE PARA RENTA",
+                ratesLabel: "Tarifas de Renta",
+                inquireRates: "Llame para Tarifas",
+                tabLabel: "Rentar",
+                formSubtitle: "Interesado en rentar este vehiculo? Envie su informacion y nuestro equipo le llamara para hablar sobre terminos, disponibilidad y requisitos.",
+                successTitle: "CONSULTA RECIBIDA",
+                successMsg: "Nuestro equipo le llamara pronto para hablar sobre los detalles de renta de este",
+                disclaimer: "Las rentas requieren licencia de conducir valida, comprobante de seguro y deposito de seguridad. Las tarifas estan sujetas a disponibilidad.",
+                submitButton: "Enviar Consulta de Renta"
+            },
+            sortOptions: {
+                priceHighLow: "Precio: Mayor-Menor",
+                priceLowHigh: "Precio: Menor-Mayor",
+                yearNewest: "Ano: Mas Reciente",
+                yearOldest: "Ano: Mas Antiguo",
+                mileageLowHigh: "Millas: Menor-Mayor",
+                allMakes: "Todas las Marcas"
+            },
+            formErrors: {
+                invalidPhone: "Ingrese un numero de telefono valido de 10 digitos",
+                nameRequired: "Ingrese su nombre",
+                genericError: "Algo salio mal. Llamenos directamente al (832) 400-9760"
             }
         },
         contact: {
@@ -834,35 +1034,95 @@ export const t = {
             questions: [
                 {
                     q: "Que tipo de vehiculos venden?",
-                    a: "Nos especializamos en vehiculos usados confiables en el rango de $3,000 a $8,000. Nuestro inventario incluye sedanes, camionetas, SUVs y mas -- todos inspeccionados y listos para manejar."
+                    a: "Triple J Auto Investment vende carros usados confiables -- sedanes, camionetas y SUVs con precios desde $3,000 hasta $8,000. Todos los vehiculos en nuestro lote son inspeccionados antes de ponerse a la venta. Nos enfocamos en vehiculos de transporte diario para familias de Houston."
+                },
+                {
+                    q: "Puedo comprar un carro con mal credito en Houston?",
+                    a: "Si, en Triple J Auto Investment puedes comprar un carro aunque tengas mal credito. Ofrecemos financiamiento para compradores con todo tipo de situacion crediticia, incluyendo puntajes bajos o sin historial de credito. Visitanos en 8774 Almeda Genoa Road o llama al (832) 400-9760 para hablar de tus opciones."
+                },
+                {
+                    q: "Que es el financiamiento Buy Here Pay Here?",
+                    a: "Buy Here Pay Here significa que el concesionario te financia el vehiculo directamente -- sin banco, sin esperar aprobacion. En Triple J Auto Investment, manejamos todo el proceso. Escoges tu carro, traes tus documentos, das tu enganche y te vas manejando el mismo dia. Los pagos se hacen directamente a Triple J."
+                },
+                {
+                    q: "Cuanto es el enganche en Triple J Auto Investment?",
+                    a: "Los enganches en Triple J Auto Investment empiezan desde $1,000. La cantidad exacta depende del vehiculo que escojas y tu presupuesto. Trabajamos contigo para encontrar un enganche que tenga sentido para ti. Llama al (832) 400-9760 para hablar de tu situacion."
+                },
+                {
+                    q: "Necesito verificacion de credito para comprar un carro?",
+                    a: "No, Triple J Auto Investment no requiere verificacion de credito tradicional para financiamiento interno. Nos enfocamos en tu capacidad de hacer pagos, no en tu puntaje de credito. Trae tu identificacion, comprobante de ingresos y comprobante de domicilio -- eso es todo lo que necesitas."
+                },
+                {
+                    q: "Que documentos necesito para comprar un carro?",
+                    a: "Para comprar un carro en Triple J Auto Investment necesitas tres documentos: licencia de conducir o identificacion oficial, comprobante de ingresos (talones de pago o estados de cuenta), y comprobante de domicilio (recibo de luz o contrato de renta). Tambien necesitas confirmacion de seguro antes de llevarte el vehiculo."
+                },
+                {
+                    q: "Como funciona el financiamiento interno?",
+                    a: "El financiamiento interno en Triple J Auto Investment significa que nosotros financiamos tu vehiculo directamente -- sin banco ni prestamista externo. Escoges un carro de nuestro lote, presentas tus documentos, das un enganche desde $1,000 y te vas manejando el mismo dia. Haces pagos semanales o quincenales directamente a Triple J. No se requiere verificacion de credito."
+                },
+                {
+                    q: "Que carros puedo conseguir por menos de $5,000 en Houston?",
+                    a: "Triple J Auto Investment tiene regularmente carros usados confiables por menos de $5,000 en Houston. Nuestro inventario incluye sedanes como Honda Accord, Toyota Camry y Ford Fusion -- todos inspeccionados y listos para manejar. Visita nuestro lote en 8774 Almeda Genoa Road o mira nuestro sitio web para ver la disponibilidad actual."
+                },
+                {
+                    q: "Cual es el carro mas barato en Triple J Auto Investment?",
+                    a: "Triple J Auto Investment tiene vehiculos usados desde aproximadamente $3,000. Nuestro inventario cambia seguido, asi que las opciones mas economicas varian. Todos los vehiculos son inspeccionados antes de listarse sin importar el precio. Revisa nuestro inventario en linea o llama al (832) 400-9760 para ver lo mas reciente."
+                },
+                {
+                    q: "Tienen camionetas o SUVs por menos de $8,000?",
+                    a: "Si, Triple J Auto Investment tiene SUVs y camionetas por menos de $8,000. Nuestro inventario incluye modelos populares como Chevy Equinox, Ford Explorer y Toyota 4Runner cuando estan disponibles. Todos son inspeccionados antes de listarse. Visita nuestro inventario en linea o ven a 8774 Almeda Genoa Road en Houston."
+                },
+                {
+                    q: "Cuanto cuesta rentar un carro en Houston?",
+                    a: "Triple J Auto Investment ofrece rentas de vehiculos accesibles en Houston por semana o por mes -- sin contratos a largo plazo. Las tarifas dependen del vehiculo y el periodo de renta. Llama al (832) 400-9760 para conocer las tarifas actuales y disponibilidad. Estamos en 8774 Almeda Genoa Road, Houston, TX 77075."
+                },
+                {
+                    q: "Puedo rentar un carro sin tarjeta de credito en Houston?",
+                    a: "Si, Triple J Auto Investment ofrece rentas de vehiculos en Houston sin necesidad de tarjeta de credito. Necesitas licencia de conducir valida, comprobante de seguro y deposito de seguridad. Llamanos al (832) 400-9760 para hablar de los requisitos y reservar un vehiculo."
+                },
+                {
+                    q: "Ofrecen rentas semanales o mensuales de carros?",
+                    a: "Si, Triple J Auto Investment ofrece rentas de vehiculos tanto semanales como mensuales en Houston. No se requieren contratos a largo plazo -- renta el tiempo que necesites. Se requiere licencia de conducir valida, comprobante de seguro y deposito de seguridad. Llama al (832) 400-9760 para tarifas y disponibilidad."
+                },
+                {
+                    q: "Es Triple J Auto Investment un dealer con licencia?",
+                    a: "Si, Triple J Auto Investment es un concesionario de autos con licencia completa en Texas. Nuestro numero de licencia es P171632. Operamos desde nuestro lote permanente en 8774 Almeda Genoa Road, Houston, TX 77075, y cumplimos con todas las regulaciones del Departamento de Vehiculos Motorizados de Texas."
+                },
+                {
+                    q: "Como se si un carro usado es confiable?",
+                    a: "Todos los vehiculos en Triple J Auto Investment son inspeccionados antes de ponerse a la venta. Proporcionamos informacion del historial del vehiculo y transparencia total de su condicion -- cualquier problema encontrado durante la inspeccion se documenta y se divulga. Tambien puedes usar nuestra herramienta gratuita de busqueda de VIN o traer tu propio mecanico para una inspeccion independiente."
+                },
+                {
+                    q: "Que pasa despues de que compro un carro en Triple J?",
+                    a: "Despues de comprar un vehiculo en Triple J Auto Investment, enviamos toda la documentacion de titulo y registro al DMV de Texas dentro de 48 horas. Recibes placas temporales validas por 60 dias mientras el estado procesa tus placas permanentes. Necesitas tener seguro antes de salir del lote."
                 },
                 {
                     q: "Ofrecen financiamiento?",
-                    a: "Si, ofrecemos opciones de financiamiento para ayudarle a ponerse en camino. Contactenos para hablar sobre planes de pago que funcionen para su presupuesto."
+                    a: "Si, Triple J Auto Investment ofrece financiamiento interno sin verificacion de credito. Los enganches empiezan desde $1,000 y los pagos se hacen directamente a Triple J. Tambien trabajamos con prestamistas externos para compradores que prefieran financiamiento tradicional. Llama al (832) 400-9760 para hablar de opciones."
                 },
                 {
                     q: "Rentan vehiculos?",
-                    a: "Si, ofrecemos rentas de vehiculos ademas de ventas. Contactenos para disponibilidad, precios y terminos de renta."
+                    a: "Si, Triple J Auto Investment ofrece rentas de vehiculos accesibles en Houston por semana o por mes. Sin contratos a largo plazo. Necesitas licencia de conducir valida, comprobante de seguro y deposito de seguridad. Llama al (832) 400-9760 para tarifas y disponibilidad."
                 },
                 {
                     q: "Donde estan ubicados?",
-                    a: "Estamos ubicados en 8774 Almeda Genoa Road, Houston, Texas 77075. Somos faciles de encontrar y estamos felices de ayudarle cuando nos visite."
+                    a: "Triple J Auto Investment esta ubicado en 8774 Almeda Genoa Road, Houston, Texas 77075. Servimos a familias en Houston, South Houston, Pasadena, Pearland y areas cercanas. Abiertos de lunes a sabado, 9:00 AM a 6:00 PM."
                 },
                 {
                     q: "Cual es su horario?",
-                    a: "Estamos abiertos de lunes a sabado, de 9:00 AM a 6:00 PM. Cerramos los domingos."
+                    a: "Triple J Auto Investment esta abierto de lunes a sabado, de 9:00 AM a 6:00 PM. Cerramos los domingos. Llama al (832) 400-9760 en horario de atencion o visitanos en 8774 Almeda Genoa Road, Houston, TX 77075."
                 },
                 {
                     q: "Hablan espanol?",
-                    a: "Si! Somos completamente bilingues. Nuestro equipo habla ingles y espanol para servir a la comunidad de Houston."
+                    a: "Si, en Triple J Auto Investment somos completamente bilingues. Nuestro equipo habla ingles y espanol para servir a la comunidad de Houston. Visitenos en 8774 Almeda Genoa Road o llamenos al (832) 400-9760."
                 },
                 {
                     q: "Puedo dar mi carro como parte de pago?",
-                    a: "Si, aceptamos vehiculos como parte de pago. Traiga su vehiculo para una evaluacion justa y aplicaremos el valor a su proxima compra."
+                    a: "Si, Triple J Auto Investment acepta vehiculos como parte de pago. Trae tu carro a nuestro lote en 8774 Almeda Genoa Road para una evaluacion justa y aplicamos el valor a tu proxima compra. Llama al (832) 400-9760 para programar una evaluacion."
                 },
                 {
                     q: "Sus vehiculos estan inspeccionados?",
-                    a: "Cada vehiculo en nuestro lote pasa por un proceso de inspeccion antes de ser puesto a la venta. Queremos que maneje con confianza."
+                    a: "Si, todos los vehiculos en Triple J Auto Investment pasan por un proceso de inspeccion antes de ponerse a la venta. Documentamos cualquier problema encontrado y ofrecemos transparencia total sobre la condicion para que compres con confianza."
                 }
             ]
         },
@@ -1141,6 +1401,18 @@ export const t = {
                 plant: "Planta",
                 mfgEntity: "Fabricante",
                 verified: "Verificado"
+            },
+            vinLabel: "Numero de Identificacion del Vehiculo",
+            decode: "DECODIFICAR",
+            decodeAnother: "Decodificar Otro VIN",
+            baseTrim: "Base",
+            doorSuffix: "Puertas",
+            errors: {
+                lettersOnly: "Solo se permiten letras y numeros",
+                forbiddenChar: "no esta permitido en VINs (I, O, Q estan prohibidos)",
+                exactLength: "El VIN debe tener exactamente 17 caracteres",
+                currently: "actualmente",
+                noData: "No se encontraron datos del vehiculo para este VIN. Verifique el numero e intente de nuevo."
             }
         },
         paymentOptions: {
