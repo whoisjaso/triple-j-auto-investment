@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-16
-**Session:** Phase 11 plan 01 complete (production polish infrastructure)
+**Session:** Phase 11 plan 02 complete (loading/empty/error states)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 11 - Production Polish (1/6 plans complete)
+**Current focus:** Phase 11 - Production Polish (2/6 plans complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 11 of 19 (Production Polish)
-**Plan:** 1 of 6 completed (11-01)
+**Plan:** 2 of 6 completed (11-01, 11-02)
 **Status:** In progress
-**Last activity:** 2026-02-16 -- Completed 11-01-PLAN.md (production polish infrastructure: console stripping, error/loading/offline components, maintenance page, translation keys)
+**Last activity:** 2026-02-16 -- Completed 11-02-PLAN.md (loading/empty/error states for Inventory, Contact, Finance, CustomerDashboard, About)
 
-Progress: [█████████░] 90% (9/10 plans completed across v2.0 so far)
+Progress: [██████████░] 91% (10/11 plans completed across v2.0 so far)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01)
+- Total plans completed: 10 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -85,6 +85,10 @@ Progress: [█████████░] 90% (9/10 plans completed across v2.0
 - **[11-01]** OfflineBanner renders above Navbar with z-[9999] to ensure visibility regardless of page content
 - **[11-01]** Maintenance page is fully static HTML with inline CSS (no build dependencies) and stacks both languages
 - **[11-01]** lazyWithErrorHandling fallback UI updated from bg-tj-green to bg-black to match site dark aesthetic
+- **[11-02]** Inventory uses connectionError from Store to distinguish error vs empty (not heuristic)
+- **[11-02]** Contact/Finance forms converted from setTimeout fire-and-forget to async/try-catch for proper error catching
+- **[11-02]** CustomerLogin and VinLookup already had proper error handling -- verified, no changes needed
+- **[11-02]** About page images are CSS backgrounds (not img tags) so lazy loading N/A; map iframe already had loading="lazy"
 
 ### Completed Work (Phase 9)
 
@@ -104,6 +108,7 @@ Progress: [█████████░] 90% (9/10 plans completed across v2.0
 ### Completed Work (Phase 11) -- IN PROGRESS
 
 - **11-01 (complete):** Console stripping via esbuild.drop (conditional on production mode). ErrorBoundary repositioned to wrap Routes/Suspense block. PageLoader component as branded Suspense fallback. useOnlineStatus hook + OfflineBanner + ConnectionErrorBanner. Static bilingual maintenance.html. 30 polish translation keys in en+es for loading/empty/error/accessibility.
+- **11-02 (complete):** Inventory empty/error state separation (skeleton loading, error+retry, empty+CTA). Contact/Finance form error states with bilingual retry UI. CustomerDashboard bilingual empty state. About map iframe skeleton. Image lazy loading on vehicle cards + featured vehicles.
 
 ### Remaining Phase 9 Work
 
@@ -120,7 +125,6 @@ None -- Phase 10 is fully complete (all original plans + gap closure plans).
 
 ### Remaining Phase 11 Work
 
-- **11-02:** Mobile responsiveness (375px-414px viewport fixes across all pages)
 - **11-03:** Loading states (skeletons, empty states, form submission states)
 - **11-04:** Error handling (Supabase error surfacing, form error states)
 - **11-05:** Visual consistency (spacing, buttons, cards standardization)
@@ -139,6 +143,6 @@ None -- Phase 10 is fully complete (all original plans + gap closure plans).
 ## Session Continuity
 
 **Last session:** 2026-02-16
-**Stopped at:** Completed 11-01-PLAN.md (production polish infrastructure)
+**Stopped at:** Completed 11-02-PLAN.md (loading/empty/error states)
 **Resume file:** None
-**Resume:** Phase 11 plan 01 complete. All infrastructure components (PageLoader, OfflineBanner, ConnectionErrorBanner, useOnlineStatus, maintenance page, translation keys) are in place. Next: 11-02 (mobile responsiveness) or 11-03 (loading/empty states).
+**Resume:** Phase 11 plan 02 complete. All customer-facing pages now have proper loading, empty, and error states. Inventory distinguishes between connection error and empty inventory. Contact/Finance forms catch submission errors. Next: 11-03 (additional loading/skeleton states) or 11-04 (deeper error handling) or 11-05 (visual consistency).
