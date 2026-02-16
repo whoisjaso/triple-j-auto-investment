@@ -198,10 +198,10 @@ const Home = () => {
          </div>
 
          {/* --- FEATURED VEHICLES --- */}
-         <section className="py-24 bg-[#050505] relative overflow-hidden border-b border-white/10">
+         <section className="py-16 md:py-24 bg-[#050505] relative overflow-hidden border-b border-white/10">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent"></div>
 
-            <div className="max-w-[1920px] mx-auto px-6">
+            <div className="max-w-[1920px] mx-auto px-4 md:px-6">
                <div className="flex flex-col md:flex-row justify-between items-end mb-12">
                   <motion.div
                      initial={{ opacity: 0, x: -50 }}
@@ -211,7 +211,7 @@ const Home = () => {
                      <h2 className="text-3xl sm:text-4xl md:text-6xl font-display text-white mb-2 flex flex-wrap items-center gap-3 sm:gap-4">
                         {t.home.arsenal.title.toUpperCase()} <span className="text-xs font-mono text-tj-gold bg-tj-gold/10 px-2 py-1 rounded border border-tj-gold/20 align-middle tracking-widest uppercase">{t.home.arsenal.subtitle}</span>
                      </h2>
-                     <p className="text-gray-500 text-xs font-mono uppercase tracking-widest">{t.home.arsenal.desc}</p>
+                     <p className="text-gray-400 text-xs font-mono uppercase tracking-widest">{t.home.arsenal.desc}</p>
                   </motion.div>
                   <Link to="/inventory" className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white transition-colors">
                      {t.home.arsenal.viewAll} <ArrowRight size={12} />
@@ -244,7 +244,7 @@ const Home = () => {
 
                               <motion.img
                                  src={vehicle.imageUrl}
-                                 alt={vehicle.model}
+                                 alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                                  loading="lazy"
                                  className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0"
                                  whileHover={{ scale: 1.1 }}
@@ -276,7 +276,7 @@ const Home = () => {
                )}
 
                <div className="mt-8 text-center md:hidden">
-                  <Link to="/inventory" className="inline-block border border-tj-gold text-tj-gold px-8 py-4 text-xs uppercase tracking-widest font-bold">
+                  <Link to="/inventory" className="inline-block border border-tj-gold text-tj-gold px-8 py-4 text-xs uppercase tracking-[0.3em] font-bold hover:bg-tj-gold hover:text-black transition-colors">
                      {t.home.arsenal.viewAll}
                   </Link>
                </div>
@@ -284,12 +284,12 @@ const Home = () => {
          </section>
 
          {/* --- VALUE PILLARS --- */}
-         <section className="py-24 px-6 max-w-[1920px] mx-auto bg-black">
+         <section className="py-16 md:py-24 px-4 md:px-6 max-w-[1920px] mx-auto bg-black">
             <div className="flex items-end justify-between mb-16 border-b border-white/10 pb-6">
                <h2 className="text-white font-display text-4xl md:text-5xl tracking-tighter">
                   {t.home.pillars.title.split(' ')[0]} <span className="text-tj-gold">{t.home.pillars.title.split(' ').slice(1).join(' ')}</span>
                </h2>
-               <p className="hidden md:block text-gray-500 text-xs font-mono uppercase tracking-widest">
+               <p className="hidden md:block text-gray-400 text-xs font-mono uppercase tracking-widest">
                   {t.home.pillars.subtitle}
                </p>
             </div>
@@ -300,14 +300,14 @@ const Home = () => {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="bg-tj-dark p-6 sm:p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
+                  className="bg-tj-dark p-6 md:p-8 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
                >
                   <div>
                      <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
                         <Fingerprint size={40} className="group-hover:animate-pulse" />
                      </div>
                      <h3 className="text-white font-display text-2xl sm:text-3xl tracking-wide mb-4">{t.home.pillars.p1Title}</h3>
-                     <p className="text-gray-500 text-sm leading-relaxed font-light">
+                     <p className="text-gray-400 text-sm leading-relaxed font-light">
                         {t.home.pillars.p1Desc} <br /><span className="text-white">{t.home.pillars.p1Highlight}</span>
                      </p>
                   </div>
@@ -321,14 +321,14 @@ const Home = () => {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-tj-dark p-6 sm:p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
+                  className="bg-tj-dark p-6 md:p-8 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
                >
                   <div>
                      <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
                         <Zap size={40} className="group-hover:text-white transition-colors" />
                      </div>
                      <h3 className="text-white font-display text-2xl sm:text-3xl tracking-wide mb-4">{t.home.pillars.p2Title}</h3>
-                     <p className="text-gray-500 text-sm leading-relaxed font-light">
+                     <p className="text-gray-400 text-sm leading-relaxed font-light">
                         {t.home.pillars.p2Desc} <br /><span className="text-white">{t.home.pillars.p2Highlight}</span>
                      </p>
                   </div>
@@ -342,14 +342,14 @@ const Home = () => {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
-                  className="bg-tj-dark p-6 sm:p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
+                  className="bg-tj-dark p-6 md:p-8 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
                >
                   <div>
                      <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
                         <Target size={40} className="group-hover:rotate-90 transition-transform duration-700" />
                      </div>
                      <h3 className="text-white font-display text-2xl sm:text-3xl tracking-wide mb-4">{t.home.pillars.p3Title}</h3>
-                     <p className="text-gray-500 text-sm leading-relaxed font-light">
+                     <p className="text-gray-400 text-sm leading-relaxed font-light">
                         {t.home.pillars.p3Desc} <br /><span className="text-white">{t.home.pillars.p3Highlight}</span>
                      </p>
                   </div>
@@ -389,7 +389,7 @@ const Home = () => {
          </section>
 
          {/* --- WHAT SETS US APART --- */}
-         <section className="py-16 sm:py-20 px-4 sm:px-6 max-w-[1600px] mx-auto">
+         <section className="py-16 md:py-24 px-4 md:px-6 max-w-[1600px] mx-auto">
             <div className="text-center mb-16">
                <h2 className="font-display text-sm text-tj-gold tracking-[0.5em] uppercase mb-4">{t.home.architecture}</h2>
                <div className="w-px h-16 bg-gradient-to-b from-tj-gold to-transparent mx-auto"></div>
@@ -397,7 +397,7 @@ const Home = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                {/* Card 1 */}
-               <Link to="/vin" className="bg-tj-dark border border-white/5 p-6 sm:p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
+               <Link to="/vin" className="bg-tj-dark border border-white/5 p-6 md:p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
                   <div className="absolute -right-12 -top-12 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
                      <Diamond size={150} />
                   </div>
@@ -407,7 +407,7 @@ const Home = () => {
                   </div>
 
                   <h3 className="font-display text-xl text-white mb-4 tracking-widest relative z-10 group-hover:text-tj-gold transition-colors">{t.home.cards.vetting.title}</h3>
-                  <p className="text-gray-500 text-xs leading-relaxed mb-6 relative z-10 group-hover:text-gray-300 transition-colors">
+                  <p className="text-gray-400 text-xs leading-relaxed mb-6 relative z-10 group-hover:text-gray-300 transition-colors">
                      {t.home.cards.vetting.desc}
                   </p>
                   <span className="text-[9px] uppercase tracking-widest text-tj-gold flex items-center gap-2 group-hover:gap-4 transition-all">
@@ -416,7 +416,7 @@ const Home = () => {
                </Link>
 
                {/* Card 2 (Featured) */}
-               <Link to="/about" className="bg-gradient-to-br from-black to-tj-dark border border-tj-gold/30 p-6 sm:p-8 group hover:border-tj-gold hover:-translate-y-3 hover:scale-[1.05] transition-all duration-500 relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:shadow-[0_0_60px_rgba(212,175,55,0.2)] z-10 scale-[1.02]">
+               <Link to="/about" className="bg-gradient-to-br from-black to-tj-dark border border-tj-gold/30 p-6 md:p-8 group hover:border-tj-gold hover:-translate-y-3 hover:scale-[1.05] transition-all duration-500 relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:shadow-[0_0_60px_rgba(212,175,55,0.2)] z-10 scale-[1.02]">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse"></div>
 
                   <div className="mb-8 text-tj-gold transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_30px_rgba(212,175,55,1)] relative z-10">
@@ -433,7 +433,7 @@ const Home = () => {
                </Link>
 
                {/* Card 3 */}
-               <div className="bg-tj-dark border border-white/5 p-6 sm:p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
+               <div className="bg-tj-dark border border-white/5 p-6 md:p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
                   <div className="absolute -right-12 -top-12 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
                      <Zap size={150} />
                   </div>
@@ -443,10 +443,10 @@ const Home = () => {
                   </div>
 
                   <h3 className="font-display text-xl text-white mb-4 tracking-widest relative z-10 group-hover:text-tj-gold transition-colors">{t.home.cards.velocity.title}</h3>
-                  <p className="text-gray-500 text-xs leading-relaxed mb-6 relative z-10 group-hover:text-gray-300 transition-colors">
+                  <p className="text-gray-400 text-xs leading-relaxed mb-6 relative z-10 group-hover:text-gray-300 transition-colors">
                      {t.home.cards.velocity.desc}
                   </p>
-                  <span className="text-[9px] uppercase tracking-widest text-gray-600 flex items-center gap-2 group-hover:text-white transition-colors">
+                  <span className="text-[9px] uppercase tracking-widest text-gray-400 flex items-center gap-2 group-hover:text-white transition-colors">
                      {t.home.cards.velocity.cta} <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
                   </span>
                </div>

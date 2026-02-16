@@ -11,7 +11,7 @@ const Services = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-black pt-40 pb-20 px-6">
+    <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
 
         <div className="text-center mb-20 border-b border-white/10 pb-12">
@@ -36,7 +36,7 @@ const Services = () => {
             const ctaText = (t.common as Record<string, string>)[ctaKey] || t.services.learnMore;
 
             return (
-              <div key={idx} className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all duration-500 group">
+              <div key={idx} className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all duration-500 group">
                 <div className="flex items-start gap-4 mb-6">
                   <div className="p-4 bg-black border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                     <IconComponent size={32} />
@@ -48,7 +48,7 @@ const Services = () => {
                 <p className="text-gray-400 leading-relaxed mb-4">
                   {service.desc}
                 </p>
-                <p className="text-gray-500 leading-relaxed mb-6 text-sm">
+                <p className="text-gray-400 leading-relaxed mb-6 text-sm">
                   {service.detail}
                 </p>
                 <Link to={link} className="text-tj-gold text-xs uppercase tracking-widest hover:text-white transition-colors flex items-center gap-2">
@@ -60,7 +60,7 @@ const Services = () => {
         </div>
 
         {/* What We Don't Do */}
-        <div className="bg-red-900/10 border border-red-900/30 p-6 sm:p-12">
+        <div className="bg-red-900/10 border border-red-900/30 p-6 md:p-8">
           <h2 className="text-white font-display text-3xl mb-8 flex items-center gap-3">
             <span className="text-red-500">&#9888;</span> {t.services.dontDo.title}
           </h2>

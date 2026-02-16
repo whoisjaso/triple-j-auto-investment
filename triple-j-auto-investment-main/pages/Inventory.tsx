@@ -47,7 +47,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
 
       {/* Status Indicator */}
       <div className="absolute top-0 left-0 w-full flex justify-between items-center z-20 p-6 pointer-events-none">
-        <div className={`px-3 py-1 text-[8px] font-bold uppercase tracking-[0.2em] border shadow-lg backdrop-blur-md ${vehicle.status === 'Available' ? 'border-tj-gold text-tj-gold bg-black/90' : 'border-gray-700 text-gray-500 bg-black/90'}`}>
+        <div className={`px-3 py-1 text-[8px] font-bold uppercase tracking-[0.2em] border shadow-lg backdrop-blur-md ${vehicle.status === 'Available' ? 'border-tj-gold text-tj-gold bg-black/90' : 'border-gray-700 text-gray-400 bg-black/90'}`}>
           {vehicle.status === 'Available' ? `• ${t.common.available.toUpperCase()}` : `• ${vehicle.status.toUpperCase()}`}
         </div>
       </div>
@@ -106,14 +106,14 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
         <div className="mb-6 relative z-10">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-[10px] uppercase tracking-ultra text-gray-500 mb-2 transition-colors group-hover:text-tj-gold/80">{vehicle.make}</p>
+              <p className="text-[10px] uppercase tracking-ultra text-gray-400 mb-2 transition-colors group-hover:text-tj-gold/80">{vehicle.make}</p>
               <h3 className="font-display text-2xl md:text-3xl text-white mb-2 group-hover:text-tj-gold transition-colors leading-none tracking-tight">
                 {vehicle.model}
               </h3>
             </div>
             <div className="text-right">
-              <span className="text-[10px] font-mono text-gray-600 block">{vehicle.year}</span>
-              <span className="text-[10px] font-mono text-gray-600 block">{vehicle.mileage.toLocaleString()} {t.common.mileage}</span>
+              <span className="text-[10px] font-mono text-gray-400 block">{vehicle.year}</span>
+              <span className="text-[10px] font-mono text-gray-400 block">{vehicle.mileage.toLocaleString()} {t.common.mileage}</span>
             </div>
           </div>
         </div>
@@ -126,7 +126,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
 
         <div className="flex items-end justify-between mt-auto border-t border-white/5 pt-6 relative z-10">
           <div>
-            <p className="text-[8px] uppercase tracking-widest text-gray-600 mb-1 group-hover:text-tj-gold transition-colors">{t.common.price}</p>
+            <p className="text-[8px] uppercase tracking-widest text-gray-400 mb-1 group-hover:text-tj-gold transition-colors">{t.common.price}</p>
             <div className="flex items-baseline gap-2">
               <p className="font-display text-xl text-white tracking-wider group-hover:scale-105 transition-transform origin-left">
                 {vehicle.price > 0 ? `$${vehicle.price.toLocaleString()}` : 'INQUIRE'}
@@ -141,7 +141,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
                 e.stopPropagation();
                 onClick();
               }}
-              className="group/btn flex items-center gap-2 bg-white/5 text-gray-300 px-4 py-3 min-h-[44px] text-[10px] font-bold uppercase tracking-[0.25em] transition-all hover:bg-tj-gold hover:text-black active:scale-95 border border-white/10 hover:border-tj-gold"
+              className="group/btn flex items-center gap-2 bg-white/5 text-gray-300 px-4 py-3 min-h-[44px] text-xs font-bold uppercase tracking-[0.3em] transition-all hover:bg-tj-gold hover:text-black active:scale-95 border border-white/10 hover:border-tj-gold"
             >
               <span className="hidden md:inline">{t.common.expressInterest}</span>
               <span className="md:hidden">View</span>
@@ -380,18 +380,18 @@ const Inventory = () => {
           <div className="flex flex-col items-end gap-6 w-full md:w-auto">
             {/* Search Input */}
             <div className="relative w-full">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" size={18} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
               <input
                 type="text"
                 placeholder={t.inventory.searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-black border border-white/10 pl-12 pr-4 py-4 text-white placeholder-gray-600 text-sm focus:border-tj-gold focus:outline-none transition-colors"
+                className="w-full bg-black border border-white/10 pl-12 pr-4 py-4 text-white placeholder-gray-500 text-sm focus:border-tj-gold focus:outline-none transition-colors"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-tj-gold transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-tj-gold transition-colors"
                 >
                   <X size={16} />
                 </button>
@@ -499,13 +499,13 @@ const Inventory = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
                 onClick={() => refreshVehicles()}
-                className="text-[10px] uppercase tracking-widest bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all flex items-center gap-2 font-bold"
+                className="text-xs uppercase tracking-[0.3em] bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all flex items-center gap-2 font-bold"
               >
                 <RefreshCw size={14} /> {t.polish.errorTryAgain}
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="text-[10px] uppercase tracking-widest text-tj-gold hover:text-white border border-tj-gold/30 hover:border-tj-gold px-6 py-4 transition-all flex items-center gap-2"
+                className="text-xs uppercase tracking-[0.3em] text-tj-gold hover:text-white border border-tj-gold/30 hover:border-tj-gold px-8 py-4 transition-all flex items-center gap-2 font-bold"
               >
                 <RefreshCw size={14} /> {t.polish.errorReload}
               </button>
@@ -525,7 +525,7 @@ const Inventory = () => {
             </p>
             <a
               href="tel:+18324009760"
-              className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all font-bold"
+              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all font-bold"
             >
               <Phone size={14} /> {t.common.phone}
             </a>
@@ -599,7 +599,7 @@ const Inventory = () => {
                     >
                       <img
                         src={modalImages[modalImgIndex]}
-                        alt="Detail"
+                        alt={`${selectedVehicle.year} ${selectedVehicle.make} ${selectedVehicle.model} - detail view`}
                         className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
                       />
                       {/* Fullscreen Hint */}
@@ -654,32 +654,32 @@ const Inventory = () => {
                       <span className="bg-red-900/20 text-red-500 text-[9px] px-2 py-0.5 uppercase tracking-widest font-bold border border-red-900/50">AS-IS</span>
                     </div>
                     <h2 className="font-display text-4xl text-white leading-none mb-1">{selectedVehicle.year} {selectedVehicle.model}</h2>
-                    <p className="text-gray-500 text-xs font-mono">{selectedVehicle.vin}</p>
+                    <p className="text-gray-400 text-xs font-mono">{selectedVehicle.vin}</p>
                   </div>
 
                   {/* Tabs - Sticky & Scrollable */}
                   <div className="flex border-b border-white/10 overflow-x-auto scrollbar-none bg-[#050505] sticky top-0 z-30 shadow-lg shrink-0">
                     <button
                       onClick={() => setModalTab('overview')}
-                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'overview' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-500 hover:text-white'}`}
+                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'overview' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-400 hover:text-white'}`}
                     >
                       {t.inventory.modal.tabs.overview}
                     </button>
                     <button
                       onClick={() => setModalTab('specs')}
-                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'specs' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-500 hover:text-white'}`}
+                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'specs' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-400 hover:text-white'}`}
                     >
                       {t.inventory.modal.tabs.specs}
                     </button>
                     <button
                       onClick={() => setModalTab('transparency')}
-                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'transparency' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-500 hover:text-white'}`}
+                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'transparency' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-400 hover:text-white'}`}
                     >
                       {t.inventory.modal.tabs.transparency}
                     </button>
                     <button
                       onClick={() => setModalTab('purchase')}
-                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'purchase' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-500 hover:text-white'}`}
+                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'purchase' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-400 hover:text-white'}`}
                     >
                       {t.inventory.modal.tabs.purchase}
                     </button>
@@ -692,11 +692,11 @@ const Inventory = () => {
                       <div className="space-y-6 animate-fade-in">
                         <div className="grid grid-cols-2 gap-4">
                           <div className="p-4 bg-white/5 border border-white/5">
-                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1">{t.common.mileage}</p>
+                            <p className="text-[10px] uppercase text-gray-400 tracking-widest mb-1">{t.common.mileage}</p>
                             <p className="text-white font-mono text-lg">{selectedVehicle.mileage.toLocaleString()}</p>
                           </div>
                           <div className="p-4 bg-white/5 border border-white/5">
-                            <p className="text-[10px] uppercase text-gray-500 tracking-widest mb-1">{t.common.price}</p>
+                            <p className="text-[10px] uppercase text-gray-400 tracking-widest mb-1">{t.common.price}</p>
                             <p className="text-tj-gold font-display text-xl">${selectedVehicle.price.toLocaleString()}</p>
                           </div>
                         </div>
@@ -721,7 +721,7 @@ const Inventory = () => {
                                 </li>
                               ))}
                               {selectedVehicle.diagnostics.length > 3 && (
-                                <li className="text-[10px] text-gray-500 italic pt-1">
+                                <li className="text-[10px] text-gray-400 italic pt-1">
                                   ... {selectedVehicle.diagnostics.length - 3} more issues logged.
                                 </li>
                               )}
@@ -733,7 +733,7 @@ const Inventory = () => {
                           )}
                           <button
                             onClick={(e) => { e.stopPropagation(); setModalTab('transparency'); }}
-                            className="text-[10px] uppercase tracking-widest text-gray-500 hover:text-white mt-3 underline decoration-gray-700 underline-offset-4"
+                            className="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white mt-3 underline decoration-gray-700 underline-offset-4"
                           >
                             Review Full Diagnostics
                           </button>
@@ -746,7 +746,7 @@ const Inventory = () => {
                         {/* VIN Card */}
                         <div className="p-4 bg-white/5 border border-white/10 flex items-center justify-between">
                           <div>
-                            <p className="text-[10px] uppercase text-gray-500 tracking-widest">VIN Identity</p>
+                            <p className="text-[10px] uppercase text-gray-400 tracking-widest">VIN Identity</p>
                             <p className="text-white font-mono text-xs mt-1">{selectedVehicle.vin}</p>
                           </div>
                           <ClipboardCheck className="text-tj-gold opacity-50" />
@@ -759,15 +759,15 @@ const Inventory = () => {
                           </h3>
                           <div className="space-y-3">
                             <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-500 text-xs">Paint Finish</span>
+                              <span className="text-gray-400 text-xs">Paint Finish</span>
                               <span className="text-white text-xs font-mono">Original Spec</span>
                             </div>
                             <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-500 text-xs">Body Integrity</span>
+                              <span className="text-gray-400 text-xs">Body Integrity</span>
                               <span className="text-white text-xs font-mono">Structured</span>
                             </div>
                             <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-500 text-xs">Glass/Optics</span>
+                              <span className="text-gray-400 text-xs">Glass/Optics</span>
                               <span className="text-white text-xs font-mono">Inspection Complete</span>
                             </div>
                           </div>
@@ -780,11 +780,11 @@ const Inventory = () => {
                           </h3>
                           <div className="space-y-3">
                             <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-500 text-xs">Upholstery</span>
+                              <span className="text-gray-400 text-xs">Upholstery</span>
                               <span className="text-white text-xs font-mono">Verified Clean</span>
                             </div>
                             <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-500 text-xs">Controls & Electronics</span>
+                              <span className="text-gray-400 text-xs">Controls & Electronics</span>
                               <span className="text-white text-xs font-mono">Functional</span>
                             </div>
                           </div>
@@ -821,15 +821,15 @@ const Inventory = () => {
                           ) : (
                             <div className="text-center py-8 opacity-50">
                               <CheckCircle className="mx-auto text-green-500 mb-2" size={24} />
-                              <p className="text-xs text-gray-500 uppercase tracking-widest">No Major Faults Logged</p>
+                              <p className="text-xs text-gray-400 uppercase tracking-widest">No Major Faults Logged</p>
                             </div>
                           )}
                         </div>
 
                         <div className="flex items-center gap-3 p-4 border border-gray-800 bg-white/5">
-                          <MapPin size={16} className="text-gray-500" />
+                          <MapPin size={16} className="text-gray-400" />
                           <div>
-                            <p className="text-[10px] uppercase tracking-widest text-gray-500">Physical Location</p>
+                            <p className="text-[10px] uppercase tracking-widest text-gray-400">Physical Location</p>
                             <p className="text-white text-xs">Houston, TX (77075)</p>
                           </div>
                         </div>
@@ -848,10 +848,10 @@ const Inventory = () => {
                               Our advisor Divine will call you within the next few minutes to discuss the{' '}
                               <span className="text-tj-gold">{selectedVehicle?.year} {selectedVehicle?.make} {selectedVehicle?.model}</span>.
                             </p>
-                            <p className="text-[10px] text-gray-600 uppercase tracking-widest mb-8">
+                            <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-8">
                               Keep your phone nearby
                             </p>
-                            <a href="tel:+18324009760" className="w-full bg-white/10 text-white font-bold py-4 text-sm uppercase tracking-[0.2em] hover:bg-tj-gold hover:text-black transition-colors flex items-center justify-center gap-2 mb-4 border border-white/20">
+                            <a href="tel:+18324009760" className="w-full bg-white/10 text-white font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-tj-gold hover:text-black transition-colors flex items-center justify-center gap-2 mb-4 border border-white/20">
                               <Phone size={16} /> Can't Wait? Call Us Now
                             </a>
                           </div>
@@ -859,7 +859,7 @@ const Inventory = () => {
                           <form onSubmit={handleSubmit} className="space-y-4 flex-grow flex flex-col">
                             <div className="flex-grow space-y-4">
                               <div>
-                                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Your Name</label>
+                                <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Your Name</label>
                                 <input
                                   required
                                   type="text"
@@ -870,7 +870,7 @@ const Inventory = () => {
                                 />
                               </div>
                               <div>
-                                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Phone Number</label>
+                                <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Phone Number</label>
                                 <input
                                   required
                                   type="tel"
@@ -884,7 +884,7 @@ const Inventory = () => {
                                 />
                               </div>
                               <div>
-                                <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-1">Email</label>
+                                <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Email</label>
                                 <input
                                   type="email"
                                   value={leadForm.email}
@@ -912,7 +912,7 @@ const Inventory = () => {
                             <button
                               type="submit"
                               disabled={submitStatus === 'submitting'}
-                              className="w-full bg-tj-gold text-black font-bold py-5 text-sm uppercase tracking-[0.2em] hover:bg-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-auto shadow-[0_0_20px_rgba(212,175,55,0.2)]"
+                              className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-auto shadow-[0_0_20px_rgba(212,175,55,0.2)]"
                             >
                               {submitStatus === 'submitting' ? (
                                 <Loader2 className="animate-spin" size={16} />
@@ -933,7 +933,7 @@ const Inventory = () => {
                     <div className="md:hidden absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black via-black/90 to-transparent z-40">
                       <button
                         onClick={() => setModalTab('purchase')}
-                        className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.2em] shadow-[0_0_20px_rgba(212,175,55,0.3)] border border-tj-gold/50 active:scale-95 transition-transform"
+                        className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(212,175,55,0.3)] border border-tj-gold/50 active:scale-95 transition-transform"
                       >
                         {t.inventory.modal.tabs.purchase}
                       </button>

@@ -32,7 +32,7 @@ const Contact = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black pt-40 pb-20 px-6">
+    <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
@@ -52,7 +52,7 @@ const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
           {/* Contact Form */}
-          <div className="bg-tj-dark border border-white/10 p-6 sm:p-12 relative">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
 
             {status === 'sent' ? (
@@ -83,7 +83,7 @@ const Contact = () => {
                 </p>
                 <button
                   onClick={() => setStatus('idle')}
-                  className="mt-6 text-[10px] uppercase tracking-widest bg-tj-gold text-black hover:bg-white px-8 py-3 transition-all font-bold"
+                  className="mt-6 text-xs uppercase tracking-[0.3em] bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all font-bold"
                 >
                   {t.polish.errorTryAgain}
                 </button>
@@ -91,7 +91,7 @@ const Contact = () => {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.name}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.contact.form.name}</label>
                   <input
                     required
                     type="text"
@@ -103,7 +103,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.phone}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.contact.form.phone}</label>
                   <input
                     required
                     type="tel"
@@ -115,7 +115,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.email}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.contact.form.email}</label>
                   <input
                     type="email"
                     value={form.email}
@@ -126,7 +126,7 @@ const Contact = () => {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.message}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.contact.form.message}</label>
                   <textarea
                     required
                     value={form.message}
@@ -157,7 +157,7 @@ const Contact = () => {
           <div className="space-y-8">
 
             {/* Headquarters */}
-            <div className="bg-black border border-white/10 p-8 hover:border-tj-gold/50 transition-colors group">
+            <div className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group">
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold">
                   <MapPin size={24} />
@@ -181,7 +181,7 @@ const Contact = () => {
             </div>
 
             {/* Phone */}
-            <div className="bg-black border border-white/10 p-8 hover:border-tj-gold/50 transition-colors group">
+            <div className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group">
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold">
                   <Phone size={24} />
@@ -197,7 +197,7 @@ const Contact = () => {
             </div>
 
             {/* Hours */}
-            <div className="bg-black border border-white/10 p-8 hover:border-tj-gold/50 transition-colors group">
+            <div className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group">
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold">
                   <Clock size={24} />

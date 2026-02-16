@@ -33,7 +33,7 @@ const Finance = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black pt-40 pb-20 px-6">
+    <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
@@ -53,7 +53,7 @@ const Finance = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
 
           {/* Benefit 1 */}
-          <div className="bg-tj-dark border border-white/10 p-8 hover:border-tj-gold/50 transition-all">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all">
             <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
               <Calculator size={24} />
             </div>
@@ -64,7 +64,7 @@ const Finance = () => {
           </div>
 
           {/* Benefit 2 */}
-          <div className="bg-tj-dark border border-white/10 p-8 hover:border-tj-gold/50 transition-all">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all">
             <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
               <TrendingUp size={24} />
             </div>
@@ -75,7 +75,7 @@ const Finance = () => {
           </div>
 
           {/* Benefit 3 */}
-          <div className="bg-tj-dark border border-white/10 p-8 hover:border-tj-gold/50 transition-all">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all">
             <div className="w-12 h-12 bg-tj-gold/10 border border-tj-gold/30 flex items-center justify-center mb-6 text-tj-gold">
               <Shield size={24} />
             </div>
@@ -90,7 +90,7 @@ const Finance = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
           {/* Application Form */}
-          <div className="bg-tj-dark border border-white/10 p-6 sm:p-12 relative">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
 
             {status === 'submitted' ? (
@@ -121,7 +121,7 @@ const Finance = () => {
                 </p>
                 <button
                   onClick={() => setStatus('idle')}
-                  className="mt-6 text-[10px] uppercase tracking-widest bg-tj-gold text-black hover:bg-white px-8 py-3 transition-all font-bold"
+                  className="mt-6 text-xs uppercase tracking-[0.3em] bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all font-bold"
                 >
                   {t.polish.errorTryAgain}
                 </button>
@@ -129,11 +129,11 @@ const Finance = () => {
             ) : (
               <>
                 <h2 className="text-white font-display text-2xl mb-2">{t.finance.options.title}</h2>
-                <p className="text-gray-500 text-xs uppercase tracking-widest mb-8">{t.finance.intro}</p>
+                <p className="text-gray-400 text-xs uppercase tracking-widest mb-8">{t.finance.intro}</p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.name}</label>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.contact.form.name}</label>
                     <input
                       required
                       type="text"
@@ -145,7 +145,7 @@ const Finance = () => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.phone}</label>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.contact.form.phone}</label>
                       <input
                         required
                         type="tel"
@@ -155,7 +155,7 @@ const Finance = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.email}</label>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.contact.form.email}</label>
                       <input
                         type="email"
                         value={form.email}
@@ -166,7 +166,7 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.inventory.modal.form.name}</label>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.inventory.modal.form.name}</label>
                     <input
                       required
                       type="text"
@@ -179,9 +179,9 @@ const Finance = () => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.common.price}</label>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.common.price}</label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                         <input
                           required
                           type="number"
@@ -192,9 +192,9 @@ const Finance = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.finance.form.downPayment}</label>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.finance.form.downPayment}</label>
                       <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">$</span>
                         <input
                           required
                           type="number"
@@ -207,7 +207,7 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.finance.form.creditProfile}</label>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">{t.finance.form.creditProfile}</label>
                     <select
                       value={form.creditScore}
                       onChange={e => setForm({...form, creditScore: e.target.value})}
@@ -243,7 +243,7 @@ const Finance = () => {
           <div className="space-y-8">
 
             {/* Requirements */}
-            <div className="bg-black border border-white/10 p-8">
+            <div className="bg-black border border-white/10 p-6 md:p-8">
               <h3 className="text-white font-display text-xl mb-6 flex items-center gap-2">
                 <CheckCircle size={20} className="text-tj-gold" />
                 {t.finance.requirements.title.toUpperCase()}
@@ -259,32 +259,32 @@ const Finance = () => {
             </div>
 
             {/* Rates */}
-            <div className="bg-black border border-white/10 p-8">
+            <div className="bg-black border border-white/10 p-6 md:p-8">
               <h3 className="text-white font-display text-xl mb-6">{t.finance.rates.title.toUpperCase()}</h3>
               <div className="space-y-4">
                 <div className="border-b border-white/5 pb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs uppercase tracking-widest text-gray-500">{t.finance.rates.excellent.label}</span>
+                    <span className="text-xs uppercase tracking-widest text-gray-400">{t.finance.rates.excellent.label}</span>
                     <span className="text-tj-gold font-mono text-lg">{t.finance.rates.excellent.rate}</span>
                   </div>
-                  <p className="text-xs text-gray-600">{t.finance.rates.excellent.detail}</p>
+                  <p className="text-xs text-gray-400">{t.finance.rates.excellent.detail}</p>
                 </div>
                 <div className="border-b border-white/5 pb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs uppercase tracking-widest text-gray-500">{t.finance.rates.good.label}</span>
+                    <span className="text-xs uppercase tracking-widest text-gray-400">{t.finance.rates.good.label}</span>
                     <span className="text-white font-mono text-lg">{t.finance.rates.good.rate}</span>
                   </div>
-                  <p className="text-xs text-gray-600">{t.finance.rates.good.detail}</p>
+                  <p className="text-xs text-gray-400">{t.finance.rates.good.detail}</p>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs uppercase tracking-widest text-gray-500">{t.finance.rates.fair.label}</span>
+                    <span className="text-xs uppercase tracking-widest text-gray-400">{t.finance.rates.fair.label}</span>
                     <span className="text-white font-mono text-lg">{t.finance.rates.fair.rate}</span>
                   </div>
-                  <p className="text-xs text-gray-600">{t.finance.rates.fair.detail}</p>
+                  <p className="text-xs text-gray-400">{t.finance.rates.fair.detail}</p>
                 </div>
               </div>
-              <p className="text-xs text-gray-600 mt-6">
+              <p className="text-xs text-gray-400 mt-6">
                 {t.finance.rates.disclaimer}
               </p>
             </div>

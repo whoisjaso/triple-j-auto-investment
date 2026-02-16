@@ -59,7 +59,7 @@ const About = () => {
       </section>
 
       {/* SECTION 1: Our Story */}
-      <section className="py-32 bg-black relative border-t border-tj-gold/20 z-10 overflow-hidden bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80')] bg-fixed bg-cover bg-center">
+      <section className="py-20 md:py-32 bg-black relative border-t border-tj-gold/20 z-10 overflow-hidden bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80')] bg-fixed bg-cover bg-center">
         <div className="absolute inset-0 bg-black/90"></div>
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] bg-fixed mix-blend-overlay"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-tj-green/60 via-black/80 to-black"></div>
@@ -100,7 +100,7 @@ const About = () => {
               {t.about.story.title}
             </h2>
 
-            <div className="relative bg-gradient-to-br from-tj-green/30 to-black border border-tj-gold/30 p-6 sm:p-10 backdrop-blur-sm shadow-[0_0_20px_rgba(212,175,55,0.15)] group hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:border-tj-gold/50 transition-all duration-500">
+            <div className="relative bg-gradient-to-br from-tj-green/30 to-black border border-tj-gold/30 p-6 md:p-8 backdrop-blur-sm shadow-[0_0_20px_rgba(212,175,55,0.15)] group hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:border-tj-gold/50 transition-all duration-500">
               <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-tj-gold/60 drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]"></div>
               <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-tj-gold/60 drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]"></div>
 
@@ -117,7 +117,7 @@ const About = () => {
       </section>
 
       {/* SECTION 2: Our Values */}
-      <section className="py-40 bg-tj-green border-y border-tj-gold/10 relative overflow-hidden">
+      <section className="py-20 md:py-32 bg-tj-green border-y border-tj-gold/10 relative overflow-hidden">
         <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(0,0,0,0.4)_25%,transparent_25%,transparent_50%,rgba(0,0,0,0.4)_50%,rgba(0,0,0,0.4)_75%,transparent_75%,transparent)] bg-[size:40px_40px] opacity-20"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-tj-green/50 to-black/80"></div>
 
@@ -135,7 +135,7 @@ const About = () => {
               { id: '02', icon: Heart, title: t.about.values.v2Title, text: t.about.values.v2Desc },
               { id: '03', icon: Users, title: t.about.values.v3Title, text: t.about.values.v3Desc }
             ].map((card, i) => (
-              <div key={i} className="bg-black/60 p-10 group relative overflow-hidden border border-tj-gold/10 hover:border-tj-gold/60 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.5)] hover:-translate-y-2">
+              <div key={i} className="bg-black/60 p-6 md:p-8 group relative overflow-hidden border border-tj-gold/10 hover:border-tj-gold/60 transition-all duration-500 hover:shadow-[0_10px_40px_rgba(0,0,0,0.5)] hover:-translate-y-2">
                 <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold/0 group-hover:bg-tj-gold transition-colors duration-500"></div>
 
                 <div className="absolute -right-12 -bottom-12 text-tj-gold/5 group-hover:text-tj-gold/10 transition-colors duration-700 transform group-hover:scale-110 group-hover:rotate-12">
@@ -156,7 +156,7 @@ const About = () => {
       </section>
 
       {/* SECTION 3: Bilingual & Community */}
-      <section className="py-32 bg-black relative overflow-hidden">
+      <section className="py-16 md:py-24 bg-black relative overflow-hidden">
          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-tj-green/20 blur-[120px] rounded-full pointer-events-none"></div>
 
         <div className="max-w-7xl mx-auto px-6 relative z-10">
@@ -177,7 +177,7 @@ const About = () => {
             </div>
 
             {/* Info Card */}
-            <div className="bg-tj-green/10 backdrop-blur-md border border-tj-gold/20 p-6 sm:p-12 relative shadow-2xl group hover:border-tj-gold/40 hover:bg-tj-green/20 transition-all duration-700">
+            <div className="bg-tj-green/10 backdrop-blur-md border border-tj-gold/20 p-6 md:p-8 relative shadow-2xl group hover:border-tj-gold/40 hover:bg-tj-green/20 transition-all duration-700">
               <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-tj-gold/40"></div>
               <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-tj-gold/40"></div>
 
@@ -190,21 +190,21 @@ const About = () => {
                 <li className="flex items-center gap-6 border-b border-white/5 pb-4">
                     <div className="h-1.5 w-1.5 bg-tj-gold rotate-45 shadow-[0_0_5px_rgba(212,175,55,0.8)]"></div>
                     <div>
-                      <span className="tracking-widest text-xs uppercase font-medium text-gray-500 block mb-1">{t.footer.location}</span>
+                      <span className="tracking-widest text-xs uppercase font-medium text-gray-400 block mb-1">{t.footer.location}</span>
                       <span className="text-white text-sm">{t.about.location.address}, {t.about.location.city}</span>
                     </div>
                 </li>
                 <li className="flex items-center gap-6 border-b border-white/5 pb-4">
                     <div className="h-1.5 w-1.5 bg-tj-gold rotate-45 shadow-[0_0_5px_rgba(212,175,55,0.8)]"></div>
                     <div>
-                      <span className="tracking-widest text-xs uppercase font-medium text-gray-500 block mb-1">{t.footer.phoneLabel}</span>
+                      <span className="tracking-widest text-xs uppercase font-medium text-gray-400 block mb-1">{t.footer.phoneLabel}</span>
                       <span className="text-white text-sm">{t.about.location.phone}</span>
                     </div>
                 </li>
                 <li className="flex items-center gap-6 border-b border-white/5 pb-4">
                     <div className="h-1.5 w-1.5 bg-tj-gold rotate-45 shadow-[0_0_5px_rgba(212,175,55,0.8)]"></div>
                     <div>
-                      <span className="tracking-widest text-xs uppercase font-medium text-gray-500 block mb-1">{t.footer.hours}</span>
+                      <span className="tracking-widest text-xs uppercase font-medium text-gray-400 block mb-1">{t.footer.hours}</span>
                       <span className="text-white text-sm">{t.about.location.hours}</span>
                     </div>
                 </li>
@@ -224,7 +224,7 @@ const About = () => {
               <div className="flex flex-col md:flex-row items-start md:items-stretch gap-0 md:gap-12 border border-tj-gold/20">
 
                   {/* Left: Location Info */}
-                  <div className="w-full md:w-1/3 bg-black p-6 sm:p-12 flex flex-col justify-center relative overflow-hidden group">
+                  <div className="w-full md:w-1/3 bg-black p-6 md:p-8 flex flex-col justify-center relative overflow-hidden group">
                       <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
                       <MapPin className="absolute -right-12 -bottom-12 text-tj-gold/5 w-64 h-64 rotate-12 group-hover:text-tj-gold/10 transition-colors" />
 
@@ -234,7 +234,7 @@ const About = () => {
 
                       <div className="space-y-8 relative z-10">
                           <div>
-                              <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-2">{t.footer.location}</p>
+                              <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-2">{t.footer.location}</p>
                               <p className="text-white font-display text-2xl tracking-wide">{t.about.location.address.toUpperCase()}</p>
                               <p className="text-gray-400 font-mono text-sm">{t.about.location.city}</p>
                           </div>
@@ -253,7 +253,7 @@ const About = () => {
                               href="https://www.google.com/maps/search/?api=1&query=8774+Almeda+Genoa+Road,+Houston,+TX+77075"
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-3 bg-white/5 hover:bg-tj-gold text-white hover:text-black px-8 py-4 text-xs uppercase tracking-[0.2em] font-bold transition-all border border-white/10 hover:border-tj-gold"
+                              className="inline-flex items-center gap-3 bg-white/5 hover:bg-tj-gold text-white hover:text-black px-8 py-4 text-xs uppercase tracking-[0.3em] font-bold transition-all border border-white/10 hover:border-tj-gold"
                           >
                               <Navigation size={16} /> {t.about.location.directions}
                           </a>
@@ -267,7 +267,7 @@ const About = () => {
                          <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-900">
                            <div className="text-center">
                              <MapPin size={32} className="text-gray-700 mx-auto mb-3 animate-pulse" />
-                             <p className="text-gray-600 text-xs uppercase tracking-widest">{t.common.loading}</p>
+                             <p className="text-gray-400 text-xs uppercase tracking-widest">{t.common.loading}</p>
                            </div>
                          </div>
                        )}
@@ -295,7 +295,7 @@ const About = () => {
        </section>
 
       {/* CTA */}
-      <section className="py-32 bg-tj-green text-center px-6 relative overflow-hidden border-t border-tj-gold/30">
+      <section className="py-20 md:py-32 bg-tj-green text-center px-4 md:px-6 relative overflow-hidden border-t border-tj-gold/30">
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10"></div>
 
         <div className="relative z-10 max-w-4xl mx-auto">
