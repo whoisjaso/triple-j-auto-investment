@@ -92,12 +92,15 @@ Plans:
   3. Zero console.log output in the production build -- browser DevTools console is clean
   4. When Supabase is unreachable or an Edge Function fails, the user sees a helpful error message instead of a blank screen or infinite spinner
   5. All images have alt text, color contrast passes WCAG AA, and primary flows are navigable by keyboard alone
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- [ ] 11-01: TBD
-- [ ] 11-02: TBD
-- [ ] 11-03: TBD
+- [ ] 11-01-PLAN.md -- Infrastructure: console stripping, ErrorBoundary fix, Suspense fallback, offline detection, maintenance page, bilingual translation keys
+- [ ] 11-02-PLAN.md -- Loading/empty/error states across all customer-facing pages (Inventory, Home, Contact, Finance, CustomerDashboard, etc.)
+- [ ] 11-03-PLAN.md -- Mobile responsiveness at 375px + touch targets 44x44px across all customer-facing pages and Navbar/Footer
+- [ ] 11-04-PLAN.md -- Spacing standardization + button consistency across all pages (canonical padding scale, 4 button patterns)
+- [ ] 11-05-PLAN.md -- Accessibility: color contrast WCAG AA, alt text audit, skip-to-content, keyboard navigation, focus trapping, ARIA
+- [ ] 11-06-PLAN.md -- Human verification checkpoint: visual + functional testing across mobile viewports and keyboard
 
 ### Phase 12: SEO Foundation
 **Goal**: Search engines can discover, crawl, and correctly represent every public page of the site
@@ -236,7 +239,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 |-------|-----------|----------------|--------|-----------|
 | 9. Production Infrastructure | v2.0 | 0/7 | Planning complete | - |
 | 10. Brand Truth | v2.0 | 6/6 | Complete | 2026-02-15 |
-| 11. Production Polish | v2.0 | 0/TBD | Not started | - |
+| 11. Production Polish | v2.0 | 0/6 | Planning complete | - |
 | 12. SEO Foundation | v2.0 | 0/TBD | Not started | - |
 | 13. Focus Capture | v2.0 | 0/TBD | Not started | - |
 | 14. Expectancy Building | v2.0 | 0/TBD | Not started | - |
