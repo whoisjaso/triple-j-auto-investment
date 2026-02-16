@@ -376,28 +376,28 @@ export const t = {
             list: [
                 {
                     title: "Vehicle Sales",
-                    desc: "Quality pre-owned vehicles in the $3,000-$8,000 range. Every car is inspected and priced transparently.",
-                    detail: "Browse our lot or website to find a vehicle that fits your needs and budget. We're here to answer questions and help you make a confident choice."
+                    desc: "Triple J Auto Investment sells reliable pre-owned vehicles in the $3,000-$8,000 range to Houston families. Every vehicle is inspected before listing.",
+                    detail: "Browse our lot at 8774 Almeda Genoa Road or our website to find sedans, SUVs, and trucks that fit your needs and budget. We carry popular models like Honda Accord, Toyota Camry, Chevy Equinox, and Ford Explorer. Transparent pricing on every vehicle -- no hidden fees, no surprises."
                 },
                 {
                     title: "Vehicle Rentals",
-                    desc: "Need a vehicle for a short time? We offer rental options to keep you moving.",
-                    detail: "Whether you need a vehicle for a week or a month, our rental fleet has you covered. Contact us for rates and availability."
+                    desc: "Triple J Auto Investment offers affordable vehicle rentals in Houston by the week or month. No long-term contracts required.",
+                    detail: "Whether you need a vehicle for a week or a month, our rental fleet has you covered. A valid driver's license, proof of insurance, and a security deposit are required. Call (832) 400-9760 for current rates and availability."
                 },
                 {
                     title: "VIN History Reports",
-                    desc: "Full vehicle history reports so you know exactly what you're buying.",
-                    detail: "We provide transparent vehicle history information including accident reports, title status, and service records when available."
+                    desc: "Triple J Auto Investment provides free VIN lookup so you know exactly what you are buying before you commit.",
+                    detail: "We provide transparent vehicle history information including accident reports, title status, and service records when available. Use our online VIN lookup tool or ask our team for a full vehicle history report."
                 },
                 {
-                    title: "Financing Assistance",
-                    desc: "Flexible payment options to help you get behind the wheel.",
-                    detail: "We work with you to find a financing plan that fits your budget. Talk to our team about available options."
+                    title: "In-House Financing",
+                    desc: "Triple J Auto Investment provides in-house Buy Here Pay Here financing with no credit check. Down payments start at $1,000.",
+                    detail: "We finance your vehicle directly -- no bank, no third-party lender, no waiting. Bring your ID, proof of income, and proof of residence. Make your down payment and drive home the same day. We also work with third-party lenders for buyers who prefer traditional financing."
                 },
                 {
                     title: "Trade-In Assessment",
-                    desc: "Get a fair value for your current vehicle toward your next purchase.",
-                    detail: "Bring your vehicle in and we'll give you an honest assessment. The trade-in value can be applied directly to your purchase."
+                    desc: "Triple J Auto Investment accepts trade-ins and applies the value directly toward your next vehicle purchase.",
+                    detail: "Bring your vehicle to our lot at 8774 Almeda Genoa Road for a fair assessment. We'll evaluate your trade-in and apply the value to your purchase. Call (832) 400-9760 to schedule an evaluation."
                 }
             ],
             dontDo: {
@@ -450,19 +450,37 @@ export const t = {
             badge: "Financing",
             title: "FINANCING OPTIONS",
             subtitle: "Flexible payment plans to fit your budget.",
-            intro: "We understand that buying a car is a big decision. That's why we offer financing options designed to make it easier for Houston families to get reliable transportation.",
+            intro: "Triple J Auto Investment offers in-house Buy Here Pay Here financing with no credit check required. Down payments start at $1,000, and you can drive home the same day. We also work with third-party lenders for traditional financing options. Buying a car is a big decision -- we make financing simple so Houston families can get reliable transportation without the hassle.",
+            bhph: {
+                processTitle: "How Buy Here Pay Here Works at Triple J",
+                processIntro: "Buy Here Pay Here means Triple J Auto Investment finances your vehicle directly -- no bank, no credit check, no waiting for approval. You deal with us from start to finish.",
+                processSteps: [
+                    { title: "Choose Your Vehicle", desc: "Browse our inventory of inspected pre-owned vehicles priced from $3,000 to $8,000." },
+                    { title: "Bring Your Documents", desc: "Valid ID, proof of income, and proof of residence. That is all you need." },
+                    { title: "Make Your Down Payment", desc: "Down payments start at $1,000. We work with your budget to find the right amount." },
+                    { title: "Drive Home Today", desc: "Once approved, you drive your vehicle home the same day. Payments are made directly to Triple J." }
+                ],
+                whyTitle: "Why Choose Buy Here Pay Here?",
+                whyItems: [
+                    "No credit check required",
+                    "No bank approval needed",
+                    "Same-day drive-off",
+                    "Payments made directly to Triple J",
+                    "We work with all credit situations"
+                ]
+            },
             options: {
                 title: "How It Works",
                 step1Title: "Choose Your Vehicle",
-                step1Desc: "Browse our inventory and find the car that's right for you.",
-                step2Title: "Talk to Our Team",
-                step2Desc: "We'll discuss payment options that fit your budget and situation.",
-                step3Title: "Drive Away Happy",
-                step3Desc: "Complete the paperwork and drive home in your new vehicle."
+                step1Desc: "Browse our inventory of inspected pre-owned vehicles priced from $3,000 to $8,000.",
+                step2Title: "Bring Your Documents",
+                step2Desc: "Valid ID, proof of income, and proof of residence. No credit check required for in-house financing.",
+                step3Title: "Drive Home Today",
+                step3Desc: "Make your down payment (starting at $1,000) and drive home the same day."
             },
             cta: {
                 title: "Ready to Get Started?",
-                desc: "Contact us to discuss financing options for any vehicle on our lot.",
+                desc: "Contact us to discuss financing options for any vehicle on our lot. No credit check required for in-house financing.",
                 button: "Contact Us",
                 phone: "Or call us at (832) 400-9760"
             },
@@ -1134,28 +1152,28 @@ export const t = {
             list: [
                 {
                     title: "Venta de Vehiculos",
-                    desc: "Vehiculos usados de calidad en el rango de $3,000-$8,000. Cada carro es inspeccionado y tiene precio transparente.",
-                    detail: "Visite nuestro lote o sitio web para encontrar un vehiculo que se ajuste a sus necesidades y presupuesto. Estamos aqui para responder preguntas y ayudarle a tomar una decision segura."
+                    desc: "Triple J Auto Investment vende vehiculos usados confiables en el rango de $3,000 a $8,000 para familias de Houston. Todos los vehiculos son inspeccionados antes de listarse.",
+                    detail: "Visite nuestro lote en 8774 Almeda Genoa Road o nuestro sitio web para encontrar sedanes, camionetas y SUVs. Tenemos modelos populares como Honda Accord, Toyota Camry, Chevy Equinox y Ford Explorer. Precios transparentes en cada vehiculo -- sin cargos ocultos, sin sorpresas."
                 },
                 {
                     title: "Renta de Vehiculos",
-                    desc: "Necesita un vehiculo por un tiempo? Ofrecemos opciones de renta para mantenerlo en movimiento.",
-                    detail: "Ya sea que necesite un vehiculo por una semana o un mes, nuestra flota de renta lo tiene cubierto. Contactenos para tarifas y disponibilidad."
+                    desc: "Triple J Auto Investment ofrece rentas de vehiculos accesibles en Houston por semana o por mes. Sin contratos a largo plazo.",
+                    detail: "Ya sea que necesite un vehiculo por una semana o un mes, nuestra flota de renta lo tiene cubierto. Se requiere licencia de conducir valida, comprobante de seguro y deposito de seguridad. Llame al (832) 400-9760 para tarifas y disponibilidad."
                 },
                 {
                     title: "Reportes de Historial VIN",
-                    desc: "Reportes completos de historial del vehiculo para que sepa exactamente lo que esta comprando.",
-                    detail: "Proporcionamos informacion transparente del historial del vehiculo incluyendo reportes de accidentes, estado del titulo y registros de servicio cuando estan disponibles."
+                    desc: "Triple J Auto Investment ofrece busqueda de VIN gratuita para que sepa exactamente lo que esta comprando antes de comprometerse.",
+                    detail: "Proporcionamos informacion transparente del historial del vehiculo incluyendo reportes de accidentes, estado del titulo y registros de servicio cuando estan disponibles. Use nuestra herramienta de busqueda de VIN en linea o pregunte a nuestro equipo por un reporte completo."
                 },
                 {
-                    title: "Asistencia de Financiamiento",
-                    desc: "Opciones de pago flexibles para ayudarle a ponerse al volante.",
-                    detail: "Trabajamos con usted para encontrar un plan de financiamiento que se ajuste a su presupuesto. Hable con nuestro equipo sobre las opciones disponibles."
+                    title: "Financiamiento Interno",
+                    desc: "Triple J Auto Investment ofrece financiamiento interno Buy Here Pay Here sin verificacion de credito. Enganches desde $1,000.",
+                    detail: "Nosotros financiamos su vehiculo directamente -- sin banco, sin prestamista externo, sin esperar. Traiga su identificacion, comprobante de ingresos y comprobante de domicilio. Haga su enganche y vayase manejando el mismo dia. Tambien trabajamos con prestamistas externos para quienes prefieran financiamiento tradicional."
                 },
                 {
                     title: "Evaluacion de Intercambio",
-                    desc: "Obtenga un valor justo por su vehiculo actual para su proxima compra.",
-                    detail: "Traiga su vehiculo y le daremos una evaluacion honesta. El valor del intercambio se puede aplicar directamente a su compra."
+                    desc: "Triple J Auto Investment acepta vehiculos como parte de pago y aplica el valor directamente a su proxima compra.",
+                    detail: "Traiga su vehiculo a nuestro lote en 8774 Almeda Genoa Road para una evaluacion justa. Evaluaremos su intercambio y aplicaremos el valor a su compra. Llame al (832) 400-9760 para programar una evaluacion."
                 }
             ],
             dontDo: {
@@ -1208,19 +1226,37 @@ export const t = {
             badge: "Financiamiento",
             title: "OPCIONES DE FINANCIAMIENTO",
             subtitle: "Planes de pago flexibles para su presupuesto.",
-            intro: "Entendemos que comprar un carro es una decision importante. Por eso ofrecemos opciones de financiamiento disenadas para facilitar que las familias de Houston obtengan transporte confiable.",
+            intro: "Triple J Auto Investment ofrece financiamiento interno Buy Here Pay Here sin verificacion de credito. Los enganches empiezan desde $1,000 y puedes irte manejando el mismo dia. Tambien trabajamos con prestamistas externos para opciones de financiamiento tradicional. Comprar un carro es una decision importante -- nosotros hacemos el financiamiento simple para que las familias de Houston obtengan transporte confiable sin complicaciones.",
+            bhph: {
+                processTitle: "Como Funciona el Buy Here Pay Here en Triple J",
+                processIntro: "Buy Here Pay Here significa que Triple J Auto Investment financia tu vehiculo directamente -- sin banco, sin verificacion de credito, sin esperar aprobacion. Tratas con nosotros de principio a fin.",
+                processSteps: [
+                    { title: "Escoge Tu Vehiculo", desc: "Explora nuestro inventario de vehiculos usados inspeccionados con precios desde $3,000 hasta $8,000." },
+                    { title: "Trae Tus Documentos", desc: "Identificacion oficial, comprobante de ingresos y comprobante de domicilio. Eso es todo lo que necesitas." },
+                    { title: "Da Tu Enganche", desc: "Los enganches empiezan desde $1,000. Trabajamos con tu presupuesto para encontrar la cantidad adecuada." },
+                    { title: "Vete Manejando Hoy", desc: "Una vez aprobado, te vas manejando tu vehiculo el mismo dia. Los pagos se hacen directamente a Triple J." }
+                ],
+                whyTitle: "Por Que Elegir Buy Here Pay Here?",
+                whyItems: [
+                    "Sin verificacion de credito",
+                    "Sin aprobacion bancaria",
+                    "Te vas manejando el mismo dia",
+                    "Pagos directos a Triple J",
+                    "Trabajamos con todo tipo de credito"
+                ]
+            },
             options: {
                 title: "Como Funciona",
-                step1Title: "Elija Su Vehiculo",
-                step1Desc: "Explore nuestro inventario y encuentre el carro adecuado para usted.",
-                step2Title: "Hable con Nuestro Equipo",
-                step2Desc: "Hablaremos sobre opciones de pago que se ajusten a su presupuesto y situacion.",
-                step3Title: "Vayase Feliz",
-                step3Desc: "Complete el papeleo y vayase a casa en su nuevo vehiculo."
+                step1Title: "Escoge Tu Vehiculo",
+                step1Desc: "Explora nuestro inventario de vehiculos usados inspeccionados con precios desde $3,000 hasta $8,000.",
+                step2Title: "Trae Tus Documentos",
+                step2Desc: "Identificacion oficial, comprobante de ingresos y comprobante de domicilio. Sin verificacion de credito para financiamiento interno.",
+                step3Title: "Vete Manejando Hoy",
+                step3Desc: "Haz tu enganche (desde $1,000) y vete manejando a casa el mismo dia."
             },
             cta: {
                 title: "Listo para Comenzar?",
-                desc: "Contactenos para hablar sobre opciones de financiamiento para cualquier vehiculo en nuestro lote.",
+                desc: "Contactenos para hablar sobre opciones de financiamiento para cualquier vehiculo en nuestro lote. Sin verificacion de credito para financiamiento interno.",
                 button: "Contactenos",
                 phone: "O llamenos al (832) 400-9760"
             },
