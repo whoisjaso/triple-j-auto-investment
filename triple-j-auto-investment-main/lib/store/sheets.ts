@@ -5,15 +5,15 @@ import { Vehicle, VehicleStatus } from '../../types';
 // --- CONFIGURATION ---
 export const GOOGLE_SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRHeta2U3ATyxE4hlQC3-kVCV8Iu-hnJYQIij68ptCBZYVw4C4vxIiu2fli5ltWXdsb7uVKxXco9WE3/pub?output=csv";
 
-// --- SOVEREIGN CAPTION GENERATOR ---
-export const generateOpulentCaption = (make: string, model: string, year: number, mileage: number, price: number) => {
+// --- VEHICLE CAPTION GENERATOR ---
+export const generateVehicleCaption = (make: string, model: string, year: number, mileage: number, price: number) => {
   const templates = [
-    `Experience defines value. This ${year} ${make} ${model} carries the frequency of established power. With ${mileage.toLocaleString()} miles of operational history, it stands as a testament to durability and precision.`,
-    `A vessel of proven authority. The ${make} ${model} is not merely built; it is forged. This specific example, seasoned by ${mileage.toLocaleString()} miles, offers a kinetic entry point into the higher echelons of status.`,
-    `Time filters the weak. This ${year} ${make} ${model} remains. A sovereign asset with ${mileage.toLocaleString()} miles of legacy, ready to enforce your will upon the asphalt.`,
-    `The ${make} ${model}. Engineering that transcends mere transportation. Having conquered ${mileage.toLocaleString()} miles, this machine has been initiated. It requires no introduction, only a capable operator.`,
-    `Not for the uninitiated. This ${year} ${make} ${model} bears the marks of experience (${mileage.toLocaleString()} miles), verifying its resilience. A strategic acquisition for the sovereign mind.`,
-    `Provenance verified. This ${make} ${model} exists at the intersection of luxury and legacy. With ${mileage.toLocaleString()} miles logged, it has proven its capacity for dominion.`
+    `Reliable and well-maintained. This ${year} ${make} ${model} has ${mileage.toLocaleString()} miles and has been inspected for quality. Great option for daily driving and family use.`,
+    `A dependable choice. The ${year} ${make} ${model} offers solid value with ${mileage.toLocaleString()} miles on the odometer. Clean title and ready for its next owner.`,
+    `Well-kept ${year} ${make} ${model} with ${mileage.toLocaleString()} miles. Practical, fuel-efficient, and perfect for everyday commuting. Come see it at our Houston lot.`,
+    `This ${year} ${make} ${model} is a smart pick for families and commuters. With ${mileage.toLocaleString()} miles and regular maintenance, it has plenty of life left.`,
+    `Looking for an affordable, reliable ride? This ${year} ${make} ${model} with ${mileage.toLocaleString()} miles is a great value. Inspected and ready to go.`,
+    `Clean title ${year} ${make} ${model} with ${mileage.toLocaleString()} miles. Honest pricing, no hidden fees. Stop by Triple J Auto Investment to take it for a test drive.`
   ];
 
   const index = (year + mileage + model.length) % templates.length;
@@ -135,7 +135,7 @@ export async function syncWithGoogleSheets(
 
       let description = idx.desc > -1 ? row[idx.desc] : '';
       if (!description || description.trim().length < 10) {
-        description = generateOpulentCaption(make, model, year, mileage, price);
+        description = generateVehicleCaption(make, model, year, mileage, price);
       }
 
       let imageUrl = (idx.image > -1 && row[idx.image]) ? row[idx.image] : '';
@@ -207,7 +207,7 @@ export async function syncWithGoogleSheets(
 
     deps.isSyncingRef.current = false;
     deps.setLastSync(new Date());
-    const msg = `SYNC COMPLETE: ${sheetVehicles.length} Assets synced to database.`;
+    const msg = `SYNC COMPLETE: ${sheetVehicles.length} vehicles synced to database.`;
     if (!silent) console.log(msg);
 
     // Reload from database to get UUIDs
