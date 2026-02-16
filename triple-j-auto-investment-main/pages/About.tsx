@@ -100,7 +100,7 @@ const About = () => {
               {t.about.story.title}
             </h2>
 
-            <div className="relative bg-gradient-to-br from-tj-green/30 to-black border border-tj-gold/30 p-10 backdrop-blur-sm shadow-[0_0_20px_rgba(212,175,55,0.15)] group hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:border-tj-gold/50 transition-all duration-500">
+            <div className="relative bg-gradient-to-br from-tj-green/30 to-black border border-tj-gold/30 p-6 sm:p-10 backdrop-blur-sm shadow-[0_0_20px_rgba(212,175,55,0.15)] group hover:shadow-[0_0_30px_rgba(212,175,55,0.3)] hover:border-tj-gold/50 transition-all duration-500">
               <div className="absolute top-0 left-0 w-4 h-4 border-t border-l border-tj-gold/60 drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]"></div>
               <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-tj-gold/60 drop-shadow-[0_0_8px_rgba(212,175,55,0.6)]"></div>
 
@@ -177,7 +177,7 @@ const About = () => {
             </div>
 
             {/* Info Card */}
-            <div className="bg-tj-green/10 backdrop-blur-md border border-tj-gold/20 p-12 relative shadow-2xl group hover:border-tj-gold/40 hover:bg-tj-green/20 transition-all duration-700">
+            <div className="bg-tj-green/10 backdrop-blur-md border border-tj-gold/20 p-6 sm:p-12 relative shadow-2xl group hover:border-tj-gold/40 hover:bg-tj-green/20 transition-all duration-700">
               <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-tj-gold/40"></div>
               <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-tj-gold/40"></div>
 
@@ -224,7 +224,7 @@ const About = () => {
               <div className="flex flex-col md:flex-row items-start md:items-stretch gap-0 md:gap-12 border border-tj-gold/20">
 
                   {/* Left: Location Info */}
-                  <div className="w-full md:w-1/3 bg-black p-12 flex flex-col justify-center relative overflow-hidden group">
+                  <div className="w-full md:w-1/3 bg-black p-6 sm:p-12 flex flex-col justify-center relative overflow-hidden group">
                       <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
                       <MapPin className="absolute -right-12 -bottom-12 text-tj-gold/5 w-64 h-64 rotate-12 group-hover:text-tj-gold/10 transition-colors" />
 
@@ -261,7 +261,7 @@ const About = () => {
                   </div>
 
                   {/* Right: Interactive Map */}
-                  <div className="w-full md:w-2/3 min-h-[500px] relative bg-gray-900 group">
+                  <div className="w-full md:w-2/3 min-h-[300px] md:min-h-[500px] relative bg-gray-900 group">
                        {/* Map skeleton placeholder */}
                        {!mapLoaded && (
                          <div className="absolute inset-0 flex items-center justify-center z-10 bg-gray-900">

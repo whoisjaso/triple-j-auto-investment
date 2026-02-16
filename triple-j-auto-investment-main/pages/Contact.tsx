@@ -52,7 +52,7 @@ const Contact = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
           {/* Contact Form */}
-          <div className="bg-tj-dark border border-white/10 p-12">
+          <div className="bg-tj-dark border border-white/10 p-6 sm:p-12 relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
 
             {status === 'sent' ? (

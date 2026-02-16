@@ -36,7 +36,7 @@ const Services = () => {
             const ctaText = (t.common as Record<string, string>)[ctaKey] || t.services.learnMore;
 
             return (
-              <div key={idx} className="bg-tj-dark border border-white/10 p-10 hover:border-tj-gold/50 transition-all duration-500 group">
+              <div key={idx} className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all duration-500 group">
                 <div className="flex items-start gap-4 mb-6">
                   <div className="p-4 bg-black border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                     <IconComponent size={32} />
@@ -60,7 +60,7 @@ const Services = () => {
         </div>
 
         {/* What We Don't Do */}
-        <div className="bg-red-900/10 border border-red-900/30 p-12">
+        <div className="bg-red-900/10 border border-red-900/30 p-6 sm:p-12">
           <h2 className="text-white font-display text-3xl mb-8 flex items-center gap-3">
             <span className="text-red-500">&#9888;</span> {t.services.dontDo.title}
           </h2>

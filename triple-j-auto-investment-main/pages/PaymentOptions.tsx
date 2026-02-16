@@ -27,7 +27,7 @@ const PaymentOptions = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
 
           {/* Cash */}
-          <div className="bg-tj-dark border border-white/10 p-10 hover:border-tj-gold/50 transition-all group">
+          <div className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all group">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-4 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                 <Banknote size={32} />
@@ -56,7 +56,7 @@ const PaymentOptions = () => {
           </div>
 
           {/* Cashier's Check */}
-          <div className="bg-tj-dark border border-white/10 p-10 hover:border-tj-gold/50 transition-all group">
+          <div className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all group">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-4 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                 <FileText size={32} />
@@ -79,7 +79,7 @@ const PaymentOptions = () => {
           </div>
 
           {/* Debit Card */}
-          <div className="bg-tj-dark border border-white/10 p-10 hover:border-tj-gold/50 transition-all group">
+          <div className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all group">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-4 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                 <CreditCard size={32} />
@@ -102,7 +102,7 @@ const PaymentOptions = () => {
           </div>
 
           {/* Financing */}
-          <div className="bg-tj-dark border border-white/10 p-10 hover:border-tj-gold/50 transition-all group">
+          <div className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all group">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-4 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                 <Building2 size={32} />

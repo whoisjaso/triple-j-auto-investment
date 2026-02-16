@@ -171,7 +171,7 @@ const CustomerLogin: React.FC = () => {
             <button
               onClick={handleSendCode}
               disabled={!isPhoneValid || loading}
-              className="w-full bg-tj-gold text-black font-bold uppercase tracking-widest py-3 rounded flex items-center justify-center gap-2 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full bg-tj-gold text-black font-bold uppercase tracking-widest py-3 min-h-[44px] rounded flex items-center justify-center gap-2 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="animate-pulse">Sending...</span>
@@ -225,7 +225,7 @@ const CustomerLogin: React.FC = () => {
             <button
               onClick={handleVerify}
               disabled={code.length !== 6 || loading}
-              className="w-full bg-tj-gold text-black font-bold uppercase tracking-widest py-3 rounded flex items-center justify-center gap-2 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="w-full bg-tj-gold text-black font-bold uppercase tracking-widest py-3 min-h-[44px] rounded flex items-center justify-center gap-2 hover:bg-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <span className="animate-pulse">Verifying...</span>
@@ -282,7 +282,7 @@ const CustomerLogin: React.FC = () => {
             <button
               onClick={handleTrackingGo}
               disabled={!trackingLink.trim()}
-              className="bg-white/5 border border-white/10 rounded px-4 py-2.5 text-tj-gold hover:bg-white/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="bg-white/5 border border-white/10 rounded px-4 py-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center text-tj-gold hover:bg-white/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ExternalLink size={16} />
             </button>

@@ -90,7 +90,7 @@ const Finance = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
           {/* Application Form */}
-          <div className="bg-tj-dark border border-white/10 p-12">
+          <div className="bg-tj-dark border border-white/10 p-6 sm:p-12 relative">
             <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
 
             {status === 'submitted' ? (
@@ -143,7 +143,7 @@ const Finance = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.contact.form.phone}</label>
                       <input
@@ -177,7 +177,7 @@ const Finance = () => {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.common.price}</label>
                       <div className="relative">
