@@ -20,6 +20,7 @@
  */
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -113,7 +114,7 @@ const AdminHeader = () => {
 
   return (
     <>
-      <header className="bg-black backdrop-blur-md border-b border-tj-gold/30 sticky top-0 z-[100] shadow-lg">
+      <header className="bg-black/95 backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-[100]">
         <div className="max-w-[1800px] mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link to="/" className="flex items-center group">
@@ -132,7 +133,7 @@ const AdminHeader = () => {
                   className={`flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold transition-all border ${
                     location.pathname === item.path
                       ? 'bg-tj-gold text-black border-tj-gold'
-                      : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/5'
+                      : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/[0.04]'
                   }`}
                 >
                   <item.icon size={14} />
@@ -142,17 +143,17 @@ const AdminHeader = () => {
 
               <button
                 onClick={() => setShowDocModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold text-gray-400 hover:text-white border border-transparent hover:border-white/20 hover:bg-white/5 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold text-gray-400 hover:text-white border border-transparent hover:border-white/20 hover:bg-white/[0.04] transition-all"
               >
                 <FileText size={14} />
                 Documents
               </button>
 
-              <div className="h-6 w-px bg-gray-700 mx-2" />
+              <div className="h-5 w-px bg-white/[0.08] mx-2" />
 
               <button
                 onClick={() => { logout(); navigate('/'); }}
-                className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400/70 hover:text-red-300 hover:bg-red-900/10 transition-all"
               >
                 <LogOut size={14} />
                 Logout
@@ -168,7 +169,7 @@ const AdminHeader = () => {
           </div>
 
           {mobileMenuOpen && (
-            <nav className="md:hidden border-t border-white/10 py-4 space-y-2">
+            <nav className="md:hidden border-t border-white/[0.06] py-4 space-y-2">
               {navItems.map(item => (
                 <Link
                   key={item.path}
@@ -177,7 +178,7 @@ const AdminHeader = () => {
                   className={`flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold transition-all ${
                     location.pathname === item.path
                       ? 'bg-tj-gold/10 text-tj-gold border-l-2 border-tj-gold'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
                   <item.icon size={18} />
@@ -187,16 +188,16 @@ const AdminHeader = () => {
 
               <button
                 onClick={() => { setShowDocModal(true); setMobileMenuOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-gray-400 hover:text-white hover:bg-white/[0.04] transition-all"
               >
                 <FileText size={18} />
                 Documents
               </button>
 
-              <div className="border-t border-white/10 mt-2 pt-2">
+              <div className="border-t border-white/[0.06] mt-2 pt-2">
                 <button
                   onClick={() => { logout(); navigate('/'); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400 hover:bg-red-900/20 transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400/70 hover:text-red-300 hover:bg-red-900/10 transition-all"
                 >
                   <LogOut size={18} />
                   Logout
@@ -575,7 +576,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
           <div className="flex items-start gap-4">
             {/* Vehicle thumbnail */}
             {vehicle?.imageUrl && (
-              <div className="w-20 h-14 border border-gray-800 overflow-hidden shrink-0 hidden md:block">
+              <div className="w-20 h-14 border border-white/[0.06] overflow-hidden shrink-0 hidden md:block">
                 <img src={vehicle.imageUrl} alt={vehicleName} className="w-full h-full object-cover" />
               </div>
             )}
@@ -809,7 +810,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
               <Loader2 className="animate-spin text-tj-gold" size={16} />
             </div>
           ) : payments.length > 0 ? (
-            <div className="border border-gray-800 overflow-hidden">
+            <div className="border border-white/[0.06] overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-black/50 text-[10px] uppercase tracking-widest text-gray-500">
@@ -822,7 +823,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
                 </thead>
                 <tbody>
                   {payments.map(payment => (
-                    <tr key={payment.id} className="border-t border-gray-800/50 hover:bg-white/5">
+                    <tr key={payment.id} className="border-t border-white/[0.03] hover:bg-white/5">
                       <td className="px-3 py-2 text-gray-300">{formatDate(payment.paymentDate)}</td>
                       <td className="px-3 py-2 text-emerald-400 font-mono">{formatCurrency(payment.amount)}</td>
                       <td className="px-3 py-2 text-white">
@@ -1005,7 +1006,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
 
             {/* Plate return confirmation */}
             {bookingPlate && (
-              <div className="mt-4 border-t border-gray-800 pt-4">
+              <div className="mt-4 border-t border-white/[0.06] pt-4">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="text-[10px] uppercase tracking-widest text-gray-400">
                     Dealer Plate: <span className="text-white font-bold">{bookingPlate.plateNumber}</span>
@@ -1052,7 +1053,7 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
         )}
 
         {/* ============ ACTIONS BAR ============ */}
-        <div className="border-t border-gray-800 pt-4 flex flex-wrap gap-2">
+        <div className="border-t border-white/[0.06] pt-4 flex flex-wrap gap-2">
           <button
             onClick={() => onOpenAgreement(booking)}
             className="px-3 py-2 border border-gray-700 text-gray-300 text-xs font-bold uppercase tracking-wider hover:border-tj-gold hover:text-tj-gold transition-colors flex items-center gap-2"
@@ -1113,6 +1114,15 @@ const BookingDetail: React.FC<BookingDetailProps> = ({
       </div>
     </div>
   );
+};
+
+// ================================================================
+// ANIMATION VARIANTS
+// ================================================================
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.4 } }),
 };
 
 // ================================================================
@@ -1427,18 +1437,29 @@ const Rentals: React.FC = () => {
     <>
       <AdminHeader />
 
-      <div className="min-h-screen bg-black px-4 md:px-8 pb-4 md:pb-8 pt-4 md:pt-8">
+      <div className="relative min-h-screen bg-black px-4 md:px-8 pb-4 md:pb-8 pt-4 md:pt-8">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
         <div className="max-w-7xl mx-auto">
           {/* Page Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+          <motion.div
+            custom={0}
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
+          >
             <div>
-              <h1 className="text-2xl md:text-3xl font-display text-white tracking-wide mb-1">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-2 bg-tj-gold animate-pulse" />
+                <p className="text-tj-gold uppercase tracking-[0.4em] text-[10px]">Fleet Operations</p>
+              </div>
+              <h1 className="font-display text-3xl md:text-4xl text-white tracking-tight leading-none mb-1">
                 Rental Management
               </h1>
               <p className="text-gray-500 text-sm">
                 Calendar, active rentals, and fleet management
               </p>
-              <div className="h-px w-24 bg-gradient-to-r from-tj-gold/60 to-transparent" />
+              <div className="h-px w-24 bg-gradient-to-r from-tj-gold/60 to-transparent mt-2" />
             </div>
 
             <div className="flex gap-3">
@@ -1457,21 +1478,21 @@ const Rentals: React.FC = () => {
                 New Booking
               </button>
             </div>
-          </div>
+          </motion.div>
 
           <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
 
           {/* Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
+            <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp} className="bg-[#080808] border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
               <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total Bookings</p>
               <p className="text-white text-2xl font-mono">{stats.totalBookings}</p>
-            </div>
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
+            </motion.div>
+            <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp} className="bg-[#080808] border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
               <p className="text-emerald-400 text-[10px] uppercase tracking-widest mb-1">Active</p>
               <p className="text-emerald-400 text-2xl font-mono">{stats.activeCount}</p>
-            </div>
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4 relative">
+            </motion.div>
+            <motion.div custom={3} initial="hidden" animate="visible" variants={fadeUp} className="bg-[#080808] border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4 relative">
               <p className="text-red-400 text-[10px] uppercase tracking-widest mb-1">Overdue</p>
               <p className={`text-2xl font-mono ${stats.overdueCount > 0 ? 'text-red-400' : 'text-gray-600'}`}>
                 {stats.overdueCount}
@@ -1481,8 +1502,8 @@ const Rentals: React.FC = () => {
                   {stats.overdueCount}
                 </span>
               )}
-            </div>
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4 relative">
+            </motion.div>
+            <motion.div custom={4} initial="hidden" animate="visible" variants={fadeUp} className="bg-[#080808] border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4 relative">
               <p className={`text-[10px] uppercase tracking-widest mb-1 flex items-center gap-1 ${
                 stats.unverifiedInsurance > 0 ? 'text-amber-400' : 'text-gray-500'
               }`}>
@@ -1491,17 +1512,17 @@ const Rentals: React.FC = () => {
               <p className={`text-2xl font-mono ${stats.unverifiedInsurance > 0 ? 'text-amber-400' : 'text-gray-600'}`}>
                 {stats.unverifiedInsurance}
               </p>
-            </div>
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
+            </motion.div>
+            <motion.div custom={5} initial="hidden" animate="visible" variants={fadeUp} className="bg-[#080808] border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
               <p className="text-blue-400 text-[10px] uppercase tracking-widest mb-1">Fleet Size</p>
               <p className="text-blue-400 text-2xl font-mono">{stats.fleetSize}</p>
-            </div>
+            </motion.div>
           </div>
 
           <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
 
           {/* Tab Navigation */}
-          <div className="flex border-b border-tj-gold/20 mb-6">
+          <motion.div custom={6} initial="hidden" animate="visible" variants={fadeUp} className="flex border-b border-tj-gold/20 mb-6">
             {([
               { key: 'calendar' as RentalTab, label: 'Calendar', icon: Calendar },
               { key: 'active' as RentalTab, label: 'Active Rentals', icon: Clock },
@@ -1511,30 +1532,55 @@ const Rentals: React.FC = () => {
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-2 px-6 py-3 text-[11px] uppercase tracking-widest font-bold border-b-2 transition-colors ${
+                className={`relative flex items-center gap-2 px-6 py-3 text-[11px] uppercase tracking-widest font-bold transition-colors ${
                   activeTab === tab.key
-                    ? 'text-tj-gold border-tj-gold'
-                    : 'text-gray-500 border-transparent hover:text-gray-300 hover:border-gray-600'
+                    ? 'text-tj-gold'
+                    : 'text-gray-500 hover:text-gray-300'
                 }`}
               >
                 <tab.icon size={14} />
                 {tab.label}
+                {activeTab === tab.key && (
+                  <motion.div
+                    layoutId="rental-tab-indicator"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-tj-gold"
+                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  />
+                )}
               </button>
             ))}
-          </div>
+          </motion.div>
 
           {/* Loading State */}
-          {loading && (
-            <div className="flex justify-center py-16">
-              <Loader2 className="animate-spin text-tj-gold" size={32} />
-            </div>
-          )}
+          <AnimatePresence>
+            {loading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex justify-center py-16"
+              >
+                <Loader2 className="animate-spin text-tj-gold" size={32} />
+              </motion.div>
+            )}
+          </AnimatePresence>
 
+          {/* ============================================================ */}
+          {/* TAB CONTENT WITH ANIMATED TRANSITIONS */}
+          {/* ============================================================ */}
+          <AnimatePresence mode="wait">
           {/* ============================================================ */}
           {/* CALENDAR TAB */}
           {/* ============================================================ */}
           {activeTab === 'calendar' && !loading && (
-            <div>
+            <motion.div
+              key="calendar"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
               <RentalCalendar
                 bookings={calendarBookings}
                 onDateClick={handleDateClick}
@@ -1542,40 +1588,60 @@ const Rentals: React.FC = () => {
               />
 
               {/* Selected booking detail (inline expansion from calendar click) */}
-              {expandedBookingId && (() => {
-                const calBooking = calendarBookings.find(b => b.id === expandedBookingId);
-                if (!calBooking) return null;
-                return (
-                  <div className="mt-4">
-                    <BookingDetail
-                      booking={calBooking}
-                      allBookings={bookings}
-                      vehicles={vehicles}
-                      platesOut={platesOut}
-                      onRefresh={handleRefresh}
-                      onOpenAgreement={handleOpenAgreement}
-                      onClose={() => setExpandedBookingId(null)}
-                    />
-                  </div>
-                );
-              })()}
-            </div>
+              <AnimatePresence>
+                {expandedBookingId && (() => {
+                  const calBooking = calendarBookings.find(b => b.id === expandedBookingId);
+                  if (!calBooking) return null;
+                  return (
+                    <motion.div
+                      key={`cal-detail-${expandedBookingId}`}
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-4 overflow-hidden"
+                    >
+                      <BookingDetail
+                        booking={calBooking}
+                        allBookings={bookings}
+                        vehicles={vehicles}
+                        platesOut={platesOut}
+                        onRefresh={handleRefresh}
+                        onOpenAgreement={handleOpenAgreement}
+                        onClose={() => setExpandedBookingId(null)}
+                      />
+                    </motion.div>
+                  );
+                })()}
+              </AnimatePresence>
+            </motion.div>
           )}
 
           {/* ============================================================ */}
           {/* ACTIVE RENTALS TAB */}
           {/* ============================================================ */}
           {activeTab === 'active' && !loading && (
-            <div>
+            <motion.div
+              key="active"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
               {sortedActiveRentals.length === 0 ? (
-                <div className="text-center py-16 bg-tj-dark border border-tj-gold/10">
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-center py-16 bg-[#080808] border border-tj-gold/10"
+                >
                   <CheckCircle className="mx-auto text-green-500 mb-4" size={48} />
                   <p className="text-gray-400 text-lg mb-2">No Active Rentals</p>
                   <p className="text-gray-600 text-sm">All vehicles are currently available.</p>
-                </div>
+                </motion.div>
               ) : (
                 <div className="space-y-0">
-                  {sortedActiveRentals.map(booking => {
+                  {sortedActiveRentals.map((booking, idx) => {
                     const daysInfo = getDaysInfo(booking);
                     const isExpanded = expandedBookingId === booking.id;
                     const lateFee = booking.status === 'overdue'
@@ -1588,13 +1654,19 @@ const Rentals: React.FC = () => {
                       : null;
 
                     return (
-                      <div key={booking.id}>
+                      <motion.div
+                        key={booking.id}
+                        custom={idx}
+                        initial="hidden"
+                        animate="visible"
+                        variants={fadeUp}
+                      >
                         {/* Collapsed row */}
                         <div
-                          className={`bg-tj-dark border p-4 md:p-5 cursor-pointer transition-colors hover:bg-white/[0.02] ${
+                          className={`bg-[#080808] border p-4 md:p-5 cursor-pointer transition-all duration-300 hover:bg-white/[0.02] hover:shadow-[0_0_20px_rgba(212,175,55,0.05)] ${
                             booking.status === 'overdue'
                               ? 'border-red-500/50 bg-red-900/10'
-                              : isExpanded ? 'border-tj-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.05)]' : 'border-gray-800 hover:border-tj-gold/20 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)]'
+                              : isExpanded ? 'border-tj-gold/30 shadow-[0_0_20px_rgba(212,175,55,0.05)]' : 'border-white/[0.06] hover:border-tj-gold/20'
                           } ${isExpanded ? 'border-b-0' : ''}`}
                           onClick={() => setExpandedBookingId(isExpanded ? null : booking.id)}
                         >
@@ -1705,30 +1777,46 @@ const Rentals: React.FC = () => {
                         </div>
 
                         {/* Expanded detail */}
-                        {isExpanded && (
-                          <BookingDetail
-                            booking={booking}
-                            allBookings={bookings}
-                            vehicles={vehicles}
-                            platesOut={platesOut}
-                            onRefresh={handleRefresh}
-                            onOpenAgreement={handleOpenAgreement}
-                            onClose={() => setExpandedBookingId(null)}
-                          />
-                        )}
-                      </div>
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.3 }}
+                              className="overflow-hidden"
+                            >
+                              <BookingDetail
+                                booking={booking}
+                                allBookings={bookings}
+                                vehicles={vehicles}
+                                platesOut={platesOut}
+                                onRefresh={handleRefresh}
+                                onOpenAgreement={handleOpenAgreement}
+                                onClose={() => setExpandedBookingId(null)}
+                              />
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
                     );
                   })}
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* ============================================================ */}
           {/* FLEET TAB */}
           {/* ============================================================ */}
           {activeTab === 'fleet' && !loading && (
-            <div>
+            <motion.div
+              key="fleet"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
               {/* Fleet Controls */}
               <div className="flex flex-col md:flex-row gap-4 mb-6">
                 <div className="relative flex-1">
@@ -1738,7 +1826,7 @@ const Rentals: React.FC = () => {
                     placeholder="Search vehicles..."
                     value={fleetSearch}
                     onChange={e => setFleetSearch(e.target.value)}
-                    className="w-full bg-tj-dark border border-gray-700 pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold transition-colors"
+                    className="w-full bg-[#080808] border border-gray-700 pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold transition-colors"
                   />
                 </div>
                 <div className="flex gap-2">
@@ -1767,7 +1855,12 @@ const Rentals: React.FC = () => {
 
               {/* Fleet List */}
               {fleetVehicles.length === 0 ? (
-                <div className="text-center py-16 bg-tj-dark border border-tj-gold/10">
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-center py-16 bg-[#080808] border border-tj-gold/10"
+                >
                   <Car className="mx-auto text-gray-700 mb-4" size={48} />
                   <p className="text-gray-500 mb-2">
                     {fleetFilter === 'rental'
@@ -1777,35 +1870,48 @@ const Rentals: React.FC = () => {
                   <p className="text-gray-600 text-sm">
                     Set a vehicle's listing type to "Rental Only" or "Both" to add it to the rental fleet.
                   </p>
-                </div>
+                </motion.div>
               ) : (
                 <div className="space-y-3">
-                  {fleetVehicles.map(vehicle => {
+                  {fleetVehicles.map((vehicle, idx) => {
                     const activeBooking = getActiveBookingForVehicle(vehicle.id);
                     const isRental = vehicle.listingType === 'rental_only' || vehicle.listingType === 'both';
 
                     return (
-                      <FleetVehicleRow
+                      <motion.div
                         key={vehicle.id}
-                        vehicle={vehicle}
-                        activeBooking={activeBooking}
-                        isRental={isRental}
-                        actionLoading={actionLoading}
-                        onListingTypeChange={handleListingTypeChange}
-                        onRateUpdate={handleRateUpdate}
-                      />
+                        custom={idx}
+                        initial="hidden"
+                        animate="visible"
+                        variants={fadeUp}
+                      >
+                        <FleetVehicleRow
+                          vehicle={vehicle}
+                          activeBooking={activeBooking}
+                          isRental={isRental}
+                          actionLoading={actionLoading}
+                          onListingTypeChange={handleListingTypeChange}
+                          onRateUpdate={handleRateUpdate}
+                        />
+                      </motion.div>
                     );
                   })}
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
 
           {/* ============================================================ */}
           {/* PLATES TAB */}
           {/* ============================================================ */}
           {activeTab === 'plates' && !loading && (
-            <div>
+            <motion.div
+              key="plates"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+            >
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xs uppercase tracking-widest text-gray-400">
                   Plates Currently Out ({platesOut.length})
@@ -1819,10 +1925,15 @@ const Rentals: React.FC = () => {
               </div>
 
               {platesOut.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4 }}
+                  className="text-center py-12 text-gray-500"
+                >
                   <CheckCircle size={32} className="mx-auto mb-3 text-green-500/50" />
                   <p>All plates accounted for</p>
-                </div>
+                </motion.div>
               ) : (
                 <div className="space-y-3">
                   {platesOut
@@ -1836,7 +1947,7 @@ const Rentals: React.FC = () => {
                         : 0;
                       return bOverdue - aOverdue;
                     })
-                    .map(plate => {
+                    .map((plate, idx) => {
                       const assignment = plate.currentAssignment;
                       const isOverdue = assignment?.expectedReturnDate
                         ? new Date(assignment.expectedReturnDate) < new Date()
@@ -1846,10 +1957,14 @@ const Rentals: React.FC = () => {
                         : null;
 
                       return (
-                        <div
+                        <motion.div
                           key={plate.id}
-                          className={`p-4 border ${
-                            isOverdue ? 'border-red-500/50 bg-red-500/5' : 'border-gray-800'
+                          custom={idx}
+                          initial="hidden"
+                          animate="visible"
+                          variants={fadeUp}
+                          className={`p-4 border transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)] ${
+                            isOverdue ? 'border-red-500/50 bg-red-500/5' : 'border-white/[0.06] hover:border-tj-gold/20'
                           }`}
                         >
                           <div className="flex items-center justify-between">
@@ -1878,74 +1993,89 @@ const Rentals: React.FC = () => {
                               )}
                             </div>
                           )}
-                        </div>
+                        </motion.div>
                       );
                     })
                   }
                 </div>
               )}
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
 
           {/* ============================================================ */}
           {/* RETURN VEHICLE DIALOG (simple, for quick actions) */}
           {/* ============================================================ */}
-          {returnDialog && (
-            <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
-              <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-md">
-                <div className="p-6 border-b border-gray-800 flex justify-between items-center">
-                  <h3 className="text-white font-display text-lg tracking-wide">Return Vehicle</h3>
-                  <button
-                    onClick={() => setReturnDialog(null)}
-                    className="text-gray-500 hover:text-white transition-colors"
-                  >
-                    <X size={20} />
-                  </button>
-                </div>
-
-                <div className="p-6 space-y-4">
-                  <div>
-                    <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2">
-                      Mileage In
-                    </label>
-                    <input
-                      type="number"
-                      value={returnDialog.mileageIn}
-                      onChange={e => setReturnDialog({ ...returnDialog, mileageIn: e.target.value })}
-                      className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
-                      placeholder="Enter current mileage"
-                    />
+          <AnimatePresence>
+            {returnDialog && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4"
+              >
+                <motion.div
+                  initial={{ y: 30, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: 30, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                  className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-md"
+                >
+                  <div className="p-6 border-b border-white/[0.06] flex justify-between items-center">
+                    <h3 className="text-white font-display text-lg tracking-wide">Return Vehicle</h3>
+                    <button
+                      onClick={() => setReturnDialog(null)}
+                      className="text-gray-500 hover:text-white transition-colors"
+                    >
+                      <X size={20} />
+                    </button>
                   </div>
-                </div>
 
-                <div className="p-6 border-t border-gray-800 flex justify-end gap-4">
-                  <button
-                    onClick={() => setReturnDialog(null)}
-                    className="px-6 py-3 border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleReturnBooking}
-                    disabled={actionLoading !== null}
-                    className="px-6 py-3 bg-tj-gold text-black font-bold text-sm tracking-wider hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
-                  >
-                    {actionLoading ? (
-                      <>
-                        <Loader2 className="animate-spin" size={16} />
-                        Processing...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle size={16} />
-                        Confirm Return
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
+                  <div className="p-6 space-y-4">
+                    <div>
+                      <label className="block text-gray-500 text-[10px] uppercase tracking-widest mb-2">
+                        Mileage In
+                      </label>
+                      <input
+                        type="number"
+                        value={returnDialog.mileageIn}
+                        onChange={e => setReturnDialog({ ...returnDialog, mileageIn: e.target.value })}
+                        className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+                        placeholder="Enter current mileage"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="p-6 border-t border-white/[0.06] flex justify-end gap-4">
+                    <button
+                      onClick={() => setReturnDialog(null)}
+                      className="px-6 py-3 border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleReturnBooking}
+                      disabled={actionLoading !== null}
+                      className="px-6 py-3 bg-tj-gold text-black font-bold text-sm tracking-wider hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
+                    >
+                      {actionLoading ? (
+                        <>
+                          <Loader2 className="animate-spin" size={16} />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle size={16} />
+                          Confirm Return
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ============================================================ */}
           {/* MODALS */}
@@ -2022,10 +2152,10 @@ const FleetVehicleRow: React.FC<FleetVehicleRowProps> = ({
   };
 
   return (
-    <div className="bg-tj-dark border border-gray-800 hover:border-tj-gold/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)] p-4 md:p-6">
+    <div className="bg-[#080808] border border-white/[0.06] hover:border-tj-gold/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)] p-4 md:p-6">
       <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
         {/* Vehicle Image */}
-        <div className="w-16 h-12 bg-black/50 border border-gray-800 flex items-center justify-center shrink-0 overflow-hidden">
+        <div className="w-16 h-12 bg-black/50 border border-white/[0.06] flex items-center justify-center shrink-0 overflow-hidden">
           {vehicle.imageUrl ? (
             <img
               src={vehicle.imageUrl}
