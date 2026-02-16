@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-15
-**Session:** Phase 10 execution started
+**Session:** Phase 10 execution in progress
 
 ---
 
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 10 of 19 (Brand Truth)
-**Plan:** 1 of 4 completed (10-01)
+**Plan:** 2 of 4 completed (10-01, 10-02)
 **Status:** In progress
-**Last activity:** 2026-02-15 -- Completed 10-01-PLAN.md (translations foundation + homepage cleanup)
+**Last activity:** 2026-02-15 -- Completed 10-02-PLAN.md (About, Services, FAQ page rewrites)
 
-Progress: [███░░░░░░░] 30% (3/10 plans completed across v2.0)
+Progress: [████░░░░░░] 40% (4/10 plans completed across v2.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3 (v2.0: 09-03, 09-04, 10-01)
+- Total plans completed: 4 (v2.0: 09-03, 09-04, 10-01, 10-02)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -62,6 +62,11 @@ Progress: [███░░░░░░░] 30% (3/10 plans completed across v2.0
 - **[10-01]** Fake Live Signals replaced with honest dealership info ticker (Option A from plan) rather than removed
 - **[10-01]** FAQ Q&A and service descriptions embedded directly in translations.ts as arrays of objects
 - **[10-01]** Phone number standardized to (832) 400-9760 across all translation keys
+- **[10-02]** About page focuses on business story, values, location -- no fabricated team member names or biographies
+- **[10-02]** Services rendered dynamically from t.services.list[] array with icon/link mapping
+- **[10-02]** "Logistics Coordination" (out-of-state shipping) removed as unverified service
+- **[10-02]** FAQ switched from 5 English-only categories to flat bilingual list from t.faq.questions[]
+- **[10-02]** "What We Don't Do" section added to translations as t.services.dontDo for proper bilingual support
 
 ### Completed Work (Phase 9)
 
@@ -72,6 +77,7 @@ Progress: [███░░░░░░░] 30% (3/10 plans completed across v2.0
 ### Completed Work (Phase 10)
 
 - **10-01 (complete):** Rewrote translations.ts (376 to 808 lines) with honest bilingual content. All SOVEREIGN jargon replaced. 9 new sections added (about, finance, policies, legal, notFound, vinLookup, paymentOptions, expanded faq+services). Rewrote Home.tsx: removed SubliminalPrime component, removed fake Live Signals ticker, replaced with honest dealership info. All homepage content now from translations.
+- **10-02 (complete):** Rewrote About.tsx (329 to 313 lines), Services.tsx (186 to 85 lines), FAQ.tsx (206 to 100 lines). All three pages fully bilingual via t.about.*/t.services.*/t.faq.* keys. Added services.dontDo to translations.ts. Vehicle sales and rentals on Services page. Zero SOVEREIGN jargon on any page.
 
 ### Remaining Phase 9 Work
 
@@ -84,8 +90,7 @@ Progress: [███░░░░░░░] 30% (3/10 plans completed across v2.0
 
 ### Remaining Phase 10 Work
 
-- **10-02:** About page rewrite + Footer content update + bilingual wiring
-- **10-03:** Services, Finance, FAQ, VinLookup, PaymentOptions, Policies page rewrites
+- **10-03:** Finance, VinLookup, PaymentOptions, Policies, Legal, NotFound page rewrites
 - **10-04:** Support file cleanup (vehicles.ts, sheets.ts, geminiService.ts, SovereignCrest.tsx)
 
 ### Blockers/Concerns
@@ -101,6 +106,6 @@ Progress: [███░░░░░░░] 30% (3/10 plans completed across v2.0
 ## Session Continuity
 
 **Last session:** 2026-02-15
-**Stopped at:** Completed 10-01-PLAN.md. translations.ts and Home.tsx fully rewritten with honest content. Translation foundation established for all Phase 10 plans.
+**Stopped at:** Completed 10-02-PLAN.md. About.tsx, Services.tsx, FAQ.tsx fully rewritten with honest bilingual content. 4 of 6 main content pages now clean (Home, About, Services, FAQ).
 **Resume file:** None
-**Resume:** Continue with 10-02 (About page + Footer) or 10-03 (Services/Finance/FAQ/etc page rewrites). All translation keys for those pages are already in translations.ts.
+**Resume:** Continue with 10-03 (Finance/VinLookup/PaymentOptions/Policies/Legal/NotFound page rewrites) or 10-04 (support file cleanup). All translation keys for remaining pages are already in translations.ts.
