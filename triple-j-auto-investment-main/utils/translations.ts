@@ -341,6 +341,36 @@ export const t = {
                 desc: "Contact us to discuss financing options for any vehicle on our lot.",
                 button: "Contact Us",
                 phone: "Or call us at (832) 400-9760"
+            },
+            form: {
+                downPayment: "Down Payment",
+                creditProfile: "Credit Profile",
+                creditExcellent: "Excellent (750+)",
+                creditGood: "Good (700-749)",
+                creditFair: "Fair (650-699)",
+                creditPoor: "Below 650",
+                vehiclePlaceholder: "e.g., 2018 Honda Civic",
+                softInquiryNotice: "By submitting, you authorize a soft credit inquiry which does not impact your credit score."
+            },
+            requirements: {
+                title: "Requirements",
+                items: [
+                    "Valid driver's license or government-issued ID",
+                    "Proof of income (pay stubs or bank statements)",
+                    "Proof of residence (utility bill or lease agreement)",
+                    "Insurance coverage confirmation"
+                ]
+            },
+            rates: {
+                title: "Estimated Rates",
+                excellent: { label: "Excellent Credit", rate: "4.9% - 6.9%", detail: "750+ score, 20%+ down" },
+                good: { label: "Good Credit", rate: "7.9% - 10.9%", detail: "700-749 score, 15%+ down" },
+                fair: { label: "Fair Credit", rate: "11.9% - 16.9%", detail: "650-699 score, 25%+ down required" },
+                disclaimer: "*Rates subject to change. Final APR determined by lender based on full credit profile."
+            },
+            importantNotice: {
+                title: "Important Notice",
+                content: "Financing is subject to approval by third-party lenders. Triple J Auto Investment does not provide direct financing. We are a dealership, not a bank."
             }
         },
         policies: {
@@ -357,7 +387,67 @@ export const t = {
             returns: {
                 title: "Return Policy",
                 content: "All sales are final. We encourage all buyers to thoroughly inspect vehicles and review all documentation before completing a purchase. We are happy to answer any questions before you buy."
-            }
+            },
+            asIs: {
+                title: "AS-IS Sales Policy",
+                noWarranties: "No Warranties",
+                noReturns: "No Returns",
+                mainWarning: "ALL VEHICLES ARE SOLD \"AS-IS\" WITH NO WARRANTIES, EXPRESSED OR IMPLIED.",
+                p1: "This means you are purchasing the vehicle in its current condition, with all existing faults, whether known or unknown.",
+                p2: "Triple J Auto Investment makes no guarantees regarding the mechanical, electrical, cosmetic, or operational condition of any vehicle. While we provide diagnostic disclosures where available, we do not warrant that such disclosures are exhaustive or complete.",
+                acknowledge: "By completing a purchase, you acknowledge that:",
+                items: [
+                    "You have inspected the vehicle or waived your right to do so",
+                    "All post-sale repairs are your sole responsibility",
+                    "No refunds, exchanges, or returns are permitted",
+                    "You accept all risk of future malfunction or failure"
+                ]
+            },
+            payment: {
+                title: "Payment Policy",
+                acceptedMethods: "Accepted Methods",
+                methodsTitle: "Accepted Payment Methods",
+                methods: [
+                    { method: "Cash:", detail: "Immediate release of vehicle" },
+                    { method: "Cashier's Check:", detail: "Verified same-day release" },
+                    { method: "Debit Card:", detail: "Accepted for deposits and payments" },
+                    { method: "Personal Check:", detail: "3-5 business day hold for clearance" },
+                    { method: "Approved Financing:", detail: "Release upon lender funding confirmation" }
+                ],
+                deposit: {
+                    title: "Deposit Policy",
+                    content: "Non-refundable deposits may be required to hold a vehicle. Deposits are applied to final purchase price. If buyer fails to complete purchase within agreed timeframe, deposit is forfeited."
+                }
+            },
+            titleRegistration: {
+                title: "Title & Registration Policy",
+                compliance: "Texas DMV Compliance",
+                introBefore: "We submit all required paperwork to the Texas DMV within",
+                introHighlight: "48 hours",
+                introAfter: "of completed sale. Processing time is controlled by the state, not Triple J Auto Investment.",
+                buyerTitle: "Buyer Responsibilities",
+                buyerItems: [
+                    "Obtain valid insurance coverage before taking possession",
+                    "Complete emissions testing if required by county",
+                    "Pay all applicable state and local taxes, title fees, and registration fees",
+                    "Provide valid government-issued ID and proof of residence"
+                ],
+                outOfStateLabel: "Out-of-State Buyers:",
+                outOfState: "You are responsible for understanding and complying with your state's registration requirements. We provide all necessary documentation but do not guarantee acceptance by your state's DMV."
+            },
+            inspection: {
+                title: "Inspection & Test Drive Policy",
+                prePurchaseTitle: "Pre-Purchase Inspections",
+                prePurchaseContent: "Buyers may arrange independent mechanical inspections at their own expense. Inspector must be licensed and insured. Inspections must be scheduled in advance and completed on our premises during business hours.",
+                testDriveTitle: "Test Drives",
+                testDriveItems: [
+                    "Valid driver's license required",
+                    "Proof of insurance may be required",
+                    "Routes are predetermined by Triple J staff",
+                    "Driver assumes all liability during test drive"
+                ]
+            },
+            privacyConsent: "By providing your information, you consent to communication via phone, email, or SMS regarding your inquiry or purchase."
         },
         legal: {
             title: "LEGAL",
@@ -388,7 +478,48 @@ export const t = {
             search: "Look Up VIN",
             searching: "Searching...",
             results: "Vehicle Details",
-            noResults: "No information found for this VIN. Please double-check the number and try again."
+            noResults: "No information found for this VIN. Please double-check the number and try again.",
+            logs: {
+                connecting: "Connecting to vehicle database...",
+                accessGranted: "Connection established.",
+                decoding: "Looking up VIN:",
+                extracting: "Vehicle data retrieved.",
+                populating: "Organizing results...",
+                rendering: "Preparing report...",
+                processing: "Loading...",
+                initializing: "Ready",
+                connectionFailed: "Connection failed. Please try again.",
+                dataError: "Data error:"
+            },
+            fields: {
+                make: "Make",
+                model: "Model",
+                year: "Year",
+                waitingForInput: "Waiting for input...",
+                dataStream: "Status Log",
+                quickDecode: "Quick Lookup"
+            },
+            resultLabels: {
+                manufacturer: "Manufacturer (Make)",
+                model: "Model",
+                year: "Year",
+                bodyType: "Body Type",
+                detailedConfig: "Detailed Configuration",
+                trimLevel: "Trim Level",
+                series: "Series",
+                transmission: "Transmission",
+                doors: "Doors",
+                engineSpecs: "Engine & Performance",
+                cylinders: "Cylinders",
+                horsepower: "Horsepower",
+                drivetrain: "Drivetrain",
+                fuelSystem: "Fuel System",
+                standardCombustion: "Standard Combustion",
+                manufacturingOrigin: "Manufacturing Origin",
+                plant: "Plant",
+                mfgEntity: "Manufacturer",
+                verified: "Verified"
+            }
         },
         paymentOptions: {
             badge: "Payments",
@@ -409,6 +540,48 @@ export const t = {
             fraud: {
                 title: "Fraud Prevention",
                 content: "Triple J Auto Investment will never ask for payment via wire transfer, gift cards, or cryptocurrency. If you receive a suspicious request claiming to be from us, please call (832) 400-9760 to verify."
+            },
+            cashAdvantages: {
+                title: "Advantages",
+                items: [
+                    "Same-day pickup",
+                    "No financing fees or interest",
+                    "Strongest negotiating position",
+                    "No credit check required"
+                ],
+                irsNote: "Transactions over $10,000 require IRS Form 8300 reporting."
+            },
+            cashiersRequirements: {
+                title: "Requirements",
+                items: [
+                    "Must be from a US-based bank",
+                    "Made payable to \"Triple J Auto Investment\"",
+                    "Subject to bank verification call",
+                    "Bring valid government-issued ID"
+                ]
+            },
+            debitDetails: {
+                title: "Details",
+                items: [
+                    "Accepted for deposits and partial payments",
+                    "Daily limits may apply per your bank",
+                    "PIN or signature authorization"
+                ]
+            },
+            financingRequirements: {
+                title: "Requirements",
+                items: [
+                    "Credit score 580+ (minimum)",
+                    "Proof of income and residence",
+                    "Valid insurance coverage",
+                    "Down payment 10-25% (score dependent)"
+                ]
+            },
+            personalCheck: {
+                title: "Personal Checks Accepted with Hold",
+                before: "We accept personal checks, but vehicle release is delayed",
+                holdPeriod: "3-5 business days",
+                after: "for bank clearance. If immediate pickup is required, use cash, cashier's check, or debit card instead."
             }
         }
     },
@@ -752,6 +925,36 @@ export const t = {
                 desc: "Contactenos para hablar sobre opciones de financiamiento para cualquier vehiculo en nuestro lote.",
                 button: "Contactenos",
                 phone: "O llamenos al (832) 400-9760"
+            },
+            form: {
+                downPayment: "Enganche",
+                creditProfile: "Perfil de Credito",
+                creditExcellent: "Excelente (750+)",
+                creditGood: "Bueno (700-749)",
+                creditFair: "Regular (650-699)",
+                creditPoor: "Menos de 650",
+                vehiclePlaceholder: "ej., 2018 Honda Civic",
+                softInquiryNotice: "Al enviar, usted autoriza una consulta de credito suave que no afecta su puntaje crediticio."
+            },
+            requirements: {
+                title: "Requisitos",
+                items: [
+                    "Licencia de conducir valida o identificacion oficial",
+                    "Comprobante de ingresos (talones de pago o estados de cuenta)",
+                    "Comprobante de domicilio (recibo de servicio o contrato de arrendamiento)",
+                    "Confirmacion de cobertura de seguro"
+                ]
+            },
+            rates: {
+                title: "Tasas Estimadas",
+                excellent: { label: "Credito Excelente", rate: "4.9% - 6.9%", detail: "Puntaje 750+, 20%+ de enganche" },
+                good: { label: "Buen Credito", rate: "7.9% - 10.9%", detail: "Puntaje 700-749, 15%+ de enganche" },
+                fair: { label: "Credito Regular", rate: "11.9% - 16.9%", detail: "Puntaje 650-699, 25%+ de enganche requerido" },
+                disclaimer: "*Las tasas estan sujetas a cambio. La APR final la determina el prestamista segun su perfil crediticio completo."
+            },
+            importantNotice: {
+                title: "Aviso Importante",
+                content: "El financiamiento esta sujeto a aprobacion por prestamistas de terceros. Triple J Auto Investment no proporciona financiamiento directo. Somos un concesionario, no un banco."
             }
         },
         policies: {
@@ -768,7 +971,67 @@ export const t = {
             returns: {
                 title: "Politica de Devolucion",
                 content: "Todas las ventas son finales. Animamos a todos los compradores a inspeccionar los vehiculos a fondo y revisar toda la documentacion antes de completar una compra. Estamos felices de responder cualquier pregunta antes de que compre."
-            }
+            },
+            asIs: {
+                title: "Politica de Venta TAL CUAL",
+                noWarranties: "Sin Garantias",
+                noReturns: "Sin Devoluciones",
+                mainWarning: "TODOS LOS VEHICULOS SE VENDEN \"TAL CUAL\" SIN GARANTIAS, EXPRESAS O IMPLICITAS.",
+                p1: "Esto significa que usted esta comprando el vehiculo en su condicion actual, con todas las fallas existentes, conocidas o desconocidas.",
+                p2: "Triple J Auto Investment no hace garantias sobre la condicion mecanica, electrica, estetica u operativa de ningun vehiculo. Aunque proporcionamos divulgaciones de diagnostico cuando estan disponibles, no garantizamos que dichas divulgaciones sean exhaustivas o completas.",
+                acknowledge: "Al completar una compra, usted reconoce que:",
+                items: [
+                    "Ha inspeccionado el vehiculo o ha renunciado a su derecho de hacerlo",
+                    "Todas las reparaciones posteriores a la venta son su responsabilidad exclusiva",
+                    "No se permiten reembolsos, cambios ni devoluciones",
+                    "Acepta todo riesgo de mal funcionamiento o falla futura"
+                ]
+            },
+            payment: {
+                title: "Politica de Pago",
+                acceptedMethods: "Metodos Aceptados",
+                methodsTitle: "Metodos de Pago Aceptados",
+                methods: [
+                    { method: "Efectivo:", detail: "Entrega inmediata del vehiculo" },
+                    { method: "Cheque de Caja:", detail: "Entrega verificada el mismo dia" },
+                    { method: "Tarjeta de Debito:", detail: "Aceptada para depositos y pagos" },
+                    { method: "Cheque Personal:", detail: "Retencion de 3-5 dias habiles para verificacion" },
+                    { method: "Financiamiento Aprobado:", detail: "Entrega tras confirmacion de fondos del prestamista" }
+                ],
+                deposit: {
+                    title: "Politica de Deposito",
+                    content: "Se pueden requerir depositos no reembolsables para reservar un vehiculo. Los depositos se aplican al precio final de compra. Si el comprador no completa la compra dentro del plazo acordado, el deposito se pierde."
+                }
+            },
+            titleRegistration: {
+                title: "Politica de Titulo y Registro",
+                compliance: "Cumplimiento del DMV de Texas",
+                introBefore: "Enviamos toda la documentacion requerida al DMV de Texas dentro de",
+                introHighlight: "48 horas",
+                introAfter: "de la venta completada. El tiempo de procesamiento lo controla el estado, no Triple J Auto Investment.",
+                buyerTitle: "Responsabilidades del Comprador",
+                buyerItems: [
+                    "Obtener cobertura de seguro valida antes de tomar posesion",
+                    "Completar prueba de emisiones si lo requiere el condado",
+                    "Pagar todos los impuestos estatales y locales aplicables, tarifas de titulo y registro",
+                    "Proporcionar identificacion oficial valida y comprobante de domicilio"
+                ],
+                outOfStateLabel: "Compradores de Fuera del Estado:",
+                outOfState: "Usted es responsable de entender y cumplir con los requisitos de registro de su estado. Proporcionamos toda la documentacion necesaria pero no garantizamos la aceptacion por el DMV de su estado."
+            },
+            inspection: {
+                title: "Politica de Inspeccion y Prueba de Manejo",
+                prePurchaseTitle: "Inspecciones Pre-Compra",
+                prePurchaseContent: "Los compradores pueden organizar inspecciones mecanicas independientes a su cargo. El inspector debe tener licencia y seguro. Las inspecciones deben programarse con anticipacion y completarse en nuestras instalaciones durante horario laboral.",
+                testDriveTitle: "Pruebas de Manejo",
+                testDriveItems: [
+                    "Se requiere licencia de conducir valida",
+                    "Se puede requerir comprobante de seguro",
+                    "Las rutas son predeterminadas por el personal de Triple J",
+                    "El conductor asume toda la responsabilidad durante la prueba de manejo"
+                ]
+            },
+            privacyConsent: "Al proporcionar su informacion, usted consiente la comunicacion por telefono, correo electronico o SMS sobre su consulta o compra."
         },
         legal: {
             title: "LEGAL",
@@ -799,7 +1062,48 @@ export const t = {
             search: "Buscar VIN",
             searching: "Buscando...",
             results: "Detalles del Vehiculo",
-            noResults: "No se encontro informacion para este VIN. Verifique el numero e intente de nuevo."
+            noResults: "No se encontro informacion para este VIN. Verifique el numero e intente de nuevo.",
+            logs: {
+                connecting: "Conectando a la base de datos de vehiculos...",
+                accessGranted: "Conexion establecida.",
+                decoding: "Buscando VIN:",
+                extracting: "Datos del vehiculo obtenidos.",
+                populating: "Organizando resultados...",
+                rendering: "Preparando reporte...",
+                processing: "Cargando...",
+                initializing: "Listo",
+                connectionFailed: "Error de conexion. Intente de nuevo.",
+                dataError: "Error de datos:"
+            },
+            fields: {
+                make: "Marca",
+                model: "Modelo",
+                year: "Ano",
+                waitingForInput: "Esperando entrada...",
+                dataStream: "Registro de Estado",
+                quickDecode: "Busqueda Rapida"
+            },
+            resultLabels: {
+                manufacturer: "Fabricante (Marca)",
+                model: "Modelo",
+                year: "Ano",
+                bodyType: "Tipo de Carroceria",
+                detailedConfig: "Configuracion Detallada",
+                trimLevel: "Nivel de Equipamiento",
+                series: "Serie",
+                transmission: "Transmision",
+                doors: "Puertas",
+                engineSpecs: "Motor y Rendimiento",
+                cylinders: "Cilindros",
+                horsepower: "Caballos de Fuerza",
+                drivetrain: "Tren Motriz",
+                fuelSystem: "Sistema de Combustible",
+                standardCombustion: "Combustion Estandar",
+                manufacturingOrigin: "Origen de Fabricacion",
+                plant: "Planta",
+                mfgEntity: "Fabricante",
+                verified: "Verificado"
+            }
         },
         paymentOptions: {
             badge: "Pagos",
@@ -820,6 +1124,48 @@ export const t = {
             fraud: {
                 title: "Prevencion de Fraude",
                 content: "Triple J Auto Investment nunca le pedira pagos por transferencia bancaria, tarjetas de regalo o criptomonedas. Si recibe una solicitud sospechosa que dice ser de nosotros, llame al (832) 400-9760 para verificar."
+            },
+            cashAdvantages: {
+                title: "Ventajas",
+                items: [
+                    "Recoja el mismo dia",
+                    "Sin cargos de financiamiento ni intereses",
+                    "Mejor posicion de negociacion",
+                    "No se requiere verificacion de credito"
+                ],
+                irsNote: "Transacciones mayores a $10,000 requieren reporte del formulario IRS 8300."
+            },
+            cashiersRequirements: {
+                title: "Requisitos",
+                items: [
+                    "Debe ser de un banco estadounidense",
+                    "A nombre de \"Triple J Auto Investment\"",
+                    "Sujeto a llamada de verificacion bancaria",
+                    "Traiga identificacion oficial valida"
+                ]
+            },
+            debitDetails: {
+                title: "Detalles",
+                items: [
+                    "Aceptada para depositos y pagos parciales",
+                    "Pueden aplicar limites diarios segun su banco",
+                    "Autorizacion con PIN o firma"
+                ]
+            },
+            financingRequirements: {
+                title: "Requisitos",
+                items: [
+                    "Puntaje de credito 580+ (minimo)",
+                    "Comprobante de ingresos y domicilio",
+                    "Cobertura de seguro valida",
+                    "Enganche 10-25% (segun puntaje)"
+                ]
+            },
+            personalCheck: {
+                title: "Cheques Personales Aceptados con Retencion",
+                before: "Aceptamos cheques personales, pero la entrega del vehiculo se retrasa",
+                holdPeriod: "3-5 dias habiles",
+                after: "para verificacion bancaria. Si necesita recoger inmediatamente, use efectivo, cheque de caja o tarjeta de debito."
             }
         }
     }
