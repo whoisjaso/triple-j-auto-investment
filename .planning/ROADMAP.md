@@ -31,7 +31,7 @@ See: `.planning/milestones/v1-ROADMAP.md`
 - [ ] **Phase 9: Production Infrastructure** - Deploy to production with fresh Supabase, Vercel, and credential rotation
 - [x] **Phase 10: Brand Truth** - Align all content with "automotive investment firm" positioning using real business data
 - [x] **Phase 11: Production Polish** - Mobile-first verification, performance, accessibility, and production-grade error handling
-- [ ] **Phase 12: SEO Foundation** - BrowserRouter migration, meta tags, sitemap, and schema markup for search visibility
+- [x] **Phase 12: SEO Foundation** - BrowserRouter migration, meta tags, sitemap, and schema markup for search visibility
 - [ ] **Phase 13: Focus Capture** - SOVEREIGN landing experience with pattern-interrupt, authority, and tribe signals
 - [ ] **Phase 14: Expectancy Building** - Vehicle listings as micro-stories with price anchoring and identity framing
 - [ ] **Phase 15: Engagement Spectrum** - Micro-commitment ladder from zero-friction saves to vehicle reservations
@@ -116,8 +116,8 @@ Plans:
 **Plans**: 2 plans
 
 Plans:
-- [ ] 12-01-PLAN.md -- BrowserRouter migration, SEO component (React 19 native metadata), per-page title/description/OG tags on all 17 pages
-- [ ] 12-02-PLAN.md -- Static file fixes: robots.txt disallow rules, sitemap.xml lastmod dates, index.html schema LocalBusiness + FAQ correction
+- [x] 12-01-PLAN.md -- BrowserRouter migration, SEO component (React 19 native metadata), per-page title/description/OG tags on all 17 pages
+- [x] 12-02-PLAN.md -- Static file fixes: robots.txt disallow rules, sitemap.xml lastmod dates, index.html schema LocalBusiness + FAQ correction
 
 ### Phase 13: Focus Capture
 **Goal**: A visitor's first 3 seconds on the site break the "used car lot" script -- they register novelty, authority, and tribe belonging before conscious evaluation begins
@@ -242,7 +242,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 9. Production Infrastructure | v2.0 | 0/7 | Planning complete | - |
 | 10. Brand Truth | v2.0 | 6/6 | Complete | 2026-02-15 |
 | 11. Production Polish | v2.0 | 8/8 | Complete | 2026-02-16 |
-| 12. SEO Foundation | v2.0 | 0/2 | Planning complete | - |
+| 12. SEO Foundation | v2.0 | 2/2 | Complete | 2026-02-16 |
 | 13. Focus Capture | v2.0 | 0/TBD | Not started | - |
 | 14. Expectancy Building | v2.0 | 0/TBD | Not started | - |
 | 15. Engagement Spectrum | v2.0 | 0/TBD | Not started | - |
