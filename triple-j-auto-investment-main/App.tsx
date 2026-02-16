@@ -2,7 +2,7 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
-import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe, Key, CreditCard } from 'lucide-react';
+import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe, Key, CreditCard, Phone, Clock, Facebook, Twitter } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
@@ -338,49 +338,91 @@ const Footer = () => {
         />
       </div>
 
-      <div className="max-w-[1400px] mx-auto px-6 relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-24">
+      <div className="max-w-[1400px] mx-auto px-6 relative z-10 grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-16">
 
-        {/* HEADQUARTERS */}
-        <div className="flex flex-col items-start">
-          <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">Headquarters</h3>
-          <div className="mb-6">
-            {/* Crest Logo instead of text */}
-            <div className="flex items-center gap-3 mb-4">
-              <img
-                src="/GoldTripleJLogo.png"
-                alt="Triple J Auto Investment"
-                className="w-12 h-12 object-contain"
-              />
-              <div>
-                <p className="text-white font-display text-lg tracking-wider leading-tight">TRIPLE J</p>
-                <p className="text-gray-500 text-[10px] uppercase tracking-widest">Auto Investment</p>
-              </div>
+        {/* ABOUT & BRANDING */}
+        <div className="flex flex-col items-start md:col-span-1">
+          <div className="flex items-center gap-3 mb-4">
+            <img
+              src="/GoldTripleJLogo.png"
+              alt="Triple J Auto Investment"
+              className="w-12 h-12 object-contain"
+            />
+            <div>
+              <p className="text-white font-display text-lg tracking-wider leading-tight">TRIPLE J</p>
+              <p className="text-gray-500 text-[10px] uppercase tracking-widest">Auto Investment</p>
             </div>
-            <p className="text-xs text-gray-500 italic mb-4">{t.footer.tagline}</p>
+          </div>
+          <p className="text-xs text-gray-500 italic mb-6">{t.footer.tagline}</p>
+
+          {/* Social Media Links */}
+          <div className="mb-6">
+            <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-3">{t.footer.followUs}</p>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://www.facebook.com/thetriplejauto"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-tj-gold transition-colors"
+                aria-label="Facebook"
+              >
+                <Facebook size={20} />
+              </a>
+              <a
+                href="https://x.com/thetriplejauto"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-tj-gold transition-colors"
+                aria-label="X (Twitter)"
+              >
+                <Twitter size={20} />
+              </a>
+            </div>
+          </div>
+
+          <p className="text-[10px] uppercase tracking-widest text-gray-600 mt-auto">
+            &copy; {new Date().getFullYear()} {t.footer.copyright}. {t.footer.rights}
+          </p>
+        </div>
+
+        {/* LOCATION & CONTACT */}
+        <div className="flex flex-col items-start">
+          <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">{t.footer.location.toUpperCase()}</h3>
+          <div className="mb-4">
             <button
               onClick={openSmartMap}
               className="not-italic text-sm text-gray-400 leading-loose text-left hover:text-tj-gold transition-colors group"
             >
               <div className="flex items-center gap-2 mb-1">
                 <MapPin size={14} className="text-tj-gold group-hover:animate-bounce" />
-                <span>8774 Almeda Genoa Road</span>
+                <span>{t.footer.address}</span>
               </div>
-              <span className="pl-6 block">Houston, Texas 77075</span>
+              <span className="pl-6 block">{t.footer.city}</span>
             </button>
           </div>
-          <p className="text-[10px] uppercase tracking-widest text-gray-600 mt-auto">
-            © {new Date().getFullYear()} Sovereign Entity. {t.footer.rights}
-          </p>
+          <div className="space-y-3 text-sm text-gray-400">
+            <a href="tel:+18324009760" className="flex items-center gap-2 hover:text-tj-gold transition-colors">
+              <Phone size={14} className="text-tj-gold" />
+              <span>{t.footer.phone}</span>
+            </a>
+            <div className="flex items-center gap-2">
+              <Clock size={14} className="text-tj-gold" />
+              <div>
+                <p>{t.footer.hoursDetail}</p>
+                <p className="text-gray-600 text-xs">{t.footer.closed}</p>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* COMPLIANCE */}
+        {/* COMPLIANCE & LEGAL */}
         <div className="flex flex-col items-start">
           <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full flex items-center gap-2">
             <ShieldCheck size={14} /> {t.footer.legal.toUpperCase()}
           </h3>
           <div className="mb-6 w-full">
             <div className="flex justify-between items-center border-b border-white/5 pb-3 mb-3">
-              <span className="text-[10px] uppercase tracking-widest text-gray-500">TX Dealer License</span>
+              <span className="text-[10px] uppercase tracking-widest text-gray-500">{t.footer.dealerLicense}</span>
               <span className="font-mono text-tj-gold text-sm">P171632</span>
             </div>
           </div>
@@ -392,13 +434,15 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* SYSTEM LINKS */}
+        {/* QUICK LINKS */}
         <div className="flex flex-col items-start">
           <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">{t.footer.quickLinks.toUpperCase()}</h3>
           <ul className="space-y-4 text-[10px] uppercase tracking-widest w-full">
             <li><Link to="/inventory" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.nav.inventory}</Link></li>
             <li><Link to="/about" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.nav.about}</Link></li>
-            <li><Link to="/vin" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">Intel</Link></li>
+            <li><Link to="/services" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.nav.services}</Link></li>
+            <li><Link to="/vin" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.vinLookup.title}</Link></li>
+            <li><Link to="/contact" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.footer.contact}</Link></li>
             <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-600 flex items-center gap-2"><Lock size={10} /> {t.nav.login}</Link></li>
           </ul>
         </div>
