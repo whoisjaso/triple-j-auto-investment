@@ -275,7 +275,16 @@ export const t = {
                     desc: "Get a fair value for your current vehicle toward your next purchase.",
                     detail: "Bring your vehicle in and we'll give you an honest assessment. The trade-in value can be applied directly to your purchase."
                 }
-            ]
+            ],
+            dontDo: {
+                title: "WHAT WE DON'T DO",
+                items: [
+                    { title: "No Warranties or Guarantees", desc: "All sales are AS-IS. We do not provide warranties, implied or express. You purchase based on disclosed condition." },
+                    { title: "No Post-Sale Modifications", desc: "We do not perform mechanical work, detailing, or customization after purchase. Vehicles are delivered as inspected." },
+                    { title: "No Returns or Refunds", desc: "All sales are final. Inspect thoroughly before commitment. We are happy to answer questions before you buy." },
+                    { title: "No Pressure", desc: "We believe in honest conversations, not sales tactics. Take your time, ask questions, and decide when you are ready." }
+                ]
+            }
         },
         about: {
             hero: {
@@ -677,7 +686,16 @@ export const t = {
                     desc: "Obtenga un valor justo por su vehiculo actual para su proxima compra.",
                     detail: "Traiga su vehiculo y le daremos una evaluacion honesta. El valor del intercambio se puede aplicar directamente a su compra."
                 }
-            ]
+            ],
+            dontDo: {
+                title: "LO QUE NO HACEMOS",
+                items: [
+                    { title: "Sin Garantias", desc: "Todas las ventas son TAL CUAL. No ofrecemos garantias, implicitas o expresas. Usted compra segun la condicion revelada." },
+                    { title: "Sin Modificaciones Despues de la Venta", desc: "No realizamos trabajo mecanico, detallado o personalizacion despues de la compra. Los vehiculos se entregan tal como fueron inspeccionados." },
+                    { title: "Sin Devoluciones ni Reembolsos", desc: "Todas las ventas son finales. Inspeccione a fondo antes de comprometerse. Estamos felices de responder preguntas antes de que compre." },
+                    { title: "Sin Presion", desc: "Creemos en conversaciones honestas, no en tacticas de venta. Tome su tiempo, haga preguntas y decida cuando este listo." }
+                ]
+            }
         },
         about: {
             hero: {
