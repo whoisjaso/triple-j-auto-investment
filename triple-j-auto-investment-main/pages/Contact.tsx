@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, MessageSquare, AlertTriangle } from 'lucide-react';
 import { useStore } from '../context/Store';
 import { openSmartMap } from '../App';
 import { useLanguage } from '../context/LanguageContext';
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { delay: i * 0.1, duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }
+  })
+};
 
 const Contact = () => {
   const { addLead } = useStore();
@@ -37,22 +47,42 @@ const Contact = () => {
 
         {/* Header */}
         <div className="text-center mb-20">
-          <div className="inline-flex items-center gap-2 mb-6 text-tj-gold text-xs uppercase tracking-[0.4em]">
+          <motion.div
+            className="inline-flex items-center gap-2 mb-6 text-tj-gold text-xs uppercase tracking-[0.4em]"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <MessageSquare size={16} />
             <span>{t.contact.subtitle}</span>
-          </div>
-          <h1 className="text-6xl md:text-8xl font-display text-white tracking-tight mb-6">
+          </motion.div>
+          <motion.h1
+            className="text-6xl md:text-8xl font-display text-white tracking-tight mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
             {t.contact.title}
-          </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          </motion.h1>
+          <motion.p
+            className="text-gray-400 text-lg max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             {t.contact.desc}
-          </p>
+          </motion.p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
 
           {/* Contact Form */}
-          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 relative">
+          <motion.div
+            className="bg-tj-dark border border-white/10 p-6 md:p-8 relative"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
             <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
 
             {status === 'sent' ? (
@@ -151,13 +181,19 @@ const Contact = () => {
                 </button>
               </form>
             )}
-          </div>
+          </motion.div>
 
           {/* Contact Info */}
-          <div className="space-y-8">
+          <motion.div className="space-y-8">
 
             {/* Headquarters */}
-            <div className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group">
+            <motion.div
+              className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group"
+              variants={fadeUp}
+              custom={0}
+              initial="hidden"
+              animate="visible"
+            >
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold">
                   <MapPin size={24} />
@@ -178,10 +214,16 @@ const Contact = () => {
               >
                 {t.contact.info.openNav} <span>→</span>
               </button>
-            </div>
+            </motion.div>
 
             {/* Phone */}
-            <div className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group">
+            <motion.div
+              className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group"
+              variants={fadeUp}
+              custom={1}
+              initial="hidden"
+              animate="visible"
+            >
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold">
                   <Phone size={24} />
@@ -194,10 +236,16 @@ const Contact = () => {
               <a href="tel:+18324009760" className="text-white text-2xl font-mono hover:text-tj-gold transition-colors block">
                 +1 (832) 400-9760
               </a>
-            </div>
+            </motion.div>
 
             {/* Hours */}
-            <div className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group">
+            <motion.div
+              className="bg-black border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-colors group"
+              variants={fadeUp}
+              custom={2}
+              initial="hidden"
+              animate="visible"
+            >
               <div className="flex items-start gap-4 mb-6">
                 <div className="p-3 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold">
                   <Clock size={24} />
@@ -221,9 +269,9 @@ const Contact = () => {
                   <span className="font-mono text-red-500">{t.contact.info.closed}</span>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-          </div>
+          </motion.div>
         </div>
       </div>
     </div>
