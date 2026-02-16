@@ -198,27 +198,27 @@ const Home = () => {
          </div>
 
          {/* --- FEATURED VEHICLES --- */}
-         {hasVehicles && (
-            <section className="py-24 bg-[#050505] relative overflow-hidden border-b border-white/10">
-               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent"></div>
+         <section className="py-24 bg-[#050505] relative overflow-hidden border-b border-white/10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent"></div>
 
-               <div className="max-w-[1920px] mx-auto px-6">
-                  <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-                     <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                     >
-                        <h2 className="text-4xl md:text-6xl font-display text-white mb-2 flex items-center gap-4">
-                           {t.home.arsenal.title.toUpperCase()} <span className="text-xs font-mono text-tj-gold bg-tj-gold/10 px-2 py-1 rounded border border-tj-gold/20 align-middle tracking-widest uppercase">{t.home.arsenal.subtitle}</span>
-                        </h2>
-                        <p className="text-gray-500 text-xs font-mono uppercase tracking-widest">{t.home.arsenal.desc}</p>
-                     </motion.div>
-                     <Link to="/inventory" className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white transition-colors">
-                        {t.home.arsenal.viewAll} <ArrowRight size={12} />
-                     </Link>
-                  </div>
+            <div className="max-w-[1920px] mx-auto px-6">
+               <div className="flex flex-col md:flex-row justify-between items-end mb-12">
+                  <motion.div
+                     initial={{ opacity: 0, x: -50 }}
+                     whileInView={{ opacity: 1, x: 0 }}
+                     viewport={{ once: true }}
+                  >
+                     <h2 className="text-3xl sm:text-4xl md:text-6xl font-display text-white mb-2 flex flex-wrap items-center gap-3 sm:gap-4">
+                        {t.home.arsenal.title.toUpperCase()} <span className="text-xs font-mono text-tj-gold bg-tj-gold/10 px-2 py-1 rounded border border-tj-gold/20 align-middle tracking-widest uppercase">{t.home.arsenal.subtitle}</span>
+                     </h2>
+                     <p className="text-gray-500 text-xs font-mono uppercase tracking-widest">{t.home.arsenal.desc}</p>
+                  </motion.div>
+                  <Link to="/inventory" className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white transition-colors">
+                     {t.home.arsenal.viewAll} <ArrowRight size={12} />
+                  </Link>
+               </div>
 
+               {hasVehicles ? (
                   <motion.div
                      variants={containerVariants}
                      initial="hidden"
@@ -245,6 +245,7 @@ const Home = () => {
                               <motion.img
                                  src={vehicle.imageUrl}
                                  alt={vehicle.model}
+                                 loading="lazy"
                                  className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0"
                                  whileHover={{ scale: 1.1 }}
                                  transition={{ duration: 0.7 }}
@@ -262,15 +263,25 @@ const Home = () => {
                         </motion.div>
                      ))}
                   </motion.div>
-
-                  <div className="mt-8 text-center md:hidden">
-                     <Link to="/inventory" className="inline-block border border-tj-gold text-tj-gold px-8 py-4 text-xs uppercase tracking-widest font-bold">
-                        {t.home.arsenal.viewAll}
-                     </Link>
+               ) : (
+                  <div className="py-16 text-center border border-white/5 bg-white/[0.02]">
+                     <p className="text-gray-400 text-sm mb-4">{t.polish.emptyInventory}</p>
+                     <a
+                        href="tel:+18324009760"
+                        className="inline-flex items-center gap-2 text-tj-gold text-xs uppercase tracking-widest hover:text-white transition-colors"
+                     >
+                        <Phone size={14} /> {t.common.phone}
+                     </a>
                   </div>
+               )}
+
+               <div className="mt-8 text-center md:hidden">
+                  <Link to="/inventory" className="inline-block border border-tj-gold text-tj-gold px-8 py-4 text-xs uppercase tracking-widest font-bold">
+                     {t.home.arsenal.viewAll}
+                  </Link>
                </div>
-            </section>
-         )}
+            </div>
+         </section>
 
          {/* --- VALUE PILLARS --- */}
          <section className="py-24 px-6 max-w-[1920px] mx-auto bg-black">
@@ -289,13 +300,13 @@ const Home = () => {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5 }}
-                  className="bg-tj-dark p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden h-[350px] flex flex-col justify-between"
+                  className="bg-tj-dark p-6 sm:p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
                >
                   <div>
                      <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
                         <Fingerprint size={40} className="group-hover:animate-pulse" />
                      </div>
-                     <h3 className="text-white font-display text-3xl tracking-wide mb-4">{t.home.pillars.p1Title}</h3>
+                     <h3 className="text-white font-display text-2xl sm:text-3xl tracking-wide mb-4">{t.home.pillars.p1Title}</h3>
                      <p className="text-gray-500 text-sm leading-relaxed font-light">
                         {t.home.pillars.p1Desc} <br /><span className="text-white">{t.home.pillars.p1Highlight}</span>
                      </p>
@@ -310,13 +321,13 @@ const Home = () => {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.2 }}
-                  className="bg-tj-dark p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden h-[350px] flex flex-col justify-between"
+                  className="bg-tj-dark p-6 sm:p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
                >
                   <div>
                      <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
                         <Zap size={40} className="group-hover:text-white transition-colors" />
                      </div>
-                     <h3 className="text-white font-display text-3xl tracking-wide mb-4">{t.home.pillars.p2Title}</h3>
+                     <h3 className="text-white font-display text-2xl sm:text-3xl tracking-wide mb-4">{t.home.pillars.p2Title}</h3>
                      <p className="text-gray-500 text-sm leading-relaxed font-light">
                         {t.home.pillars.p2Desc} <br /><span className="text-white">{t.home.pillars.p2Highlight}</span>
                      </p>
@@ -331,13 +342,13 @@ const Home = () => {
                   initial={{ opacity: 0, y: 50 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.4 }}
-                  className="bg-tj-dark p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden h-[350px] flex flex-col justify-between"
+                  className="bg-tj-dark p-6 sm:p-10 group hover:bg-white/5 transition-colors duration-500 relative overflow-hidden min-h-[300px] md:min-h-[350px] flex flex-col justify-between"
                >
                   <div>
                      <div className="text-tj-gold mb-6 group-hover:scale-110 transition-transform duration-500 origin-left">
                         <Target size={40} className="group-hover:rotate-90 transition-transform duration-700" />
                      </div>
-                     <h3 className="text-white font-display text-3xl tracking-wide mb-4">{t.home.pillars.p3Title}</h3>
+                     <h3 className="text-white font-display text-2xl sm:text-3xl tracking-wide mb-4">{t.home.pillars.p3Title}</h3>
                      <p className="text-gray-500 text-sm leading-relaxed font-light">
                         {t.home.pillars.p3Desc} <br /><span className="text-white">{t.home.pillars.p3Highlight}</span>
                      </p>
@@ -378,7 +389,7 @@ const Home = () => {
          </section>
 
          {/* --- WHAT SETS US APART --- */}
-         <section className="py-20 px-6 max-w-[1600px] mx-auto">
+         <section className="py-16 sm:py-20 px-4 sm:px-6 max-w-[1600px] mx-auto">
             <div className="text-center mb-16">
                <h2 className="font-display text-sm text-tj-gold tracking-[0.5em] uppercase mb-4">{t.home.architecture}</h2>
                <div className="w-px h-16 bg-gradient-to-b from-tj-gold to-transparent mx-auto"></div>
@@ -386,7 +397,7 @@ const Home = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                {/* Card 1 */}
-               <Link to="/vin" className="bg-tj-dark border border-white/5 p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
+               <Link to="/vin" className="bg-tj-dark border border-white/5 p-6 sm:p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
                   <div className="absolute -right-12 -top-12 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
                      <Diamond size={150} />
                   </div>
@@ -405,7 +416,7 @@ const Home = () => {
                </Link>
 
                {/* Card 2 (Featured) */}
-               <Link to="/about" className="bg-gradient-to-br from-black to-tj-dark border border-tj-gold/30 p-8 group hover:border-tj-gold hover:-translate-y-3 hover:scale-[1.05] transition-all duration-500 relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:shadow-[0_0_60px_rgba(212,175,55,0.2)] z-10 scale-[1.02]">
+               <Link to="/about" className="bg-gradient-to-br from-black to-tj-dark border border-tj-gold/30 p-6 sm:p-8 group hover:border-tj-gold hover:-translate-y-3 hover:scale-[1.05] transition-all duration-500 relative overflow-hidden shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:shadow-[0_0_60px_rgba(212,175,55,0.2)] z-10 scale-[1.02]">
                   <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-1000 animate-pulse"></div>
 
                   <div className="mb-8 text-tj-gold transition-all duration-500 group-hover:scale-110 group-hover:drop-shadow-[0_0_30px_rgba(212,175,55,1)] relative z-10">
@@ -422,7 +433,7 @@ const Home = () => {
                </Link>
 
                {/* Card 3 */}
-               <div className="bg-tj-dark border border-white/5 p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
+               <div className="bg-tj-dark border border-white/5 p-6 sm:p-8 group hover:border-tj-gold hover:-translate-y-2 hover:scale-[1.02] transition-all duration-500 relative overflow-hidden shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.1)] hover:bg-gradient-to-b hover:from-tj-dark hover:to-tj-gold/5">
                   <div className="absolute -right-12 -top-12 opacity-5 group-hover:opacity-10 transition-opacity duration-500">
                      <Zap size={150} />
                   </div>
@@ -447,14 +458,14 @@ const Home = () => {
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1617788138017-80ad40651399?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center grayscale brightness-50 group-hover:brightness-75 group-hover:grayscale-0 transition-all duration-[1.5s] ease-out transform group-hover:scale-105"></div>
             <div className="absolute inset-0 bg-black/60 group-hover:bg-black/30 transition-colors duration-700"></div>
 
-            <div className="relative z-10 text-center">
+            <div className="relative z-10 text-center px-6">
                <div className="mb-6 inline-block overflow-hidden">
                   <span className="block text-tj-gold text-xs font-mono uppercase tracking-[0.5em] translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                      {t.home.vault.access}
                   </span>
                </div>
 
-               <h2 className="text-6xl md:text-9xl font-display text-white mb-10 tracking-tighter mix-blend-overlay group-hover:mix-blend-normal transition-all duration-700">
+               <h2 className="text-5xl sm:text-6xl md:text-9xl font-display text-white mb-10 tracking-tighter mix-blend-overlay group-hover:mix-blend-normal transition-all duration-700">
                   {t.home.vault.title}
                </h2>
 

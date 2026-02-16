@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useStore } from '../context/Store';
 import { VehicleStatus, Vehicle } from '../types';
-import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw, Car, ZoomIn } from 'lucide-react';
+import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw, Car, ZoomIn, WifiOff, PackageOpen } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -71,6 +71,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
           transition={{ duration: 0.5 }}
           src={images[imgIndex]}
           alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+          loading="lazy"
           className={`w-full h-full object-cover transition-all duration-1000 ${vehicle.status === VehicleStatus.SOLD ? 'grayscale opacity-40' : 'opacity-80 group-hover:opacity-100 group-hover:scale-105'}`}
         />
 
@@ -79,13 +80,13 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
           <>
             <button
               onClick={prevImg}
-              className="absolute left-0 top-0 bottom-0 z-30 px-3 flex items-center justify-center bg-gradient-to-r from-black/60 to-transparent text-white active:text-tj-gold transition-all opacity-0 group-hover:opacity-100"
+              className="absolute left-0 top-0 bottom-0 z-30 px-3 flex items-center justify-center bg-gradient-to-r from-black/60 to-transparent text-white active:text-tj-gold transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
             >
               <ChevronLeft size={32} strokeWidth={1} />
             </button>
             <button
               onClick={nextImg}
-              className="absolute right-0 top-0 bottom-0 z-30 px-3 flex items-center justify-center bg-gradient-to-l from-black/60 to-transparent text-white active:text-tj-gold transition-all opacity-0 group-hover:opacity-100"
+              className="absolute right-0 top-0 bottom-0 z-30 px-3 flex items-center justify-center bg-gradient-to-l from-black/60 to-transparent text-white active:text-tj-gold transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
             >
               <ChevronRight size={32} strokeWidth={1} />
             </button>
@@ -140,7 +141,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
                 e.stopPropagation();
                 onClick();
               }}
-              className="group/btn flex items-center gap-2 bg-white/5 text-gray-300 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.25em] transition-all hover:bg-tj-gold hover:text-black active:scale-95 border border-white/10 hover:border-tj-gold"
+              className="group/btn flex items-center gap-2 bg-white/5 text-gray-300 px-4 py-3 min-h-[44px] text-[10px] font-bold uppercase tracking-[0.25em] transition-all hover:bg-tj-gold hover:text-black active:scale-95 border border-white/10 hover:border-tj-gold"
             >
               <span className="hidden md:inline">{t.common.expressInterest}</span>
               <span className="md:hidden">View</span>
@@ -154,7 +155,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick }) => {
 };
 
 const Inventory = () => {
-  const { vehicles, addLead, isLoading, refreshVehicles } = useStore();
+  const { vehicles, addLead, isLoading, connectionError, refreshVehicles } = useStore();
   const { t, lang, toggleLang } = useLanguage();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
   const [makeFilter, setMakeFilter] = useState<string>('All');
@@ -461,95 +462,92 @@ const Inventory = () => {
           </div>
         </div>
 
-        {/* Grid */}
-        <motion.div
-          layout
-          className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 mt-8 md:mt-12"
-        >
-          <AnimatePresence mode="popLayout">
-            {sortedVehicles.map((vehicle) => (
-              <VehicleCard
-                key={vehicle.id}
-                vehicle={vehicle}
-                onClick={() => handleOpenModal(vehicle)}
-              />
-            ))}
-          </AnimatePresence>
-        </motion.div>
-
+        {/* Loading State: Skeleton Grid */}
         {isLoading && (
-          <div className="py-32 text-center border border-white/10 mt-12 bg-white/5">
-            <Loader2 size={32} className="mx-auto text-tj-gold mb-4 animate-spin" />
-            <p className="font-display text-xl text-white tracking-widest animate-pulse">LOADING INVENTORY...</p>
+          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 mt-8 md:mt-12">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="bg-black border border-white/5 overflow-hidden">
+                <div className="aspect-[4/3] bg-gray-800 animate-pulse" />
+                <div className="p-6 md:p-8 space-y-4">
+                  <div className="h-3 w-16 bg-gray-800 animate-pulse rounded" />
+                  <div className="h-7 w-40 bg-gray-800 animate-pulse rounded" />
+                  <div className="h-px w-12 bg-gray-800" />
+                  <div className="space-y-2">
+                    <div className="h-3 w-full bg-gray-800 animate-pulse rounded" />
+                    <div className="h-3 w-3/4 bg-gray-800 animate-pulse rounded" />
+                  </div>
+                  <div className="flex justify-between items-end pt-4 border-t border-white/5">
+                    <div className="h-6 w-24 bg-gray-800 animate-pulse rounded" />
+                    <div className="h-10 w-28 bg-gray-800 animate-pulse rounded" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        {!isLoading && sortedVehicles.length === 0 && (
-          <div className="py-16 text-center border border-red-900/30 mt-12 bg-red-900/5">
-            <ShieldAlert size={48} className="mx-auto text-red-500 mb-4" />
-            <p className="font-display text-2xl text-white tracking-widest uppercase mb-2">Connection Issue Detected</p>
-            <p className="text-sm text-gray-400 mt-2 max-w-lg mx-auto mb-6">
-              Unable to load vehicle inventory. This is usually a browser or network issue.
+        {/* Error State: Connection/fetch failure */}
+        {!isLoading && connectionError && sortedVehicles.length === 0 && (
+          <div className="py-20 text-center border border-red-900/30 mt-8 md:mt-12 bg-red-900/5">
+            <WifiOff size={48} className="mx-auto text-red-500/80 mb-6" />
+            <p className="font-display text-2xl text-white tracking-widest uppercase mb-3">
+              {t.polish.errorLoadFailed}
             </p>
-
-            {/* Diagnostic Info */}
-            <div className="max-w-xl mx-auto text-left space-y-3 mb-8 px-4">
-              <p className="text-xs text-tj-gold uppercase tracking-widest font-bold mb-4 text-center">Try These Fixes:</p>
-
-              <div className="bg-black/50 border border-white/10 p-4">
-                <p className="text-sm text-white font-bold mb-1">1. Hard Refresh</p>
-                <p className="text-xs text-gray-400">Press <span className="text-tj-gold font-mono">Ctrl + Shift + R</span> (Windows) or <span className="text-tj-gold font-mono">Cmd + Shift + R</span> (Mac)</p>
-              </div>
-
-              <div className="bg-black/50 border border-white/10 p-4">
-                <p className="text-sm text-white font-bold mb-1">2. Clear Browser Cache</p>
-                <p className="text-xs text-gray-400">Settings → Privacy → Clear browsing data → Select "Cached images and files" → Clear</p>
-              </div>
-
-              <div className="bg-black/50 border border-white/10 p-4">
-                <p className="text-sm text-white font-bold mb-1">3. Disable Ad Blockers / Extensions</p>
-                <p className="text-xs text-gray-400">Extensions may block our secure database connection. Try disabling them temporarily.</p>
-              </div>
-
-              {(typeof navigator !== 'undefined' && (navigator.userAgent.includes('Brave') || (navigator as any).brave)) && (
-                <div className="bg-yellow-900/30 border border-yellow-700/50 p-4">
-                  <p className="text-sm text-yellow-400 font-bold mb-1">⚠️ Brave Browser Detected</p>
-                  <p className="text-xs text-gray-300">Click the <span className="text-yellow-400">lion icon</span> in the address bar → Turn OFF Shields for this site → Refresh</p>
-                </div>
-              )}
-
-              <div className="bg-black/50 border border-white/10 p-4">
-                <p className="text-sm text-white font-bold mb-1">4. Try Incognito/Private Mode</p>
-                <p className="text-xs text-gray-400">This bypasses cached data and most extensions.</p>
-              </div>
-            </div>
-
+            <p className="text-sm text-gray-400 max-w-md mx-auto mb-8">
+              {t.polish.errorCallUs} <a href="tel:+18324009760" className="text-tj-gold hover:text-white transition-colors">{t.common.phone}</a>
+            </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <button
-                onClick={() => {
-                  // Clear local cache
-                  localStorage.removeItem('tj_build_version');
-                  localStorage.removeItem('supabase.auth.token');
-                  // Force hard refresh
-                  window.location.reload();
-                }}
+                onClick={() => refreshVehicles()}
                 className="text-[10px] uppercase tracking-widest bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all flex items-center gap-2 font-bold"
               >
-                <RefreshCw size={14} /> Clear Cache & Reload
+                <RefreshCw size={14} /> {t.polish.errorTryAgain}
               </button>
-
               <button
-                onClick={() => refreshVehicles()}
+                onClick={() => window.location.reload()}
                 className="text-[10px] uppercase tracking-widest text-tj-gold hover:text-white border border-tj-gold/30 hover:border-tj-gold px-6 py-4 transition-all flex items-center gap-2"
               >
-                <RefreshCw size={14} /> Retry Connection
+                <RefreshCw size={14} /> {t.polish.errorReload}
               </button>
             </div>
-
-            <p className="text-[10px] text-gray-600 mt-8 font-mono">
-              If this persists, check the browser console (F12) for errors or try a different browser.
-            </p>
           </div>
+        )}
+
+        {/* Empty State: Fetch succeeded but zero vehicles */}
+        {!isLoading && !connectionError && sortedVehicles.length === 0 && (
+          <div className="py-20 text-center border border-tj-gold/20 mt-8 md:mt-12 bg-tj-gold/5">
+            <PackageOpen size={48} className="mx-auto text-tj-gold/60 mb-6" />
+            <p className="font-display text-2xl text-white tracking-widest uppercase mb-3">
+              {t.polish.emptyInventory}
+            </p>
+            <p className="text-sm text-gray-400 max-w-md mx-auto mb-8">
+              {t.polish.emptyInventorySubtext}
+            </p>
+            <a
+              href="tel:+18324009760"
+              className="inline-flex items-center gap-2 text-[10px] uppercase tracking-widest bg-tj-gold text-black hover:bg-white px-8 py-4 transition-all font-bold"
+            >
+              <Phone size={14} /> {t.common.phone}
+            </a>
+          </div>
+        )}
+
+        {/* Vehicle Grid: Has vehicles to display */}
+        {!isLoading && sortedVehicles.length > 0 && (
+          <motion.div
+            layout
+            className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 mt-8 md:mt-12"
+          >
+            <AnimatePresence mode="popLayout">
+              {sortedVehicles.map((vehicle) => (
+                <VehicleCard
+                  key={vehicle.id}
+                  vehicle={vehicle}
+                  onClick={() => handleOpenModal(vehicle)}
+                />
+              ))}
+            </AnimatePresence>
+          </motion.div>
         )}
       </div>
 
