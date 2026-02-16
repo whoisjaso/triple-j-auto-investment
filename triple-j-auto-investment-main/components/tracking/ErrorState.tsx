@@ -56,11 +56,11 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ type }) => {
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <a
-              href="tel:+17135550192"
+              href="tel:+18324009760"
               className="inline-flex items-center justify-center gap-2 text-tj-gold hover:text-white transition-colors"
             >
               <Phone size={14} />
-              (713) 555-0192
+              (832) 400-9760
             </a>
             <a
               href="mailto:registration@triplejautoinvestment.com"

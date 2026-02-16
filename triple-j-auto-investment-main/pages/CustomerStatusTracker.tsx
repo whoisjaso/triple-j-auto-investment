@@ -231,8 +231,8 @@ const CustomerStatusTracker: React.FC = () => {
       <footer className="mt-12 pb-8 text-center">
         <p className="text-gray-500 text-xs">
           Questions? Call{' '}
-          <a href="tel:+17135550192" className="text-tj-gold hover:underline">
-            (713) 555-0192
+          <a href="tel:+18324009760" className="text-tj-gold hover:underline">
+            (832) 400-9760
           </a>
         </p>
       </footer>

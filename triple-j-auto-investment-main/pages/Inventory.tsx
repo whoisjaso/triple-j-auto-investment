@@ -480,7 +480,7 @@ const Inventory = () => {
         {isLoading && (
           <div className="py-32 text-center border border-white/10 mt-12 bg-white/5">
             <Loader2 size={32} className="mx-auto text-tj-gold mb-4 animate-spin" />
-            <p className="font-display text-xl text-white tracking-widest animate-pulse">UPLINKING COMMAND LEDGER...</p>
+            <p className="font-display text-xl text-white tracking-widest animate-pulse">LOADING INVENTORY...</p>
           </div>
         )}
 
@@ -652,7 +652,7 @@ const Inventory = () => {
                   {/* Desktop Header */}
                   <div className="hidden md:block p-8 border-b border-white/10 shrink-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-tj-gold font-bold text-xs uppercase tracking-widest flex items-center gap-2"><Target size={12} /> Asset Dossier</span>
+                      <span className="text-tj-gold font-bold text-xs uppercase tracking-widest flex items-center gap-2"><Target size={12} /> Vehicle Details</span>
                       <span className="bg-red-900/20 text-red-500 text-[9px] px-2 py-0.5 uppercase tracking-widest font-bold border border-red-900/50">AS-IS</span>
                     </div>
                     <h2 className="font-display text-4xl text-white leading-none mb-1">{selectedVehicle.year} {selectedVehicle.model}</h2>

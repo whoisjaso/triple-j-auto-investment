@@ -1086,7 +1086,7 @@ export const generateRentalAgreementPDF = async (data: RentalAgreementData): Pro
   );
 
   writeClause(6, "ACCIDENT PROCEDURES",
-    "In case of any accident, collision, or incident involving the vehicle: (a) Call 911 immediately if there are injuries or safety hazards; (b) Do not admit fault or liability to any party; (c) Exchange information with all other parties involved (name, phone, insurance, license plate); (d) File a police report at the scene or nearest station; (e) Document the scene with photographs if safe to do so; (f) Notify Triple J Auto Investment immediately at (713) 555-0100. Failure to follow these procedures may result in Lessee bearing full financial responsibility."
+    "In case of any accident, collision, or incident involving the vehicle: (a) Call 911 immediately if there are injuries or safety hazards; (b) Do not admit fault or liability to any party; (c) Exchange information with all other parties involved (name, phone, insurance, license plate); (d) File a police report at the scene or nearest station; (e) Document the scene with photographs if safe to do so; (f) Notify Triple J Auto Investment immediately at (832) 400-9760. Failure to follow these procedures may result in Lessee bearing full financial responsibility."
   );
 
   writeClause(7, "MAINTENANCE AND CARE",
