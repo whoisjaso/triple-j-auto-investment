@@ -41,17 +41,16 @@ const PaymentOptions = () => {
               <div className="bg-black/50 border border-white/5 p-4">
                 <h4 className="text-white text-sm font-bold mb-2 flex items-center gap-2">
                   <CheckCircle size={14} className="text-green-500" />
-                  ADVANTAGES
+                  {t.paymentOptions.cashAdvantages.title.toUpperCase()}
                 </h4>
                 <ul className="text-xs space-y-1">
-                  <li>&bull; Same-day pickup</li>
-                  <li>&bull; No financing fees or interest</li>
-                  <li>&bull; Strongest negotiating position</li>
-                  <li>&bull; No credit check required</li>
+                  {t.paymentOptions.cashAdvantages.items.map((item, i) => (
+                    <li key={i}>&bull; {item}</li>
+                  ))}
                 </ul>
               </div>
               <div className="text-xs text-gray-600">
-                <strong className="text-white">Note:</strong> Transactions over $10,000 require IRS Form 8300 reporting.
+                <strong className="text-white">Note:</strong> {t.paymentOptions.cashAdvantages.irsNote}
               </div>
             </div>
           </div>
@@ -69,12 +68,11 @@ const PaymentOptions = () => {
             </div>
             <div className="space-y-4 text-gray-400">
               <div className="bg-black/50 border border-white/5 p-4">
-                <h4 className="text-white text-sm font-bold mb-2">REQUIREMENTS</h4>
+                <h4 className="text-white text-sm font-bold mb-2">{t.paymentOptions.cashiersRequirements.title.toUpperCase()}</h4>
                 <ul className="text-xs space-y-1">
-                  <li>&bull; Must be from a US-based bank</li>
-                  <li>&bull; Made payable to "Triple J Auto Investment"</li>
-                  <li>&bull; Subject to bank verification call</li>
-                  <li>&bull; Bring valid government-issued ID</li>
+                  {t.paymentOptions.cashiersRequirements.items.map((item, i) => (
+                    <li key={i}>&bull; {item}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -93,11 +91,11 @@ const PaymentOptions = () => {
             </div>
             <div className="space-y-4 text-gray-400">
               <div className="bg-black/50 border border-white/5 p-4">
-                <h4 className="text-white text-sm font-bold mb-2">DETAILS</h4>
+                <h4 className="text-white text-sm font-bold mb-2">{t.paymentOptions.debitDetails.title.toUpperCase()}</h4>
                 <ul className="text-xs space-y-1">
-                  <li>&bull; Accepted for deposits and partial payments</li>
-                  <li>&bull; Daily limits may apply per your bank</li>
-                  <li>&bull; PIN or signature authorization</li>
+                  {t.paymentOptions.debitDetails.items.map((item, i) => (
+                    <li key={i}>&bull; {item}</li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -116,12 +114,11 @@ const PaymentOptions = () => {
             </div>
             <div className="space-y-4 text-gray-400">
               <div className="bg-black/50 border border-white/5 p-4">
-                <h4 className="text-white text-sm font-bold mb-2">REQUIREMENTS</h4>
+                <h4 className="text-white text-sm font-bold mb-2">{t.paymentOptions.financingRequirements.title.toUpperCase()}</h4>
                 <ul className="text-xs space-y-1">
-                  <li>&bull; Credit score 580+ (minimum)</li>
-                  <li>&bull; Proof of income and residence</li>
-                  <li>&bull; Valid insurance coverage</li>
-                  <li>&bull; Down payment 10-25% (score dependent)</li>
+                  {t.paymentOptions.financingRequirements.items.map((item, i) => (
+                    <li key={i}>&bull; {item}</li>
+                  ))}
                 </ul>
               </div>
               <a href="/finance" className="inline-block text-tj-gold text-xs uppercase tracking-widest hover:text-white transition-colors">
@@ -138,11 +135,10 @@ const PaymentOptions = () => {
             <AlertTriangle className="text-yellow-500 flex-shrink-0" size={24} />
             <div>
               <h3 className="text-yellow-500 font-bold text-sm uppercase tracking-widest mb-2">
-                PERSONAL CHECKS ACCEPTED WITH HOLD
+                {t.paymentOptions.personalCheck.title.toUpperCase()}
               </h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                We accept personal checks, but vehicle release is delayed <strong className="text-white">3-5 business days</strong> for bank clearance.
-                If immediate pickup is required, use cash, cashier's check, or debit card instead.
+                {t.paymentOptions.personalCheck.before} <strong className="text-white">{t.paymentOptions.personalCheck.holdPeriod}</strong> {t.paymentOptions.personalCheck.after}
               </p>
             </div>
           </div>

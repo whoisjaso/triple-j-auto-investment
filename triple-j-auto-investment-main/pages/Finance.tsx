@@ -153,7 +153,7 @@ const Finance = () => {
                       type="text"
                       value={form.vehicleInterest}
                       onChange={e => setForm({...form, vehicleInterest: e.target.value})}
-                      placeholder="e.g., 2018 Honda Civic"
+                      placeholder={t.finance.form.vehiclePlaceholder}
                       className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                     />
                   </div>
@@ -173,7 +173,7 @@ const Finance = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">Down Payment</label>
+                      <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.finance.form.downPayment}</label>
                       <div className="relative">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                         <input
@@ -188,23 +188,23 @@ const Finance = () => {
                   </div>
 
                   <div>
-                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">Credit Profile</label>
+                    <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">{t.finance.form.creditProfile}</label>
                     <select
                       value={form.creditScore}
                       onChange={e => setForm({...form, creditScore: e.target.value})}
                       className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors appearance-none"
                     >
-                      <option value="excellent">Excellent (750+)</option>
-                      <option value="good">Good (700-749)</option>
-                      <option value="fair">Fair (650-699)</option>
-                      <option value="poor">Below 650</option>
+                      <option value="excellent">{t.finance.form.creditExcellent}</option>
+                      <option value="good">{t.finance.form.creditGood}</option>
+                      <option value="fair">{t.finance.form.creditFair}</option>
+                      <option value="poor">{t.finance.form.creditPoor}</option>
                     </select>
                   </div>
 
                   <div className="bg-white/5 border border-white/10 p-4 text-xs text-gray-400">
                     <p className="mb-2">
                       <AlertTriangle size={14} className="inline mr-2 text-tj-gold" />
-                      By submitting, you authorize a soft credit inquiry which does not impact your credit score.
+                      {t.finance.form.softInquiryNotice}
                     </p>
                   </div>
 
@@ -227,56 +227,46 @@ const Finance = () => {
             <div className="bg-black border border-white/10 p-8">
               <h3 className="text-white font-display text-xl mb-6 flex items-center gap-2">
                 <CheckCircle size={20} className="text-tj-gold" />
-                REQUIREMENTS
+                {t.finance.requirements.title.toUpperCase()}
               </h3>
               <ul className="space-y-4 text-gray-400 text-sm">
-                <li className="flex items-start gap-3">
-                  <span className="text-tj-gold">&bull;</span>
-                  <span>Valid driver's license or government-issued ID</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-tj-gold">&bull;</span>
-                  <span>Proof of income (pay stubs or bank statements)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-tj-gold">&bull;</span>
-                  <span>Proof of residence (utility bill or lease agreement)</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <span className="text-tj-gold">&bull;</span>
-                  <span>Insurance coverage confirmation</span>
-                </li>
+                {t.finance.requirements.items.map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <span className="text-tj-gold">&bull;</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
               </ul>
             </div>
 
             {/* Rates */}
             <div className="bg-black border border-white/10 p-8">
-              <h3 className="text-white font-display text-xl mb-6">ESTIMATED RATES</h3>
+              <h3 className="text-white font-display text-xl mb-6">{t.finance.rates.title.toUpperCase()}</h3>
               <div className="space-y-4">
                 <div className="border-b border-white/5 pb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs uppercase tracking-widest text-gray-500">Excellent Credit</span>
-                    <span className="text-tj-gold font-mono text-lg">4.9% - 6.9%</span>
+                    <span className="text-xs uppercase tracking-widest text-gray-500">{t.finance.rates.excellent.label}</span>
+                    <span className="text-tj-gold font-mono text-lg">{t.finance.rates.excellent.rate}</span>
                   </div>
-                  <p className="text-xs text-gray-600">750+ score, 20%+ down</p>
+                  <p className="text-xs text-gray-600">{t.finance.rates.excellent.detail}</p>
                 </div>
                 <div className="border-b border-white/5 pb-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs uppercase tracking-widest text-gray-500">Good Credit</span>
-                    <span className="text-white font-mono text-lg">7.9% - 10.9%</span>
+                    <span className="text-xs uppercase tracking-widest text-gray-500">{t.finance.rates.good.label}</span>
+                    <span className="text-white font-mono text-lg">{t.finance.rates.good.rate}</span>
                   </div>
-                  <p className="text-xs text-gray-600">700-749 score, 15%+ down</p>
+                  <p className="text-xs text-gray-600">{t.finance.rates.good.detail}</p>
                 </div>
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs uppercase tracking-widest text-gray-500">Fair Credit</span>
-                    <span className="text-white font-mono text-lg">11.9% - 16.9%</span>
+                    <span className="text-xs uppercase tracking-widest text-gray-500">{t.finance.rates.fair.label}</span>
+                    <span className="text-white font-mono text-lg">{t.finance.rates.fair.rate}</span>
                   </div>
-                  <p className="text-xs text-gray-600">650-699 score, 25%+ down required</p>
+                  <p className="text-xs text-gray-600">{t.finance.rates.fair.detail}</p>
                 </div>
               </div>
               <p className="text-xs text-gray-600 mt-6">
-                *Rates subject to change. Final APR determined by lender based on full credit profile.
+                {t.finance.rates.disclaimer}
               </p>
             </div>
 
@@ -284,10 +274,10 @@ const Finance = () => {
             <div className="bg-red-900/10 border border-red-900/30 p-6">
               <h4 className="text-red-500 font-bold text-sm uppercase tracking-widest mb-3 flex items-center gap-2">
                 <AlertTriangle size={16} />
-                Important Notice
+                {t.finance.importantNotice.title}
               </h4>
               <p className="text-gray-400 text-xs leading-relaxed">
-                Financing is subject to approval by third-party lenders. Triple J Auto Investment does not provide direct financing. We are a dealership, not a bank.
+                {t.finance.importantNotice.content}
               </p>
             </div>
 
