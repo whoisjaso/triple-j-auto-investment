@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
 import { SplashScreen } from './components/SplashScreen';
 import { ScrollToTop } from './components/ScrollToTop';
+import { PageLoader } from './components/PageLoader';
 
 // Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
@@ -24,11 +25,19 @@ const lazyWithErrorHandling = (importFn: () => Promise<any>, pageName: string) =
       // Return a fallback component
       return {
         default: () => (
-          <div className="min-h-screen flex items-center justify-center bg-tj-green text-white p-8">
+          <div className="min-h-screen flex items-center justify-center bg-black text-white p-8">
             <div className="text-center max-w-2xl">
+              <img
+                src="/GoldTripleJLogo.png"
+                alt="Triple J Auto Investment"
+                className="w-16 h-16 mx-auto mb-6 opacity-50"
+              />
               <h1 className="font-display text-3xl text-tj-gold mb-4">Error Loading {pageName}</h1>
-              <p className="text-gray-300 mb-6">
-                Failed to load the {pageName} page. Please refresh the page or contact support.
+              <p className="text-gray-400 mb-2">
+                Failed to load the {pageName} page.
+              </p>
+              <p className="text-gray-500 text-sm mb-8">
+                Please refresh the page or call us at (832) 400-9760.
               </p>
               <button
                 onClick={() => window.location.reload()}
@@ -483,11 +492,19 @@ class ErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-tj-green text-white p-8">
+        <div className="min-h-screen flex items-center justify-center bg-black text-white p-8">
           <div className="text-center max-w-2xl">
-            <h1 className="font-display text-3xl text-tj-gold mb-4">Error Loading Page</h1>
-            <p className="text-gray-300 mb-6">
-              {this.state.error?.message || 'An unexpected error occurred'}
+            <img
+              src="/GoldTripleJLogo.png"
+              alt="Triple J Auto Investment"
+              className="w-16 h-16 mx-auto mb-6 opacity-50"
+            />
+            <h1 className="font-display text-3xl text-tj-gold mb-4">Something Went Wrong</h1>
+            <p className="text-gray-400 mb-2">
+              We're sorry, but this page encountered an error.
+            </p>
+            <p className="text-gray-500 text-sm mb-8">
+              Please reload the page or contact us at (832) 400-9760.
             </p>
             <button
               onClick={() => window.location.reload()}
@@ -509,55 +526,55 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">
-      <ErrorBoundary>
-        <BrowserCompatibilityCheck />
-      </ErrorBoundary>
+      <BrowserCompatibilityCheck />
       <Navbar />
-      {/* Top padding matches navbar height (h-32 = 128px = pt-32) plus buffer */}
-      <main className="flex-grow pt-36">
-        {/* Global Page Transition Wrapper */}
-        <AnimatePresence mode="wait">
-          <Suspense fallback={null}>
-            <div key={location.pathname} className="min-h-full origin-top">
-              <Routes location={location}>
-                <Route path="/" element={<Home />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/inventory" element={<Inventory />} />
-                <Route path="/vin" element={<VinLookup />} />
-                <Route path="/vin/free-check" element={<VinLookup />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/finance" element={<Finance />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/policies" element={<Policies />} />
-                <Route path="/terms" element={<Policies />} />
-                <Route path="/payment-options" element={<PaymentOptions />} />
-                <Route path="/commercial-wholesale" element={<Contact />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/legal/:section" element={<Legal />} />
-                {/* Customer tracking - token-based access (new format: /track/{orderId}-{token}) */}
-                <Route path="/track/:accessKey" element={<CustomerStatusTracker />} />
-                {/* Legacy order ID lookup - keep for admin testing */}
-                <Route path="/track" element={<RegistrationTracker />} />
+      <ErrorBoundary>
+        {/* Top padding matches navbar height (h-32 = 128px = pt-32) plus buffer */}
+        <main className="flex-grow pt-36">
+          {/* Global Page Transition Wrapper */}
+          <AnimatePresence mode="wait">
+            <Suspense fallback={<PageLoader />}>
+              <div key={location.pathname} className="min-h-full origin-top">
+                <Routes location={location}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/inventory" element={<Inventory />} />
+                  <Route path="/vin" element={<VinLookup />} />
+                  <Route path="/vin/free-check" element={<VinLookup />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/finance" element={<Finance />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/policies" element={<Policies />} />
+                  <Route path="/terms" element={<Policies />} />
+                  <Route path="/payment-options" element={<PaymentOptions />} />
+                  <Route path="/commercial-wholesale" element={<Contact />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/legal/:section" element={<Legal />} />
+                  {/* Customer tracking - token-based access (new format: /track/{orderId}-{token}) */}
+                  <Route path="/track/:accessKey" element={<CustomerStatusTracker />} />
+                  {/* Legacy order ID lookup - keep for admin testing */}
+                  <Route path="/track" element={<RegistrationTracker />} />
 
-                {/* Customer Portal - phone OTP auth (NOT admin /login) */}
-                <Route path="/customer/login" element={<CustomerLogin />} />
-                <Route path="/customer/dashboard" element={<CustomerDashboard />} />
+                  {/* Customer Portal - phone OTP auth (NOT admin /login) */}
+                  <Route path="/customer/login" element={<CustomerLogin />} />
+                  <Route path="/customer/dashboard" element={<CustomerDashboard />} />
 
-                {/* Admin Routes */}
-                <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
-                <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventory /></ProtectedRoute>} />
-                <Route path="/admin/registrations" element={<ProtectedRoute><AdminRegistrations /></ProtectedRoute>} />
-                <Route path="/admin/rentals" element={<ProtectedRoute><AdminRentals /></ProtectedRoute>} />
-                <Route path="/admin/plates" element={<ProtectedRoute><AdminPlates /></ProtectedRoute>} />
+                  {/* Admin Routes */}
+                  <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventory /></ProtectedRoute>} />
+                  <Route path="/admin/registrations" element={<ProtectedRoute><AdminRegistrations /></ProtectedRoute>} />
+                  <Route path="/admin/rentals" element={<ProtectedRoute><AdminRentals /></ProtectedRoute>} />
+                  <Route path="/admin/plates" element={<ProtectedRoute><AdminPlates /></ProtectedRoute>} />
 
-                {/* 404 Catch-All */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </Suspense>
-        </AnimatePresence>
-      </main>
+                  {/* 404 Catch-All */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </Suspense>
+          </AnimatePresence>
+        </main>
+      </ErrorBoundary>
       <Footer />
     </div>
   );
