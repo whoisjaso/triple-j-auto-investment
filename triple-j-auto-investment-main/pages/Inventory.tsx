@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom';
 import { useStore } from '../context/Store';
 import { VehicleStatus, Vehicle } from '../types';
-import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw, Car, ZoomIn, WifiOff, PackageOpen } from 'lucide-react';
+import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, ShieldAlert, Globe, ChevronLeft, ChevronRight, FileText, CheckCircle, AlertTriangle, CreditCard, ClipboardCheck, Eye, Layers, Target, MapPin, Search, RefreshCw, Car, ZoomIn, WifiOff, PackageOpen, Key, Mail, User, Calendar, Shield, Fingerprint } from 'lucide-react';
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
@@ -12,15 +12,17 @@ import { triggerOutboundCall } from '../services/retellService';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
 
+const isRentable = (_v: Vehicle): boolean => true;
+
 interface VehicleCardProps {
   vehicle: Vehicle;
   onClick: () => void;
   onImageClick: (imgIndex: number) => void;
 }
 
-// --- VEHICLE CARD COMPONENT (With Carousel) ---
+// --- VEHICLE CARD COMPONENT (Swipeable Carousel + Sleek Design) ---
 const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClick }) => {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const [imgIndex, setImgIndex] = useState(0);
   const images = [vehicle.imageUrl, ...(vehicle.gallery || [])].filter(Boolean);
 
@@ -41,133 +43,150 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClic
     }
   };
 
+  // Swipe gesture handler (pattern from ImageGallery.tsx)
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const threshold = 50;
+    if (info.offset.x > threshold || info.velocity.x > 0.5) {
+      setImgIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
+    } else if (info.offset.x < -threshold || info.velocity.x < -0.5) {
+      setImgIndex(prev => (prev + 1) % images.length);
+    }
+  };
+
+  const isSold = vehicle.status === VehicleStatus.SOLD;
+
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
       onClick={onClick}
-      className="group relative bg-black transition-all duration-500 ease-out hover:shadow-[0_0_40px_rgba(212,175,55,0.15)] hover:z-30 border border-transparent hover:border-tj-gold/40 flex flex-col h-full cursor-pointer select-none overflow-hidden"
+      className="group relative bg-black transition-all duration-500 ease-out hover:shadow-[0_0_50px_rgba(212,175,55,0.12)] hover:z-30 hover:-translate-y-1 border border-white/[0.06] hover:border-tj-gold/30 flex flex-col h-full cursor-pointer select-none overflow-hidden"
     >
-      {/* Golden Glow Effect on Hover */}
-      <div className="absolute inset-0 bg-tj-gold/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none z-0"></div>
-
-      {/* Status Indicator */}
-      <div className="absolute top-0 left-0 w-full flex justify-between items-center z-20 p-6 pointer-events-none">
-        <div className={`px-3 py-1 text-[8px] font-bold uppercase tracking-[0.2em] border shadow-lg backdrop-blur-md ${vehicle.status === 'Available' ? 'border-tj-gold text-tj-gold bg-black/90' : 'border-gray-700 text-gray-400 bg-black/90'}`}>
-          {vehicle.status === 'Available' ? `• ${t.common.available.toUpperCase()}` : `• ${vehicle.status.toUpperCase()}`}
-        </div>
-      </div>
-
-      {/* Image Carousel Area - Clickable for fullscreen */}
+      {/* Image Area — Swipeable, 16:10 aspect for full car view */}
       <div
-        className="relative aspect-[4/3] overflow-hidden border-b border-white/5 group/image bg-gray-900 cursor-zoom-in"
+        className={`relative aspect-[16/10] overflow-hidden bg-gray-900 ${!isSold && images.length > 1 ? 'cursor-grab active:cursor-grabbing' : ''}`}
         onClick={handleImageClick}
       >
-        {vehicle.status === VehicleStatus.SOLD && (
+        {/* Badges — Top Row */}
+        <div className="absolute top-0 left-0 right-0 z-20 p-4 flex justify-between items-start pointer-events-none">
+          <div className={`px-2.5 py-1 text-[7px] font-bold uppercase tracking-[0.2em] backdrop-blur-md shadow-lg ${vehicle.status === 'Available' ? 'border border-tj-gold/60 text-tj-gold bg-black/80' : 'border border-gray-700 text-gray-400 bg-black/80'}`}>
+            {vehicle.status === 'Available' ? `${t.common.available.toUpperCase()}` : vehicle.status.toUpperCase()}
+          </div>
+          {vehicle.status === VehicleStatus.AVAILABLE && (
+            <div className="px-2.5 py-1 text-[7px] font-bold uppercase tracking-[0.15em] bg-tj-gold text-black shadow-lg">
+              {t.common.saleAndRental}
+            </div>
+          )}
+        </div>
+
+        {/* SOLD Overlay */}
+        {isSold && (
           <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-[2px]">
             <div className="transform -rotate-12 bg-tj-gold border-y-4 border-white shadow-[0_0_50px_rgba(0,0,0,0.8)] w-[120%] flex justify-center py-3">
-              <span className="font-display font-black text-5xl md:text-6xl tracking-[0.3em] text-black uppercase drop-shadow-md">
+              <span className="font-display font-black text-5xl md:text-6xl tracking-[0.3em] text-black uppercase">
                 {t.common.sold.toUpperCase()}
               </span>
             </div>
           </div>
         )}
 
+        {/* Swipeable Image */}
         <motion.img
           key={imgIndex}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
           src={images[imgIndex]}
           alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
           loading="lazy"
-          className={`w-full h-full object-cover transition-all duration-1000 ${vehicle.status === VehicleStatus.SOLD ? 'grayscale opacity-40' : 'opacity-80 group-hover:opacity-100 group-hover:scale-105'}`}
+          drag={!isSold && images.length > 1 ? 'x' : false}
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.15}
+          onDragEnd={handleDragEnd}
+          className={`w-full h-full object-cover transition-all duration-700 ${isSold ? 'grayscale opacity-40' : 'opacity-95 group-hover:opacity-100 group-hover:scale-[1.03]'}`}
         />
 
-        {/* Fullscreen hint overlay */}
-        {vehicle.status !== VehicleStatus.SOLD && (
-          <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/0 group-hover/image:bg-black/20 transition-all duration-300 pointer-events-none">
-            <div className="opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 bg-black/70 backdrop-blur-sm px-3 py-2 flex items-center gap-2 border border-white/20">
-              <ZoomIn size={14} className="text-tj-gold" />
-              <span className="text-[9px] uppercase tracking-widest text-white/90">Tap to view</span>
-            </div>
+        {/* Image count badge */}
+        {images.length > 1 && !isSold && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 z-20 px-3 py-1 bg-black/60 backdrop-blur-sm text-[9px] font-mono text-white/80 tracking-wider pointer-events-none">
+            {imgIndex + 1} / {images.length}
           </div>
         )}
 
-        {/* Carousel Controls (Improved Visibility on Mobile) */}
-        {images.length > 1 && vehicle.status !== VehicleStatus.SOLD && (
+        {/* Carousel Arrow Controls */}
+        {images.length > 1 && !isSold && (
           <>
             <button
               onClick={prevImg}
-              className="absolute left-0 top-0 bottom-0 z-30 px-3 flex items-center justify-center bg-gradient-to-r from-black/60 to-transparent text-white active:text-tj-gold transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+              className="absolute left-0 top-0 bottom-0 z-30 w-12 flex items-center justify-center bg-gradient-to-r from-black/40 to-transparent text-white/60 hover:text-white active:text-tj-gold transition-all opacity-0 md:group-hover:opacity-100"
             >
-              <ChevronLeft size={32} strokeWidth={1} />
+              <ChevronLeft size={24} strokeWidth={1.5} />
             </button>
             <button
               onClick={nextImg}
-              className="absolute right-0 top-0 bottom-0 z-30 px-3 flex items-center justify-center bg-gradient-to-l from-black/60 to-transparent text-white active:text-tj-gold transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
+              className="absolute right-0 top-0 bottom-0 z-30 w-12 flex items-center justify-center bg-gradient-to-l from-black/40 to-transparent text-white/60 hover:text-white active:text-tj-gold transition-all opacity-0 md:group-hover:opacity-100"
             >
-              <ChevronRight size={32} strokeWidth={1} />
+              <ChevronRight size={24} strokeWidth={1.5} />
             </button>
-
-            {/* Dots Indicator */}
-            <div className="absolute bottom-4 left-0 w-full flex justify-center gap-1 z-20 pointer-events-none">
-              {images.map((_, i) => (
-                <div key={i} className={`h-1 rounded-full transition-all duration-300 ${i === imgIndex ? 'bg-tj-gold w-6 shadow-[0_0_10px_rgba(212,175,55,0.8)]' : 'bg-white/30 w-1.5'}`}></div>
-              ))}
-            </div>
           </>
         )}
+
+        {/* Dot Indicators */}
+        {images.length > 1 && !isSold && (
+          <div className="absolute bottom-3 left-0 w-full flex justify-center gap-1.5 z-20 pointer-events-none">
+            {images.map((_, i) => (
+              <div key={i} className={`h-[3px] rounded-full transition-all duration-300 ${i === imgIndex ? 'bg-tj-gold w-5 shadow-[0_0_8px_rgba(212,175,55,0.6)]' : 'bg-white/25 w-[6px]'}`} />
+            ))}
+          </div>
+        )}
+
+        {/* Bottom gradient fade into content */}
+        <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
       </div>
 
-      {/* Content */}
-      <div className="p-6 md:p-8 relative flex flex-col flex-grow bg-gradient-to-b from-black via-black to-tj-dark/30">
-        <div className="mb-6 relative z-10">
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-[10px] uppercase tracking-ultra text-gray-400 mb-2 transition-colors group-hover:text-tj-gold/80">{vehicle.make}</p>
-              <h3 className="font-display text-2xl md:text-3xl text-white mb-2 group-hover:text-tj-gold transition-colors leading-none tracking-tight">
-                {vehicle.model}
-              </h3>
-            </div>
-            <div className="text-right">
-              <span className="text-[10px] font-mono text-gray-400 block">{vehicle.year}</span>
-              <span className="text-[10px] font-mono text-gray-400 block">{vehicle.mileage.toLocaleString()} {t.common.mileage}</span>
-            </div>
+      {/* Content — Compact & Clean */}
+      <div className="px-5 pt-4 pb-5 relative flex flex-col flex-grow">
+        {/* Vehicle Info Row */}
+        <div className="flex justify-between items-start mb-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-1 group-hover:text-tj-gold/60 transition-colors">{vehicle.year} {vehicle.make}</p>
+            <h3 className="font-display text-xl md:text-2xl text-white group-hover:text-tj-gold transition-colors leading-none tracking-tight truncate">
+              {vehicle.model}
+            </h3>
+          </div>
+          <div className="text-right flex-shrink-0 ml-4">
+            <span className="text-[9px] font-mono text-gray-400 block">{vehicle.mileage.toLocaleString()} mi</span>
           </div>
         </div>
 
-        <div className="h-px w-12 bg-gray-800 mb-6 group-hover:w-full group-hover:bg-tj-gold/50 transition-all duration-700 ease-out"></div>
-
-        <p className="font-serif text-gray-400 italic leading-loose mb-8 text-sm line-clamp-3 flex-grow opacity-60 group-hover:opacity-100 transition-opacity">
-          "{vehicle.description}"
-        </p>
-
-        <div className="flex items-end justify-between mt-auto border-t border-white/5 pt-6 relative z-10">
+        {/* Price + Dual CTA Row */}
+        <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/[0.04]">
           <div>
-            <p className="text-[8px] uppercase tracking-widest text-gray-400 mb-1 group-hover:text-tj-gold transition-colors">{t.common.price}</p>
-            <div className="flex items-baseline gap-2">
-              <p className="font-display text-xl text-white tracking-wider group-hover:scale-105 transition-transform origin-left">
-                {vehicle.price > 0 ? `$${vehicle.price.toLocaleString()}` : 'INQUIRE'}
-              </p>
-              <span className="text-[9px] font-bold text-red-900 uppercase tracking-widest group-hover:text-red-500 transition-colors">{t.common.asIs}</span>
-            </div>
+            <p className="font-display text-lg text-white tracking-wider">
+              {vehicle.price > 0 ? `$${vehicle.price.toLocaleString()}` : 'INQUIRE'}
+            </p>
+            {vehicle.dailyRate && (
+              <p className="text-[9px] font-mono text-tj-gold mt-0.5">${vehicle.dailyRate}{t.common.perDay}</p>
+            )}
           </div>
 
-          {vehicle.status !== VehicleStatus.SOLD && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onClick();
-              }}
-              className="group/btn flex items-center gap-2 bg-white/5 text-gray-300 px-4 py-3 min-h-[44px] text-xs font-bold uppercase tracking-[0.3em] transition-all hover:bg-tj-gold hover:text-black active:scale-95 border border-white/10 hover:border-tj-gold"
-            >
-              <span className="hidden md:inline">{t.common.expressInterest}</span>
-              <span className="md:hidden">View</span>
-              <ArrowUpRight size={14} className="group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1 transition-transform" />
-            </button>
+          {!isSold && (
+            <div className="flex gap-1.5">
+              <button
+                onClick={(e) => { e.stopPropagation(); onClick(); }}
+                className="group/btn px-3 py-2.5 min-h-[44px] text-[9px] font-bold uppercase tracking-[0.2em] transition-all active:scale-95 bg-white/[0.04] text-gray-400 border border-white/[0.08] hover:bg-white/10 hover:text-white hover:border-white/20"
+              >
+                {t.common.expressInterest}
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); onClick(); }}
+                className="group/btn px-3 py-2.5 min-h-[44px] text-[9px] font-bold uppercase tracking-[0.2em] transition-all active:scale-95 bg-tj-gold/10 text-tj-gold border border-tj-gold/20 hover:bg-tj-gold hover:text-black hover:border-tj-gold"
+              >
+                {t.common.bookNow}
+              </button>
+            </div>
           )}
         </div>
       </div>
@@ -182,10 +201,11 @@ const Inventory = () => {
   const [makeFilter, setMakeFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<SortOption>('alphabetical');
   const [searchTerm, setSearchTerm] = useState('');
+  const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'sale' | 'rental'>('all');
 
   // Modal State
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
-  const [modalTab, setModalTab] = useState<'overview' | 'specs' | 'transparency' | 'purchase'>('overview');
+  const [modalTab, setModalTab] = useState<'overview' | 'specs' | 'transparency' | 'purchase' | 'rent'>('overview');
   const [leadForm, setLeadForm] = useState({ name: '', email: '', phone: '' });
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [formError, setFormError] = useState<string>('');
@@ -259,7 +279,12 @@ const Inventory = () => {
       v.year.toString().includes(searchTerm) ||
       v.vin.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesStatus && matchesMake && matchesSearch;
+    // Filter by listing type
+    const matchesListingType = listingTypeFilter === 'all' ||
+      (listingTypeFilter === 'sale' && (!v.listingType || v.listingType === 'sale_only' || v.listingType === 'both')) ||
+      (listingTypeFilter === 'rental' && (v.listingType === 'rental_only' || v.listingType === 'both'));
+
+    return matchesStatus && matchesMake && matchesSearch && matchesListingType;
   });
 
   const sortedVehicles = [...filteredVehicles].sort((a, b) => {
@@ -281,7 +306,7 @@ const Inventory = () => {
     setLeadForm({ name: '', email: '', phone: '' });
     setSubmitStatus('idle');
     setFormError('');
-    setModalTab('overview');
+    setModalTab(vehicle.listingType === 'rental_only' ? 'rent' : 'overview');
     setModalImgIndex(0);
   }, []);
 
@@ -308,14 +333,14 @@ const Inventory = () => {
     // Validate phone number (must be 10 digits)
     const phoneDigits = leadForm.phone.replace(/\D/g, '');
     if (phoneDigits.length < 10) {
-      setFormError('Please enter a valid 10-digit phone number');
+      setFormError(t.inventory.formErrors.invalidPhone);
       setSubmitStatus('error');
       return;
     }
 
     // Validate name
     if (!leadForm.name.trim()) {
-      setFormError('Please enter your name');
+      setFormError(t.inventory.formErrors.nameRequired);
       setSubmitStatus('error');
       return;
     }
@@ -361,12 +386,66 @@ const Inventory = () => {
       setSubmitStatus('success');
     } catch (error) {
       console.error('Failed to submit lead:', error);
-      setFormError('Something went wrong. Please call us directly at (832) 400-9760');
+      setFormError(t.inventory.formErrors.genericError);
       setSubmitStatus('error');
     }
   };
 
+  const handleRentalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
 
+    const phoneDigits = leadForm.phone.replace(/\D/g, '');
+    if (phoneDigits.length < 10) {
+      setFormError(t.inventory.formErrors.invalidPhone);
+      setSubmitStatus('error');
+      return;
+    }
+    if (!leadForm.name.trim()) {
+      setFormError(t.inventory.formErrors.nameRequired);
+      setSubmitStatus('error');
+      return;
+    }
+
+    setSubmitStatus('submitting');
+    try {
+      await addLead({
+        id: Math.random().toString(36).substr(2, 9),
+        name: leadForm.name,
+        email: leadForm.email,
+        phone: leadForm.phone,
+        interest: `RENTAL inquiry: ${selectedVehicle?.year} ${selectedVehicle?.make} ${selectedVehicle?.model} (VIN: ${selectedVehicle?.vin})`,
+        date: new Date().toISOString(),
+        status: 'New'
+      });
+
+      if (selectedVehicle) {
+        const callResult = await triggerOutboundCall({
+          customer_name: leadForm.name.trim(),
+          phone_number: `+1${phoneDigits}`,
+          email: leadForm.email.trim(),
+          vehicle_year: selectedVehicle.year.toString(),
+          vehicle_make: selectedVehicle.make,
+          vehicle_model: selectedVehicle.model,
+          vehicle_full: `${selectedVehicle.year} ${selectedVehicle.make} ${selectedVehicle.model}`,
+          vehicle_price: selectedVehicle.dailyRate ? `$${selectedVehicle.dailyRate}/day` : 'Inquire',
+          vehicle_condition: selectedVehicle.description || 'No known issues',
+          vehicle_status: 'Rental Inquiry',
+          vehicle_id: selectedVehicle.id,
+          inquiry_source: 'Website Rental Inquiry',
+          inquiry_timestamp: new Date().toISOString()
+        });
+        if (!callResult.success) {
+          console.error('Retell rental call failed:', callResult.error);
+        }
+      }
+      setSubmitStatus('success');
+    } catch (error) {
+      console.error('Failed to submit rental lead:', error);
+      setFormError(t.inventory.formErrors.genericError);
+      setSubmitStatus('error');
+    }
+  };
 
   // For Modal Image Carousel
   const modalImages = selectedVehicle ? [selectedVehicle.imageUrl, ...(selectedVehicle.gallery || [])].filter(Boolean) : [];
@@ -476,11 +555,11 @@ const Inventory = () => {
                     onChange={(e) => setSortBy(e.target.value as SortOption)}
                   >
                     <option className="bg-black text-white" value="alphabetical">A-Z</option>
-                    <option className="bg-black text-white" value="price_desc">{t.common.price}: High-Low</option>
-                    <option className="bg-black text-white" value="price_asc">{t.common.price}: Low-High</option>
-                    <option className="bg-black text-white" value="year_desc">Year: Newest</option>
-                    <option className="bg-black text-white" value="year_asc">Year: Oldest</option>
-                    <option className="bg-black text-white" value="mileage_asc">Mileage: Low-High</option>
+                    <option className="bg-black text-white" value="price_desc">{t.inventory.sortOptions.priceHighLow}</option>
+                    <option className="bg-black text-white" value="price_asc">{t.inventory.sortOptions.priceLowHigh}</option>
+                    <option className="bg-black text-white" value="year_desc">{t.inventory.sortOptions.yearNewest}</option>
+                    <option className="bg-black text-white" value="year_asc">{t.inventory.sortOptions.yearOldest}</option>
+                    <option className="bg-black text-white" value="mileage_asc">{t.inventory.sortOptions.mileageLowHigh}</option>
                   </select>
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-tj-gold">
                     <ArrowDownUp size={10} />
@@ -498,7 +577,7 @@ const Inventory = () => {
                   >
                     {uniqueMakes.map(make => (
                       <option key={make} className="bg-black text-white" value={make}>
-                        {make === 'All' ? 'All Makes' : make}
+                        {make === 'All' ? t.inventory.sortOptions.allMakes : make}
                       </option>
                     ))}
                   </select>
@@ -526,13 +605,31 @@ const Inventory = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Listing Type Filter */}
+              <div className="flex items-center gap-4 bg-tj-dark border border-white/10 p-1 w-full md:w-auto">
+                <div className="relative group w-full">
+                  <select
+                    className="appearance-none bg-black text-white pl-4 pr-10 py-3 text-[10px] uppercase tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-tj-gold/50 focus:bg-white/5 transition-colors cursor-pointer w-full md:min-w-[140px]"
+                    value={listingTypeFilter}
+                    onChange={(e) => setListingTypeFilter(e.target.value as any)}
+                  >
+                    <option className="bg-black text-white" value="all">{t.common.allListings}</option>
+                    <option className="bg-black text-white" value="sale">{t.common.forSale}</option>
+                    <option className="bg-black text-white" value="rental">{t.common.forRent}</option>
+                  </select>
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-tj-gold">
+                    <Key size={10} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Loading State: Skeleton Grid */}
         {isLoading && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 mt-8 md:mt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mt-8 md:mt-12">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="bg-black border border-white/5 overflow-hidden">
                 <div className="aspect-[4/3] bg-gray-800 animate-pulse" />
@@ -604,7 +701,7 @@ const Inventory = () => {
         {!isLoading && sortedVehicles.length > 0 && (
           <motion.div
             layout
-            className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 mt-8 md:mt-12"
+            className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mt-8 md:mt-12"
           >
             <AnimatePresence mode="popLayout">
               {sortedVehicles.map((vehicle) => (
@@ -620,7 +717,7 @@ const Inventory = () => {
         )}
       </div>
 
-      {/* DETAILED REPORT MODAL (Rendered via Portal to bypass Stacking Contexts) */}
+      {/* VEHICLE DETAIL MODAL */}
       {typeof document !== 'undefined' && createPortal(
         <AnimatePresence>
           {selectedVehicle && (
@@ -628,90 +725,111 @@ const Inventory = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9999] flex items-center justify-center p-0 md:p-6"
+              className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center"
               style={{ overscrollBehavior: 'none' }}
             >
 
               {/* Backdrop */}
               <motion.div
-                className="absolute inset-0 bg-black/95 backdrop-blur-xl"
+                className="absolute inset-0 bg-black/90 backdrop-blur-lg"
                 onClick={handleCloseModal}
                 aria-hidden="true"
-              ></motion.div>
+              />
 
-              {/* Modal Container - FULL SCREEN ON MOBILE */}
+              {/* Modal Container */}
               <motion.div
                 ref={modalRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label={`${selectedVehicle.year} ${selectedVehicle.make} ${selectedVehicle.model} details`}
                 tabIndex={-1}
-                initial={{ scale: 0.95, y: 20 }}
-                animate={{ scale: 1, y: 0 }}
-                exit={{ scale: 0.95, y: 20 }}
-                className="relative w-full h-screen md:h-[85vh] md:max-h-[800px] max-w-7xl bg-[#080808] md:border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] flex flex-col md:flex-row overflow-hidden md:rounded-sm focus:outline-none"
+                initial={{ y: 40, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 40, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="relative w-full h-screen md:h-[90vh] md:max-h-[900px] max-w-6xl bg-black md:border border-white/[0.08] shadow-[0_0_80px_rgba(0,0,0,0.8)] flex flex-col md:flex-row overflow-hidden focus:outline-none"
                 style={{ height: 'calc(var(--vh, 1vh) * 100)', maxHeight: '100vh' }}
               >
 
-                {/* Close Button - Optimized Touch Target */}
+                {/* Close Button */}
                 <button
                   onClick={handleCloseModal}
                   aria-label="Close vehicle details"
-                  className="absolute top-4 right-4 z-30 text-white hover:text-tj-gold bg-black/80 backdrop-blur-md rounded-full p-4 md:p-3 border border-white/10 hover:border-tj-gold transition-all shadow-lg active:scale-90 focus:outline-none focus:ring-2 focus:ring-tj-gold"
+                  className="absolute top-4 right-4 z-40 w-11 h-11 flex items-center justify-center text-white/60 hover:text-white bg-black/60 backdrop-blur-md border border-white/10 hover:border-white/30 transition-all active:scale-90 focus:outline-none focus:ring-2 focus:ring-tj-gold"
                 >
-                  <X size={24} />
+                  <X size={18} />
                 </button>
 
-                {/* LEFT: Image Gallery (Mobile: Top 40% / Desktop: Left 55%) */}
-                <div className="w-full md:w-[55%] h-[40%] md:h-full bg-black relative flex flex-col border-b md:border-b-0 md:border-r border-white/10 shrink-0">
+                {/* LEFT: Image Gallery */}
+                <div className="w-full md:w-[55%] h-[38%] md:h-full bg-black relative flex flex-col shrink-0">
                   <div className="flex-grow relative overflow-hidden group select-none">
-                    {/* Clickable Image for Lightbox */}
+                    {/* Main Image */}
                     <button
-                      onClick={() => {
-                        setLightboxIndex(modalImgIndex);
-                        setLightboxOpen(true);
-                      }}
+                      onClick={() => { setLightboxIndex(modalImgIndex); setLightboxOpen(true); }}
                       className="w-full h-full cursor-zoom-in"
                     >
-                      <img
+                      <motion.img
+                        key={modalImgIndex}
+                        initial={{ opacity: 0.6 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.3 }}
                         src={modalImages[modalImgIndex]}
-                        alt={`${selectedVehicle.year} ${selectedVehicle.make} ${selectedVehicle.model} - detail view`}
-                        className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
+                        alt={`${selectedVehicle.year} ${selectedVehicle.make} ${selectedVehicle.model}`}
+                        className="w-full h-full object-contain bg-black"
                       />
-                      {/* Fullscreen Hint */}
-                      <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm text-white p-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-white/20">
-                        <ZoomIn size={14} />
-                        <span className="text-[9px] uppercase tracking-widest">Click to Fullscreen</span>
-                      </div>
                     </button>
+
+                    {/* Image Counter */}
+                    {modalImages.length > 1 && (
+                      <div className="absolute top-4 left-4 z-20 px-3 py-1.5 bg-black/50 backdrop-blur-sm text-[10px] font-mono text-white/70 tracking-wider pointer-events-none">
+                        {modalImgIndex + 1} / {modalImages.length}
+                      </div>
+                    )}
+
+                    {/* Fullscreen Hint */}
+                    <div className="absolute top-4 right-16 md:right-4 z-20 px-3 py-1.5 bg-black/50 backdrop-blur-sm text-[9px] text-white/40 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex items-center gap-1.5">
+                      <ZoomIn size={12} /> {t.inventory.modal.fullscreen}
+                    </div>
 
                     {/* Carousel Controls */}
                     {modalImages.length > 1 && (
                       <>
-                        <button onClick={prevModalImg} className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-black/80 to-transparent text-white flex items-center justify-center hover:text-tj-gold transition-colors z-20 active:bg-black/40">
-                          <ChevronLeft size={40} strokeWidth={1} />
+                        <button onClick={prevModalImg} className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-black/50 to-transparent text-white/40 flex items-center justify-center hover:text-white transition-colors z-20">
+                          <ChevronLeft size={28} strokeWidth={1.5} />
                         </button>
-                        <button onClick={nextModalImg} className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-black/80 to-transparent text-white flex items-center justify-center hover:text-tj-gold transition-colors z-20 active:bg-black/40">
-                          <ChevronRight size={40} strokeWidth={1} />
+                        <button onClick={nextModalImg} className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-black/50 to-transparent text-white/40 flex items-center justify-center hover:text-white transition-colors z-20">
+                          <ChevronRight size={28} strokeWidth={1.5} />
                         </button>
                       </>
                     )}
 
-                    {/* Mobile Only Title Overlay */}
-                    <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent z-20 md:hidden pointer-events-none">
-                      <p className="text-tj-gold text-[10px] uppercase tracking-widest mb-1">{selectedVehicle.year} {selectedVehicle.make}</p>
-                      <h2 className="text-white font-display text-3xl leading-none">{selectedVehicle.model}</h2>
+                    {/* Dot Indicators (Mobile) */}
+                    {modalImages.length > 1 && (
+                      <div className="absolute bottom-3 left-0 w-full flex justify-center gap-1.5 z-20 pointer-events-none md:hidden">
+                        {modalImages.map((_, i) => (
+                          <div key={i} className={`h-[3px] rounded-full transition-all duration-300 ${i === modalImgIndex ? 'bg-tj-gold w-5' : 'bg-white/30 w-[6px]'}`} />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Bottom Gradient */}
+                    <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black to-transparent z-10 pointer-events-none" />
+
+                    {/* Mobile Vehicle Title Overlay */}
+                    <div className="absolute bottom-0 left-0 right-0 p-5 z-20 md:hidden pointer-events-none">
+                      <p className="text-[9px] uppercase tracking-[0.3em] text-tj-gold mb-1">{selectedVehicle.year} {selectedVehicle.make}</p>
+                      <h2 className="text-white font-display text-2xl leading-none tracking-tight">{selectedVehicle.model}</h2>
                     </div>
                   </div>
 
-                  {/* Desktop Thumbnails */}
+                  {/* Desktop Thumbnail Strip */}
                   {modalImages.length > 1 && (
-                    <div className="hidden md:flex h-24 bg-[#050505] border-t border-white/10 overflow-x-auto scrollbar-none">
+                    <div className="hidden md:flex h-20 bg-black border-t border-white/[0.06] overflow-x-auto scrollbar-none">
                       {modalImages.map((img, idx) => (
                         <button
                           key={idx}
                           onClick={() => setModalImgIndex(idx)}
-                          className={`h-full aspect-[4/3] border-r border-white/10 relative ${modalImgIndex === idx ? 'opacity-100 border-t-2 border-t-tj-gold grayscale-0' : 'opacity-40 hover:opacity-100 grayscale'}`}
+                          className={`h-full aspect-[4/3] relative flex-shrink-0 transition-all ${modalImgIndex === idx ? 'opacity-100 ring-1 ring-inset ring-tj-gold' : 'opacity-30 hover:opacity-70'}`}
                         >
                           <img src={img} alt="" className="w-full h-full object-cover" />
                         </button>
@@ -720,312 +838,479 @@ const Inventory = () => {
                   )}
                 </div>
 
-                {/* RIGHT: Content & Tabs */}
-                <div className="w-full md:w-[45%] flex flex-col bg-[#080808] h-[60%] md:h-full relative">
+                {/* RIGHT: Content Panel */}
+                <div className="w-full md:w-[45%] flex flex-col bg-[#060606] h-[62%] md:h-full relative">
 
-                  {/* Desktop Header */}
-                  <div className="hidden md:block p-8 border-b border-white/10 shrink-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-tj-gold font-bold text-xs uppercase tracking-widest flex items-center gap-2"><Target size={12} /> Vehicle Details</span>
-                      <span className="bg-red-900/20 text-red-500 text-[9px] px-2 py-0.5 uppercase tracking-widest font-bold border border-red-900/50">AS-IS</span>
+                  {/* Desktop Vehicle Header */}
+                  <div className="hidden md:flex flex-col p-7 pb-5 border-b border-white/[0.06] shrink-0">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <p className="text-[9px] uppercase tracking-[0.3em] text-gray-400 mb-2">{selectedVehicle.year} {selectedVehicle.make}</p>
+                        <h2 className="font-display text-3xl text-white leading-none tracking-tight">{selectedVehicle.model}</h2>
+                      </div>
+                      <div className="text-right flex-shrink-0 ml-4">
+                        <p className="text-tj-gold font-display text-2xl tracking-wide">
+                          {selectedVehicle.price > 0 ? `$${selectedVehicle.price.toLocaleString()}` : 'INQUIRE'}
+                        </p>
+                        {selectedVehicle.dailyRate && (
+                          <p className="text-[9px] font-mono text-gray-400 mt-1">${selectedVehicle.dailyRate}{t.common.perDay}</p>
+                        )}
+                      </div>
                     </div>
-                    <h2 className="font-display text-4xl text-white leading-none mb-1">{selectedVehicle.year} {selectedVehicle.model}</h2>
-                    <p className="text-gray-400 text-xs font-mono">{selectedVehicle.vin}</p>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[9px] font-mono text-gray-400">{selectedVehicle.vin}</span>
+                      <span className="px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-white/[0.04] border border-white/[0.08] text-gray-400">
+                        {selectedVehicle.mileage.toLocaleString()} mi
+                      </span>
+                      <span className="px-2 py-0.5 text-[8px] uppercase tracking-widest font-bold bg-red-950/40 border border-red-900/30 text-red-400">
+                        AS-IS
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Tabs - Sticky & Scrollable */}
-                  <div className="flex border-b border-white/10 overflow-x-auto scrollbar-none bg-[#050505] sticky top-0 z-30 shadow-lg shrink-0">
-                    <button
-                      onClick={() => setModalTab('overview')}
-                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'overview' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-400 hover:text-white'}`}
-                    >
-                      {t.inventory.modal.tabs.overview}
-                    </button>
-                    <button
-                      onClick={() => setModalTab('specs')}
-                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'specs' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-400 hover:text-white'}`}
-                    >
-                      {t.inventory.modal.tabs.specs}
-                    </button>
-                    <button
-                      onClick={() => setModalTab('transparency')}
-                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'transparency' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-400 hover:text-white'}`}
-                    >
-                      {t.inventory.modal.tabs.transparency}
-                    </button>
-                    <button
-                      onClick={() => setModalTab('purchase')}
-                      className={`flex-1 py-4 px-4 text-[10px] uppercase tracking-widest font-bold transition-colors whitespace-nowrap ${modalTab === 'purchase' ? 'bg-white/5 text-tj-gold border-b-2 border-tj-gold' : 'text-gray-400 hover:text-white'}`}
-                    >
-                      {t.inventory.modal.tabs.purchase}
-                    </button>
+                  {/* Tab Bar */}
+                  <div className="flex border-b border-white/[0.06] overflow-x-auto scrollbar-none bg-black/40 sticky top-0 z-30 shrink-0">
+                    {[
+                      { key: 'overview', label: t.inventory.modal.tabs.overview },
+                      { key: 'specs', label: t.inventory.modal.tabs.specs },
+                      { key: 'transparency', label: t.inventory.modal.tabs.transparency },
+                      { key: 'purchase', label: t.inventory.modal.tabs.purchase },
+                      ...(isRentable(selectedVehicle) ? [{ key: 'rent', label: t.inventory.rental.tabLabel }] : []),
+                    ].map(tab => (
+                      <button
+                        key={tab.key}
+                        onClick={() => setModalTab(tab.key as typeof modalTab)}
+                        className={`flex-1 py-3.5 px-3 text-[9px] uppercase tracking-[0.15em] font-bold transition-all whitespace-nowrap relative ${
+                          modalTab === tab.key
+                            ? 'text-tj-gold'
+                            : 'text-gray-400 hover:text-gray-300'
+                        }`}
+                      >
+                        {tab.label}
+                        {modalTab === tab.key && (
+                          <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-[2px] bg-tj-gold" />
+                        )}
+                      </button>
+                    ))}
                   </div>
 
-                  {/* Tab Content Area - Scrollable with bottom padding for FAB */}
-                  <div className="flex-grow p-6 md:p-8 overflow-y-auto custom-scrollbar bg-[#080808] pb-32 md:pb-8">
+                  {/* Tab Content */}
+                  <div className="flex-grow p-5 md:p-7 overflow-y-auto custom-scrollbar bg-[#060606] pb-28 md:pb-6">
 
+                    {/* OVERVIEW TAB */}
                     {modalTab === 'overview' && (
-                      <div className="space-y-6 animate-fade-in">
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="p-4 bg-white/5 border border-white/5">
-                            <p className="text-[10px] uppercase text-gray-400 tracking-widest mb-1">{t.common.mileage}</p>
-                            <p className="text-white font-mono text-lg">{selectedVehicle.mileage.toLocaleString()}</p>
+                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+                        {/* Quick Stats */}
+                        <div className="grid grid-cols-3 gap-1">
+                          <div className="p-3 bg-white/[0.02] border border-white/[0.06] text-center">
+                            <p className="text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.common.mileage}</p>
+                            <p className="text-white font-mono text-sm">{selectedVehicle.mileage.toLocaleString()}</p>
                           </div>
-                          <div className="p-4 bg-white/5 border border-white/5">
-                            <p className="text-[10px] uppercase text-gray-400 tracking-widest mb-1">{t.common.price}</p>
-                            <p className="text-tj-gold font-display text-xl">${selectedVehicle.price.toLocaleString()}</p>
+                          <div className="p-3 bg-white/[0.02] border border-white/[0.06] text-center">
+                            <p className="text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.common.price}</p>
+                            <p className="text-tj-gold font-display text-sm">${selectedVehicle.price.toLocaleString()}</p>
                           </div>
-                        </div>
-
-                        <div className="relative pl-6 border-l border-tj-gold/30">
-                          <div className="absolute top-0 left-[-2px] w-1 h-8 bg-tj-gold"></div>
-                          <p className="text-gray-300 font-serif italic leading-loose text-sm">
-                            "{selectedVehicle.description}"
-                          </p>
-                        </div>
-
-                        {/* Snapshot of Diagnostics in Overview */}
-                        <div className="bg-red-900/10 p-4 border border-red-900/30">
-                          <h3 className="text-[10px] uppercase tracking-widest text-tj-gold mb-3 flex items-center gap-2">
-                            <ShieldAlert size={14} /> Condition Snapshot
-                          </h3>
-                          {selectedVehicle.diagnostics && selectedVehicle.diagnostics.length > 0 ? (
-                            <ul className="space-y-2">
-                              {selectedVehicle.diagnostics.slice(0, 3).map((issue, i) => (
-                                <li key={i} className="flex items-start gap-2 text-[10px] text-gray-400 font-mono">
-                                  <span className="text-red-500">!</span> {issue}
-                                </li>
-                              ))}
-                              {selectedVehicle.diagnostics.length > 3 && (
-                                <li className="text-[10px] text-gray-400 italic pt-1">
-                                  ... {selectedVehicle.diagnostics.length - 3} more issues logged.
-                                </li>
-                              )}
-                            </ul>
-                          ) : (
-                            <p className="text-[10px] text-green-500 flex items-center gap-2">
-                              <CheckCircle size={14} /> Systems Nominal / Clean Scan
-                            </p>
-                          )}
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setModalTab('transparency'); }}
-                            className="text-[10px] uppercase tracking-widest text-gray-400 hover:text-white mt-3 underline decoration-gray-700 underline-offset-4"
-                          >
-                            Review Full Diagnostics
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {modalTab === 'specs' && (
-                      <div className="space-y-6 animate-fade-in">
-                        {/* VIN Card */}
-                        <div className="p-4 bg-white/5 border border-white/10 flex items-center justify-between">
-                          <div>
-                            <p className="text-[10px] uppercase text-gray-400 tracking-widest">VIN Identity</p>
-                            <p className="text-white font-mono text-xs mt-1">{selectedVehicle.vin}</p>
-                          </div>
-                          <ClipboardCheck className="text-tj-gold opacity-50" />
-                        </div>
-
-                        {/* Exterior Section */}
-                        <div className="bg-black/40 p-5 border border-white/5">
-                          <h3 className="text-gray-400 text-[10px] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                            <Eye size={14} className="text-tj-gold" /> Exterior Systems
-                          </h3>
-                          <div className="space-y-3">
-                            <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-400 text-xs">Paint Finish</span>
-                              <span className="text-white text-xs font-mono">Original Spec</span>
-                            </div>
-                            <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-400 text-xs">Body Integrity</span>
-                              <span className="text-white text-xs font-mono">Structured</span>
-                            </div>
-                            <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-400 text-xs">Glass/Optics</span>
-                              <span className="text-white text-xs font-mono">Inspection Complete</span>
-                            </div>
+                          <div className="p-3 bg-white/[0.02] border border-white/[0.06] text-center">
+                            <p className="text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.common.status}</p>
+                            <p className="text-white text-sm">{selectedVehicle.status}</p>
                           </div>
                         </div>
 
-                        {/* Interior Section */}
-                        <div className="bg-black/40 p-5 border border-white/5">
-                          <h3 className="text-gray-400 text-[10px] uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                            <Layers size={14} className="text-tj-gold" /> Interior Configuration
-                          </h3>
-                          <div className="space-y-3">
-                            <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-400 text-xs">Upholstery</span>
-                              <span className="text-white text-xs font-mono">Verified Clean</span>
-                            </div>
-                            <div className="flex justify-between border-b border-white/5 pb-2">
-                              <span className="text-gray-400 text-xs">Controls & Electronics</span>
-                              <span className="text-white text-xs font-mono">Functional</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* NEW TRANSPARENCY TAB */}
-                    {modalTab === 'transparency' && (
-                      <div className="space-y-6 animate-fade-in">
-                        <div className="bg-tj-gold/10 border border-tj-gold p-4 mb-4">
-                          <p className="text-tj-gold text-[10px] uppercase tracking-[0.2em] font-bold mb-1 flex items-center gap-2">
-                            <ShieldAlert size={14} /> Transparency Protocol
-                          </p>
-                          <p className="text-xs text-gray-400 leading-relaxed">
-                            We believe in absolute clarity. The following diagnostic notes are provided by our team to ensure you have a complete operational picture.
-                          </p>
-                        </div>
-
-                        <div className="bg-black p-6 border border-white/10">
-                          <h3 className="text-white text-xs uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
-                            <ClipboardCheck size={14} className="text-tj-gold" /> Mechanic's Diagnostic Log
-                          </h3>
-
-                          {selectedVehicle.diagnostics && selectedVehicle.diagnostics.length > 0 ? (
-                            <ul className="space-y-3">
-                              {selectedVehicle.diagnostics.map((issue, i) => (
-                                <li key={i} className="flex items-start gap-3 text-xs text-gray-300 font-mono border-b border-gray-800 pb-2 last:border-0">
-                                  <span className="text-tj-gold mt-1">{'>'}{'>'}</span>
-                                  {issue}
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <div className="text-center py-8 opacity-50">
-                              <CheckCircle className="mx-auto text-green-500 mb-2" size={24} />
-                              <p className="text-xs text-gray-400 uppercase tracking-widest">No Major Faults Logged</p>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex items-center gap-3 p-4 border border-gray-800 bg-white/5">
-                          <MapPin size={16} className="text-gray-400" />
-                          <div>
-                            <p className="text-[10px] uppercase tracking-widest text-gray-400">Physical Location</p>
-                            <p className="text-white text-xs">Houston, TX (77075)</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {modalTab === 'purchase' && (
-                      <div className="animate-fade-in h-full flex flex-col">
-                        {submitStatus === 'success' ? (
-                          <div className="text-center py-8 flex-grow flex flex-col justify-center">
-                            <div className="w-16 h-16 mx-auto border border-tj-gold rounded-full flex items-center justify-center bg-tj-gold/10 animate-gold-pulse mb-6">
-                              <Phone className="text-tj-gold" size={24} />
-                            </div>
-                            <h3 className="font-display text-xl text-white tracking-widest mb-2">DIVINE WILL CALL YOU</h3>
-                            <p className="text-gray-400 text-xs mb-4 leading-relaxed max-w-xs mx-auto">
-                              Our advisor Divine will call you within the next few minutes to discuss the{' '}
-                              <span className="text-tj-gold">{selectedVehicle?.year} {selectedVehicle?.make} {selectedVehicle?.model}</span>.
-                            </p>
-                            <p className="text-[10px] text-gray-400 uppercase tracking-widest mb-8">
-                              Keep your phone nearby
-                            </p>
-                            <a href="tel:+18324009760" className="w-full bg-white/10 text-white font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-tj-gold hover:text-black transition-colors flex items-center justify-center gap-2 mb-4 border border-white/20">
-                              <Phone size={16} /> Can't Wait? Call Us Now
-                            </a>
-                          </div>
-                        ) : (
-                          <form onSubmit={handleSubmit} className="space-y-4 flex-grow flex flex-col">
-                            <div className="flex-grow space-y-4">
-                              <div>
-                                <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Your Name</label>
-                                <input
-                                  required
-                                  type="text"
-                                  value={leadForm.name}
-                                  onChange={e => setLeadForm({ ...leadForm, name: e.target.value })}
-                                  className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
-                                  placeholder="Full Name / Nombre Completo"
-                                />
+                        {/* Rental Rates */}
+                        {isRentable(selectedVehicle) && selectedVehicle.dailyRate && (
+                          <div className="flex items-center justify-between p-4 bg-tj-gold/[0.03] border border-tj-gold/20">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 flex items-center justify-center bg-tj-gold/10 border border-tj-gold/30">
+                                <Key size={14} className="text-tj-gold" />
                               </div>
                               <div>
-                                <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Phone Number</label>
-                                <input
-                                  required
-                                  type="tel"
-                                  value={leadForm.phone}
-                                  onChange={e => handlePhoneChange(e.target.value)}
-                                  className={`w-full bg-black border p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors font-mono ${
-                                    submitStatus === 'error' && formError.includes('phone') ? 'border-red-500' : 'border-gray-700'
-                                  }`}
-                                  placeholder="(832) 400-9760"
-                                  maxLength={14}
-                                />
-                              </div>
-                              <div>
-                                <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-1">Email</label>
-                                <input
-                                  type="email"
-                                  value={leadForm.email}
-                                  onChange={e => setLeadForm({ ...leadForm, email: e.target.value })}
-                                  className="w-full bg-black border border-gray-700 p-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-2 focus:ring-tj-gold/50 transition-colors"
-                                  placeholder="email@address.com"
-                                />
-                              </div>
-                              {/* Error Message Display */}
-                              {submitStatus === 'error' && formError && (
-                                <div className="flex items-center gap-2 p-3 bg-red-900/20 border border-red-500/50 animate-shake">
-                                  <AlertTriangle size={16} className="text-red-400 flex-shrink-0" />
-                                  <p className="text-xs text-red-400">{formError}</p>
-                                </div>
-                              )}
-
-                              <div className="flex items-center gap-2 p-3 bg-red-900/10 border border-red-900/30">
-                                <ShieldAlert size={16} className="text-red-500 flex-shrink-0" />
-                                <p className="text-[10px] text-gray-400 leading-tight">
-                                  {t.inventory.modal.disclaimer}
+                                <p className="text-white font-mono text-sm">
+                                  ${selectedVehicle.dailyRate}{t.common.perDay}
+                                  {selectedVehicle.weeklyRate && (
+                                    <span className="text-gray-400 text-xs ml-2">/ ${selectedVehicle.weeklyRate}{t.common.perWeek}</span>
+                                  )}
                                 </p>
                               </div>
                             </div>
-
                             <button
-                              type="submit"
-                              disabled={submitStatus === 'submitting'}
-                              className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2 mt-auto shadow-[0_0_20px_rgba(212,175,55,0.2)]"
+                              onClick={() => setModalTab('rent')}
+                              className="px-4 py-2.5 min-h-[44px] bg-tj-gold text-black text-[9px] uppercase tracking-widest font-bold hover:bg-white transition-colors"
                             >
-                              {submitStatus === 'submitting' ? (
-                                <Loader2 className="animate-spin" size={16} />
-                              ) : (
-                                <>
-                                  {t.inventory.modal.submit} <ArrowUpRight size={16} />
-                                </>
+                              {t.common.bookNow}
+                            </button>
+                          </div>
+                        )}
+
+                        {/* Description */}
+                        {selectedVehicle.description && (
+                          <div className="py-4 border-y border-white/[0.04]">
+                            <p className="text-gray-400 text-sm leading-relaxed">
+                              {selectedVehicle.description}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Condition */}
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-[9px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center gap-2">
+                              <ShieldAlert size={12} className="text-tj-gold" /> {t.inventory.modal.conditionReport}
+                            </h4>
+                            <button
+                              onClick={() => setModalTab('transparency')}
+                              className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-tj-gold transition-colors"
+                            >
+                              {t.inventory.modal.viewFullReport}
+                            </button>
+                          </div>
+                          {selectedVehicle.diagnostics && selectedVehicle.diagnostics.length > 0 ? (
+                            <div className="space-y-1.5">
+                              {selectedVehicle.diagnostics.slice(0, 3).map((issue, i) => (
+                                <div key={i} className="flex items-start gap-2 p-2.5 bg-white/[0.02] border border-white/[0.04]">
+                                  <AlertTriangle size={11} className="text-amber-500 flex-shrink-0 mt-0.5" />
+                                  <p className="text-[11px] text-gray-400 font-mono leading-relaxed">{issue}</p>
+                                </div>
+                              ))}
+                              {selectedVehicle.diagnostics.length > 3 && (
+                                <p className="text-[10px] text-gray-400 pl-2">+ {selectedVehicle.diagnostics.length - 3} {t.inventory.modal.moreNoted}</p>
                               )}
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 p-3 bg-green-950/20 border border-green-900/20">
+                              <CheckCircle size={14} className="text-green-500" />
+                              <p className="text-[11px] text-green-400">{t.inventory.modal.noIssues}</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Action Buttons (Desktop) */}
+                        <div className="hidden md:flex gap-2 pt-2">
+                          <button
+                            onClick={() => setModalTab('purchase')}
+                            className="flex-1 py-3.5 min-h-[44px] text-[9px] font-bold uppercase tracking-[0.2em] bg-white/[0.04] text-gray-300 border border-white/[0.08] hover:bg-white/10 hover:text-white transition-all active:scale-[0.98]"
+                          >
+                            {t.inventory.modal.tabs.purchase}
+                          </button>
+                          <button
+                            onClick={() => setModalTab('rent')}
+                            className="flex-1 py-3.5 min-h-[44px] text-[9px] font-bold uppercase tracking-[0.2em] bg-tj-gold text-black hover:bg-white transition-all active:scale-[0.98]"
+                          >
+                            {t.common.bookNow}
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* SPECS TAB */}
+                    {modalTab === 'specs' && (
+                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+                        {/* VIN */}
+                        <div className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/[0.06]">
+                          <div>
+                            <p className="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-1">VIN</p>
+                            <p className="text-white font-mono text-xs tracking-wider">{selectedVehicle.vin}</p>
+                          </div>
+                          <Fingerprint size={20} className="text-tj-gold/20" />
+                        </div>
+
+                        {/* Spec Rows */}
+                        <div className="space-y-0">
+                          {[
+                            { label: t.common.year, value: selectedVehicle.year.toString() },
+                            { label: t.inventory.modal.specs.make, value: selectedVehicle.make },
+                            { label: t.inventory.modal.specs.model, value: selectedVehicle.model },
+                            { label: t.common.mileage, value: `${selectedVehicle.mileage.toLocaleString()} mi` },
+                          ].map((spec, i) => (
+                            <div key={i} className="flex justify-between items-center py-3 border-b border-white/[0.04]">
+                              <span className="text-gray-400 text-xs">{spec.label}</span>
+                              <span className="text-white text-sm font-mono">{spec.value}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Systems */}
+                        <div>
+                          <h4 className="text-[9px] uppercase tracking-[0.2em] text-tj-gold font-bold mb-4 flex items-center gap-2">
+                            <Eye size={12} /> {t.inventory.modal.specs.exterior}
+                          </h4>
+                          <div className="space-y-0">
+                            {[t.inventory.modal.specs.paintFinish, t.inventory.modal.specs.bodyIntegrity, t.inventory.modal.specs.glassOptics].map((item, i) => (
+                              <div key={i} className="flex justify-between items-center py-2.5 border-b border-white/[0.04]">
+                                <span className="text-gray-400 text-xs">{item}</span>
+                                <span className="flex items-center gap-1.5 text-xs">
+                                  <CheckCircle size={11} className="text-green-500/60" />
+                                  <span className="text-gray-300 font-mono">{t.inventory.modal.specs.inspected}</span>
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div>
+                          <h4 className="text-[9px] uppercase tracking-[0.2em] text-tj-gold font-bold mb-4 flex items-center gap-2">
+                            <Layers size={12} /> {t.inventory.modal.specs.interior}
+                          </h4>
+                          <div className="space-y-0">
+                            {[t.inventory.modal.specs.upholstery, t.inventory.modal.specs.controlsElectronics, t.inventory.modal.specs.climateSystem].map((item, i) => (
+                              <div key={i} className="flex justify-between items-center py-2.5 border-b border-white/[0.04]">
+                                <span className="text-gray-400 text-xs">{item}</span>
+                                <span className="flex items-center gap-1.5 text-xs">
+                                  <CheckCircle size={11} className="text-green-500/60" />
+                                  <span className="text-gray-300 font-mono">{t.inventory.modal.specs.functional}</span>
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* TRANSPARENCY TAB */}
+                    {modalTab === 'transparency' && (
+                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-5">
+                        <div className="p-4 bg-tj-gold/[0.03] border border-tj-gold/20">
+                          <h4 className="text-[9px] uppercase tracking-[0.2em] text-tj-gold font-bold mb-2 flex items-center gap-2">
+                            <ShieldAlert size={12} /> {t.inventory.modal.transparencyProtocol}
+                          </h4>
+                          <p className="text-xs text-gray-400 leading-relaxed">
+                            {t.inventory.modal.transparencyDesc}
+                          </p>
+                        </div>
+
+                        <div className="space-y-2">
+                          <h4 className="text-[9px] uppercase tracking-[0.2em] text-gray-400 font-bold flex items-center gap-2 mb-3">
+                            <ClipboardCheck size={12} className="text-tj-gold" /> {t.inventory.modal.diagnosticLog}
+                          </h4>
+                          {selectedVehicle.diagnostics && selectedVehicle.diagnostics.length > 0 ? (
+                            <div className="space-y-1.5">
+                              {selectedVehicle.diagnostics.map((issue, i) => (
+                                <div key={i} className="flex items-start gap-3 p-3 bg-white/[0.02] border border-white/[0.04]">
+                                  <span className="text-tj-gold text-[10px] font-mono mt-0.5">{String(i + 1).padStart(2, '0')}</span>
+                                  <p className="text-xs text-gray-400 font-mono leading-relaxed">{issue}</p>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-center py-10 border border-white/[0.04]">
+                              <CheckCircle className="mx-auto text-green-500/60 mb-3" size={28} />
+                              <p className="text-xs text-gray-400 uppercase tracking-widest">{t.inventory.modal.noFaultsLogged}</p>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-3 p-4 bg-white/[0.02] border border-white/[0.06]">
+                          <MapPin size={14} className="text-gray-400" />
+                          <div>
+                            <p className="text-[9px] uppercase tracking-widest text-gray-400">{t.inventory.modal.location}</p>
+                            <p className="text-gray-300 text-xs">Houston, TX (77075)</p>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* PURCHASE TAB */}
+                    {modalTab === 'purchase' && (
+                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col">
+                        {submitStatus === 'success' ? (
+                          <div className="flex-grow flex flex-col items-center justify-center text-center px-4">
+                            <motion.div
+                              initial={{ scale: 0 }}
+                              animate={{ scale: 1 }}
+                              transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.1 }}
+                              className="relative mb-8"
+                            >
+                              <div className="w-20 h-20 rounded-full border-2 border-tj-gold/40 flex items-center justify-center bg-tj-gold/5">
+                                <CheckCircle className="text-tj-gold" size={36} />
+                              </div>
+                              <div className="absolute -inset-3 rounded-full border border-tj-gold/10 animate-pulse" />
+                            </motion.div>
+                            <h3 className="font-display text-2xl text-white tracking-wider mb-3">{t.inventory.modal.allSet}</h3>
+                            <p className="text-gray-400 text-sm leading-relaxed max-w-sm mb-1">
+                              {t.inventory.modal.advisorMsg}
+                            </p>
+                            <p className="text-tj-gold font-display text-lg tracking-wide mb-8">
+                              {selectedVehicle?.year} {selectedVehicle?.make} {selectedVehicle?.model}
+                            </p>
+                            <div className="w-full max-w-sm space-y-3">
+                              <a href="tel:+18324009760" className="w-full flex items-center justify-center gap-2 bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors">
+                                <Phone size={16} /> {t.inventory.modal.callUsNow}
+                              </a>
+                              <button onClick={handleCloseModal} className="w-full py-3 text-[10px] uppercase tracking-widest text-gray-400 hover:text-white transition-colors">
+                                {t.inventory.modal.backToInventory}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <form onSubmit={handleSubmit} className="flex-grow flex flex-col">
+                            {/* Vehicle Summary */}
+                            <div className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/[0.06] mb-5">
+                              <img src={modalImages[0]} alt="" className="w-14 h-10 object-cover opacity-80" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white font-display text-sm truncate">{selectedVehicle?.year} {selectedVehicle?.make} {selectedVehicle?.model}</p>
+                                <p className="text-gray-400 text-[9px] font-mono truncate">{selectedVehicle?.vin}</p>
+                              </div>
+                              <p className="text-tj-gold font-display text-lg flex-shrink-0">
+                                {selectedVehicle && selectedVehicle.price > 0 ? `$${selectedVehicle.price.toLocaleString()}` : 'TBD'}
+                              </p>
+                            </div>
+
+                            {/* Form */}
+                            <div className="flex-grow space-y-3">
+                              <div className="relative group/input">
+                                <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/input:text-tj-gold transition-colors" />
+                                <input required type="text" value={leadForm.name}
+                                  onChange={e => setLeadForm({ ...leadForm, name: e.target.value })}
+                                  className="w-full bg-black/50 border border-white/10 pl-12 pr-4 py-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-1 focus:ring-tj-gold/30 transition-all placeholder-gray-600"
+                                  placeholder={t.inventory.modal.form.name} />
+                              </div>
+                              <div className="relative group/input">
+                                <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/input:text-tj-gold transition-colors" />
+                                <input required type="tel" value={leadForm.phone}
+                                  onChange={e => handlePhoneChange(e.target.value)}
+                                  className={`w-full bg-black/50 border pl-12 pr-4 py-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-1 focus:ring-tj-gold/30 transition-all placeholder-gray-600 font-mono ${
+                                    submitStatus === 'error' && formError.includes('phone') ? 'border-red-500' : 'border-white/10'
+                                  }`}
+                                  placeholder="(832) 400-9760" maxLength={14} />
+                              </div>
+                              <div className="relative group/input">
+                                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/input:text-tj-gold transition-colors" />
+                                <input type="email" value={leadForm.email}
+                                  onChange={e => setLeadForm({ ...leadForm, email: e.target.value })}
+                                  className="w-full bg-black/50 border border-white/10 pl-12 pr-4 py-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-1 focus:ring-tj-gold/30 transition-all placeholder-gray-600"
+                                  placeholder="email@address.com" />
+                              </div>
+                              {submitStatus === 'error' && formError && (
+                                <div className="flex items-center gap-2 px-4 py-3 bg-red-950/40 border border-red-500/30">
+                                  <AlertTriangle size={14} className="text-red-400 flex-shrink-0" />
+                                  <p className="text-xs text-red-400">{formError}</p>
+                                </div>
+                              )}
+                              <div className="flex items-start gap-3 px-4 py-3 bg-white/[0.02] border border-white/[0.05]">
+                                <Shield size={14} className="text-gray-400 flex-shrink-0 mt-0.5" />
+                                <p className="text-[10px] text-gray-400 leading-relaxed">{t.inventory.modal.disclaimer}</p>
+                              </div>
+                            </div>
+                            <button type="submit" disabled={submitStatus === 'submitting'}
+                              className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-all disabled:opacity-50 flex items-center justify-center gap-2 mt-5 shadow-[0_0_30px_rgba(212,175,55,0.15)]">
+                              {submitStatus === 'submitting' ? <Loader2 className="animate-spin" size={16} /> : <>{t.inventory.modal.submit} <ArrowUpRight size={16} /></>}
                             </button>
                           </form>
                         )}
-                      </div>
+                      </motion.div>
+                    )}
+
+                    {/* RENT TAB */}
+                    {modalTab === 'rent' && selectedVehicle && (
+                      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="h-full flex flex-col">
+                        {submitStatus === 'success' ? (
+                          <div className="flex-grow flex flex-col items-center justify-center text-center px-4">
+                            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 180, damping: 14, delay: 0.1 }} className="relative mb-8">
+                              <div className="w-20 h-20 rounded-full border-2 border-tj-gold/40 flex items-center justify-center bg-tj-gold/5">
+                                <Key className="text-tj-gold" size={36} />
+                              </div>
+                              <div className="absolute -inset-3 rounded-full border border-tj-gold/10 animate-pulse" />
+                            </motion.div>
+                            <h3 className="font-display text-2xl text-white tracking-wider mb-3">{t.inventory.rental.successTitle}</h3>
+                            <p className="text-gray-400 text-sm leading-relaxed max-w-sm mb-1">{t.inventory.rental.successMsg}</p>
+                            <p className="text-tj-gold font-display text-lg tracking-wide mb-8">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</p>
+                            <div className="w-full max-w-sm space-y-3">
+                              <a href="tel:+18324009760" className="w-full flex items-center justify-center gap-2 bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-colors">
+                                <Phone size={16} /> {t.common.phone}
+                              </a>
+                              <button onClick={handleCloseModal} className="w-full py-3 text-[10px] uppercase tracking-widest text-gray-400 hover:text-white transition-colors">{t.inventory.modal.backToInventory}</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <form onSubmit={handleRentalSubmit} className="flex-grow flex flex-col">
+                            {/* Vehicle + Rates */}
+                            <div className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/[0.06] mb-4">
+                              <img src={modalImages[0]} alt="" className="w-14 h-10 object-cover opacity-80" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-white font-display text-sm truncate">{selectedVehicle.year} {selectedVehicle.make} {selectedVehicle.model}</p>
+                                <p className="text-gray-400 text-[9px] font-mono truncate">{selectedVehicle.vin}</p>
+                              </div>
+                            </div>
+                            <div className="flex border border-tj-gold/20 mb-5 overflow-hidden">
+                              <div className="flex-1 p-3 bg-tj-gold/[0.04] text-center border-r border-tj-gold/20">
+                                <p className="text-[9px] uppercase tracking-widest text-gray-400 mb-1">{t.common.dailyRate}</p>
+                                <p className="text-white font-mono text-lg">{selectedVehicle.dailyRate ? `$${selectedVehicle.dailyRate}` : '—'}</p>
+                              </div>
+                              <div className="flex-1 p-3 bg-tj-gold/[0.04] text-center">
+                                <p className="text-[9px] uppercase tracking-widest text-gray-400 mb-1">{t.common.weeklyRate}</p>
+                                <p className="text-white font-mono text-lg">{selectedVehicle.weeklyRate ? `$${selectedVehicle.weeklyRate}` : '—'}</p>
+                              </div>
+                            </div>
+                            {/* Form */}
+                            <div className="flex-grow space-y-3">
+                              <p className="text-gray-400 text-xs leading-relaxed mb-1">{t.inventory.rental.formSubtitle}</p>
+                              <div className="relative group/input">
+                                <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/input:text-tj-gold transition-colors" />
+                                <input required type="text" value={leadForm.name} onChange={e => setLeadForm({...leadForm, name: e.target.value})}
+                                  className="w-full bg-black/50 border border-white/10 pl-12 pr-4 py-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-1 focus:ring-tj-gold/30 transition-all placeholder-gray-600"
+                                  placeholder={t.inventory.modal.form.name} />
+                              </div>
+                              <div className="relative group/input">
+                                <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/input:text-tj-gold transition-colors" />
+                                <input required type="tel" value={leadForm.phone} onChange={e => handlePhoneChange(e.target.value)}
+                                  className="w-full bg-black/50 border border-white/10 pl-12 pr-4 py-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-1 focus:ring-tj-gold/30 transition-all placeholder-gray-600 font-mono"
+                                  placeholder="(832) 400-9760" maxLength={14} />
+                              </div>
+                              <div className="relative group/input">
+                                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within/input:text-tj-gold transition-colors" />
+                                <input type="email" value={leadForm.email} onChange={e => setLeadForm({...leadForm, email: e.target.value})}
+                                  className="w-full bg-black/50 border border-white/10 pl-12 pr-4 py-4 text-white text-sm focus:border-tj-gold outline-none focus:ring-1 focus:ring-tj-gold/30 transition-all placeholder-gray-600"
+                                  placeholder={t.inventory.modal.form.email} />
+                              </div>
+                              {submitStatus === 'error' && formError && (
+                                <div className="flex items-center gap-2 px-4 py-3 bg-red-950/40 border border-red-500/30">
+                                  <AlertTriangle size={14} className="text-red-400 flex-shrink-0" />
+                                  <p className="text-xs text-red-400">{formError}</p>
+                                </div>
+                              )}
+                              <div className="flex items-start gap-3 px-4 py-3 bg-white/[0.02] border border-white/[0.05]">
+                                <Shield size={14} className="text-gray-400 flex-shrink-0 mt-0.5" />
+                                <p className="text-[10px] text-gray-400 leading-relaxed">{t.inventory.rental.disclaimer}</p>
+                              </div>
+                            </div>
+                            <button type="submit" disabled={submitStatus === 'submitting'}
+                              className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] hover:bg-white transition-all disabled:opacity-50 flex items-center justify-center gap-2 mt-5 shadow-[0_0_30px_rgba(212,175,55,0.15)]">
+                              {submitStatus === 'submitting' ? <Loader2 className="animate-spin" size={16} /> : <>{t.inventory.rental.submitButton} <Key size={16} /></>}
+                            </button>
+                          </form>
+                        )}
+                      </motion.div>
                     )}
                   </div>
 
-                  {/* Mobile Floating Action Button (Only visible if not on Purchase Tab) */}
-                  {modalTab !== 'purchase' && (
-                    <div className="md:hidden absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black via-black/90 to-transparent z-40">
-                      <button
-                        onClick={() => setModalTab('purchase')}
-                        className="w-full bg-tj-gold text-black font-bold py-4 text-xs uppercase tracking-[0.3em] shadow-[0_0_20px_rgba(212,175,55,0.3)] border border-tj-gold/50 active:scale-95 transition-transform"
-                      >
-                        {t.inventory.modal.tabs.purchase}
-                      </button>
+                  {/* Mobile Floating Action Buttons */}
+                  {modalTab !== 'purchase' && modalTab !== 'rent' && (
+                    <div className="md:hidden absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black via-black/95 to-transparent z-40">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setModalTab('purchase')}
+                          className="flex-1 py-4 min-h-[48px] text-[9px] font-bold uppercase tracking-[0.2em] bg-white/[0.06] text-white border border-white/10 active:scale-95 transition-transform"
+                        >
+                          {t.inventory.modal.tabs.purchase}
+                        </button>
+                        <button
+                          onClick={() => setModalTab('rent')}
+                          className="flex-1 py-4 min-h-[48px] text-[9px] font-bold uppercase tracking-[0.2em] bg-tj-gold text-black active:scale-95 transition-transform"
+                        >
+                          {t.common.bookNow}
+                        </button>
+                      </div>
                     </div>
                   )}
 
-                  {/* AI Voice Agent CTA - Desktop (Always visible at bottom) */}
-                  <div className="hidden md:block border-t border-white/10 p-4 bg-gradient-to-r from-tj-gold/10 via-transparent to-tj-gold/10 shrink-0">
-                    <a
-                      href="tel:+18324009760"
-                      className="flex items-center justify-center gap-3 text-tj-gold hover:text-white transition-colors group"
-                    >
-                      <Phone size={16} className="group-hover:animate-bounce" />
-                      <span className="text-xs uppercase tracking-widest font-bold">Speak with AI Agent Now</span>
-                      <Mic size={14} className="animate-pulse" />
+                  {/* Desktop Bottom CTA */}
+                  <div className="hidden md:flex items-center justify-center gap-3 border-t border-white/[0.06] p-3.5 bg-black/40 shrink-0">
+                    <Phone size={14} className="text-tj-gold" />
+                    <a href="tel:+18324009760" className="text-[10px] uppercase tracking-[0.2em] text-gray-400 hover:text-tj-gold transition-colors font-bold">
+                      (832) 400-9760
                     </a>
+                    <span className="text-gray-700">|</span>
+                    <Mic size={12} className="text-tj-gold animate-pulse" />
+                    <span className="text-[10px] uppercase tracking-[0.2em] text-gray-400">{t.inventory.modal.aiAgent}</span>
                   </div>
                 </div>
 

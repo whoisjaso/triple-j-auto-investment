@@ -1,365 +1,383 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { decodeVin } from '../services/nhtsaService';
 import { VinResult } from '../types';
-import { Search, Fingerprint, Activity, ShieldAlert, Terminal, Check, Cpu, Globe, Database, AlertTriangle, Zap, ArrowRight, Gauge, Layers } from 'lucide-react';
+import { Fingerprint, Activity, ShieldAlert, Check, Cpu, Globe, AlertTriangle, Zap, Gauge, Layers, Search, Car, Fuel, Settings, Factory, ArrowRight, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 
 const VinLookup = () => {
   const { t } = useLanguage();
   const [vin, setVin] = useState('');
-  const [vehicleDetails, setVehicleDetails] = useState({ make: '', model: '', year: '' });
   const [result, setResult] = useState<VinResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [logs, setLogs] = useState<string[]>([]);
-
-  const addLog = (msg: string) => setLogs(prev => [...prev, `> ${msg}`]);
+  const resultsRef = useRef<HTMLDivElement>(null);
 
   const validateInput = (value: string): string | null => {
-    // Check for non-alphanumeric (VINs are strictly alphanumeric)
     if (/[^A-Z0-9]/.test(value)) {
-      return 'ERROR: SYNTAX_INVALID (ALPHANUMERIC_ONLY)';
+      return t.vinLookup.errors.lettersOnly;
     }
-
-    // Check for forbidden VIN characters (I, O, Q)
-    // Note: I, O, Q are strictly forbidden in standard VINs to avoid confusion with 1, 0.
     const forbiddenMatch = value.match(/[IOQ]/);
     if (forbiddenMatch) {
-      return `ERROR: ILLEGAL_CHARACTER '${forbiddenMatch[0]}' (I, O, Q PROHIBITED IN VIN)`;
+      return `"${forbiddenMatch[0]}" ${t.vinLookup.errors.forbiddenChar}`;
     }
-
     return null;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Auto-convert to uppercase and strip whitespace for better UX
     const val = e.target.value.toUpperCase().replace(/\s/g, '');
     setVin(val);
-
-    // Immediate Validation Feedback
     if (val.length > 0) {
       const validationError = validateInput(val);
-      if (validationError) {
-        setError(validationError);
-      } else {
-        // Clear error if valid so far
-        setError('');
-      }
+      setError(validationError || '');
     } else {
       setError('');
     }
   };
 
-  const handlePreFill = async (e?: React.FormEvent) => {
+  const handleDecode = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    // Pre-flight checks
     const inputError = validateInput(vin);
-    if (inputError) {
-      setError(inputError);
-      return;
-    }
-
-    // Specific Length Error
+    if (inputError) { setError(inputError); return; }
     if (vin.length !== 17) {
-      setError(`ERROR: INVALID_SEQUENCE_LENGTH (CURRENT: ${vin.length} / REQUIRED: 17)`);
+      setError(`${t.vinLookup.errors.exactLength} (${t.vinLookup.errors.currently} ${vin.length})`);
       return;
     }
 
     setLoading(true);
     setError('');
     setResult(null);
-    setVehicleDetails({ make: '', model: '', year: '' });
-    setLogs([`> ${t.vinLookup.logs.connecting}`]);
-
-    // Simulate "Thinking" time with logs
-    await new Promise(r => setTimeout(r, 400));
-    addLog(t.vinLookup.logs.accessGranted);
-    await new Promise(r => setTimeout(r, 400));
-    addLog(`${t.vinLookup.logs.decoding} ${vin}`);
 
     const data = await decodeVin(vin);
 
     if (data) {
-      // Validation Update: Check ErrorCode. '0' indicates success.
-      // Note: API ErrorText often starts with "0 - VIN decoded clean...", which is NOT an error.
-      const hasError = data.ErrorCode && data.ErrorCode !== '0';
-      // Fallback if ErrorCode is missing but ErrorText suggests failure
-      const textError = !data.ErrorCode && data.ErrorText && !data.ErrorText.startsWith('0');
+      const errorCodes = (data.ErrorCode || '0').split(',').map((c: string) => c.trim());
+      const fatalCodes = ['5', '6', '7', '8'];
+      const hasFatalError = errorCodes.some((code: string) => fatalCodes.includes(code));
+      const hasData = !!(data.Make && data.Model && data.ModelYear);
 
-      if (hasError || textError) {
-         const rawError = data.ErrorText || "UNKNOWN_ERROR";
-         // Clean up verbose NHTSA errors
-         const displayError = rawError.length > 50 ? "INVALID_VIN_RESPONSE_FROM_AGENCY" : rawError;
-         setError(t.vinLookup.logs.dataError + " " + displayError);
-         addLog(`ERROR CODE: ${data.ErrorCode || 'ERR'} - ${displayError}`);
+      if (hasFatalError && !hasData) {
+        setError(t.vinLookup.logs.dataError || 'Unable to decode this VIN. Please verify and try again.');
+      } else if (hasData) {
+        setResult(data);
+        setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
       } else {
-         setResult(data);
-         setVehicleDetails({
-           make: data.Make || 'UNKNOWN',
-           model: data.Model || 'UNKNOWN',
-           year: data.ModelYear || 'UNKNOWN'
-         });
-         addLog(t.vinLookup.logs.extracting);
-         addLog(t.vinLookup.logs.populating);
-         addLog(t.vinLookup.logs.rendering);
+        setError(t.vinLookup.errors.noData);
       }
     } else {
-      setError(t.vinLookup.logs.connectionFailed);
-      addLog(t.vinLookup.logs.connectionFailed);
+      setError(t.vinLookup.logs.connectionFailed || 'Connection failed. Please check your internet and try again.');
     }
     setLoading(false);
   };
 
+  // Helper: spec row item
+  const SpecItem = ({ icon: Icon, label, value, gold }: { icon: React.ElementType; label: string; value: string; gold?: boolean }) => (
+    <div className="flex items-start gap-3 p-4 bg-white/[0.02] border border-white/[0.06] group/spec hover:border-tj-gold/20 transition-colors">
+      <div className="w-8 h-8 flex items-center justify-center bg-tj-gold/5 border border-tj-gold/20 flex-shrink-0 mt-0.5">
+        <Icon size={14} className="text-tj-gold" />
+      </div>
+      <div className="min-w-0">
+        <p className="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-1">{label}</p>
+        <p className={`text-sm font-mono tracking-wide ${gold ? 'text-tj-gold' : 'text-white'}`}>{value || 'N/A'}</p>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-black flex flex-col items-center justify-center px-4 md:px-6 py-24 relative overflow-hidden font-mono">
-      {/* CRT Effect */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[size:100%_2px,3px_100%] pointer-events-none z-20"></div>
+    <div className="min-h-screen bg-black px-4 md:px-6 pb-20 relative">
+      {/* Background Grid */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
 
-      <div className="max-w-6xl w-full relative z-10">
+      <div className="max-w-5xl mx-auto relative z-10">
 
-        {/* Terminal Header */}
-        <div className="flex justify-between items-end mb-8 border-b border-tj-gold/30 pb-4">
-          <div>
-            <h1 className="text-2xl text-tj-gold tracking-widest mb-2 flex items-center gap-2">
-              <Terminal size={24} />
-              {t.vinLookup.title}
-            </h1>
-            <p className="text-gray-400 text-xs uppercase tracking-widest">{t.vinLookup.subtitle}</p>
+        {/* Hero Header */}
+        <div className="pt-28 pb-16 text-center">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <div className="w-2 h-2 bg-tj-gold animate-pulse" />
+            <p className="text-tj-gold uppercase tracking-[0.4em] text-[10px]">{t.vinLookup.badge}</p>
+            <div className="w-2 h-2 bg-tj-gold animate-pulse" />
           </div>
-          <div className="text-right">
-             <div className="text-green-500 text-xs animate-pulse">● ONLINE</div>
-          </div>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="font-display text-5xl md:text-7xl text-white tracking-tight leading-none mb-4"
+          >
+            {t.vinLookup.title}
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3 }}
+            className="text-gray-400 text-sm max-w-lg mx-auto"
+          >
+            {t.vinLookup.subtitle}
+          </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column: Input & Logs */}
-          <div className="lg:col-span-1 space-y-8">
-            <div className={`bg-tj-dark/50 border ${error ? 'border-red-500/50' : 'border-gray-800'} p-8 backdrop-blur relative overflow-hidden transition-colors duration-300`}>
-               {/* Corner Accents */}
-               <div className={`absolute top-0 left-0 w-2 h-2 ${error ? 'bg-red-500' : 'bg-tj-gold'}`}></div>
-               <div className={`absolute top-0 right-0 w-2 h-2 ${error ? 'bg-red-500' : 'bg-tj-gold'}`}></div>
+        {/* Search Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="max-w-2xl mx-auto mb-16"
+        >
+          <form onSubmit={handleDecode} className="relative">
+            {/* VIN Input */}
+            <div className={`bg-[#080808] border ${error ? 'border-red-500/40' : result ? 'border-tj-gold/40' : 'border-white/10'} p-6 md:p-8 transition-colors`}>
+              <div className="flex items-center justify-between mb-4">
+                <label className={`text-[10px] uppercase tracking-[0.3em] font-bold ${error ? 'text-red-400' : 'text-tj-gold'}`}>
+                  {t.vinLookup.vinLabel}
+                </label>
+                {vin.length > 0 && (
+                  <span className={`text-[10px] font-mono ${vin.length === 17 ? 'text-green-500' : 'text-gray-400'}`}>
+                    {vin.length}/17
+                  </span>
+                )}
+              </div>
 
-               <div className="flex flex-col gap-6">
-                <div>
-                  <div className="flex justify-between items-center mb-4">
-                    <label className={`block text-[10px] uppercase tracking-[0.3em] ${error ? 'text-red-500' : 'text-tj-gold'}`}>{t.vinLookup.badge} (VIN)</label>
-                    {vin.length > 0 && (
-                      <span className={`text-[10px] ${vin.length === 17 ? 'text-green-500' : 'text-gray-400'}`}>
-                        {vin.length}/17
-                      </span>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={vin}
-                      onChange={handleInputChange}
-                      onKeyDown={(e) => e.key === 'Enter' && handlePreFill()}
-                      placeholder={t.vinLookup.placeholder}
-                      maxLength={17}
-                      className={`w-full bg-black border ${error ? 'border-red-500 text-red-500 focus:border-red-500' : 'border-gray-700 text-white focus:border-tj-gold'} px-3 sm:px-4 py-3 pr-10 sm:pr-12 text-sm sm:text-lg font-mono focus:outline-none focus:ring-2 focus:ring-tj-gold/50 tracking-[0.05em] sm:tracking-[0.1em] placeholder-gray-800 transition-colors`}
-                      spellCheck="false"
-                    />
-                    <button
-                      onClick={() => handlePreFill()}
-                      disabled={loading || (!!error && vin.length > 0) || vin.length === 0}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-tj-gold hover:text-white disabled:text-gray-700 transition-colors p-2"
-                      title={t.vinLookup.fields.quickDecode}
-                    >
-                      {loading ? <Activity className="animate-spin" size={18} /> : <Zap size={18} />}
-                    </button>
-                  </div>
+              <div className="flex gap-3">
+                <div className="relative flex-1">
+                  <Fingerprint size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    value={vin}
+                    onChange={handleInputChange}
+                    onKeyDown={(e) => e.key === 'Enter' && handleDecode()}
+                    placeholder={t.vinLookup.placeholder}
+                    maxLength={17}
+                    className={`w-full bg-black border ${error ? 'border-red-500/50 text-red-400' : 'border-white/10 text-white focus:border-tj-gold'} pl-12 pr-4 py-4 text-base md:text-lg font-mono focus:outline-none focus:ring-1 focus:ring-tj-gold/30 tracking-[0.15em] placeholder-gray-700 transition-all`}
+                    spellCheck="false"
+                    autoComplete="off"
+                  />
                 </div>
-
-                {/* Auto-Populated Fields */}
-                <div className="grid grid-cols-1 gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                     <div>
-                       <label className="block text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.vinLookup.fields.make}</label>
-                       <input
-                          type="text"
-                          readOnly
-                          value={vehicleDetails.make}
-                          placeholder="---"
-                          className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-tj-gold/30 focus:border-tj-gold/50 transition-colors"
-                       />
-                     </div>
-                     <div>
-                       <label className="block text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.vinLookup.fields.year}</label>
-                       <input
-                          type="text"
-                          readOnly
-                          value={vehicleDetails.year}
-                          placeholder="---"
-                          className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-tj-gold focus:outline-none focus:ring-1 focus:ring-tj-gold/30 focus:border-tj-gold/50 transition-colors"
-                       />
-                     </div>
-                  </div>
-                  <div>
-                     <label className="block text-[8px] uppercase tracking-widest text-gray-400 mb-1">{t.vinLookup.fields.model}</label>
-                     <input
-                        type="text"
-                        readOnly
-                        value={vehicleDetails.model}
-                        placeholder={t.vinLookup.fields.waitingForInput}
-                        className="w-full bg-black/50 border border-gray-800 px-3 py-2 text-xs text-white focus:outline-none focus:ring-1 focus:ring-tj-gold/30 focus:border-tj-gold/50 transition-colors"
-                     />
-                  </div>
-                </div>
-
                 <button
-                  onClick={() => handlePreFill()}
+                  type="submit"
                   disabled={loading || !!error || vin.length !== 17}
-                  className={`mt-4 px-6 py-3 font-bold text-xs tracking-[0.3em] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 group ${error ? 'bg-red-900/20 text-red-500 cursor-not-allowed' : 'bg-tj-gold text-black hover:bg-white'}`}
+                  className="px-6 md:px-8 bg-tj-gold text-black font-bold text-xs uppercase tracking-[0.2em] hover:bg-white transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2 min-h-[56px] active:scale-95"
                 >
-                  {loading ? t.vinLookup.searching : t.vinLookup.search}
-                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                  {loading ? (
+                    <Loader2 className="animate-spin" size={18} />
+                  ) : (
+                    <>
+                      <Search size={16} />
+                      <span className="hidden md:inline">{t.vinLookup.decode}</span>
+                    </>
+                  )}
                 </button>
               </div>
 
-              {error && (
-                <div className="mt-6 p-3 border border-red-500/50 bg-red-900/20 text-red-500 flex items-start gap-3 font-mono text-xs animate-fade-in">
-                  <ShieldAlert size={14} className="shrink-0 mt-0.5" />
-                  <span className="leading-relaxed">{error}</span>
+              {/* VIN Progress Bar */}
+              <div className="mt-4 h-[2px] bg-white/5 overflow-hidden">
+                <motion.div
+                  className={`h-full ${error ? 'bg-red-500' : 'bg-tj-gold'}`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(vin.length / 17) * 100}%` }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                />
+              </div>
+
+              {/* Error Display */}
+              <AnimatePresence>
+                {error && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="overflow-hidden"
+                  >
+                    <div className="flex items-center gap-2 mt-4 px-3 py-2.5 bg-red-950/30 border border-red-500/20 text-red-400 text-xs">
+                      <AlertTriangle size={14} className="flex-shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </form>
+        </motion.div>
+
+        {/* Results */}
+        <AnimatePresence>
+          {result && (
+            <motion.div
+              ref={resultsRef}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-1"
+            >
+              {/* Vehicle Identity — Hero Card */}
+              <div className="bg-[#080808] border border-tj-gold/30 p-8 md:p-10 relative overflow-hidden">
+                {/* Decorative watermark */}
+                <Fingerprint className="absolute right-6 top-6 text-tj-gold/[0.04] w-32 h-32 -rotate-12 pointer-events-none" />
+
+                <div className="flex items-center gap-2 mb-8">
+                  <div className="w-2 h-2 bg-green-500 animate-pulse rounded-full" />
+                  <span className="text-[9px] text-green-500 uppercase tracking-[0.3em] font-bold">{t.vinLookup.resultLabels.verified}</span>
                 </div>
-              )}
-            </div>
 
-            {/* System Logs */}
-            <div className="bg-black border border-gray-800 p-6 h-[200px] font-mono text-xs overflow-y-auto scrollbar-none">
-               <div className="mb-4 text-gray-400 uppercase tracking-widest border-b border-gray-800 pb-2">{t.vinLookup.fields.dataStream}</div>
-               <div className="space-y-2 text-green-500/80">
-                  <div className="opacity-50">{'>'} {t.vinLookup.logs.initializing}</div>
-                  {logs.map((log, i) => (
-                    <div key={i} className="animate-fade-in">{log}</div>
-                  ))}
-                  {loading && <div className="animate-pulse">{'>'} {t.vinLookup.logs.processing}</div>}
-               </div>
-            </div>
-          </div>
+                {/* Year / Make / Model — Large Display */}
+                <div className="relative z-10 mb-8">
+                  <p className="text-tj-gold text-[10px] uppercase tracking-[0.3em] mb-3">{t.vinLookup.resultLabels.year}</p>
+                  <h2 className="font-display text-5xl md:text-7xl text-white leading-none tracking-tight mb-2">
+                    {result.ModelYear}
+                  </h2>
+                  <h3 className="font-display text-3xl md:text-4xl text-tj-gold leading-none tracking-wider">
+                    {result.Make} {result.Model}
+                  </h3>
+                </div>
 
-          {/* Right Column: Results Output */}
-          <div className="lg:col-span-2">
-            {!result ? (
-              <div className="h-full flex items-center justify-center border border-gray-800 bg-white/5 opacity-50 min-h-[500px]">
-                <div className="text-center">
-                   <Database size={48} className="mx-auto text-gray-700 mb-4 animate-pulse" />
-                   <p className="text-gray-400 tracking-widest text-xs">{t.vinLookup.placeholder}</p>
+                {/* Quick Stats Row */}
+                <div className="flex flex-wrap gap-4 pt-6 border-t border-white/[0.06]">
+                  {result.BodyClass && (
+                    <div className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-[10px] text-gray-400 uppercase tracking-widest">
+                      {result.BodyClass}
+                    </div>
+                  )}
+                  {result.VehicleType && (
+                    <div className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-[10px] text-gray-400 uppercase tracking-widest">
+                      {result.VehicleType}
+                    </div>
+                  )}
+                  {result.DriveType && (
+                    <div className="px-3 py-1.5 bg-tj-gold/5 border border-tj-gold/20 text-[10px] text-tj-gold uppercase tracking-widest">
+                      {result.DriveType}
+                    </div>
+                  )}
+                  {result.FuelType && (
+                    <div className="px-3 py-1.5 bg-white/[0.04] border border-white/[0.08] text-[10px] text-gray-400 uppercase tracking-widest">
+                      {result.FuelType}
+                    </div>
+                  )}
                 </div>
               </div>
-            ) : (
-              <div className="animate-slide-up space-y-6">
 
-                {/* Core Vehicle Details */}
-                <div className="bg-tj-dark border border-tj-gold/30 p-8 relative overflow-hidden group hover:border-tj-gold/60 transition-colors shadow-[0_0_30px_rgba(0,0,0,0.3)]">
-                  <div className="absolute right-0 top-0 p-4"><Fingerprint className="text-tj-gold opacity-10 w-24 h-24 -rotate-12" /></div>
-
-                  <div className="flex items-center justify-between border-b border-gray-800 pb-4 mb-8 relative z-10">
-                    <h3 className="text-white text-sm uppercase tracking-[0.3em] flex items-center gap-3">
-                      <Fingerprint size={16} className="text-tj-gold" />
-                      {t.vinLookup.results}
-                    </h3>
-                    <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 animate-pulse rounded-full"></div>
-                        <span className="text-[9px] text-green-500 uppercase tracking-widest">{t.vinLookup.resultLabels.verified}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-12 relative z-10">
-                    <div>
-                      <p className="text-gray-400 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.manufacturer}</p>
-                      <p className="text-white text-2xl tracking-widest font-display border-l-2 border-tj-gold pl-4">{result.Make || 'UNKNOWN'}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.model}</p>
-                      <p className="text-white text-2xl tracking-widest font-display border-l-2 border-tj-gold pl-4">{result.Model || 'UNKNOWN'}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.year}</p>
-                      <p className="text-tj-gold text-2xl tracking-widest font-mono border-l-2 border-gray-700 pl-4">{result.ModelYear || 'UNKNOWN'}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-[9px] uppercase tracking-[0.2em] mb-2">{t.vinLookup.resultLabels.bodyType}</p>
-                      <p className="text-white text-sm tracking-widest font-mono border-l-2 border-gray-700 pl-4 leading-relaxed flex items-center h-full uppercase">{result.BodyClass || 'N/A'}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Detailed Configuration */}
-                <div className="bg-black border border-gray-800 p-6 relative overflow-hidden">
-                    <h3 className="text-white text-xs uppercase tracking-[0.3em] mb-6 border-b border-gray-800 pb-2 flex items-center gap-3 relative z-10">
-                        <Layers size={14} className="text-tj-gold" /> {t.vinLookup.resultLabels.detailedConfig}
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
-                        <div>
-                            <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.trimLevel}</p>
-                            <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.Trim || 'Base'}</p>
-                        </div>
-                        <div>
-                            <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.series}</p>
-                            <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.Series || 'N/A'}</p>
-                        </div>
-                        <div>
-                            <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.transmission}</p>
-                            <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.TransmissionStyle || 'Standard'}</p>
-                        </div>
-                        <div>
-                            <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.doors}</p>
-                            <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.Doors ? `${result.Doors} ${t.vinLookup.resultLabels.doors}` : 'N/A'}</p>
-                        </div>
-                    </div>
-                </div>
-
+              {/* Specs Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                 {/* Engine & Performance */}
-                <div className="bg-black border border-gray-800 p-8 group hover:border-gray-700 transition-colors relative overflow-hidden">
-                   {/* Background grid */}
-                   <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:2rem_2rem] pointer-events-none"></div>
-
-                   <h3 className="text-white text-xs uppercase tracking-[0.3em] mb-8 border-b border-gray-800 pb-2 flex items-center gap-3 relative z-10">
-                     <Cpu size={14} className="text-tj-gold" /> {t.vinLookup.resultLabels.engineSpecs}
-                   </h3>
-
-                   <div className="grid grid-cols-2 md:grid-cols-3 gap-8 relative z-10">
-                     <div className="bg-tj-dark/50 p-4 border border-white/5">
-                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Activity size={10}/> {t.vinLookup.resultLabels.cylinders}</p>
-                        <p className="text-white text-lg font-mono">{result.EngineCylinders || 'UNK'}</p>
-                     </div>
-                     <div className="bg-tj-dark/50 p-4 border border-white/5">
-                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Gauge size={10}/> {t.vinLookup.resultLabels.horsepower}</p>
-                        <p className="text-white text-lg font-mono">{result.EngineHP ? `${result.EngineHP} HP` : 'N/A'}</p>
-                     </div>
-                     <div className="bg-tj-dark/50 p-4 border border-white/5">
-                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-2 flex items-center gap-2"><Zap size={10}/> {t.vinLookup.resultLabels.drivetrain}</p>
-                        <p className="text-tj-gold text-lg font-mono">{result.DriveType || 'N/A'}</p>
-                     </div>
-                     <div className="col-span-2 md:col-span-3 pt-4 border-t border-gray-900/50">
-                        <p className="text-gray-400 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.fuelSystem}</p>
-                        <p className="text-white text-xs tracking-wider font-mono">{result.FuelType || t.vinLookup.resultLabels.standardCombustion}</p>
-                     </div>
-                   </div>
+                <div className="bg-[#080808] border border-white/[0.06] p-6">
+                  <h4 className="text-[10px] uppercase tracking-[0.3em] text-tj-gold font-bold mb-5 flex items-center gap-2">
+                    <Cpu size={12} /> {t.vinLookup.resultLabels.engineSpecs}
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-white/[0.04]">
+                      <span className="text-gray-400 text-xs flex items-center gap-2"><Activity size={12} /> {t.vinLookup.resultLabels.cylinders}</span>
+                      <span className="text-white text-sm font-mono">{result.EngineCylinders || '—'}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-white/[0.04]">
+                      <span className="text-gray-400 text-xs flex items-center gap-2"><Gauge size={12} /> {t.vinLookup.resultLabels.horsepower}</span>
+                      <span className="text-white text-sm font-mono">{result.EngineHP ? `${result.EngineHP} HP` : '—'}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-white/[0.04]">
+                      <span className="text-gray-400 text-xs flex items-center gap-2"><Zap size={12} /> {t.vinLookup.resultLabels.drivetrain}</span>
+                      <span className="text-tj-gold text-sm font-mono">{result.DriveType || '—'}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-400 text-xs flex items-center gap-2"><Fuel size={12} /> {t.vinLookup.resultLabels.fuelSystem}</span>
+                      <span className="text-white text-sm font-mono">{result.FuelType || t.vinLookup.resultLabels.standardCombustion}</span>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Manufacturing Origin */}
-                <div className="bg-gray-900 border border-gray-800 p-6 flex justify-between items-center">
-                   <div>
-                      <p className="text-gray-400 text-[10px] tracking-widest mb-1">{t.vinLookup.resultLabels.manufacturingOrigin.toUpperCase()}</p>
-                      <div className="flex items-center gap-3">
-                        <Globe size={16} className="text-blue-500" />
-                        <span className="text-white tracking-wider uppercase">{result.PlantCountry || 'N/A'}</span>
-                      </div>
-                   </div>
-                   <div className="text-right">
-                      <p className="text-gray-400 text-[10px] tracking-widest mb-1">{t.vinLookup.resultLabels.mfgEntity.toUpperCase()}</p>
-                      <span className="text-gray-300 text-xs uppercase">{result.Manufacturer || 'UNKNOWN'}</span>
-                   </div>
+                {/* Configuration */}
+                <div className="bg-[#080808] border border-white/[0.06] p-6">
+                  <h4 className="text-[10px] uppercase tracking-[0.3em] text-tj-gold font-bold mb-5 flex items-center gap-2">
+                    <Settings size={12} /> {t.vinLookup.resultLabels.detailedConfig}
+                  </h4>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-white/[0.04]">
+                      <span className="text-gray-400 text-xs">{t.vinLookup.resultLabels.trimLevel}</span>
+                      <span className="text-white text-sm font-mono">{result.Trim || t.vinLookup.baseTrim}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-white/[0.04]">
+                      <span className="text-gray-400 text-xs">{t.vinLookup.resultLabels.series}</span>
+                      <span className="text-white text-sm font-mono">{result.Series || '—'}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-white/[0.04]">
+                      <span className="text-gray-400 text-xs">{t.vinLookup.resultLabels.transmission}</span>
+                      <span className="text-white text-sm font-mono">{result.TransmissionStyle || '—'}</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-gray-400 text-xs">{t.vinLookup.resultLabels.doors}</span>
+                      <span className="text-white text-sm font-mono">{result.Doors ? `${result.Doors} ${t.vinLookup.doorSuffix}` : '—'}</span>
+                    </div>
+                  </div>
                 </div>
-
               </div>
-            )}
+
+              {/* Manufacturing Origin — Footer Strip */}
+              <div className="bg-[#080808] border border-white/[0.06] p-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 flex items-center justify-center bg-tj-gold/5 border border-tj-gold/20">
+                    <Globe size={18} className="text-tj-gold" />
+                  </div>
+                  <div>
+                    <p className="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-0.5">{t.vinLookup.resultLabels.manufacturingOrigin}</p>
+                    <p className="text-white text-sm tracking-wider uppercase font-mono">{result.PlantCountry || 'N/A'}</p>
+                  </div>
+                </div>
+                <div className="sm:text-right">
+                  <p className="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-0.5">{t.vinLookup.resultLabels.mfgEntity}</p>
+                  <p className="text-gray-300 text-xs uppercase font-mono">{result.Manufacturer || 'UNKNOWN'}</p>
+                </div>
+              </div>
+
+              {/* Decode Another CTA */}
+              <div className="pt-8 text-center">
+                <button
+                  onClick={() => { setResult(null); setVin(''); setError(''); }}
+                  className="text-[10px] uppercase tracking-[0.3em] text-gray-400 hover:text-tj-gold transition-colors py-3 px-6 border border-white/[0.06] hover:border-tj-gold/30"
+                >
+                  {t.vinLookup.decodeAnother}
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Empty State — When no result */}
+        {!result && !loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="text-center py-16 max-w-lg mx-auto"
+          >
+            <div className="grid grid-cols-3 gap-4 mb-8">
+              <div className="p-4 border border-white/[0.06] bg-white/[0.01]">
+                <Car size={20} className="mx-auto text-gray-700 mb-2" />
+                <p className="text-[9px] text-gray-400 uppercase tracking-widest">{t.vinLookup.resultLabels.manufacturer}</p>
+              </div>
+              <div className="p-4 border border-white/[0.06] bg-white/[0.01]">
+                <Cpu size={20} className="mx-auto text-gray-700 mb-2" />
+                <p className="text-[9px] text-gray-400 uppercase tracking-widest">{t.vinLookup.resultLabels.engineSpecs}</p>
+              </div>
+              <div className="p-4 border border-white/[0.06] bg-white/[0.01]">
+                <Globe size={20} className="mx-auto text-gray-700 mb-2" />
+                <p className="text-[9px] text-gray-400 uppercase tracking-widest">{t.vinLookup.resultLabels.manufacturingOrigin}</p>
+              </div>
+            </div>
+            <p className="text-gray-400 text-xs leading-relaxed">
+              {t.vinLookup.subtitle}
+            </p>
+          </motion.div>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <div className="text-center py-20">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+              className="w-12 h-12 mx-auto border-2 border-tj-gold/20 border-t-tj-gold rounded-full mb-6"
+            />
+            <p className="text-gray-400 text-xs uppercase tracking-[0.3em]">{t.vinLookup.searching}</p>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
