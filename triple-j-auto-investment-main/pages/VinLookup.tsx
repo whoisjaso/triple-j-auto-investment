@@ -159,7 +159,7 @@ const VinLookup = () => {
                       onKeyDown={(e) => e.key === 'Enter' && handlePreFill()}
                       placeholder={t.vinLookup.placeholder}
                       maxLength={17}
-                      className={`w-full bg-black border ${error ? 'border-red-500 text-red-500 focus:border-red-500' : 'border-gray-700 text-white focus:border-tj-gold'} px-4 py-3 pr-12 text-lg font-mono focus:outline-none tracking-[0.1em] placeholder-gray-800 transition-colors`}
+                      className={`w-full bg-black border ${error ? 'border-red-500 text-red-500 focus:border-red-500' : 'border-gray-700 text-white focus:border-tj-gold'} px-3 sm:px-4 py-3 pr-10 sm:pr-12 text-sm sm:text-lg font-mono focus:outline-none tracking-[0.05em] sm:tracking-[0.1em] placeholder-gray-800 transition-colors`}
                       spellCheck="false"
                     />
                     <button
@@ -292,7 +292,7 @@ const VinLookup = () => {
                     <h3 className="text-white text-xs uppercase tracking-[0.3em] mb-6 border-b border-gray-800 pb-2 flex items-center gap-3 relative z-10">
                         <Layers size={14} className="text-tj-gold" /> {t.vinLookup.resultLabels.detailedConfig}
                     </h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 relative z-10">
                         <div>
                             <p className="text-gray-500 text-[9px] uppercase tracking-widest mb-1">{t.vinLookup.resultLabels.trimLevel}</p>
                             <p className="text-white text-xs font-mono border-l-2 border-tj-gold/50 pl-2">{result.Trim || 'Base'}</p>

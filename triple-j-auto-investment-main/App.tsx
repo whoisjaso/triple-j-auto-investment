@@ -206,7 +206,7 @@ const Navbar = () => {
             <div className="flex flex-1 justify-end md:hidden z-[70] pr-2 items-center gap-4">
               <button
                 onClick={toggleLang}
-                className="text-tj-gold p-2"
+                className="text-tj-gold p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label={lang === 'en' ? 'Switch to Spanish' : 'Cambiar a Inglés'}
               >
                 <span className="text-[10px] font-bold">{lang === 'en' ? 'ES' : 'EN'}</span>
@@ -371,12 +371,12 @@ const Footer = () => {
           {/* Social Media Links */}
           <div className="mb-6">
             <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-3">{t.footer.followUs}</p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <a
                 href="https://www.facebook.com/thetriplejauto"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-tj-gold transition-colors"
+                className="text-gray-500 hover:text-tj-gold transition-colors p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="Facebook"
               >
                 <Facebook size={20} />
@@ -385,7 +385,7 @@ const Footer = () => {
                 href="https://x.com/thetriplejauto"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-tj-gold transition-colors"
+                className="text-gray-500 hover:text-tj-gold transition-colors p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 aria-label="X (Twitter)"
               >
                 <Twitter size={20} />
@@ -439,24 +439,24 @@ const Footer = () => {
               <span className="font-mono text-tj-gold text-sm">P171632</span>
             </div>
           </div>
-          <ul className="space-y-3 text-[10px] uppercase tracking-widest text-gray-500 w-full">
-            <li><Link to="/legal/dmv" className="hover:text-tj-gold transition-colors block py-1">Texas DMV</Link></li>
-            <li><Link to="/legal/privacy" className="hover:text-tj-gold transition-colors block py-1">{t.footer.privacy}</Link></li>
-            <li><Link to="/legal/terms" className="hover:text-tj-gold transition-colors block py-1">{t.footer.terms}</Link></li>
-            <li><Link to="/legal/arbitration" className="hover:text-tj-gold transition-colors block py-1">Arbitration</Link></li>
+          <ul className="space-y-1 text-[10px] uppercase tracking-widest text-gray-500 w-full">
+            <li><Link to="/legal/dmv" className="hover:text-tj-gold transition-colors block py-3">Texas DMV</Link></li>
+            <li><Link to="/legal/privacy" className="hover:text-tj-gold transition-colors block py-3">{t.footer.privacy}</Link></li>
+            <li><Link to="/legal/terms" className="hover:text-tj-gold transition-colors block py-3">{t.footer.terms}</Link></li>
+            <li><Link to="/legal/arbitration" className="hover:text-tj-gold transition-colors block py-3">Arbitration</Link></li>
           </ul>
         </div>
 
         {/* QUICK LINKS */}
         <div className="flex flex-col items-start">
           <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">{t.footer.quickLinks.toUpperCase()}</h3>
-          <ul className="space-y-4 text-[10px] uppercase tracking-widest w-full">
-            <li><Link to="/inventory" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.nav.inventory}</Link></li>
-            <li><Link to="/about" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.nav.about}</Link></li>
-            <li><Link to="/services" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.nav.services}</Link></li>
-            <li><Link to="/vin" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.vinLookup.title}</Link></li>
-            <li><Link to="/contact" className="hover:text-white transition-colors block hover:translate-x-2 transition-transform duration-300">{t.footer.contact}</Link></li>
-            <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-600 flex items-center gap-2"><Lock size={10} /> {t.nav.login}</Link></li>
+          <ul className="space-y-1 text-[10px] uppercase tracking-widest w-full">
+            <li><Link to="/inventory" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.nav.inventory}</Link></li>
+            <li><Link to="/about" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.nav.about}</Link></li>
+            <li><Link to="/services" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.nav.services}</Link></li>
+            <li><Link to="/vin" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.vinLookup.title}</Link></li>
+            <li><Link to="/contact" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.footer.contact}</Link></li>
+            <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-600 flex items-center gap-2 py-2"><Lock size={10} /> {t.nav.login}</Link></li>
           </ul>
         </div>
 
