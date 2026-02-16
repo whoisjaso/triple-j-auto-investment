@@ -12,6 +12,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Clock,
   FileText,
@@ -86,7 +87,7 @@ const AdminHeader = () => {
   ];
 
   return (
-    <header className="bg-black backdrop-blur-md border-b border-tj-gold/30 sticky top-0 z-[100] shadow-lg">
+    <header className="bg-black/95 backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-[100]">
       <div className="max-w-[1800px] mx-auto px-4 md:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           <Link to="/" className="flex items-center group">
@@ -104,7 +105,7 @@ const AdminHeader = () => {
                 to={item.path}
                 className={`flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold transition-all border ${location.pathname === item.path
                     ? 'bg-tj-gold text-black border-tj-gold'
-                    : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/5'
+                    : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/[0.04]'
                   }`}
               >
                 <item.icon size={14} />
@@ -112,11 +113,11 @@ const AdminHeader = () => {
               </Link>
             ))}
 
-            <div className="h-6 w-px bg-gray-700 mx-2" />
+            <div className="h-5 w-px bg-white/[0.08] mx-2" />
 
             <button
               onClick={() => { logout(); navigate('/'); }}
-              className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400/70 hover:text-red-300 hover:bg-red-900/10 transition-all"
             >
               <LogOut size={14} />
               Logout
@@ -132,7 +133,7 @@ const AdminHeader = () => {
         </div>
 
         {mobileMenuOpen && (
-          <nav className="md:hidden border-t border-white/10 py-4 space-y-2">
+          <nav className="md:hidden border-t border-white/[0.06] py-4 space-y-2">
             {navItems.map(item => (
               <Link
                 key={item.path}
@@ -140,7 +141,7 @@ const AdminHeader = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold transition-all ${location.pathname === item.path
                     ? 'bg-tj-gold/10 text-tj-gold border-l-2 border-tj-gold'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
                   }`}
               >
                 <item.icon size={18} />
@@ -150,7 +151,7 @@ const AdminHeader = () => {
 
             <button
               onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all"
+              className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400/70 hover:text-red-300 hover:bg-red-900/10 transition-all"
             >
               <LogOut size={18} />
               Logout
@@ -171,6 +172,12 @@ const STAGE_ICONS: Record<RegistrationStageKey, React.ReactNode> = {
   sticker_ready: <CheckCircle size={16} />,
   sticker_delivered: <Package size={16} />,
   rejected: <AlertCircle size={16} />
+};
+
+// Animation variants
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.4 } }),
 };
 
 const Registrations: React.FC = () => {
@@ -411,24 +418,34 @@ const Registrations: React.FC = () => {
   return (
     <>
     <AdminHeader />
-    <div className="min-h-screen bg-black px-4 md:px-8 pb-4 md:pb-8 pt-4 md:pt-8">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-black px-4 md:px-8 pb-4 md:pb-8 pt-4 md:pt-8 relative">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <motion.div
+          custom={0}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
+        >
           <div>
-            <h1 className="text-2xl md:text-3xl font-display text-white tracking-wide mb-1">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-2 h-2 bg-tj-gold animate-pulse" />
+              <p className="text-tj-gold uppercase tracking-[0.4em] text-[10px]">Registration Operations</p>
+            </div>
+            <h1 className="font-display text-3xl md:text-4xl text-white tracking-tight leading-none mb-1">
               Registration Ledger
             </h1>
-            <p className="text-gray-500 text-sm">
-              6-Stage workflow management with full audit trail
-            </p>
+            <p className="text-gray-500 text-sm">6-Stage workflow management with full audit trail</p>
+            <div className="h-px w-24 bg-gradient-to-r from-tj-gold/60 to-transparent mt-2" />
           </div>
 
           <div className="flex gap-3">
             <button
               onClick={loadRegistrations}
               disabled={loading}
-              className="p-3 border border-gray-700 hover:border-tj-gold text-gray-400 hover:text-tj-gold transition-colors"
+              className="p-3 border border-white/[0.06] hover:border-tj-gold text-gray-400 hover:text-tj-gold transition-all duration-300"
             >
               <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
             </button>
@@ -440,10 +457,16 @@ const Registrations: React.FC = () => {
               New Registration
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-6">
+        <motion.div
+          custom={1}
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="flex flex-col md:flex-row gap-4 mb-6"
+        >
           <div className="relative flex-1">
             <Search
               size={18}
@@ -454,79 +477,98 @@ const Registrations: React.FC = () => {
               placeholder="Search by order ID, customer, VIN..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-tj-dark border border-gray-700 pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold transition-colors"
+              className="w-full bg-[#080808] border border-white/[0.06] pl-10 pr-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold transition-colors"
             />
           </div>
           <select
             value={statusFilter}
             onChange={e => setStatusFilter(e.target.value)}
-            className="bg-tj-dark border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+            className="bg-[#080808] border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
           >
             <option value="all">All Status</option>
             <option value="in_progress">In Progress</option>
             <option value="complete">Complete</option>
             <option value="rejected">Rejected</option>
           </select>
-        </div>
+        </motion.div>
 
         {/* Stats Bar */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
-            <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total</p>
-            <p className="text-white text-2xl font-mono">{registrations.length}</p>
-          </div>
-          <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
-            <p className="text-amber-400 text-[10px] uppercase tracking-widest mb-1">In Progress</p>
-            <p className="text-amber-400 text-2xl font-mono">
-              {registrations.filter(r => r.currentStage !== 'sticker_delivered' && r.currentStage !== 'rejected').length}
-            </p>
-          </div>
-          <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
-            <p className="text-orange-400 text-[10px] uppercase tracking-widest mb-1">Rejected</p>
-            <p className="text-orange-400 text-2xl font-mono">
-              {registrations.filter(r => r.currentStage === 'rejected').length}
-            </p>
-          </div>
-          <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
-            <p className="text-green-400 text-[10px] uppercase tracking-widest mb-1">Complete</p>
-            <p className="text-green-400 text-2xl font-mono">
-              {registrations.filter(r => r.currentStage === 'sticker_delivered').length}
-            </p>
-          </div>
+          {[
+            { label: 'Total', color: 'text-gray-500', valueColor: 'text-white', value: registrations.length },
+            { label: 'In Progress', color: 'text-amber-400', valueColor: 'text-amber-400', value: registrations.filter(r => r.currentStage !== 'sticker_delivered' && r.currentStage !== 'rejected').length },
+            { label: 'Rejected', color: 'text-orange-400', valueColor: 'text-orange-400', value: registrations.filter(r => r.currentStage === 'rejected').length },
+            { label: 'Complete', color: 'text-green-400', valueColor: 'text-green-400', value: registrations.filter(r => r.currentStage === 'sticker_delivered').length },
+          ].map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              custom={i + 2}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="bg-[#080808] border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4"
+            >
+              <p className={`${stat.color} text-[10px] uppercase tracking-widest mb-1`}>{stat.label}</p>
+              <p className={`${stat.valueColor} text-2xl font-mono`}>{stat.value}</p>
+            </motion.div>
+          ))}
         </div>
 
         <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
 
         {/* Loading State */}
-        {loading && (
-          <div className="flex justify-center py-16">
-            <Loader2 className="animate-spin text-tj-gold" size={32} />
-          </div>
-        )}
+        <AnimatePresence>
+          {loading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="flex justify-center py-16"
+            >
+              <Loader2 className="animate-spin text-tj-gold" size={32} />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Empty State */}
-        {!loading && filteredRegistrations.length === 0 && (
-          <div className="text-center py-16 bg-tj-dark border border-tj-gold/10">
-            <Car className="mx-auto text-gray-700 mb-4" size={48} />
-            <p className="text-gray-500 mb-4">
-              {searchQuery || statusFilter !== 'all'
-                ? 'No registrations match your filters'
-                : 'No registrations yet'}
-            </p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-6 py-3 bg-tj-gold text-black font-bold text-sm tracking-wider hover:bg-white transition-colors"
+        <AnimatePresence>
+          {!loading && filteredRegistrations.length === 0 && (
+            <motion.div
+              custom={0}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="text-center py-16 bg-[#080808] border border-tj-gold/10"
             >
-              Create First Registration
-            </button>
-          </div>
-        )}
+              <Car className="mx-auto text-gray-700 mb-4" size={48} />
+              <p className="text-gray-500 mb-4">
+                {searchQuery || statusFilter !== 'all'
+                  ? 'No registrations match your filters'
+                  : 'No registrations yet'}
+              </p>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="px-6 py-3 bg-tj-gold text-black font-bold text-sm tracking-wider hover:bg-white transition-colors"
+              >
+                Create First Registration
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Registrations List */}
         {!loading && filteredRegistrations.length > 0 && (
           <div className="space-y-4">
-            {filteredRegistrations.map(reg => (
-              <div key={reg.id} className="bg-tj-dark border border-gray-800 hover:border-tj-gold/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)]">
+            {filteredRegistrations.map((reg, index) => (
+              <motion.div
+                key={reg.id}
+                custom={index}
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                className="bg-[#080808] border border-white/[0.06] hover:border-tj-gold/20 transition-all duration-300 hover:shadow-[0_0_20px_rgba(212,175,55,0.05)]"
+              >
                 {/* Header Row */}
                 <div
                   className="p-4 flex items-center gap-4 cursor-pointer hover:bg-white/5 transition-colors"
@@ -619,7 +661,7 @@ const Registrations: React.FC = () => {
                     </a>
                     <ChevronDown
                       size={20}
-                      className={`text-gray-500 transition-transform ${
+                      className={`text-gray-500 transition-transform duration-300 ${
                         expandedId === reg.id ? 'rotate-180' : ''
                       }`}
                     />
@@ -627,10 +669,18 @@ const Registrations: React.FC = () => {
                 </div>
 
                 {/* Expanded Content */}
-                {expandedId === reg.id && (
-                  <div className="border-t border-gray-800 p-4 md:p-6">
+                <AnimatePresence>
+                  {expandedId === reg.id && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="border-t border-white/[0.06] p-4 md:p-6">
                     {/* Customer Info */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pb-6 border-b border-gray-800">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 pb-6 border-b border-white/[0.06]">
                       <div>
                         <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Customer</p>
                         <p className="text-white font-medium">{reg.customerName}</p>
@@ -662,7 +712,7 @@ const Registrations: React.FC = () => {
                     </div>
 
                     {/* Document Checklist */}
-                    <div className="mb-6 pb-6 border-b border-gray-800">
+                    <div className="mb-6 pb-6 border-b border-white/[0.06]">
                       <h4 className="text-[10px] uppercase tracking-widest text-tj-gold mb-4">Document Checklist</h4>
                       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                         {[
@@ -676,10 +726,10 @@ const Registrations: React.FC = () => {
                             key={doc.key}
                             onClick={() => handleDocToggle(reg.id, doc.key, !reg[doc.key as keyof Registration])}
                             disabled={actionLoading === reg.id}
-                            className={`p-3 border flex items-center gap-2 transition-colors disabled:opacity-50 ${
+                            className={`p-3 border flex items-center gap-2 transition-all duration-300 disabled:opacity-50 ${
                               reg[doc.key as keyof Registration]
                                 ? 'border-green-500/50 bg-green-900/20 text-green-400'
-                                : 'border-gray-700 text-gray-500 hover:border-gray-600'
+                                : 'border-white/[0.06] text-gray-500 hover:border-gray-600'
                             }`}
                           >
                             {reg[doc.key as keyof Registration] ? <Check size={14} /> : <Circle size={14} />}
@@ -707,9 +757,9 @@ const Registrations: React.FC = () => {
                         return (
                           <div
                             key={stageConfig.key}
-                            className={`flex items-center gap-4 p-3 border ${
+                            className={`flex items-center gap-4 p-3 border transition-all duration-300 ${
                               isCurrent
-                                ? 'border-tj-gold/50 bg-tj-gold/10 shadow-[0_0_15px_rgba(212,175,55,0.08)]'
+                                ? 'border-tj-gold/50 bg-tj-gold/10 shadow-[0_0_15px_rgba(212,175,55,0.08)] hover:shadow-[0_0_20px_rgba(212,175,55,0.08)]'
                                 : isComplete
                                 ? 'border-green-500/30 bg-green-900/10'
                                 : 'border-white/5'
@@ -784,7 +834,7 @@ const Registrations: React.FC = () => {
                         <button
                           onClick={() => openConfirmDialog(reg.id, reg.currentStage, 'rejected')}
                           disabled={actionLoading === reg.id}
-                          className="w-full p-3 border border-red-500/30 text-red-400 text-sm hover:bg-red-900/20 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                          className="w-full p-3 border border-red-500/30 text-red-400 text-sm hover:bg-red-900/20 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           <AlertCircle size={14} />
                           Mark as Rejected
@@ -793,7 +843,7 @@ const Registrations: React.FC = () => {
                     </div>
 
                     {/* Notes Section */}
-                    <div className="mt-6 pt-6 border-t border-gray-800">
+                    <div className="mt-6 pt-6 border-t border-white/[0.06]">
                       <h4 className="text-[10px] uppercase tracking-widest text-tj-gold mb-2">Admin Notes</h4>
                       <p className="text-gray-400 text-sm">{reg.notes || 'No notes'}</p>
                     </div>
@@ -818,11 +868,11 @@ const Registrations: React.FC = () => {
                     </div>
 
                     {/* Tracker Link */}
-                    <div className="mt-6 pt-6 border-t border-gray-800">
+                    <div className="mt-6 pt-6 border-t border-white/[0.06]">
                       <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-2">
                         Customer Tracker Link
                       </p>
-                      <div className="flex items-center gap-2 bg-black p-3 border border-gray-800">
+                      <div className="flex items-center gap-2 bg-black p-3 border border-white/[0.06]">
                         <LinkIcon size={14} className="text-gray-600 shrink-0" />
                         <code className="text-tj-gold text-xs flex-1 truncate">
                           {window.location.origin}/#/track/{reg.orderId}-{reg.accessToken}
@@ -839,18 +889,32 @@ const Registrations: React.FC = () => {
                         </button>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             ))}
           </div>
         )}
 
         {/* Create Modal */}
-        {showCreateModal && (
-          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
-            <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-lg max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-gray-800 flex justify-between items-center sticky top-0 bg-[#080808]">
+        <AnimatePresence>
+          {showCreateModal && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 30, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              >
+              <div className="p-6 border-b border-white/[0.06] flex justify-between items-center sticky top-0 bg-[#080808]">
                 <h3 className="text-white font-display text-lg tracking-wide">New Registration</h3>
                 <button
                   onClick={() => setShowCreateModal(false)}
@@ -869,7 +933,7 @@ const Registrations: React.FC = () => {
                   <select
                     value={createForm.vehicleId}
                     onChange={e => populateFromVehicle(e.target.value)}
-                    className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+                    className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
                   >
                     <option value="">-- Select from inventory --</option>
                     {vehicles
@@ -883,7 +947,7 @@ const Registrations: React.FC = () => {
                 </div>
 
                 {/* Customer Info */}
-                <div className="border-t border-gray-800 pt-6">
+                <div className="border-t border-white/[0.06] pt-6">
                   <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-4">Customer Information</p>
                   <div className="space-y-4">
                     <div>
@@ -895,7 +959,7 @@ const Registrations: React.FC = () => {
                         required
                         value={createForm.customerName}
                         onChange={e => setCreateForm(p => ({ ...p, customerName: e.target.value }))}
-                        className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+                        className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
                         placeholder="John Doe"
                       />
                     </div>
@@ -908,7 +972,7 @@ const Registrations: React.FC = () => {
                           type="tel"
                           value={createForm.customerPhone}
                           onChange={e => setCreateForm(p => ({ ...p, customerPhone: e.target.value }))}
-                          className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+                          className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
                           placeholder="(555) 123-4567"
                         />
                       </div>
@@ -920,7 +984,7 @@ const Registrations: React.FC = () => {
                           type="email"
                           value={createForm.customerEmail}
                           onChange={e => setCreateForm(p => ({ ...p, customerEmail: e.target.value }))}
-                          className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+                          className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
                           placeholder="john@email.com"
                         />
                       </div>
@@ -932,7 +996,7 @@ const Registrations: React.FC = () => {
                       <textarea
                         value={createForm.customerAddress}
                         onChange={e => setCreateForm(p => ({ ...p, customerAddress: e.target.value }))}
-                        className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold resize-none"
+                        className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold resize-none"
                         rows={2}
                         placeholder="123 Main St, Houston, TX 77001"
                       />
@@ -941,7 +1005,7 @@ const Registrations: React.FC = () => {
                 </div>
 
                 {/* Vehicle Info */}
-                <div className="border-t border-gray-800 pt-6">
+                <div className="border-t border-white/[0.06] pt-6">
                   <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-4">Vehicle Information</p>
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
@@ -955,7 +1019,7 @@ const Registrations: React.FC = () => {
                           maxLength={17}
                           value={createForm.vin}
                           onChange={e => setCreateForm(p => ({ ...p, vin: e.target.value.toUpperCase() }))}
-                          className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-tj-gold"
+                          className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-tj-gold"
                           placeholder="1HGBH41JXMN109186"
                         />
                       </div>
@@ -967,7 +1031,7 @@ const Registrations: React.FC = () => {
                           type="text"
                           value={createForm.plateNumber}
                           onChange={e => setCreateForm(p => ({ ...p, plateNumber: e.target.value.toUpperCase() }))}
-                          className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-tj-gold"
+                          className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm font-mono focus:outline-none focus:border-tj-gold"
                           placeholder="ABC-1234"
                         />
                       </div>
@@ -984,7 +1048,7 @@ const Registrations: React.FC = () => {
                           max={new Date().getFullYear() + 1}
                           value={createForm.vehicleYear}
                           onChange={e => setCreateForm(p => ({ ...p, vehicleYear: parseInt(e.target.value) || 0 }))}
-                          className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+                          className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
                         />
                       </div>
                       <div>
@@ -996,7 +1060,7 @@ const Registrations: React.FC = () => {
                           required
                           value={createForm.vehicleMake}
                           onChange={e => setCreateForm(p => ({ ...p, vehicleMake: e.target.value }))}
-                          className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+                          className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
                           placeholder="Toyota"
                         />
                       </div>
@@ -1009,7 +1073,7 @@ const Registrations: React.FC = () => {
                           required
                           value={createForm.vehicleModel}
                           onChange={e => setCreateForm(p => ({ ...p, vehicleModel: e.target.value }))}
-                          className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
+                          className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold"
                           placeholder="Camry"
                         />
                       </div>
@@ -1018,11 +1082,11 @@ const Registrations: React.FC = () => {
                 </div>
 
                 {/* Submit */}
-                <div className="border-t border-gray-800 pt-6 flex justify-end gap-4">
+                <div className="border-t border-white/[0.06] pt-6 flex justify-end gap-4">
                   <button
                     type="button"
                     onClick={() => setShowCreateModal(false)}
-                    className="px-6 py-3 border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+                    className="px-6 py-3 border border-white/[0.06] text-gray-400 hover:text-white hover:border-gray-500 transition-all duration-300"
                   >
                     Cancel
                   </button>
@@ -1045,15 +1109,28 @@ const Registrations: React.FC = () => {
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-        )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Status Change Confirmation Dialog */}
-        {confirmDialog && (
-          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
-            <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-md">
-              <div className="p-6 border-b border-gray-800">
+        <AnimatePresence>
+          {confirmDialog && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 30, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-md"
+              >
+              <div className="p-6 border-b border-white/[0.06]">
                 <h3 className="text-white font-display text-lg tracking-wide">
                   Confirm Status Change
                 </h3>
@@ -1083,7 +1160,7 @@ const Registrations: React.FC = () => {
                       ? 'Enter reason for rejection from DMV...'
                       : 'Add optional note for audit trail...'
                     }
-                    className="w-full bg-black border border-gray-700 px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold resize-none"
+                    className="w-full bg-black border border-white/[0.06] px-4 py-3 text-white text-sm focus:outline-none focus:border-tj-gold resize-none"
                     rows={3}
                   />
                 </div>
@@ -1102,10 +1179,10 @@ const Registrations: React.FC = () => {
                 </div>
               </div>
 
-              <div className="p-6 border-t border-gray-800 flex justify-end gap-4">
+              <div className="p-6 border-t border-white/[0.06] flex justify-end gap-4">
                 <button
                   onClick={() => setConfirmDialog(null)}
-                  className="px-6 py-3 border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 transition-colors"
+                  className="px-6 py-3 border border-white/[0.06] text-gray-400 hover:text-white hover:border-gray-500 transition-all duration-300"
                 >
                   Cancel
                 </button>
@@ -1131,15 +1208,28 @@ const Registrations: React.FC = () => {
                   )}
                 </button>
               </div>
-            </div>
-          </div>
-        )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Audit History Modal */}
-        {showAuditHistory && (
-          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
-            <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-2xl max-h-[80vh] flex flex-col">
-              <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+        <AnimatePresence>
+          {showAuditHistory && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 30, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-2xl max-h-[80vh] flex flex-col"
+              >
+              <div className="p-6 border-b border-white/[0.06] flex justify-between items-center">
                 <h3 className="text-white font-display text-lg tracking-wide">
                   Change History
                 </h3>
@@ -1157,7 +1247,7 @@ const Registrations: React.FC = () => {
                 ) : (
                   <div className="space-y-4">
                     {auditHistory.map(audit => (
-                      <div key={audit.id} className="border border-gray-800 p-4">
+                      <div key={audit.id} className="border border-white/[0.06] p-4">
                         <div className="flex justify-between items-start mb-2">
                           <span className={`text-xs px-2 py-1 ${
                             audit.operation === 'INSERT' ? 'bg-green-500/20 text-green-400' :
@@ -1192,15 +1282,28 @@ const Registrations: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-        )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Notification History Modal */}
-        {showNotifications && (
-          <div className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4">
-            <div className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-2xl max-h-[80vh] flex flex-col">
-              <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+        <AnimatePresence>
+          {showNotifications && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/95 backdrop-blur-xl flex items-center justify-center z-50 p-4"
+            >
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 30, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="bg-[#080808] border border-tj-gold/30 shadow-[0_0_100px_rgba(0,0,0,1)] w-full max-w-2xl max-h-[80vh] flex flex-col"
+              >
+              <div className="p-6 border-b border-white/[0.06] flex justify-between items-center">
                 <h3 className="text-white font-display text-lg tracking-wide">
                   Notification History
                 </h3>
@@ -1216,7 +1319,7 @@ const Registrations: React.FC = () => {
                   <p className="text-gray-500 text-sm">No notifications sent yet.</p>
                 ) : (
                   notificationHistory.map(n => (
-                    <div key={n.id} className="border border-gray-800 p-4 space-y-2">
+                    <div key={n.id} className="border border-white/[0.06] p-4 space-y-2">
                       <div className="flex justify-between items-start">
                         <div className="flex items-center gap-2">
                           <span className={`text-xs px-2 py-0.5 uppercase tracking-wider ${
@@ -1247,9 +1350,10 @@ const Registrations: React.FC = () => {
                   ))
                 )}
               </div>
-            </div>
-          </div>
-        )}
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
     </>
