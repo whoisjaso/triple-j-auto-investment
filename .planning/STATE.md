@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-16
-**Session:** Phase 11 plan 04 complete (visual consistency -- spacing and buttons)
+**Session:** Phase 11 plan 05 complete (accessibility basics -- WCAG AA contrast, keyboard nav, focus traps, ARIA)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 11 - Production Polish (4/6 plans complete)
+**Current focus:** Phase 11 - Production Polish (5/6 plans complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 11 of 19 (Production Polish)
-**Plan:** 4 of 6 completed (11-01, 11-02, 11-03, 11-04)
+**Plan:** 5 of 6 completed (11-01, 11-02, 11-03, 11-04, 11-05)
 **Status:** In progress
-**Last activity:** 2026-02-16 -- Completed 11-04-PLAN.md (visual consistency: canonical spacing scale + button patterns across all 13 pages + footer)
+**Last activity:** 2026-02-16 -- Completed 11-05-PLAN.md (accessibility basics: WCAG AA contrast, keyboard nav, focus traps, ARIA attributes)
 
-Progress: [████████████░] 92% (12/13 plans completed across v2.0 so far)
+Progress: [█████████████░] 93% (13/14 plans completed across v2.0 so far)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04)
+- Total plans completed: 13 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -98,6 +98,11 @@ Progress: [████████████░] 92% (12/13 plans completed a
 - **[11-04]** Section padding two-tier scale: py-16 md:py-24 (standard) and py-20 md:py-32 (hero/large)
 - **[11-04]** tracking-[0.2em] on non-button text (labels, headings, selects, footer headings) preserved unchanged
 - **[11-04]** 11-03 responsive pattern (p-6 sm:p-10/p-12) further standardized to p-6 md:p-8 for tighter consistency
+- **[11-05]** text-gray-400 (#9CA3AF) chosen as minimum for all readable text on black (~5.5:1 ratio, passes WCAG AA)
+- **[11-05]** Focus trap uses vanilla DOM querySelectorAll (no library) to keep bundle minimal
+- **[11-05]** Modal containers use tabIndex={-1} with focus:outline-none (programmatic focus targets only)
+- **[11-05]** Login.tsx keeps bare outline-none because parent group-focus-within provides visible focus via border change
+- **[11-05]** Admin pages excluded from accessibility fixes (out of scope for Phase 11)
 
 ### Completed Work (Phase 9)
 
@@ -120,6 +125,7 @@ Progress: [████████████░] 92% (12/13 plans completed a
 - **11-02 (complete):** Inventory empty/error state separation (skeleton loading, error+retry, empty+CTA). Contact/Finance form error states with bilingual retry UI. CustomerDashboard bilingual empty state. About map iframe skeleton. Image lazy loading on vehicle cards + featured vehicles.
 - **11-03 (complete):** Mobile responsiveness across 8 pages at 375px viewport. Footer social icons/legal links/quick links 44px touch targets. Mobile language toggle 44px target. VinLookup responsive grid and VIN input sizing. Finance form grid mobile stacking. About map iframe mobile height. Responsive padding on all form containers and cards (p-6 sm:p-10/p-12). CustomerLogin button touch targets.
 - **11-04 (complete):** Visual consistency across all 13 customer-facing pages + footer. Canonical spacing scale (py-16 md:py-24 standard, py-20 md:py-32 hero). Card padding standardized to p-6 md:p-8. All CTA buttons use py-4 px-8 text-xs tracking-[0.3em]. Page horizontal padding standardized to px-4 md:px-6. Footer quick links upgraded to py-3. Zero tracking-[0.2em] on any button element.
+- **11-05 (complete):** WCAG AA accessibility basics. Color contrast: text-gray-500/600 replaced with text-gray-400 across all customer-facing pages. Alt text: fixed generic "Detail" alt on Inventory modal, added year/make/model to featured vehicles. Skip-to-content link as first focusable element (bilingual). FAQ accordion: aria-expanded/aria-controls/role="region". Focus trapping on Inventory modal, ImageGallery, ImageLightbox. Mobile menu Escape key. Visible focus indicators (focus:ring-2 focus:ring-tj-gold/50) on all customer-facing inputs.
 
 ### Remaining Phase 9 Work
 
@@ -136,8 +142,7 @@ None -- Phase 10 is fully complete (all original plans + gap closure plans).
 
 ### Remaining Phase 11 Work
 
-- **11-05:** Visual consistency (remaining items beyond spacing/buttons)
-- **11-06:** Accessibility basics (alt text, ARIA, keyboard nav, contrast)
+- **11-06:** Performance optimization / final polish items
 
 ### Blockers/Concerns
 
@@ -152,6 +157,6 @@ None -- Phase 10 is fully complete (all original plans + gap closure plans).
 ## Session Continuity
 
 **Last session:** 2026-02-16
-**Stopped at:** Completed 11-04-PLAN.md (visual consistency: spacing and buttons)
+**Stopped at:** Completed 11-05-PLAN.md (accessibility basics)
 **Resume file:** None
-**Resume:** Phase 11 plan 04 complete. Canonical spacing scale (py-16 md:py-24 standard, py-20 md:py-32 hero) and button patterns (py-4 px-8 text-xs tracking-[0.3em]) applied across all 13 customer-facing pages plus footer. Card padding standardized to p-6 md:p-8. Next: 11-05 (visual consistency remaining items) or 11-06 (accessibility basics).
+**Resume:** Phase 11 plan 05 complete. WCAG AA color contrast (text-gray-400 minimum), skip-to-content link, FAQ accordion keyboard support, focus trapping on 3 modal/lightbox components, Escape closes mobile menu, visible focus indicators on all inputs. Next: 11-06 (performance optimization / final polish).
