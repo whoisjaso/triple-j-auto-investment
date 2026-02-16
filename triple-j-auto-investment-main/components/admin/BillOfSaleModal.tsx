@@ -546,66 +546,71 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                 </div>
               )}
 
-                {/* Document Buttons */}
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={handleGenerateBOS}
-                    disabled={!isFormValid || generatingType !== null}
-                    className="bg-tj-gold text-black font-bold py-3.5 px-4 text-sm uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {generatingType === 'bos' ? (
-                      <Loader2 className="animate-spin" size={16} />
-                    ) : (
-                      <Eye size={16} />
-                    )}
-                    Bill of Sale
-                  </button>
+                {/* Generate Documents */}
+                <div className="bg-black/50 border border-white/10 p-4">
+                  <h3 className="text-xs uppercase tracking-wider text-tj-gold mb-3 text-center flex items-center justify-center gap-2">
+                    <FileText size={14} /> Generate Documents
+                  </h3>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={handleGenerateBOS}
+                      disabled={!isFormValid || generatingType !== null}
+                      className="bg-tj-gold text-black font-bold py-4 px-4 text-sm uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[52px]"
+                    >
+                      {generatingType === 'bos' ? (
+                        <Loader2 className="animate-spin" size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                      Bill of Sale
+                    </button>
 
-                  <button
-                    onClick={handleGenerateForm130U}
-                    disabled={!isFormValid || generatingType !== null}
-                    className="bg-tj-gold/20 text-tj-gold font-bold py-3.5 px-4 text-sm uppercase tracking-wider hover:bg-tj-gold hover:text-black border border-tj-gold/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {generatingType === '130u' ? (
-                      <Loader2 className="animate-spin" size={16} />
-                    ) : (
-                      <Eye size={16} />
-                    )}
-                    Form 130-U
-                  </button>
+                    <button
+                      onClick={handleGenerateForm130U}
+                      disabled={!isFormValid || generatingType !== null}
+                      className="bg-tj-gold/20 text-tj-gold font-bold py-4 px-4 text-sm uppercase tracking-wider hover:bg-tj-gold hover:text-black border border-tj-gold/40 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[52px]"
+                    >
+                      {generatingType === '130u' ? (
+                        <Loader2 className="animate-spin" size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                      Form 130-U
+                    </button>
 
-                  <button
-                    onClick={handleGenerateAsIs}
-                    disabled={!isFormValid || generatingType !== null}
-                    className="bg-white/5 text-gray-300 font-bold py-3.5 px-4 text-sm uppercase tracking-wider hover:bg-tj-gold hover:text-black border border-white/10 hover:border-tj-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {generatingType === 'asis' ? (
-                      <Loader2 className="animate-spin" size={16} />
-                    ) : (
-                      <Eye size={16} />
-                    )}
-                    As-Is Form
-                  </button>
+                    <button
+                      onClick={handleGenerateAsIs}
+                      disabled={!isFormValid || generatingType !== null}
+                      className="bg-white/5 text-gray-300 font-bold py-4 px-4 text-sm uppercase tracking-wider hover:bg-tj-gold hover:text-black border border-white/10 hover:border-tj-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[52px]"
+                    >
+                      {generatingType === 'asis' ? (
+                        <Loader2 className="animate-spin" size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                      As-Is Form
+                    </button>
 
-                  <button
-                    onClick={handleGenerateRegistration}
-                    disabled={!isFormValid || generatingType !== null}
-                    className="bg-white/5 text-gray-300 font-bold py-3.5 px-4 text-sm uppercase tracking-wider hover:bg-tj-gold hover:text-black border border-white/10 hover:border-tj-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                  >
-                    {generatingType === 'reg' ? (
-                      <Loader2 className="animate-spin" size={16} />
-                    ) : (
-                      <Eye size={16} />
-                    )}
-                    Reg Guide
-                  </button>
+                    <button
+                      onClick={handleGenerateRegistration}
+                      disabled={!isFormValid || generatingType !== null}
+                      className="bg-white/5 text-gray-300 font-bold py-4 px-4 text-sm uppercase tracking-wider hover:bg-tj-gold hover:text-black border border-white/10 hover:border-tj-gold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 min-h-[52px]"
+                    >
+                      {generatingType === 'reg' ? (
+                        <Loader2 className="animate-spin" size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                      Reg Guide
+                    </button>
+                  </div>
+
+                  {!isFormValid && (
+                    <p className="text-xs text-gray-400 text-center mt-3">
+                      Select a vehicle and fill in buyer info to generate
+                    </p>
+                  )}
                 </div>
-
-                {!isFormValid && (
-                  <p className="text-xs text-gray-500 text-center mt-2">
-                    Select a vehicle and fill in buyer information to generate documents
-                  </p>
-                )}
               </div>
 
               {/* RIGHT PANEL - Preview */}

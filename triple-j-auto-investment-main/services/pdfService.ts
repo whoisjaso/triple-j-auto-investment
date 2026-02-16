@@ -380,16 +380,39 @@ export const generateAsIsPDF = async (data: BillOfSaleData, preview: boolean = f
         logo
     );
 
+    // --- VEHICLE DESCRIPTION (clean data boxes at top) ---
+    y = drawSection(doc, isSpanish ? "DESCRIPCIÓN DEL VEHÍCULO" : "VEHICLE DESCRIPTION", y);
+
+    const colW = CONTENT_WIDTH / 4;
+    drawDataBox(doc, isSpanish ? "AÑO" : "YEAR", data.year, MARGIN, y, colW * 0.6, 12, { align: 'center' });
+    drawDataBox(doc, isSpanish ? "MARCA" : "MAKE", data.make, MARGIN + (colW * 0.6), y, colW, 12);
+    drawDataBox(doc, isSpanish ? "MODELO" : "MODEL", data.model, MARGIN + (colW * 1.6), y, colW, 12);
+    drawDataBox(doc, isSpanish ? "MILLAJE" : "MILEAGE", data.odometer, MARGIN + (colW * 2.6), y, colW * 1.4, 12, { align: 'center' });
+    y += 12;
+
+    drawDataBox(doc, "VIN", data.vin, MARGIN, y, CONTENT_WIDTH, 12, { mono: true });
+    y += 16;
+
+    // --- BUYER INFORMATION ---
+    y = drawSection(doc, isSpanish ? "INFORMACIÓN DEL COMPRADOR" : "BUYER INFORMATION", y);
+
+    drawDataBox(doc, isSpanish ? "NOMBRE COMPLETO" : "FULL NAME", data.buyerName, MARGIN, y, CONTENT_WIDTH / 2, 12);
+    drawDataBox(doc, isSpanish ? "DIRECCIÓN" : "ADDRESS", data.buyerAddress, MARGIN + CONTENT_WIDTH / 2, y, CONTENT_WIDTH / 2, 12);
+    y += 16;
+
+    // --- AS-IS ACKNOWLEDGMENT ---
+    y = drawSection(doc, isSpanish ? "RECONOCIMIENTO DE VENTA COMO ESTÁ" : "AS-IS SALE ACKNOWLEDGMENT", y);
+
     doc.setFont("times", "normal");
     doc.setFontSize(11);
     doc.setTextColor(0, 0, 0);
 
-    const buyerName = data.buyerName ? data.buyerName : "______________________________________";
+    const buyerName = data.buyerName || "________________________";
 
     const paragraphs = [
         isSpanish
-            ? `Yo, ${buyerName} (Nombre del Comprador),\nreconozco que estoy comprando el vehículo descrito a continuación de Triple J Auto Investments LLC en condición COMO ESTÁ.`
-            : `I, ${buyerName} (Buyer's Name),\nacknowledge that I am purchasing the vehicle described below from Triple J Auto Investments LLC in AS-IS condition.`,
+            ? `Yo, ${buyerName}, reconozco que estoy comprando el vehículo descrito anteriormente de Triple J Auto Investment LLC en condición COMO ESTÁ.`
+            : `I, ${buyerName}, acknowledge that I am purchasing the vehicle described above from Triple J Auto Investment LLC in AS-IS condition.`,
 
         isSpanish
             ? "Entiendo que el vehículo se vende sin ninguna garantía, ya sea expresa o implícita. El concesionario no ofrece garantías sobre la condición, el rendimiento o la confiabilidad del vehículo."
@@ -400,103 +423,48 @@ export const generateAsIsPDF = async (data: BillOfSaleData, preview: boolean = f
             : "I have had the opportunity to inspect and test drive the vehicle to my satisfaction. I accept full responsibility for any repairs or maintenance needed after the purchase.",
 
         isSpanish
-            ? "Acepto que Triple J Auto Investments LLC no es responsable de ningún defecto, daño o problema mecánico descubierto después de la venta, y que no se otorgarán reembolsos ni cambios."
-            : "I agree that Triple J Auto Investments LLC is not responsible for any defects, damages, or mechanical issues discovered after the sale, and that no refunds or exchanges will be given."
+            ? "Acepto que Triple J Auto Investment LLC no es responsable de ningún defecto, daño o problema mecánico descubierto después de la venta, y que no se otorgarán reembolsos ni cambios."
+            : "I agree that Triple J Auto Investment LLC is not responsible for any defects, damages, or mechanical issues discovered after the sale, and that no refunds or exchanges will be given."
     ];
 
-    paragraphs.forEach((text) => {
-        const lines = doc.splitTextToSize(text, CONTENT_WIDTH);
-        doc.text(lines, MARGIN, y);
-        y += (lines.length * 5) + 6;
+    paragraphs.forEach((text, i) => {
+        const lines = doc.splitTextToSize(text, CONTENT_WIDTH - 6);
+        doc.text(lines, MARGIN + 3, y + 4);
+        y += (lines.length * 5) + 8;
     });
 
-    y += 10;
+    y += 5;
 
-    // Signatures
-    const drawSignatureRow = (label1: string, label2: string, yPos: number) => {
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
+    // --- SIGNATURES (clean, proportional, centered) ---
+    y = drawSection(doc, isSpanish ? "FIRMAS" : "SIGNATURES", y);
+    y += 5;
 
-        // Left Side (Signature)
-        doc.text(label1, MARGIN, yPos);
-        const l1w = doc.getTextWidth(label1);
-        doc.setLineWidth(0.1);
-        doc.line(MARGIN + l1w + 2, yPos, MARGIN + 110, yPos);
+    const sigColW = (CONTENT_WIDTH - 20) / 2;
 
-        // Right Side (Date)
-        doc.text(label2, MARGIN + 115, yPos);
-        const l2w = doc.getTextWidth(label2);
-        doc.line(MARGIN + 115 + l2w + 2, yPos, PAGE_WIDTH - MARGIN, yPos);
-    };
+    // Buyer signature block
+    doc.setDrawColor(200, 200, 200);
+    doc.setLineWidth(0.3);
+    doc.line(MARGIN, y + 20, MARGIN + sigColW, y + 20);
+    doc.setFont("times", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(isSpanish ? "FIRMA DEL COMPRADOR" : "BUYER SIGNATURE", MARGIN, y + 26);
+    doc.setFont("times", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text(isSpanish ? "Fecha: _______________" : "Date: _______________", MARGIN, y + 32);
 
-    drawSignatureRow(
-        isSpanish ? "Firma del Comprador:" : "Buyer Signature:",
-        isSpanish ? "Fecha:" : "Date:",
-        y
-    );
-    y += 15;
-
-    drawSignatureRow(
-        isSpanish ? "Representante de Ventas:" : "Sales Representative:",
-        isSpanish ? "Fecha:" : "Date:",
-        y
-    );
-
-    y += 20;
-
-    // Vehicle Description
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.text(isSpanish ? "Descripción del Vehículo:" : "Vehicle Description:", MARGIN, y);
-    y += 8;
-
-    // Precise Helper for underlined fields
-    const drawUnderlinedField = (label: string, value: string, x: number, width: number) => {
-         doc.setFont("helvetica", "bold");
-         doc.text(label, x, y);
-         const labelW = doc.getTextWidth(label);
-
-         const valX = x + labelW + 2;
-         const lineLen = width - labelW - 4; // approximate available space for line
-
-         if (value) {
-             doc.setFont("courier", "bold");
-             doc.text(value, valX, y);
-         } else {
-             doc.setLineWidth(0.1);
-             doc.line(valX, y, valX + lineLen, y);
-         }
-         return x + width; // return next X position
-    };
-
-    // Row 1: Year (small), Make (medium), Model (medium)
-    let curX = MARGIN;
-    curX = drawUnderlinedField(isSpanish ? "Año:" : "Year:", data.year, curX, 40);
-    curX = drawUnderlinedField(isSpanish ? "Marca:" : "Make:", data.make, curX + 5, 70);
-    curX = drawUnderlinedField(isSpanish ? "Modelo:" : "Model:", data.model, curX + 5, 70);
-
-    y += 10;
-
-    // Row 2: VIN (long), Mileage (short)
-    curX = MARGIN;
-    curX = drawUnderlinedField("VIN:", data.vin, curX, 100);
-    curX = drawUnderlinedField(isSpanish ? "Millaje:" : "Mileage:", data.odometer, curX + 10, 60);
-
-    y += 10;
-
-    // Row 3: Colors
-    curX = MARGIN;
-    curX = drawUnderlinedField(isSpanish ? "Color Mayor:" : "Major Color:", data.majorColor || data.exteriorColor, curX, 60);
-    curX = drawUnderlinedField(isSpanish ? "Color Menor:" : "Minor Color:", data.minorColor || data.interiorColor, curX + 5, 60);
-    curX = drawUnderlinedField(isSpanish ? "Planta TX:" : "TX Plant No:", data.texasPlantNo, curX + 5, 50);
-
-    y += 10;
-
-    // Row 4: Applicant ID
-    curX = MARGIN;
-    const idTypeLabel = data.applicantIdType ? data.applicantIdType.replace(/_/g, ' ') : '';
-    curX = drawUnderlinedField(isSpanish ? "Tipo de ID:" : "ID Type:", idTypeLabel, curX, 80);
-    curX = drawUnderlinedField(isSpanish ? "Número de ID:" : "ID Number:", data.applicantIdNumber, curX + 5, 80);
+    // Seller signature block
+    doc.setDrawColor(200, 200, 200);
+    doc.line(MARGIN + sigColW + 20, y + 20, PAGE_WIDTH - MARGIN, y + 20);
+    doc.setFont("times", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(isSpanish ? "REPRESENTANTE DEL VENDEDOR" : "SELLER REPRESENTATIVE", MARGIN + sigColW + 20, y + 26);
+    doc.setFont("times", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text("Triple J Auto Investment LLC", MARGIN + sigColW + 20, y + 32);
 
     drawFooter(doc);
 
@@ -692,29 +660,28 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
         // Helper: force a text field to pure black Times New Roman ink
         const forceBlackAppearance = (field: ReturnType<typeof form.getTextField>) => {
             try {
-                // Get the current DA string from the field's dictionary
                 const acro = field.acroField;
-                const rawDA = acro.dict.get(PDFName.of('DA'));
-                let daStr = rawDA ? rawDA.toString() : '';
 
-                // Strip any existing color commands (RGB, grayscale, CMYK)
+                // Use the proper getter which decodes PDFHexString/PDFString correctly
+                // (NOT .dict.get().toString() which returns hex notation garbage)
+                let daStr = (acro as any).getDefaultAppearance?.() || '';
+
+                // Strip ALL existing color commands
                 daStr = daStr
-                    .replace(/[\d.]+\s+[\d.]+\s+[\d.]+\s+rg/g, '')  // RGB color
+                    .replace(/[\d.]+\s+[\d.]+\s+[\d.]+\s+rg/g, '')   // RGB
                     .replace(/[\d.]+\s+[\d.]+\s+[\d.]+\s+[\d.]+\s+k/g, '') // CMYK
-                    .replace(/[\d.]+\s+g(?=\s|$)/g, '')              // Grayscale
-                    .replace(/\(\s*\)/g, '')                          // Empty parens
+                    .replace(/[\d.]+\s+g(?=[\s\)]|$)/g, '')           // Grayscale
                     .trim();
 
-                // Append pure black (0 0 0 rg = RGB black)
+                // Append pure black RGB
                 daStr = daStr + ' 0 0 0 rg';
 
-                // Write the modified DA back
-                acro.dict.set(PDFName.of('DA'), PDFHexString.fromText(daStr));
+                // Use the proper setter which encodes correctly
+                (acro as any).setDefaultAppearance?.(daStr);
 
-                // Rebuild appearance stream with Times font and black color
+                // Rebuild appearance stream with the updated DA + Times font
                 field.updateAppearances(timesFont);
             } catch {
-                // Fallback: just try updateAppearances
                 try { field.updateAppearances(timesFont); } catch {}
             }
         };
