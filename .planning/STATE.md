@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-16
-**Session:** Phase 12 COMPLETE (all 2 plans: 12-01, 12-02)
+**Session:** Phase 12 gap closure in progress (3/4 plans: 12-01, 12-02, 12-03)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 12 - SEO Foundation (COMPLETE -- 2/2 plans done)
+**Current focus:** Phase 12 - SEO Foundation (gap closure -- 3/4 plans done)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 12 of 19 (SEO Foundation)
-**Plan:** 2 of 2 completed (12-01, 12-02)
-**Status:** Phase complete
-**Last activity:** 2026-02-16 -- Completed 12-01-PLAN.md (BrowserRouter migration + per-page SEO metadata on 15 pages)
+**Plan:** 3 of 4 completed (12-01, 12-02, 12-03)
+**Status:** In progress (gap closure)
+**Last activity:** 2026-02-16 -- Completed 12-03-PLAN.md (GEO/AEO gap closure: AI crawlers + schema enrichment + hreflang)
 
-Progress: [██████████████████] 100% (18/18 plans completed across v2.0 so far)
+Progress: [███████████████████] 100% (19/19 plans completed across v2.0 so far)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02)
+- Total plans completed: 19 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -115,6 +115,10 @@ Progress: [██████████████████] 100% (18/18 p
 - **[12-02]** Schema @type uses array format ["AutoDealer", "LocalBusiness"] for explicit dual-type declaration
 - **[12-02]** geo: namespace and Crawl-delay removed from sitemap.xml and robots.txt respectively (non-standard/unnecessary)
 - **[12-02]** FAQ schema payment answer corrected from "wire transfer" to "debit card" (consistent with 10-03)
+- **[12-03]** AI crawlers get explicit per-bot allow/disallow blocks (8 bots: GPTBot, ChatGPT-User, ClaudeBot, Claude-Web, PerplexityBot, Google-Extended, Applebot-Extended, Amazonbot)
+- **[12-03]** sameAs uses real Facebook and Instagram business profile URLs for triplejautoinvestment
+- **[12-03]** hreflang en/es/x-default all point to same URL (bilingual toggle on single URL, not separate language URLs)
+- **[12-03]** SEO component extracts canonical into local variable for DRY hreflang + canonical + og:url rendering
 
 ### Completed Work (Phase 9)
 
@@ -142,10 +146,11 @@ Progress: [██████████████████] 100% (18/18 p
 - **11-07 (complete):** BLOCKER gap closure. Viewport meta: removed maximum-scale=1.0 and user-scalable=no for WCAG 1.4.4 compliance (pinch-to-zoom enabled). SplashScreen: reduced from 4.3s to 1.7s total (1.2s splash + 0.5s fade) for LCP under 2.5s target. Both BLOCKER gaps from 11-VERIFICATION.md resolved.
 - **11-08 (complete):** WARNING gap closure. Replaced all text-gray-500/600 with text-gray-400 on 9 customer-facing pages + 4 components (87+ instances). Zero WCAG AA contrast failures remain on any customer-facing page. Build passes.
 
-### Completed Work (Phase 12) -- ALL COMPLETE
+### Completed Work (Phase 12) -- 3/4 COMPLETE
 
 - **12-01 (complete):** BrowserRouter replaces HashRouter for clean URLs. HashRedirect component redirects legacy /#/path bookmarks. SEO.tsx component created with React 19 native meta hoisting (title, description, canonical, OG tags, noindex). 10 public pages with keyword-optimized titles/descriptions. Legal.tsx dynamic title from URL param. 4 private pages with noindex. Build passes clean.
 - **12-02 (complete):** Fixed robots.txt (added Disallow: /customer/ and /track, removed redundant Allow directives and Crawl-delay). Updated sitemap.xml (all 10 lastmod dates to 2026-02-16, removed non-standard geo: namespace). Fixed index.html schema (@type to ["AutoDealer", "LocalBusiness"], FAQ payment answer "wire transfer" to "debit card"). Removed static <title> and <meta name="description"> for React 19 per-page compatibility.
+- **12-03 (complete):** GEO/AEO gap closure. AI crawlers allowed in robots.txt (8 bots). AutoDealer schema enriched with knowsLanguage, additionalType AutoRental, sameAs (Facebook+Instagram). New FinancialProduct JSON-LD for BHPH financing. New Service JSON-LD for car rentals. BreadcrumbList expanded to all 10 public pages. hreflang en/es/x-default in index.html + per-page via SEO.tsx.
 
 ### Remaining Phase 9 Work
 
@@ -166,7 +171,7 @@ None -- Phase 11 is fully complete (all original plans + gap closure plans).
 
 ### Remaining Phase 12 Work
 
-None -- Phase 12 is fully complete (all 2 plans done).
+- **12-04:** Remaining gap closure plan (if exists)
 
 ### Blockers/Concerns
 
@@ -181,6 +186,6 @@ None -- Phase 12 is fully complete (all 2 plans done).
 ## Session Continuity
 
 **Last session:** 2026-02-16
-**Stopped at:** Completed 12-01-PLAN.md -- Phase 12 fully complete
+**Stopped at:** Completed 12-03-PLAN.md (GEO/AEO gap closure)
 **Resume file:** None
-**Resume:** Completed 12-01: BrowserRouter replaces HashRouter, SEO.tsx component with React 19 native meta hoisting, 15 pages with per-page title/description/canonical/OG tags, 4 private pages with noindex, HashRedirect for legacy URLs. Phase 12 (SEO Foundation) is fully complete with all 2 plans executed. Next: Phase 13 (Focus Capture).
+**Resume:** Completed 12-03: AI crawlers allowed in robots.txt (8 bots), entity graph enriched with FinancialProduct/Service/sameAs/knowsLanguage schemas, hreflang bilingual signals on every page, BreadcrumbList expanded to all 10 public pages. Phase 12 has 12-04 remaining. Next: 12-04 or Phase 13 (Focus Capture).
