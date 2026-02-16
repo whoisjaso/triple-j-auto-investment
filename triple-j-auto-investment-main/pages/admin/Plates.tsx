@@ -2,6 +2,7 @@
  * Admin Plate Management Page
  *
  * Phase 07-02: Dedicated plate tracking page with split-view dashboard.
+ * Phase 11: Redesigned with framer-motion animations matching Dashboard luxury style.
  *
  * Features:
  * - Split view: Plates Out (3/5) + Plate Inventory (2/5)
@@ -22,6 +23,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Car,
@@ -34,14 +36,10 @@ import {
   Plus,
   RefreshCw,
   Loader2,
-  X,
   Check,
   Edit2,
   Trash2,
-  ChevronDown,
-  ChevronUp,
   Phone,
-  AlertTriangle,
   Clock,
   Shield,
   CheckCircle,
@@ -70,6 +68,15 @@ import {
 } from '../../types';
 
 // ================================================================
+// ANIMATION VARIANTS
+// ================================================================
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.08, duration: 0.4 } }),
+};
+
+// ================================================================
 // ADMIN HEADER (duplicated per research guidance - pitfall #7)
 // ================================================================
 
@@ -90,7 +97,7 @@ const AdminHeader = () => {
 
   return (
     <>
-      <header className="bg-black backdrop-blur-md border-b border-tj-gold/30 sticky top-0 z-[100] shadow-lg">
+      <header className="bg-black/95 backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-[100]">
         <div className="max-w-[1800px] mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             <Link to="/" className="flex items-center group">
@@ -109,7 +116,7 @@ const AdminHeader = () => {
                   className={`flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold transition-all border ${
                     location.pathname === item.path
                       ? 'bg-tj-gold text-black border-tj-gold'
-                      : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/5'
+                      : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/[0.04]'
                   }`}
                 >
                   <item.icon size={14} />
@@ -119,17 +126,17 @@ const AdminHeader = () => {
 
               <button
                 onClick={() => setShowDocModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold text-gray-400 hover:text-white border border-transparent hover:border-white/20 hover:bg-white/5 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold text-gray-400 hover:text-white border border-transparent hover:border-white/20 hover:bg-white/[0.04] transition-all"
               >
                 <FileText size={14} />
                 Documents
               </button>
 
-              <div className="h-6 w-px bg-gray-700 mx-2" />
+              <div className="h-5 w-px bg-white/[0.08] mx-2" />
 
               <button
                 onClick={() => { logout(); navigate('/'); }}
-                className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400/70 hover:text-red-300 hover:bg-red-900/10 transition-all"
               >
                 <LogOut size={14} />
                 Logout
@@ -145,7 +152,7 @@ const AdminHeader = () => {
           </div>
 
           {mobileMenuOpen && (
-            <nav className="md:hidden border-t border-white/10 py-4 space-y-2">
+            <nav className="md:hidden border-t border-white/[0.06] py-4 space-y-2">
               {navItems.map(item => (
                 <Link
                   key={item.path}
@@ -154,7 +161,7 @@ const AdminHeader = () => {
                   className={`flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold transition-all ${
                     location.pathname === item.path
                       ? 'bg-tj-gold/10 text-tj-gold border-l-2 border-tj-gold'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
                   <item.icon size={18} />
@@ -164,16 +171,16 @@ const AdminHeader = () => {
 
               <button
                 onClick={() => { setShowDocModal(true); setMobileMenuOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-gray-400 hover:text-white hover:bg-white/[0.04] transition-all"
               >
                 <FileText size={18} />
                 Documents
               </button>
 
-              <div className="border-t border-white/10 mt-2 pt-2">
+              <div className="border-t border-white/[0.06] mt-2 pt-2">
                 <button
                   onClick={() => { logout(); navigate('/'); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400 hover:bg-red-900/20 transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400/70 hover:text-red-300 hover:bg-red-900/10 transition-all"
                 >
                   <LogOut size={18} />
                   Logout
@@ -671,12 +678,17 @@ const Plates = () => {
     return (
       <>
         <AdminHeader />
-        <div className="min-h-screen bg-black flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="min-h-screen bg-black flex items-center justify-center"
+        >
           <div className="text-center">
             <Loader2 size={32} className="text-tj-gold animate-spin mx-auto mb-4" />
             <p className="text-gray-500 text-xs uppercase tracking-widest">Loading plate data...</p>
           </div>
-        </div>
+        </motion.div>
       </>
     );
   }
@@ -690,26 +702,41 @@ const Plates = () => {
       <AdminHeader />
 
       {/* Success Toast */}
-      {successToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-green-900/90 border border-green-500/50 text-green-300 px-4 py-3 text-sm flex items-center gap-2 shadow-lg">
-          <CheckCircle size={16} />
-          {successToast}
-        </div>
-      )}
+      <AnimatePresence>
+        {successToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 40, x: 0 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+            className="fixed bottom-6 right-6 z-50 bg-green-900/90 border border-green-500/50 text-green-300 px-4 py-3 text-sm flex items-center gap-2 shadow-lg"
+          >
+            <CheckCircle size={16} />
+            {successToast}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="min-h-screen bg-black p-4 md:p-8 lg:p-12 font-sans text-gray-100 relative">
-        <div className="max-w-[1800px] mx-auto">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
+        <div className="max-w-[1800px] mx-auto relative z-10">
 
           {/* Page Header */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-6 border-b border-white/[0.06]"
+          >
             <div>
-              <h1 className="font-display text-2xl text-white tracking-widest flex items-center gap-3">
-                <CreditCard className="text-tj-gold" size={24} />
-                PLATE TRACKING
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-2 h-2 bg-tj-gold animate-pulse" />
+                <p className="text-tj-gold uppercase tracking-[0.4em] text-[10px]">Plate Operations</p>
+              </div>
+              <h1 className="font-display text-3xl md:text-4xl text-white tracking-tight leading-none">
+                Plate Tracking
               </h1>
-              <p className="text-xs text-gray-500 font-mono mt-1 uppercase tracking-widest">
-                Where are my plates right now
-              </p>
+              <div className="h-px w-24 bg-gradient-to-r from-tj-gold/60 to-transparent mt-2" />
             </div>
             <button
               onClick={handleRefresh}
@@ -719,43 +746,34 @@ const Plates = () => {
               <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
               Refresh
             </button>
-          </div>
-
-          <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
+          </motion.div>
 
           {/* Stats Bar */}
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
-              <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Total Plates</p>
-              <p className="text-white text-2xl font-mono">{stats.total}</p>
-            </div>
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4 relative">
-              <p className="text-amber-400 text-[10px] uppercase tracking-widest mb-1">Out Now</p>
-              <p className={`text-2xl font-mono ${stats.outNow > 0 ? 'text-amber-400' : 'text-gray-600'}`}>
-                {stats.outNow}
-              </p>
-              {stats.hasOverdue && (
-                <span className="absolute top-3 right-3 w-6 h-6 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
-                  !
-                </span>
-              )}
-            </div>
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
-              <p className="text-green-400 text-[10px] uppercase tracking-widest mb-1">Available</p>
-              <p className="text-green-400 text-2xl font-mono">{stats.available}</p>
-            </div>
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
-              <p className={`text-[10px] uppercase tracking-widest mb-1 ${stats.activeAlerts > 0 ? 'text-red-400' : 'text-gray-500'}`}>Active Alerts</p>
-              <p className={`text-2xl font-mono ${stats.activeAlerts > 0 ? 'text-red-400' : 'text-gray-600'}`}>
-                {stats.activeAlerts}
-              </p>
-            </div>
-            <div className="bg-tj-dark border border-tj-gold/20 hover:border-tj-gold/40 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.1)] p-4">
-              <p className="text-amber-400 text-[10px] uppercase tracking-widest mb-1">Expiring Soon</p>
-              <p className={`text-2xl font-mono ${stats.expiringSoon > 0 ? 'text-amber-400' : 'text-gray-600'}`}>
-                {stats.expiringSoon}
-              </p>
-            </div>
+            {[
+              { label: 'Total Plates', value: stats.total, color: 'text-white', labelColor: 'text-gray-500' },
+              { label: 'Out Now', value: stats.outNow, color: stats.outNow > 0 ? 'text-amber-400' : 'text-gray-600', labelColor: 'text-amber-400', hasOverdue: stats.hasOverdue },
+              { label: 'Available', value: stats.available, color: 'text-green-400', labelColor: 'text-green-400' },
+              { label: 'Active Alerts', value: stats.activeAlerts, color: stats.activeAlerts > 0 ? 'text-red-400' : 'text-gray-600', labelColor: stats.activeAlerts > 0 ? 'text-red-400' : 'text-gray-500' },
+              { label: 'Expiring Soon', value: stats.expiringSoon, color: stats.expiringSoon > 0 ? 'text-amber-400' : 'text-gray-600', labelColor: 'text-amber-400' },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                custom={i}
+                initial="hidden"
+                animate="visible"
+                variants={fadeUp}
+                className="bg-[#080808] border border-white/[0.06] hover:border-tj-gold/30 transition-all duration-500 hover:shadow-[0_0_30px_rgba(212,175,55,0.06)] p-4 group relative"
+              >
+                <p className={`${stat.labelColor} text-[10px] uppercase tracking-widest mb-1`}>{stat.label}</p>
+                <p className={`${stat.color} text-2xl font-mono`}>{stat.value}</p>
+                {stat.hasOverdue && (
+                  <span className="absolute top-3 right-3 w-6 h-6 bg-red-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
+                    !
+                  </span>
+                )}
+              </motion.div>
+            ))}
           </div>
 
           <div className="h-px bg-gradient-to-r from-transparent via-tj-gold/20 to-transparent mb-6" />
@@ -766,13 +784,19 @@ const Plates = () => {
             {/* ============================================ */}
             {/* LEFT PANEL - Plates Currently Out (3/5)      */}
             {/* ============================================ */}
-            <div className="lg:col-span-3">
-              <div className="bg-tj-dark border border-tj-gold/20">
+            <motion.div
+              custom={5}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="lg:col-span-3"
+            >
+              <div className="bg-[#080808] border border-white/[0.06]">
                 {/* Panel Header */}
-                <div className="p-4 border-b border-gray-800 flex items-center justify-between">
+                <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <h2 className="text-white font-display tracking-widest text-sm flex items-center gap-2">
-                      <Shield size={16} className="text-tj-gold" />
+                    <Shield size={16} className="text-tj-gold" />
+                    <h2 className="text-white font-display tracking-wider text-sm">
                       PLATES OUT
                     </h2>
                     <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold">
@@ -782,7 +806,7 @@ const Plates = () => {
                 </div>
 
                 {/* Plates Out List */}
-                <div className="divide-y divide-gray-800">
+                <div className="divide-y divide-white/[0.04]">
                   {platesOut.length === 0 ? (
                     <div className="p-8 text-center">
                       <CheckCircle size={32} className="text-green-500 mx-auto mb-3" />
@@ -790,7 +814,7 @@ const Plates = () => {
                       <p className="text-gray-600 text-xs mt-1">No plates currently assigned</p>
                     </div>
                   ) : (
-                    platesOut.map(plate => {
+                    platesOut.map((plate, rowIndex) => {
                       const assignment = plate.currentAssignment!;
                       const isHistoryOpen = expandedHistoryId === plate.id;
                       const isOverdue = assignment.expectedReturnDate
@@ -804,7 +828,14 @@ const Plates = () => {
                         : false;
 
                       return (
-                        <div key={plate.id} className={`${isOverdue ? 'bg-red-900/10 border-l-2 border-l-red-500' : ''}`}>
+                        <motion.div
+                          key={plate.id}
+                          custom={rowIndex + 6}
+                          initial="hidden"
+                          animate="visible"
+                          variants={fadeUp}
+                          className={`${isOverdue ? 'bg-red-900/10 border-l-2 border-l-red-500' : ''}`}
+                        >
                           <div className="p-4">
                             {/* Top row: plate number + type + days indicator */}
                             <div className="flex items-start justify-between gap-4">
@@ -899,30 +930,48 @@ const Plates = () => {
                           </div>
 
                           {/* Expanded History */}
-                          {isHistoryOpen && (
-                            <div className="px-4 pb-4 border-t border-gray-800/50 mt-0">
-                              <PlateAssignmentHistory plateId={plate.id} isOpen={isHistoryOpen} />
-                            </div>
-                          )}
-                        </div>
+                          <AnimatePresence>
+                            {isHistoryOpen && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                className="overflow-hidden"
+                              >
+                                <div className="px-4 pb-4 border-t border-white/[0.06]">
+                                  <PlateAssignmentHistory plateId={plate.id} isOpen={isHistoryOpen} />
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
                       );
                     })
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* ============================================ */}
             {/* RIGHT PANEL - Plate Inventory (2/5)          */}
             {/* ============================================ */}
-            <div className="lg:col-span-2">
-              <div className="bg-tj-dark border border-tj-gold/20">
+            <motion.div
+              custom={6}
+              initial="hidden"
+              animate="visible"
+              variants={fadeUp}
+              className="lg:col-span-2"
+            >
+              <div className="bg-[#080808] border border-white/[0.06]">
                 {/* Panel Header */}
-                <div className="p-4 border-b border-gray-800 flex items-center justify-between">
-                  <h2 className="text-white font-display tracking-widest text-sm flex items-center gap-2">
+                <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
+                  <div className="flex items-center gap-3">
                     <CreditCard size={16} className="text-tj-gold" />
-                    ALL PLATES
-                  </h2>
+                    <h2 className="text-white font-display tracking-wider text-sm">
+                      ALL PLATES
+                    </h2>
+                  </div>
                   <button
                     onClick={() => { setShowAddForm(true); setEditPlateId(null); }}
                     className="px-3 py-1.5 bg-tj-gold text-black font-bold text-[10px] uppercase tracking-widest hover:bg-white transition-colors flex items-center gap-1"
@@ -933,19 +982,29 @@ const Plates = () => {
                 </div>
 
                 {/* Add Plate Form */}
-                {showAddForm && (
-                  <div className="p-4 border-b border-gray-800 bg-black/30">
-                    <p className="text-[9px] uppercase tracking-widest text-tj-gold mb-3 font-bold">New Plate</p>
-                    <PlateForm
-                      onSubmit={handleAddPlate}
-                      onCancel={() => setShowAddForm(false)}
-                      loading={formLoading}
-                    />
-                  </div>
-                )}
+                <AnimatePresence>
+                  {showAddForm && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="p-4 border-b border-white/[0.06] bg-black/30">
+                        <p className="text-[9px] uppercase tracking-widest text-tj-gold mb-3 font-bold">New Plate</p>
+                        <PlateForm
+                          onSubmit={handleAddPlate}
+                          onCancel={() => setShowAddForm(false)}
+                          loading={formLoading}
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
                 {/* Filter Row */}
-                <div className="p-4 border-b border-gray-800 flex flex-wrap gap-2">
+                <div className="p-4 border-b border-white/[0.06] flex flex-wrap gap-2">
                   <div className="flex items-center gap-1">
                     <Filter size={12} className="text-gray-500" />
                     <select
@@ -973,19 +1032,25 @@ const Plates = () => {
                 </div>
 
                 {/* Plate List */}
-                <div className="divide-y divide-gray-800 max-h-[70vh] overflow-y-auto">
+                <div className="divide-y divide-white/[0.04] max-h-[70vh] overflow-y-auto">
                   {filteredInventory.length === 0 ? (
                     <div className="p-8 text-center text-gray-600 text-xs uppercase tracking-widest">
                       No plates match filters
                     </div>
                   ) : (
-                    filteredInventory.map(plate => {
+                    filteredInventory.map((plate, invIndex) => {
                       const isEditing = editPlateId === plate.id;
                       const isHistoryOpen = expandedHistoryId === plate.id;
                       const hasActiveAssignment = plate.status === 'assigned' && plate.currentAssignment;
 
                       return (
-                        <div key={plate.id}>
+                        <motion.div
+                          key={plate.id}
+                          custom={invIndex}
+                          initial="hidden"
+                          animate="visible"
+                          variants={fadeUp}
+                        >
                           {isEditing ? (
                             <div className="p-4 bg-black/30">
                               <p className="text-[9px] uppercase tracking-widest text-tj-gold mb-3 font-bold">Edit Plate</p>
@@ -1003,7 +1068,7 @@ const Plates = () => {
                               />
                             </div>
                           ) : (
-                            <div className="p-3">
+                            <div className="p-3 group hover:bg-white/[0.02] transition-colors">
                               {/* Main row */}
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex-1 min-w-0">
@@ -1039,7 +1104,7 @@ const Plates = () => {
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex items-center gap-1 flex-shrink-0">
+                                <div className="flex items-center gap-1 flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
                                   <button
                                     onClick={() => toggleHistory(plate.id)}
                                     className={`p-1.5 transition-colors ${
@@ -1051,7 +1116,7 @@ const Plates = () => {
                                   </button>
                                   <button
                                     onClick={() => { setEditPlateId(plate.id); setShowAddForm(false); }}
-                                    className="p-1.5 text-gray-600 hover:text-gray-400 transition-colors"
+                                    className="p-1.5 text-gray-600 hover:text-tj-gold transition-colors"
                                     title="Edit"
                                   >
                                     <Edit2 size={14} />
@@ -1076,18 +1141,28 @@ const Plates = () => {
                           )}
 
                           {/* Expanded History (inventory panel) */}
-                          {isHistoryOpen && !isEditing && (
-                            <div className="px-3 pb-3 border-t border-gray-800/50">
-                              <PlateAssignmentHistory plateId={plate.id} isOpen={isHistoryOpen} />
-                            </div>
-                          )}
-                        </div>
+                          <AnimatePresence>
+                            {isHistoryOpen && !isEditing && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: 'auto', opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3, ease: 'easeInOut' }}
+                                className="overflow-hidden"
+                              >
+                                <div className="px-3 pb-3 border-t border-white/[0.06]">
+                                  <PlateAssignmentHistory plateId={plate.id} isOpen={isHistoryOpen} />
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </motion.div>
                       );
                     })
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
 
           </div>
         </div>
