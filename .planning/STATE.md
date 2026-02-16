@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-15
-**Session:** Phase 10 complete
+**Last Updated:** 2026-02-16
+**Session:** Phase 10 gap closure (10-05 complete)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 10 - Brand Truth (COMPLETE)
+**Current focus:** Phase 10 - Brand Truth (gap closure in progress, 10-05 done, 10-06 remaining)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 10 of 19 (Brand Truth)
-**Plan:** 4 of 4 completed (10-01, 10-02, 10-03, 10-04)
-**Status:** Phase complete
-**Last activity:** 2026-02-15 -- Completed 10-03-PLAN.md (footer rewrite + secondary pages jargon cleanup)
+**Plan:** 5 of 6 completed (10-01, 10-02, 10-03, 10-04, 10-05)
+**Status:** In progress (10-06 remaining)
+**Last activity:** 2026-02-16 -- Completed 10-05-PLAN.md (index.html meta tags, OG tags, schema.org rewrite)
 
-Progress: [██████░░░░] 60% (6/10 plans completed across v2.0)
+Progress: [███████░░░] 70% (7/10 plans completed across v2.0)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04)
+- Total plans completed: 7 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -74,6 +74,9 @@ Progress: [██████░░░░] 60% (6/10 plans completed across v2.0
 - **[10-04]** Admin-only "Sovereign CFO" prompt in geminiService.ts kept unchanged (not customer-facing)
 - **[10-04]** Phone numbers standardized to (832) 400-9760 across entire codebase including emailService.ts and pdfService.ts
 - **[10-04]** Codebase-wide jargon sweep confirms zero SOVEREIGN framework terminology in customer-facing content
+- **[10-05]** index.html title, meta description, keywords, OG tags, and schema.org all rewritten for honest pre-owned dealer positioning
+- **[10-05]** Schema.org priceRange corrected to $3000-$8000 (was $5000-$50000)
+- **[10-05]** Schema.org paymentAccepted updated: Wire Transfer replaced with Debit Card (consistent with 10-03)
 
 ### Completed Work (Phase 9)
 
@@ -81,12 +84,13 @@ Progress: [██████░░░░] 60% (6/10 plans completed across v2.0
 - **09-03 (partial):** 3 Edge Functions deployed via MCP (process-notification-queue, unsubscribe, check-plate-alerts). 4 storage buckets created (rental-agreements private, 3 public). 5 storage RLS policies. Security fixes: vehicles_backup RLS + registration_notifications policies. Missing: Edge Function secrets (manual), pg_cron/pg_net (Pro plan), app.settings (Pro plan).
 - **09-04 (complete):** 22 deprecated files deleted (Docker, Dokploy, dev scripts, outdated docs). .env.production replaced with empty template. .gitignore updated. 5 credential pattern scans return zero matches.
 
-### Completed Work (Phase 10) -- ALL COMPLETE
+### Completed Work (Phase 10)
 
 - **10-01 (complete):** Rewrote translations.ts (376 to 808 lines) with honest bilingual content. All SOVEREIGN jargon replaced. 9 new sections added (about, finance, policies, legal, notFound, vinLookup, paymentOptions, expanded faq+services). Rewrote Home.tsx: removed SubliminalPrime component, removed fake Live Signals ticker, replaced with honest dealership info. All homepage content now from translations.
 - **10-02 (complete):** Rewrote About.tsx (329 to 313 lines), Services.tsx (186 to 85 lines), FAQ.tsx (206 to 100 lines). All three pages fully bilingual via t.about.*/t.services.*/t.faq.* keys. Added services.dontDo to translations.ts. Vehicle sales and rentals on Services page. Zero SOVEREIGN jargon on any page.
 - **10-03 (complete):** Rewrote footer in App.tsx with real business info (phone, hours, social links, 4-column layout). Cleaned jargon from Finance.tsx, PaymentOptions.tsx, Legal.tsx, Policies.tsx, NotFound.tsx, VinLookup.tsx. All wired to bilingual translation system. Cleaned mobile menu jargon and "INTEL" nav label. Fixed Legal.tsx pre-existing TS error.
 - **10-04 (complete):** Replaced FALLBACK_VEHICLES (Rolls-Royce $289K, Mercedes G63 $215K, Lamborghini $265K, Range Rover $85K) with realistic pre-owned vehicles (Honda Accord $6.5K, Toyota Camry $5.2K, Ford Fusion $4.8K, Chevy Equinox $3.9K). Renamed generateOpulentCaption to generateVehicleCaption with honest templates. Rewrote Gemini AI prompt for honest descriptions. Fixed SovereignCrest alt text. Standardized ALL phone numbers to (832) 400-9760 (5 files). Fixed jargon in VinLookup.tsx, Inventory.tsx, LuxuryHero.tsx. Codebase-wide sweep: zero customer-facing jargon.
+- **10-05 (complete):** Rewrote all index.html meta tags (title, description, keywords), OG tags (og:title, og:description), and schema.org structured data (description, slogan, priceRange, paymentAccepted, hasOfferCatalog). Zero instances of "luxury", "Sovereign", "Kingdom", or "Identity Precedes Results" remain. All BLOCKER-severity gaps from 10-VERIFICATION.md resolved.
 
 ### Remaining Phase 9 Work
 
@@ -99,7 +103,7 @@ Progress: [██████░░░░] 60% (6/10 plans completed across v2.0
 
 ### Remaining Phase 10 Work
 
-None -- Phase 10 is complete.
+- **10-06:** Hardcoded English in Finance.tsx, PaymentOptions.tsx, Policies.tsx, VinLookup.tsx (WARNING severity from verification)
 
 ### Blockers/Concerns
 
@@ -113,7 +117,7 @@ None -- Phase 10 is complete.
 
 ## Session Continuity
 
-**Last session:** 2026-02-15
-**Stopped at:** Completed 10-03-PLAN.md. Phase 10 (Brand Truth) is now fully complete -- all 4 plans executed.
+**Last session:** 2026-02-16
+**Stopped at:** Completed 10-05-PLAN.md (index.html meta tags rewrite). All BLOCKER gaps from verification resolved.
 **Resume file:** None
-**Resume:** Phase 10 complete. Next phase is Phase 11 (Production Polish) or Phase 12/13 depending on roadmap priorities. All customer-facing content is now honest, bilingual, and jargon-free.
+**Resume:** 10-06 remaining (WARNING-severity hardcoded English in 4 secondary pages). After 10-06, Phase 10 gap closure is fully complete. Then proceed to Phase 11 or other roadmap priorities.
