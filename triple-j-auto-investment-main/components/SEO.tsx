@@ -17,16 +17,22 @@ export const SEO = ({
   ogTitle,
   ogDescription,
   noindex = false,
-}: SEOProps) => (
-  <>
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={`${SITE_URL}${path}`} />
-    <meta property="og:title" content={ogTitle || title} />
-    <meta property="og:description" content={ogDescription || description} />
-    <meta property="og:url" content={`${SITE_URL}${path}`} />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content={OG_IMAGE} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
-  </>
-);
+}: SEOProps) => {
+  const canonical = `${SITE_URL}${path}`;
+  return (
+    <>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <link rel="canonical" href={canonical} />
+      <meta property="og:title" content={ogTitle || title} />
+      <meta property="og:description" content={ogDescription || description} />
+      <meta property="og:url" content={canonical} />
+      <meta property="og:type" content="website" />
+      <meta property="og:image" content={OG_IMAGE} />
+      {noindex && <meta name="robots" content="noindex, nofollow" />}
+      <link rel="alternate" hreflang="en" href={canonical} />
+      <link rel="alternate" hreflang="es" href={canonical} />
+      <link rel="alternate" hreflang="x-default" href={canonical} />
+    </>
+  );
+};

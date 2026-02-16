@@ -7,6 +7,11 @@
   <meta name="keywords"
     content="used cars houston, pre-owned cars houston tx, used car dealer houston, cars for sale houston, affordable used cars houston, auto dealer 77075, used cars near me, houston car dealership, south houston cars, pasadena auto sales, pearland car dealer, almeda genoa cars, affordable cars houston, used suv houston, used sedan houston, financing houston, cash cars houston, vehicle rentals houston, se habla espanol houston dealer, buy here pay here houston" />
 
+  <!-- Bilingual language signals for AI engines -->
+  <link rel="alternate" hreflang="en" href="https://triplejautoinvestment.com/" />
+  <link rel="alternate" hreflang="es" href="https://triplejautoinvestment.com/" />
+  <link rel="alternate" hreflang="x-default" href="https://triplejautoinvestment.com/" />
+
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/GoldTripleJLogo.png" />
   <link rel="apple-touch-icon" href="/GoldTripleJLogo.png" />
@@ -116,9 +121,15 @@
       ],
       "slogan": "Trusted Vehicles for Houston Families",
       "foundingDate": "2025",
+      "knowsLanguage": ["en", "es"],
+      "additionalType": "https://schema.org/AutoRental",
+      "sameAs": [
+        "https://www.facebook.com/triplejautoinvestment",
+        "https://www.instagram.com/triplejautoinvestment"
+      ],
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
-        "name": "Pre-Owned Vehicles",
+        "name": "Pre-Owned Vehicles & Rentals",
         "itemListElement": [
           {
             "@type": "Offer",
@@ -132,6 +143,13 @@
             "itemOffered": {
               "@type": "Car",
               "name": "Pre-Owned SUVs & Trucks"
+            }
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Vehicle Rentals"
             }
           }
         ]
@@ -213,6 +231,56 @@
     }
     </script>
 
+  <!-- FinancialProduct Schema for Buy Here Pay Here -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FinancialProduct",
+      "name": "In-House Auto Financing",
+      "description": "Buy Here Pay Here in-house auto financing for Houston families. No bank approval required. Down payments starting at $1,000 on vehicles in the $3,000-$8,000 range.",
+      "provider": {
+        "@type": "AutoDealer",
+        "name": "Triple J Auto Investment",
+        "url": "https://triplejautoinvestment.com"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": "Houston",
+        "containedInPlace": {
+          "@type": "State",
+          "name": "Texas"
+        }
+      },
+      "category": "Auto Financing",
+      "url": "https://triplejautoinvestment.com/finance"
+    }
+    </script>
+
+  <!-- Service Schema for Car Rentals -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      "serviceType": "Car Rental",
+      "name": "Triple J Vehicle Rentals",
+      "description": "Affordable vehicle rentals in Houston. Weekly and monthly rental options available. Reliable pre-owned vehicles for temporary transportation needs.",
+      "provider": {
+        "@type": "AutoDealer",
+        "name": "Triple J Auto Investment",
+        "url": "https://triplejautoinvestment.com"
+      },
+      "areaServed": {
+        "@type": "City",
+        "name": "Houston",
+        "containedInPlace": {
+          "@type": "State",
+          "name": "Texas"
+        }
+      },
+      "url": "https://triplejautoinvestment.com/services"
+    }
+    </script>
+
   <!-- Breadcrumb Schema -->
   <script type="application/ld+json">
     {
@@ -242,6 +310,42 @@
           "position": 4,
           "name": "Contact",
           "item": "https://triplejautoinvestment.com/contact"
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "name": "About",
+          "item": "https://triplejautoinvestment.com/about"
+        },
+        {
+          "@type": "ListItem",
+          "position": 6,
+          "name": "Finance",
+          "item": "https://triplejautoinvestment.com/finance"
+        },
+        {
+          "@type": "ListItem",
+          "position": 7,
+          "name": "FAQ",
+          "item": "https://triplejautoinvestment.com/faq"
+        },
+        {
+          "@type": "ListItem",
+          "position": 8,
+          "name": "VIN Lookup",
+          "item": "https://triplejautoinvestment.com/vin-lookup"
+        },
+        {
+          "@type": "ListItem",
+          "position": 9,
+          "name": "Payment Options",
+          "item": "https://triplejautoinvestment.com/payment-options"
+        },
+        {
+          "@type": "ListItem",
+          "position": 10,
+          "name": "Policies",
+          "item": "https://triplejautoinvestment.com/policies"
         }
       ]
     }
