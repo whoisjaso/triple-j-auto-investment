@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ShieldCheck, ArrowLeft, FileText, Scale, Lock, Building2, type LucideIcon } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const Legal = () => {
   const { section } = useParams();
@@ -21,6 +22,12 @@ const Legal = () => {
   const Icon = data.icon;
 
   return (
+    <>
+    <SEO
+      title={`${data.title} | Triple J Auto Investment`}
+      description="Legal information and policies for Triple J Auto Investment. Houston TX dealer, License P171632."
+      path={`/legal/${section || ''}`}
+    />
     <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6 font-sans">
       <div className="max-w-4xl mx-auto">
         <Link to="/" className="inline-flex items-center gap-2 text-tj-gold text-xs uppercase tracking-widest mb-12 hover:text-white transition-colors">
@@ -61,6 +68,7 @@ const Legal = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

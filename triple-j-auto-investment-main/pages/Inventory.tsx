@@ -6,6 +6,7 @@ import { Filter, Hexagon, ArrowUpRight, ArrowDownUp, X, Loader2, Phone, Mic, Shi
 import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { ImageGallery } from '../components/ImageGallery';
 import { triggerOutboundCall } from '../services/retellService';
@@ -489,6 +490,12 @@ const Inventory = () => {
   }, [selectedVehicle, modalImages.length, handleCloseModal]);
 
   return (
+    <>
+    <SEO
+      title="Used Cars for Sale in Houston | Triple J Auto Investment"
+      description="Browse affordable used cars, trucks, and SUVs in Houston. Vehicles from $3,000-$8,000 with transparent pricing. Visit us at 8774 Almeda Genoa Rd or call (832) 400-9760."
+      path="/inventory"
+    />
     <div className="bg-black min-h-screen px-4 md:px-6 pb-20 relative">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none"></div>
@@ -1337,6 +1344,7 @@ const Inventory = () => {
         onClose={() => setCardGalleryOpen(false)}
       />
     </div>
+    </>
   );
 };
 

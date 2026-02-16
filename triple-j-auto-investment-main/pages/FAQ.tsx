@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { HelpCircle, ChevronDown, Search } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
@@ -14,6 +15,12 @@ const FAQ = () => {
   );
 
   return (
+    <>
+    <SEO
+      title="FAQ | Triple J Auto Investment Houston | Common Questions"
+      description="Answers to common questions about buying used cars at Triple J Auto Investment in Houston. AS-IS sales policy, financing, trade-ins, title transfer, and payment options."
+      path="/faq"
+    />
     <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-4xl mx-auto">
 
@@ -99,6 +106,7 @@ const FAQ = () => {
 
       </div>
     </div>
+    </>
   );
 };
 

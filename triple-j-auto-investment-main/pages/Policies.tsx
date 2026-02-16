@@ -1,11 +1,18 @@
 import React from 'react';
 import { Shield, AlertTriangle, FileText, Scale } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const Policies = () => {
   const { t } = useLanguage();
 
   return (
+    <>
+    <SEO
+      title="Dealer Policies | Triple J Auto Investment Houston"
+      description="Sales policies, return policy, payment terms, and dealer guidelines at Triple J Auto Investment. 8774 Almeda Genoa Rd, Houston TX 77075."
+      path="/policies"
+    />
     <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
 
@@ -161,6 +168,7 @@ const Policies = () => {
 
       </div>
     </div>
+    </>
   );
 };
 

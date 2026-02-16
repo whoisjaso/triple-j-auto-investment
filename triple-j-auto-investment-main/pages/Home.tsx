@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/Store';
-import { ArrowRight, Diamond, Heart, Zap, Fingerprint, Target, Activity, Star, ChevronDown, Phone } from 'lucide-react';
+import { ArrowRight, Diamond, Heart, Zap, Fingerprint, Target, Activity, Star, ChevronDown, Phone, Key } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 // --- TEXT ANIMATION ---
 
@@ -88,6 +89,12 @@ const Home = () => {
    };
 
    return (
+      <>
+      <SEO
+         title="Triple J Auto Investment | Used Cars Houston | Sales & Rentals"
+         description="Affordable pre-owned vehicles for Houston families. Cars, trucks, and SUVs from $3,000-$8,000. Vehicle rentals available. Se habla espanol. 8774 Almeda Genoa Rd. (832) 400-9760."
+         path="/"
+      />
       <motion.div
          initial={{ opacity: 0 }}
          animate={{ opacity: 1 }}
@@ -239,6 +246,16 @@ const Home = () => {
                                     ${vehicle.price.toLocaleString()}
                                  </span>
                               </div>
+
+                              {/* Rental Badge — shown on all available vehicles */}
+                              {vehicle.status === 'Available' && (
+                                 <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 bg-tj-gold/90 backdrop-blur px-2.5 py-1 border border-tj-gold">
+                                    <Key size={10} className="text-black" />
+                                    <span className="text-[8px] uppercase tracking-widest text-black font-bold">
+                                       {vehicle.dailyRate ? `$${vehicle.dailyRate}${t.common.perDay}` : t.common.saleAndRental}
+                                    </span>
+                                 </div>
+                              )}
 
                               <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
 
@@ -479,6 +496,7 @@ const Home = () => {
          </section>
 
       </motion.div>
+      </>
    );
 };
 

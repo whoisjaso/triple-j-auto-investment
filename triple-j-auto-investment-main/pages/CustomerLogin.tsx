@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { Phone, ArrowRight, KeyRound, ArrowLeft, ExternalLink } from 'lucide-react';
 import { supabase } from '../supabase/config';
 import { normalizePhone, formatPhone } from '../utils/phone';
+import { SEO } from '../components/SEO';
 
 type Step = 'phone' | 'verify';
 
@@ -122,6 +123,13 @@ const CustomerLogin: React.FC = () => {
   };
 
   return (
+    <>
+    <SEO
+      title="Customer Login | Triple J Auto Investment"
+      description="Customer portal login."
+      path="/customer/login"
+      noindex={true}
+    />
     <div className="min-h-screen bg-gradient-to-b from-black via-tj-green to-black flex items-center justify-center px-4">
       <div className="w-full max-w-md">
         {/* Header */}
@@ -290,6 +298,7 @@ const CustomerLogin: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

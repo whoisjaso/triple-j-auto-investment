@@ -3,6 +3,7 @@ import { useStore } from '../context/Store';
 import { useNavigate } from 'react-router-dom';
 import { Key, ShieldAlert, Fingerprint } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -32,6 +33,13 @@ const Login = () => {
   };
 
   return (
+    <>
+    <SEO
+      title="Admin Login | Triple J Auto Investment"
+      description="Admin login portal."
+      path="/login"
+      noindex={true}
+    />
     <div className="min-h-screen bg-black flex items-center justify-center px-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-tj-gold/5 via-black to-black"></div>
       <div className="absolute inset-0 bg-[linear-gradient(rgba(212,175,55,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.03)_1px,transparent_1px)] bg-[size:3rem_3rem] pointer-events-none"></div>
@@ -127,6 +135,7 @@ const Login = () => {
         </p>
       </div>
     </div>
+    </>
   );
 };
 

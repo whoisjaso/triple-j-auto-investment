@@ -5,6 +5,7 @@ import { VinResult } from '../types';
 import { Fingerprint, Activity, ShieldAlert, Check, Cpu, Globe, AlertTriangle, Zap, Gauge, Layers, Search, Car, Fuel, Settings, Factory, ArrowRight, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const VinLookup = () => {
   const { t } = useLanguage();
@@ -86,6 +87,12 @@ const VinLookup = () => {
   );
 
   return (
+    <>
+    <SEO
+      title="Free VIN Check Houston | Triple J Auto Investment"
+      description="Look up any vehicle by VIN number. Get specifications, history, and details. Free VIN check tool from Triple J Auto Investment, Houston TX."
+      path="/vin"
+    />
     <div className="min-h-screen bg-black px-4 md:px-6 pb-20 relative">
       {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
@@ -380,6 +387,7 @@ const VinLookup = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

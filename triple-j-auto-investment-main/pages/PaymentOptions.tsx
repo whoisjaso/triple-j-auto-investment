@@ -1,11 +1,18 @@
 import React from 'react';
 import { DollarSign, CreditCard, Banknote, Building2, Shield, CheckCircle, AlertTriangle, FileText } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const PaymentOptions = () => {
   const { t } = useLanguage();
 
   return (
+    <>
+    <SEO
+      title="Payment Options | Triple J Auto Investment Houston"
+      description="Accepted payment methods at Triple J Auto Investment: cash, cashier's check, debit card, and approved financing. Houston TX. (832) 400-9760."
+      path="/payment-options"
+    />
     <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-6xl mx-auto">
 
@@ -172,6 +179,7 @@ const PaymentOptions = () => {
 
       </div>
     </div>
+    </>
   );
 };
 

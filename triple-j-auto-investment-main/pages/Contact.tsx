@@ -4,6 +4,7 @@ import { MapPin, Phone, Mail, Clock, Send, CheckCircle, MessageSquare, AlertTria
 import { useStore } from '../context/Store';
 import { openSmartMap } from '../App';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -42,6 +43,12 @@ const Contact = () => {
   };
 
   return (
+    <>
+    <SEO
+      title="Contact Triple J Auto Investment | Houston Car Dealer | (832) 400-9760"
+      description="Visit Triple J Auto Investment at 8774 Almeda Genoa Rd, Houston TX 77075. Call (832) 400-9760. Open Mon-Sat 9AM-6PM. Se habla espanol. Sales and rental inquiries welcome."
+      path="/contact"
+    />
     <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
 
@@ -275,6 +282,7 @@ const Contact = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

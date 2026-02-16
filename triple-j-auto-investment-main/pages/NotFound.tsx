@@ -2,11 +2,19 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, Home, ArrowLeft, Search } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const NotFound = () => {
   const { t } = useLanguage();
 
   return (
+    <>
+    <SEO
+      title="Page Not Found | Triple J Auto Investment"
+      description="The page you're looking for doesn't exist."
+      path="/404"
+      noindex={true}
+    />
     <div className="min-h-screen bg-black flex items-center justify-center px-4 md:px-6 relative overflow-hidden">
 
       {/* Background Pattern */}
@@ -78,6 +86,7 @@ const NotFound = () => {
 
       </div>
     </div>
+    </>
   );
 };
 

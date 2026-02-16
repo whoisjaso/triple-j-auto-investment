@@ -21,6 +21,7 @@ import { formatPhone } from '../utils/phone';
 import { useLanguage } from '../context/LanguageContext';
 import NotificationPreferences from '../components/NotificationPreferences';
 import { RegistrationStageKey, NotificationPreference, REGISTRATION_STAGES } from '../types';
+import { SEO } from '../components/SEO';
 
 // Lightweight display type (we map DB rows inline, not importing unexported transformer)
 interface DashboardRegistration {
@@ -154,8 +155,18 @@ const CustomerDashboard: React.FC = () => {
   const active = registrations.filter(r => r.currentStage !== 'sticker_delivered');
   const completed = registrations.filter(r => r.currentStage === 'sticker_delivered');
 
+  const seoComponent = (
+    <SEO
+      title="My Dashboard | Triple J Auto Investment"
+      description="Customer dashboard."
+      path="/customer/dashboard"
+      noindex={true}
+    />
+  );
+
   if (loading) {
     return (
+      <>{seoComponent}
       <div className="min-h-screen bg-gradient-to-b from-black via-tj-green to-black flex items-center justify-center">
         <div className="text-center">
           <img
@@ -166,10 +177,13 @@ const CustomerDashboard: React.FC = () => {
           <p className="text-gray-400 text-sm">Loading your registrations...</p>
         </div>
       </div>
+      </>
     );
   }
 
   return (
+    <>
+    {seoComponent}
     <div className="min-h-screen bg-gradient-to-b from-black via-tj-green to-black">
       {/* Header */}
       <header className="px-4 md:px-8 pt-4 pb-6">
@@ -270,6 +284,7 @@ const CustomerDashboard: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

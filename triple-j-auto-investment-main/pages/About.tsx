@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Heart, Shield, Users, ArrowRight, Star, MapPin, Navigation, Clock, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -19,6 +20,12 @@ const About = () => {
   const [mapLoaded, setMapLoaded] = useState(false);
 
   return (
+    <>
+    <SEO
+      title="About Triple J Auto Investment | Houston Pre-Owned Dealer"
+      description="Family-owned Houston auto dealer at 8774 Almeda Genoa Rd. Affordable pre-owned vehicles and rentals. Serving South Houston, Pasadena, and Pearland. Texas Dealer License P171632."
+      path="/about"
+    />
     <div className="bg-tj-green min-h-screen text-white overflow-x-hidden font-sans selection:bg-tj-gold selection:text-black">
 
       {/* HERO: Our Story */}
@@ -329,6 +336,7 @@ const About = () => {
         </motion.div>
       </section>
     </div>
+    </>
   );
 };
 

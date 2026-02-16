@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Shield, Search, FileText, Car, CreditCard, ArrowRight, Key } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -21,6 +22,12 @@ const Services = () => {
   const { t } = useLanguage();
 
   return (
+    <>
+    <SEO
+      title="Auto Services & Car Rentals Houston | Triple J Auto Investment"
+      description="Vehicle sales, car rentals, and automotive services in Houston. Affordable rentals and pre-owned vehicles from $3,000-$8,000. Se habla espanol. (832) 400-9760."
+      path="/services"
+    />
     <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
 
@@ -89,6 +96,7 @@ const Services = () => {
 
       </div>
     </div>
+    </>
   );
 };
 

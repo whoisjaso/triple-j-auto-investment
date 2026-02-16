@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { DollarSign, Calculator, Shield, CheckCircle, AlertTriangle, TrendingUp } from 'lucide-react';
 import { useStore } from '../context/Store';
 import { useLanguage } from '../context/LanguageContext';
+import { SEO } from '../components/SEO';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -43,6 +44,12 @@ const Finance = () => {
   };
 
   return (
+    <>
+    <SEO
+      title="Car Financing Houston | Buy Here Pay Here | Triple J Auto Investment"
+      description="Flexible auto financing in Houston. Third-party lenders, low down payments. Buy here pay here options. Pre-owned vehicles from $3,000-$8,000. Apply today at Triple J Auto."
+      path="/finance"
+    />
     <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
 
@@ -355,6 +362,7 @@ const Finance = () => {
 
       </div>
     </div>
+    </>
   );
 };
 
