@@ -9,6 +9,8 @@ import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
 import { SplashScreen } from './components/SplashScreen';
 import { ScrollToTop } from './components/ScrollToTop';
 import { PageLoader } from './components/PageLoader';
+import { OfflineBanner } from './components/OfflineBanner';
+import { ConnectionErrorBanner } from './components/ConnectionErrorBanner';
 
 // Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
@@ -526,11 +528,13 @@ const AppContent = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">
+      <OfflineBanner />
       <BrowserCompatibilityCheck />
       <Navbar />
       <ErrorBoundary>
         {/* Top padding matches navbar height (h-32 = 128px = pt-32) plus buffer */}
         <main className="flex-grow pt-36">
+          <ConnectionErrorBanner />
           {/* Global Page Transition Wrapper */}
           <AnimatePresence mode="wait">
             <Suspense fallback={<PageLoader />}>

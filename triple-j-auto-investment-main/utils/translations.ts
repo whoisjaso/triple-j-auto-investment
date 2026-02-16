@@ -583,6 +583,44 @@ export const t = {
                 holdPeriod: "3-5 business days",
                 after: "for bank clearance. If immediate pickup is required, use cash, cashier's check, or debit card instead."
             }
+        },
+        polish: {
+            // Offline
+            offlineBanner: "You appear to be offline. Some features may be unavailable.",
+
+            // Connection error
+            connectionError: "Having trouble connecting. Some features may be unavailable.",
+            connectionRetry: "Retry",
+            connectionCallUs: "Call us at (832) 400-9760",
+
+            // Loading states
+            loadingInventory: "Loading inventory...",
+            loadingPage: "Loading...",
+            loadingSubmitting: "Submitting...",
+            loadingSending: "Sending...",
+
+            // Empty states
+            emptyInventory: "No vehicles currently listed. Check back soon!",
+            emptyInventorySubtext: "We regularly add new vehicles to our inventory.",
+            emptyDashboard: "No registrations found.",
+            emptyDashboardSubtext: "When you purchase a vehicle, your registration details will appear here.",
+
+            // Error states
+            errorGeneric: "Something went wrong. Please try again.",
+            errorFormSubmit: "We couldn't submit your information. Please try again or call us.",
+            errorLoadFailed: "Failed to load. Please check your connection and try again.",
+            errorReload: "Reload Page",
+            errorTryAgain: "Try Again",
+            errorCallUs: "Or call us",
+
+            // Accessibility
+            skipToContent: "Skip to main content",
+            closeModal: "Close",
+            previousImage: "Previous image",
+            nextImage: "Next image",
+            openMenu: "Open menu",
+            closeMenu: "Close menu",
+            switchLanguage: "Switch language"
         }
     },
     es: {
@@ -1167,6 +1205,44 @@ export const t = {
                 holdPeriod: "3-5 dias habiles",
                 after: "para verificacion bancaria. Si necesita recoger inmediatamente, use efectivo, cheque de caja o tarjeta de debito."
             }
+        },
+        polish: {
+            // Sin conexion
+            offlineBanner: "Parece que no tienes conexion. Algunas funciones pueden no estar disponibles.",
+
+            // Error de conexion
+            connectionError: "Problemas de conexion. Algunas funciones pueden no estar disponibles.",
+            connectionRetry: "Reintentar",
+            connectionCallUs: "Llamenos al (832) 400-9760",
+
+            // Estados de carga
+            loadingInventory: "Cargando inventario...",
+            loadingPage: "Cargando...",
+            loadingSubmitting: "Enviando...",
+            loadingSending: "Enviando...",
+
+            // Estados vacios
+            emptyInventory: "No hay vehiculos disponibles en este momento. Vuelva pronto!",
+            emptyInventorySubtext: "Agregamos vehiculos nuevos a nuestro inventario regularmente.",
+            emptyDashboard: "No se encontraron registros.",
+            emptyDashboardSubtext: "Cuando compre un vehiculo, los detalles de su registro apareceran aqui.",
+
+            // Estados de error
+            errorGeneric: "Algo salio mal. Por favor, intente de nuevo.",
+            errorFormSubmit: "No pudimos enviar su informacion. Intente de nuevo o llamenos.",
+            errorLoadFailed: "Error al cargar. Verifique su conexion e intente de nuevo.",
+            errorReload: "Recargar Pagina",
+            errorTryAgain: "Intentar de Nuevo",
+            errorCallUs: "O llamenos",
+
+            // Accesibilidad
+            skipToContent: "Ir al contenido principal",
+            closeModal: "Cerrar",
+            previousImage: "Imagen anterior",
+            nextImage: "Siguiente imagen",
+            openMenu: "Abrir menu",
+            closeMenu: "Cerrar menu",
+            switchLanguage: "Cambiar idioma"
         }
     }
 };
