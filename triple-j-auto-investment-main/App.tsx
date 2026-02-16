@@ -548,7 +548,7 @@ const AppContent = () => {
       {/* Skip to content - first focusable element for keyboard users */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[99999] focus:bg-tj-gold focus:text-black focus:px-6 focus:py-3 focus:font-bold focus:text-xs focus:uppercase focus:tracking-[0.3em]"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[99999] focus:bg-tj-gold focus:text-black focus:px-6 focus:py-3 focus:font-bold focus:text-xs focus:uppercase focus:tracking-[0.3em] focus:outline-none focus:ring-2 focus:ring-white focus:shadow-lg"
       >
         {t.polish.skipToContent}
       </a>
