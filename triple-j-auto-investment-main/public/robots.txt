@@ -1,0 +1,14 @@
+# Triple J Auto Investment - Houston, TX
+# Optimized for search engine crawling
+
+User-agent: *
+Allow: /
+
+# Block private and admin pages from search engines
+Disallow: /admin/
+Disallow: /login
+Disallow: /customer/
+Disallow: /track
+
+# Sitemap location
+Sitemap: https://triplejautoinvestment.com/sitemap.xml
