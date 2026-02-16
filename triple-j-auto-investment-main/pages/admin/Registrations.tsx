@@ -775,7 +775,7 @@ const Registrations: React.FC = () => {
                           <button
                             onClick={() => openConfirmDialog(reg.id, 'rejected', 'submitted_to_dmv')}
                             disabled={actionLoading === reg.id}
-                            className="px-3 py-1 bg-amber-500 text-black text-xs font-bold hover:bg-amber-400 transition-colors disabled:opacity-50"
+                            className="px-3 py-1 bg-tj-gold text-black text-xs font-bold hover:bg-white transition-colors disabled:opacity-50"
                           >
                             Resubmit
                           </button>
@@ -1114,7 +1114,7 @@ const Registrations: React.FC = () => {
                   disabled={actionLoading !== null || (confirmDialog.requiresNotes && !confirmNotes.trim())}
                   className={`px-6 py-3 font-bold text-sm tracking-wider transition-colors disabled:opacity-50 flex items-center gap-2 ${
                     confirmDialog.targetStage === 'rejected'
-                      ? 'bg-red-500 text-white hover:bg-red-400'
+                      ? 'border border-red-500/50 text-red-400 hover:bg-red-900/20'
                       : 'bg-tj-gold text-black hover:bg-white'
                   }`}
                 >

@@ -677,7 +677,7 @@ const RegistrationChecker: React.FC<RegistrationCheckerProps> = ({
               {!allChecksPassed && (
                 <button
                   onClick={() => setShowOverrideConfirm(true)}
-                  className="px-5 py-2.5 border border-amber-500/50 text-amber-400 text-xs font-bold tracking-wider hover:bg-amber-900/20 transition-colors flex items-center gap-2"
+                  className="px-5 py-2.5 border border-tj-gold/50 text-tj-gold text-xs font-bold tracking-wider hover:bg-tj-gold/10 transition-colors flex items-center gap-2"
                 >
                   <AlertCircle size={14} />
                   Override and Proceed
@@ -731,7 +731,7 @@ const RegistrationChecker: React.FC<RegistrationCheckerProps> = ({
               <button
                 onClick={handleOverrideConfirm}
                 disabled={saving}
-                className="px-6 py-3 bg-amber-500 text-black font-bold text-sm tracking-wider hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-3 bg-tj-gold text-black font-bold text-sm tracking-wider hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {saving ? (
                   <Loader2 className="animate-spin" size={16} />

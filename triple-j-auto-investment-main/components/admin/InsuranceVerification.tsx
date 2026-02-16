@@ -870,7 +870,7 @@ const InsuranceVerification: React.FC<InsuranceVerificationProps> = ({
                       <button
                         onClick={handleVerify}
                         disabled={saving}
-                        className="px-4 py-2 bg-green-600 text-white text-xs font-bold uppercase tracking-wider hover:bg-green-500 transition-colors disabled:opacity-50 flex items-center gap-2"
+                        className="px-4 py-2 bg-tj-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
                         {saving ? <Loader2 className="animate-spin" size={14} /> : <CheckCircle size={14} />}
                         Verify
@@ -880,7 +880,7 @@ const InsuranceVerification: React.FC<InsuranceVerificationProps> = ({
                       <button
                         onClick={() => setShowRejectConfirm(true)}
                         disabled={saving || !actionNotes.trim()}
-                        className="px-4 py-2 bg-red-600 text-white text-xs font-bold uppercase tracking-wider hover:bg-red-500 transition-colors disabled:opacity-50 flex items-center gap-2"
+                        className="px-4 py-2 border border-red-500/50 text-red-400 text-xs font-bold uppercase tracking-wider hover:bg-red-900/20 transition-colors disabled:opacity-50 flex items-center gap-2"
                       >
                         <X size={14} />
                         Reject
@@ -891,7 +891,7 @@ const InsuranceVerification: React.FC<InsuranceVerificationProps> = ({
                         <button
                           onClick={() => setShowOverrideConfirm(true)}
                           disabled={saving || !actionNotes.trim()}
-                          className="px-4 py-2 border border-amber-500/50 text-amber-400 text-xs font-bold uppercase tracking-wider hover:bg-amber-900/20 transition-colors disabled:opacity-50 flex items-center gap-2"
+                          className="px-4 py-2 border border-tj-gold/50 text-tj-gold text-xs font-bold uppercase tracking-wider hover:bg-tj-gold/10 transition-colors disabled:opacity-50 flex items-center gap-2"
                         >
                           <AlertCircle size={14} />
                           Override and Verify
@@ -1038,7 +1038,7 @@ const InsuranceVerification: React.FC<InsuranceVerificationProps> = ({
               <button
                 onClick={handleOverride}
                 disabled={saving}
-                className="px-6 py-3 bg-amber-500 text-black font-bold text-sm tracking-wider hover:bg-amber-400 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-3 bg-tj-gold text-black font-bold text-sm tracking-wider hover:bg-white transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {saving ? (
                   <Loader2 className="animate-spin" size={16} />
@@ -1085,7 +1085,7 @@ const InsuranceVerification: React.FC<InsuranceVerificationProps> = ({
               <button
                 onClick={handleReject}
                 disabled={saving}
-                className="px-6 py-3 bg-red-600 text-white font-bold text-sm tracking-wider hover:bg-red-500 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="px-6 py-3 border border-red-500/50 text-red-400 font-bold text-sm tracking-wider hover:bg-red-900/20 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {saving ? (
                   <Loader2 className="animate-spin" size={16} />

@@ -626,9 +626,9 @@ const AdminInventory = () => {
                 </button>
                 <button
                     onClick={handleSheetSync}
-                    className="flex items-center gap-2 text-xs uppercase tracking-widest text-white bg-green-900/30 hover:bg-green-900/50 px-6 py-3 border border-green-900 hover:border-green-500 transition-all group"
+                    className="flex items-center gap-2 text-xs uppercase tracking-widest text-tj-gold bg-tj-gold/10 hover:bg-tj-gold hover:text-black px-6 py-3 border border-tj-gold/30 hover:border-tj-gold transition-all group"
                 >
-                <Sheet size={14} className="text-green-500 group-hover:animate-pulse" />
+                <Sheet size={14} className="group-hover:animate-pulse" />
                 Import from Sheet
                 </button>
                 <div className="flex flex-col items-end gap-1 text-xs font-mono pl-6 border-l border-white/10">

@@ -873,7 +873,7 @@ const Plates = () => {
                                   <button
                                     onClick={() => handleMarkReturned(plate)}
                                     disabled={actionLoading === plate.id}
-                                    className="px-3 py-1.5 bg-green-900/30 border border-green-500/50 text-green-400 text-[10px] uppercase tracking-widest font-bold hover:bg-green-900/50 transition-colors disabled:opacity-50 flex items-center gap-1"
+                                    className="px-3 py-1.5 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold text-[10px] uppercase tracking-widest font-bold hover:bg-tj-gold hover:text-black transition-colors disabled:opacity-50 flex items-center gap-1"
                                   >
                                     {actionLoading === plate.id ? (
                                       <Loader2 size={12} className="animate-spin" />
