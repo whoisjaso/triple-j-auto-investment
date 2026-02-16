@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, Suspense, lazy } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
 import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Database, Globe, Key, CreditCard, Phone, Clock, Facebook, Twitter } from 'lucide-react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
@@ -91,6 +91,18 @@ export const openSmartMap = () => {
   } else {
     window.open(`https://www.google.com/maps/search/?api=1&query=${encoded}`, '_blank');
   }
+};
+
+// Redirect legacy hash URLs (/#/about -> /about) for SEO and bookmarks
+const HashRedirect = () => {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (window.location.hash.startsWith('#/')) {
+      const path = window.location.hash.slice(1); // remove '#', keep '/about'
+      navigate(path, { replace: true });
+    }
+  }, [navigate]);
+  return null;
 };
 
 const Navbar = () => {
@@ -616,6 +628,7 @@ export default function App() {
       <StoreProvider>
         <Router>
           <ScrollToTop />
+          <HashRedirect />
           <SplashScreen duration={1200}>
             <AppContent />
           </SplashScreen>
