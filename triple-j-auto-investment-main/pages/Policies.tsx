@@ -6,7 +6,7 @@ const Policies = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-black pt-40 pb-20 px-6">
+    <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
 
         {/* Header */}
@@ -24,7 +24,7 @@ const Policies = () => {
         </div>
 
         {/* AS-IS Policy */}
-        <section className="mb-16 bg-red-900/10 border border-red-900/30 p-12">
+        <section className="mb-16 bg-red-900/10 border border-red-900/30 p-6 md:p-8">
           <div className="flex items-start gap-4 mb-6">
             <div className="p-3 bg-red-900/20 border border-red-900/50 text-red-500">
               <AlertTriangle size={32} />
@@ -54,7 +54,7 @@ const Policies = () => {
         </section>
 
         {/* Payment Policy */}
-        <section className="mb-16 bg-tj-dark border border-white/10 p-12">
+        <section className="mb-16 bg-tj-dark border border-white/10 p-6 md:p-8">
           <div className="flex items-start gap-4 mb-6">
             <div className="p-3 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold">
               <FileText size={32} />
@@ -86,7 +86,7 @@ const Policies = () => {
         </section>
 
         {/* Title & Registration Policy */}
-        <section className="mb-16 bg-tj-dark border border-white/10 p-12">
+        <section className="mb-16 bg-tj-dark border border-white/10 p-6 md:p-8">
           <div className="flex items-start gap-4 mb-6">
             <div className="p-3 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold">
               <Scale size={32} />
@@ -117,7 +117,7 @@ const Policies = () => {
         </section>
 
         {/* Inspection & Test Drive Policy */}
-        <section className="mb-16 bg-tj-dark border border-white/10 p-12">
+        <section className="mb-16 bg-tj-dark border border-white/10 p-6 md:p-8">
           <h2 className="text-white font-display text-3xl mb-6">{t.policies.inspection.title.toUpperCase()}</h2>
           <div className="space-y-6 text-gray-300">
             <div>
@@ -138,7 +138,7 @@ const Policies = () => {
         </section>
 
         {/* Privacy & Data Policy */}
-        <section className="mb-16 bg-tj-dark border border-white/10 p-12">
+        <section className="mb-16 bg-tj-dark border border-white/10 p-6 md:p-8">
           <h2 className="text-white font-display text-3xl mb-6">{t.policies.privacy.title.toUpperCase()}</h2>
           <div className="space-y-4 text-gray-300">
             <p>{t.policies.privacy.content}</p>
@@ -149,7 +149,7 @@ const Policies = () => {
         </section>
 
         {/* Disclaimer */}
-        <div className="bg-black border border-white/10 p-8 text-center">
+        <div className="bg-black border border-white/10 p-6 md:p-8 text-center">
           <p className="text-gray-500 text-xs uppercase tracking-widest mb-4">{t.legal.disclaimer.title}</p>
           <p className="text-gray-400 text-sm leading-relaxed max-w-3xl mx-auto">
             {t.policies.terms.content}

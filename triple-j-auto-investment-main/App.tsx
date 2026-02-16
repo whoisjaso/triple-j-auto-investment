@@ -340,7 +340,7 @@ const Footer = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-black text-gray-400 py-20 border-t border-white/5 relative overflow-hidden">
+    <footer className="bg-black text-gray-400 py-16 md:py-20 border-t border-white/5 relative overflow-hidden">
       {/* Background Crest Watermark */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.03]">
         <img
@@ -451,12 +451,12 @@ const Footer = () => {
         <div className="flex flex-col items-start">
           <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">{t.footer.quickLinks.toUpperCase()}</h3>
           <ul className="space-y-1 text-[10px] uppercase tracking-widest w-full">
-            <li><Link to="/inventory" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.nav.inventory}</Link></li>
-            <li><Link to="/about" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.nav.about}</Link></li>
-            <li><Link to="/services" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.nav.services}</Link></li>
-            <li><Link to="/vin" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.vinLookup.title}</Link></li>
-            <li><Link to="/contact" className="hover:text-white transition-colors block py-2 hover:translate-x-2 transition-transform duration-300">{t.footer.contact}</Link></li>
-            <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-400 flex items-center gap-2 py-2"><Lock size={10} /> {t.nav.login}</Link></li>
+            <li><Link to="/inventory" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.nav.inventory}</Link></li>
+            <li><Link to="/about" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.nav.about}</Link></li>
+            <li><Link to="/services" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.nav.services}</Link></li>
+            <li><Link to="/vin" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.vinLookup.title}</Link></li>
+            <li><Link to="/contact" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.footer.contact}</Link></li>
+            <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-400 flex items-center gap-2 py-3"><Lock size={10} /> {t.nav.login}</Link></li>
           </ul>
         </div>
 

@@ -14,7 +14,7 @@ const FAQ = () => {
   );
 
   return (
-    <div className="min-h-screen bg-black pt-40 pb-20 px-6">
+    <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-4xl mx-auto">
 
         <div className="text-center mb-16 border-b border-white/10 pb-12">
@@ -79,7 +79,7 @@ const FAQ = () => {
           </div>
         )}
 
-        <div className="bg-tj-gold/10 border border-tj-gold/30 p-12 text-center mt-16">
+        <div className="bg-tj-gold/10 border border-tj-gold/30 p-6 md:p-8 text-center mt-16">
           <h3 className="text-white font-display text-2xl mb-4">{t.faq.stillHaveQuestions}</h3>
           <p className="text-gray-400 mb-6">
             {t.faq.contactPrompt}

@@ -21,13 +21,13 @@ const Legal = () => {
   const Icon = data.icon;
 
   return (
-    <div className="min-h-screen bg-black pt-40 pb-20 px-6 font-sans">
+    <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6 font-sans">
       <div className="max-w-4xl mx-auto">
         <Link to="/" className="inline-flex items-center gap-2 text-tj-gold text-xs uppercase tracking-widest mb-12 hover:text-white transition-colors">
           <ArrowLeft size={14} /> {t.legal.backToHome}
         </Link>
 
-        <div className="bg-tj-dark border border-white/10 p-12 relative overflow-hidden">
+        <div className="bg-tj-dark border border-white/10 p-6 md:p-8 relative overflow-hidden">
            <div className="absolute top-0 left-0 w-full h-1 bg-tj-gold"></div>
 
            <div className="flex items-center gap-6 mb-10 border-b border-white/5 pb-10">

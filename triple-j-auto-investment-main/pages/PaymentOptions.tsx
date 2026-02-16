@@ -6,7 +6,7 @@ const PaymentOptions = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-black pt-40 pb-20 px-6">
+    <div className="min-h-screen bg-black pt-40 pb-20 px-4 md:px-6">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
@@ -27,7 +27,7 @@ const PaymentOptions = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
 
           {/* Cash */}
-          <div className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all group">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all group">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-4 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                 <Banknote size={32} />
@@ -56,7 +56,7 @@ const PaymentOptions = () => {
           </div>
 
           {/* Cashier's Check */}
-          <div className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all group">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all group">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-4 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                 <FileText size={32} />
@@ -79,7 +79,7 @@ const PaymentOptions = () => {
           </div>
 
           {/* Debit Card */}
-          <div className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all group">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all group">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-4 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                 <CreditCard size={32} />
@@ -102,7 +102,7 @@ const PaymentOptions = () => {
           </div>
 
           {/* Financing */}
-          <div className="bg-tj-dark border border-white/10 p-6 sm:p-10 hover:border-tj-gold/50 transition-all group">
+          <div className="bg-tj-dark border border-white/10 p-6 md:p-8 hover:border-tj-gold/50 transition-all group">
             <div className="flex items-start gap-4 mb-6">
               <div className="p-4 bg-tj-gold/10 border border-tj-gold/30 text-tj-gold group-hover:bg-tj-gold group-hover:text-black transition-all">
                 <Building2 size={32} />
@@ -130,7 +130,7 @@ const PaymentOptions = () => {
         </div>
 
         {/* Personal Check Warning */}
-        <div className="bg-yellow-900/10 border border-yellow-900/30 p-8 mb-8">
+        <div className="bg-yellow-900/10 border border-yellow-900/30 p-6 md:p-8 mb-8">
           <div className="flex items-start gap-4">
             <AlertTriangle className="text-yellow-500 flex-shrink-0" size={24} />
             <div>
@@ -145,7 +145,7 @@ const PaymentOptions = () => {
         </div>
 
         {/* Security Notice */}
-        <div className="bg-black border border-white/10 p-8">
+        <div className="bg-black border border-white/10 p-6 md:p-8">
           <div className="flex items-start gap-4">
             <Shield className="text-tj-gold flex-shrink-0" size={24} />
             <div>

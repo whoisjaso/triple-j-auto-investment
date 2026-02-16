@@ -7,7 +7,7 @@ const NotFound = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-6 relative overflow-hidden">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 md:px-6 relative overflow-hidden">
 
       {/* Background Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(212,175,55,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(212,175,55,0.03)_1px,transparent_1px)] bg-[size:3rem_3rem]"></div>
@@ -44,7 +44,7 @@ const NotFound = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
           <Link
             to="/"
-            className="bg-tj-dark border border-white/10 hover:border-tj-gold p-8 transition-all group flex flex-col items-center text-center"
+            className="bg-tj-dark border border-white/10 hover:border-tj-gold p-6 md:p-8 transition-all group flex flex-col items-center text-center"
           >
             <Home className="text-tj-gold mb-4 group-hover:scale-110 transition-transform" size={32} />
             <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-2">{t.notFound.homeButton}</h3>
@@ -53,7 +53,7 @@ const NotFound = () => {
 
           <Link
             to="/inventory"
-            className="bg-tj-dark border border-white/10 hover:border-tj-gold p-8 transition-all group flex flex-col items-center text-center"
+            className="bg-tj-dark border border-white/10 hover:border-tj-gold p-6 md:p-8 transition-all group flex flex-col items-center text-center"
           >
             <Search className="text-tj-gold mb-4 group-hover:scale-110 transition-transform" size={32} />
             <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-2">{t.common.viewInventory}</h3>
@@ -62,7 +62,7 @@ const NotFound = () => {
 
           <Link
             to="/contact"
-            className="bg-tj-dark border border-white/10 hover:border-tj-gold p-8 transition-all group flex flex-col items-center text-center"
+            className="bg-tj-dark border border-white/10 hover:border-tj-gold p-6 md:p-8 transition-all group flex flex-col items-center text-center"
           >
             <ArrowLeft className="text-tj-gold mb-4 group-hover:scale-110 transition-transform" size={32} />
             <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-2">{t.notFound.contactButton}</h3>
