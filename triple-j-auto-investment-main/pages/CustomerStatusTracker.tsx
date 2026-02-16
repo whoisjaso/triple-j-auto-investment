@@ -158,7 +158,7 @@ const CustomerStatusTracker: React.FC = () => {
             {registration?.vehicleYear} {registration?.vehicleMake} {registration?.vehicleModel}
           </span>
         </div>
-        <p className="text-gray-500 text-xs mt-1">
+        <p className="text-gray-400 text-xs mt-1">
           Order: {registration?.orderId}
         </p>
 
@@ -229,7 +229,7 @@ const CustomerStatusTracker: React.FC = () => {
 
       {/* Footer with contact */}
       <footer className="mt-12 pb-8 text-center">
-        <p className="text-gray-500 text-xs">
+        <p className="text-gray-400 text-xs">
           Questions? Call{' '}
           <a href="tel:+18324009760" className="text-tj-gold hover:underline">
             (832) 400-9760

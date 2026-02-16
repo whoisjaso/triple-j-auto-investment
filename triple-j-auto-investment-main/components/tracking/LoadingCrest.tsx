@@ -17,7 +17,7 @@ export const LoadingCrest: React.FC = () => (
       }}
       transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
     />
-    <p className="mt-4 text-gray-500 text-sm tracking-wide">
+    <p className="mt-4 text-gray-400 text-sm tracking-wide">
       Loading your registration...
     </p>
   </div>

@@ -50,7 +50,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ type }) => {
 
       {content.showContact && (
         <div className="space-y-4 text-sm">
-          <p className="text-gray-500">
+          <p className="text-gray-400">
             Questions? Contact Triple J Auto Investment:
           </p>
 

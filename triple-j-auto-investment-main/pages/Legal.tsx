@@ -35,7 +35,7 @@ const Legal = () => {
                <Icon size={32} />
              </div>
              <div>
-               <p className="text-gray-500 text-[10px] uppercase tracking-[0.3em] mb-2">{t.legal.subtitle}</p>
+               <p className="text-gray-400 text-[10px] uppercase tracking-[0.3em] mb-2">{t.legal.subtitle}</p>
                <h1 className="font-display text-3xl text-white tracking-wide">{data.title}</h1>
              </div>
            </div>
@@ -48,11 +48,11 @@ const Legal = () => {
                </p>
                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 pt-6 border-t border-white/10">
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">{t.footer.location}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">{t.footer.location}</p>
                     <p className="text-white">{t.legal.dealerInfo.address}</p>
                   </div>
                   <div>
-                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">{t.footer.dealerLicense}</p>
+                    <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-1">{t.footer.dealerLicense}</p>
                     <p className="text-white font-mono">P171632</p>
                   </div>
                </div>

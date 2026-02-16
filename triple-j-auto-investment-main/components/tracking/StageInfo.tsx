@@ -67,13 +67,13 @@ export const StageInfo: React.FC<StageInfoProps> = ({
 
       {/* Expected duration for predictable stages */}
       {stageConfig?.expectedDuration && currentStage !== 'sticker_delivered' && (
-        <p className="text-gray-500 text-xs mt-3">
+        <p className="text-gray-400 text-xs mt-3">
           Expected timeline: {stageConfig.expectedDuration}
         </p>
       )}
 
       {/* Completed stage dates */}
-      <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-gray-500">
+      <div className="mt-6 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-gray-400">
         {milestones.saleDate && (
           <span className="flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-tj-gold/60" />

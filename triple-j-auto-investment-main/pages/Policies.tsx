@@ -142,7 +142,7 @@ const Policies = () => {
           <h2 className="text-white font-display text-3xl mb-6">{t.policies.privacy.title.toUpperCase()}</h2>
           <div className="space-y-4 text-gray-300">
             <p>{t.policies.privacy.content}</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-400">
               {t.policies.privacyConsent}
             </p>
           </div>
@@ -150,11 +150,11 @@ const Policies = () => {
 
         {/* Disclaimer */}
         <div className="bg-black border border-white/10 p-6 md:p-8 text-center">
-          <p className="text-gray-500 text-xs uppercase tracking-widest mb-4">{t.legal.disclaimer.title}</p>
+          <p className="text-gray-400 text-xs uppercase tracking-widest mb-4">{t.legal.disclaimer.title}</p>
           <p className="text-gray-400 text-sm leading-relaxed max-w-3xl mx-auto">
             {t.policies.terms.content}
           </p>
-          <p className="text-gray-500 text-xs mt-4">
+          <p className="text-gray-400 text-xs mt-4">
             {t.footer.dealerLicense}: <strong className="text-white">P171632</strong>
           </p>
         </div>

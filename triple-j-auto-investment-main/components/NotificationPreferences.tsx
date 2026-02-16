@@ -89,7 +89,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
         {isOpen && (
           <div className="absolute right-0 top-full mt-1 w-52 bg-[#0a0a0a] border border-tj-gold/20 shadow-[0_0_30px_rgba(0,0,0,0.8)] z-50">
             <div className="px-3 py-2 border-b border-white/10">
-              <p className="text-[10px] uppercase tracking-widest text-gray-500">
+              <p className="text-[10px] uppercase tracking-widest text-gray-400">
                 Notifications
               </p>
             </div>
@@ -128,7 +128,7 @@ const NotificationPreferences: React.FC<NotificationPreferencesProps> = ({
   // Full mode: toggle buttons in a row
   return (
     <div className="space-y-3">
-      <h3 className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+      <h3 className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">
         Notification Preferences
       </h3>
       <div className="flex flex-wrap gap-2">

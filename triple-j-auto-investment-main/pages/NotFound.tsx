@@ -48,7 +48,7 @@ const NotFound = () => {
           >
             <Home className="text-tj-gold mb-4 group-hover:scale-110 transition-transform" size={32} />
             <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-2">{t.notFound.homeButton}</h3>
-            <p className="text-gray-500 text-xs">{t.nav.home}</p>
+            <p className="text-gray-400 text-xs">{t.nav.home}</p>
           </Link>
 
           <Link
@@ -57,7 +57,7 @@ const NotFound = () => {
           >
             <Search className="text-tj-gold mb-4 group-hover:scale-110 transition-transform" size={32} />
             <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-2">{t.common.viewInventory}</h3>
-            <p className="text-gray-500 text-xs">{t.inventory.subtext}</p>
+            <p className="text-gray-400 text-xs">{t.inventory.subtext}</p>
           </Link>
 
           <Link
@@ -66,7 +66,7 @@ const NotFound = () => {
           >
             <ArrowLeft className="text-tj-gold mb-4 group-hover:scale-110 transition-transform" size={32} />
             <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-2">{t.notFound.contactButton}</h3>
-            <p className="text-gray-500 text-xs">{t.contact.subtitle}</p>
+            <p className="text-gray-400 text-xs">{t.contact.subtitle}</p>
           </Link>
         </div>
 

@@ -116,7 +116,7 @@ const RegistrationTracker: React.FC = () => {
       case 'blocked':
         return <AlertCircle className="text-red-400" size={20} />;
       default:
-        return <Circle className="text-gray-500" size={20} />;
+        return <Circle className="text-gray-400" size={20} />;
     }
   };
 
@@ -140,7 +140,7 @@ const RegistrationTracker: React.FC = () => {
               Registration Status
             </h1>
           </div>
-          <p className="text-gray-500 text-sm tracking-wide max-w-md mx-auto">
+          <p className="text-gray-400 text-sm tracking-wide max-w-md mx-auto">
             Track your vehicle registration progress in real-time. Enter your order ID to view current status.
           </p>
         </div>
@@ -190,7 +190,7 @@ const RegistrationTracker: React.FC = () => {
             <div className="bg-tj-dark border border-gray-800 p-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                  <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Vehicle</p>
+                  <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Vehicle</p>
                   <h2 className="text-white text-xl font-display tracking-wide">
                     {registration.vehicleYear} {registration.vehicleMake} {registration.vehicleModel}
                   </h2>
@@ -199,7 +199,7 @@ const RegistrationTracker: React.FC = () => {
                   </p>
                 </div>
                 <div className="text-left sm:text-right">
-                  <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-1">Order</p>
+                  <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-1">Order</p>
                   <p className="text-tj-gold font-mono tracking-wider">{registration.orderId}</p>
                   <p className="text-gray-400 text-xs mt-1">
                     Purchased {formatDate(registration.purchaseDate)}
@@ -302,7 +302,7 @@ const RegistrationTracker: React.FC = () => {
 
                           {/* Expected Duration */}
                           {status === 'pending' && stageConfig.expectedDuration && (
-                            <p className="text-gray-500 text-xs mt-1">
+                            <p className="text-gray-400 text-xs mt-1">
                               Expected: {stageConfig.expectedDuration}
                             </p>
                           )}
@@ -329,7 +329,7 @@ const RegistrationTracker: React.FC = () => {
 
             {/* Contact Card */}
             <div className="bg-tj-dark border border-gray-800 p-6">
-              <p className="text-gray-500 text-[10px] uppercase tracking-widest mb-4">
+              <p className="text-gray-400 text-[10px] uppercase tracking-widest mb-4">
                 Questions about your registration?
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
@@ -366,7 +366,7 @@ const RegistrationTracker: React.FC = () => {
         {searched && !registration && !loading && !error && (
           <div className="text-center py-16">
             <Car className="mx-auto text-gray-700 mb-4" size={48} />
-            <p className="text-gray-500">No registration found for this order ID.</p>
+            <p className="text-gray-400">No registration found for this order ID.</p>
           </div>
         )}
 

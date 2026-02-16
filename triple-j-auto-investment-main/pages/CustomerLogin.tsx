@@ -143,7 +143,7 @@ const CustomerLogin: React.FC = () => {
         {step === 'phone' && (
           <div className="space-y-6">
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+              <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">
                 Phone Number
               </label>
               <div className="flex items-center gap-2">
@@ -198,11 +198,11 @@ const CustomerLogin: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+              <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">
                 Verification Code
               </label>
               <div className="flex items-center gap-2">
-                <KeyRound size={16} className="text-gray-500" />
+                <KeyRound size={16} className="text-gray-400" />
                 <input
                   type="text"
                   value={code}
@@ -243,14 +243,14 @@ const CustomerLogin: React.FC = () => {
                   setCode('');
                   setError(null);
                 }}
-                className="text-gray-500 hover:text-white transition-colors flex items-center gap-1"
+                className="text-gray-400 hover:text-white transition-colors flex items-center gap-1"
               >
                 <ArrowLeft size={14} /> Different number
               </button>
               <button
                 onClick={handleResend}
                 disabled={resendCooldown > 0}
-                className="text-tj-gold hover:text-white transition-colors disabled:text-gray-600 disabled:cursor-not-allowed"
+                className="text-tj-gold hover:text-white transition-colors disabled:text-gray-400 disabled:cursor-not-allowed"
               >
                 {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend code'}
               </button>
@@ -267,7 +267,7 @@ const CustomerLogin: React.FC = () => {
 
         {/* Tracking link input */}
         <div>
-          <label className="block text-[10px] uppercase tracking-widest text-gray-500 mb-2">
+          <label className="block text-[10px] uppercase tracking-widest text-gray-400 mb-2">
             Have a tracking link?
           </label>
           <div className="flex gap-2">

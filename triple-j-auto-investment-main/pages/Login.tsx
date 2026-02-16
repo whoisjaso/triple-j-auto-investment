@@ -46,7 +46,7 @@ const Login = () => {
             />
           </div>
           <h2 className="font-display text-3xl text-white tracking-[0.3em] mb-2">{t.login.title}</h2>
-          <p className="text-[10px] uppercase tracking-widest text-gray-500">{t.login.subtitle}</p>
+          <p className="text-[10px] uppercase tracking-widest text-gray-400">{t.login.subtitle}</p>
         </div>
 
         <div className="bg-tj-dark border border-tj-gold/20 p-10 relative overflow-hidden backdrop-blur-md shadow-[0_0_50px_rgba(0,0,0,0.8)]">
@@ -115,7 +115,7 @@ const Login = () => {
             </button>
 
             <div className="text-center">
-              <button type="button" onClick={handleForgot} className="text-[9px] uppercase tracking-widest text-gray-600 hover:text-tj-gold transition-colors">
+              <button type="button" onClick={handleForgot} className="text-[9px] uppercase tracking-widest text-gray-400 hover:text-tj-gold transition-colors">
                 {t.login.forgotAccess}
               </button>
             </div>
