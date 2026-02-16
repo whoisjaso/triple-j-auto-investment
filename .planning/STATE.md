@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-16
-**Session:** Phase 12 IN PROGRESS (12-02 complete, 12-01 pending)
+**Session:** Phase 12 COMPLETE (all 2 plans: 12-01, 12-02)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 12 - SEO Foundation (IN PROGRESS -- 1/2 plans done)
+**Current focus:** Phase 12 - SEO Foundation (COMPLETE -- 2/2 plans done)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 12 of 19 (SEO Foundation)
-**Plan:** 1 of 2 completed (12-02)
-**Status:** In progress
-**Last activity:** 2026-02-16 -- Completed 12-02-PLAN.md (Static SEO files: robots.txt, sitemap.xml, schema markup fixes)
+**Plan:** 2 of 2 completed (12-01, 12-02)
+**Status:** Phase complete
+**Last activity:** 2026-02-16 -- Completed 12-01-PLAN.md (BrowserRouter migration + per-page SEO metadata on 15 pages)
 
-Progress: [█████████████████░░] 89% (17/19 plans completed across v2.0 so far)
+Progress: [██████████████████] 100% (18/18 plans completed across v2.0 so far)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-02)
+- Total plans completed: 18 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -107,6 +107,10 @@ Progress: [█████████████████░░] 89% (17/19
 - **[11-07]** Splash screen reduced to 1200ms display + 500ms fade = 1.7s total (was 4.3s), well under 2.5s LCP target
 - **[11-08]** Admin pages intentionally excluded from contrast fixes (out of scope per 11-05 decision)
 - **[11-08]** placeholder-gray-500/600 left unchanged (placeholders are hints, not content per WCAG)
+- **[12-01]** React 19 native title/meta hoisting used instead of react-helmet (no additional dependency)
+- **[12-01]** Single og:image site-wide (GoldTripleJLogo.png) -- appropriate for small dealer site
+- **[12-01]** Static index.html OG tags kept as fallback for non-JS crawlers; React 19 dynamic tags override for JS-capable crawlers
+- **[12-01]** CustomerDashboard uses shared SEO variable for loading and main returns (early return pattern)
 - **[12-02]** Static <title> and <meta name="description"> removed from index.html so React 19 per-page metadata (Plan 01) works without duplication
 - **[12-02]** Schema @type uses array format ["AutoDealer", "LocalBusiness"] for explicit dual-type declaration
 - **[12-02]** geo: namespace and Crawl-delay removed from sitemap.xml and robots.txt respectively (non-standard/unnecessary)
@@ -138,13 +142,10 @@ Progress: [█████████████████░░] 89% (17/19
 - **11-07 (complete):** BLOCKER gap closure. Viewport meta: removed maximum-scale=1.0 and user-scalable=no for WCAG 1.4.4 compliance (pinch-to-zoom enabled). SplashScreen: reduced from 4.3s to 1.7s total (1.2s splash + 0.5s fade) for LCP under 2.5s target. Both BLOCKER gaps from 11-VERIFICATION.md resolved.
 - **11-08 (complete):** WARNING gap closure. Replaced all text-gray-500/600 with text-gray-400 on 9 customer-facing pages + 4 components (87+ instances). Zero WCAG AA contrast failures remain on any customer-facing page. Build passes.
 
-### Completed Work (Phase 12) -- IN PROGRESS
+### Completed Work (Phase 12) -- ALL COMPLETE
 
+- **12-01 (complete):** BrowserRouter replaces HashRouter for clean URLs. HashRedirect component redirects legacy /#/path bookmarks. SEO.tsx component created with React 19 native meta hoisting (title, description, canonical, OG tags, noindex). 10 public pages with keyword-optimized titles/descriptions. Legal.tsx dynamic title from URL param. 4 private pages with noindex. Build passes clean.
 - **12-02 (complete):** Fixed robots.txt (added Disallow: /customer/ and /track, removed redundant Allow directives and Crawl-delay). Updated sitemap.xml (all 10 lastmod dates to 2026-02-16, removed non-standard geo: namespace). Fixed index.html schema (@type to ["AutoDealer", "LocalBusiness"], FAQ payment answer "wire transfer" to "debit card"). Removed static <title> and <meta name="description"> for React 19 per-page compatibility.
-
-### Remaining Phase 12 Work
-
-- **12-01:** Per-page meta tags and titles via React 19 metadata hoisting
 
 ### Remaining Phase 9 Work
 
@@ -163,6 +164,10 @@ None -- Phase 10 is fully complete (all original plans + gap closure plans).
 
 None -- Phase 11 is fully complete (all original plans + gap closure plans).
 
+### Remaining Phase 12 Work
+
+None -- Phase 12 is fully complete (all 2 plans done).
+
 ### Blockers/Concerns
 
 - Supabase Free plan limits: no pg_cron, no pg_net, Edge Function limits
@@ -176,6 +181,6 @@ None -- Phase 11 is fully complete (all original plans + gap closure plans).
 ## Session Continuity
 
 **Last session:** 2026-02-16
-**Stopped at:** Completed 12-02-PLAN.md -- Static SEO files (robots.txt, sitemap.xml, schema markup)
+**Stopped at:** Completed 12-01-PLAN.md -- Phase 12 fully complete
 **Resume file:** None
-**Resume:** Completed 12-02: Fixed robots.txt crawl directives, refreshed sitemap dates, corrected schema to AutoDealer+LocalBusiness, fixed FAQ payment inconsistency, removed static title/meta for React 19 compatibility. Next: 12-01 (per-page meta tags via React 19).
+**Resume:** Completed 12-01: BrowserRouter replaces HashRouter, SEO.tsx component with React 19 native meta hoisting, 15 pages with per-page title/description/canonical/OG tags, 4 private pages with noindex, HashRedirect for legacy URLs. Phase 12 (SEO Foundation) is fully complete with all 2 plans executed. Next: Phase 13 (Focus Capture).
