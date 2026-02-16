@@ -113,11 +113,11 @@ Plans:
   2. Each page has a unique, accurate title tag and meta description visible in browser tab and page source
   3. Google Search Console can fetch and render the sitemap.xml, and robots.txt correctly allows/disallows the right paths
   4. Schema markup on the homepage accurately reflects LocalBusiness + AutoDealer with correct price range, address, and dealer license
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 12-01: TBD
-- [ ] 12-02: TBD
+- [ ] 12-01-PLAN.md -- BrowserRouter migration, SEO component (React 19 native metadata), per-page title/description/OG tags on all 17 pages
+- [ ] 12-02-PLAN.md -- Static file fixes: robots.txt disallow rules, sitemap.xml lastmod dates, index.html schema LocalBusiness + FAQ correction
 
 ### Phase 13: Focus Capture
 **Goal**: A visitor's first 3 seconds on the site break the "used car lot" script -- they register novelty, authority, and tribe belonging before conscious evaluation begins
@@ -242,7 +242,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 9. Production Infrastructure | v2.0 | 0/7 | Planning complete | - |
 | 10. Brand Truth | v2.0 | 6/6 | Complete | 2026-02-15 |
 | 11. Production Polish | v2.0 | 8/8 | Complete | 2026-02-16 |
-| 12. SEO Foundation | v2.0 | 0/TBD | Not started | - |
+| 12. SEO Foundation | v2.0 | 0/2 | Planning complete | - |
 | 13. Focus Capture | v2.0 | 0/TBD | Not started | - |
 | 14. Expectancy Building | v2.0 | 0/TBD | Not started | - |
 | 15. Engagement Spectrum | v2.0 | 0/TBD | Not started | - |
