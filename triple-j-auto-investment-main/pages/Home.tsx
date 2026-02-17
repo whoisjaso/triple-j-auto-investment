@@ -1,60 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/Store';
-import { ArrowRight, Diamond, Heart, Zap, Fingerprint, Target, Activity, Star, ChevronDown, Phone, Key } from 'lucide-react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import { ArrowRight, Diamond, Heart, Zap, Fingerprint, Target, Activity, Star, ChevronDown, Phone, Key, Users } from 'lucide-react';
+import { motion, useTransform, useSpring, useInView } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { SEO } from '../components/SEO';
 
-// --- TEXT ANIMATION ---
+// --- COUNT-UP METRIC COMPONENT ---
 
-const DecryptText = ({ text, delay = 0, speed = 30 }: { text: string, delay?: number, speed?: number }) => {
-   const [display, setDisplay] = useState('');
-   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+const CountUpNumber = ({ value, suffix = '', label, icon }: { value: number; suffix?: string; label: string; icon?: React.ReactNode }) => {
+   const ref = useRef<HTMLDivElement>(null);
+   const isInView = useInView(ref, { once: true, margin: "-100px" });
+   const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
+   const display = useTransform(spring, (current) => Math.round(current).toLocaleString());
 
    useEffect(() => {
-      let iteration = 0;
-      const startTimeout = setTimeout(() => {
-         const interval = setInterval(() => {
-            setDisplay(text
-               .split('')
-               .map((letter, index) => {
-                  if (index < iteration) {
-                     return text[index];
-                  }
-                  return chars[Math.floor(Math.random() * chars.length)];
-               })
-               .join('')
-            );
+      if (isInView) {
+         spring.set(value);
+      }
+   }, [isInView, spring, value]);
 
-            if (iteration >= text.length) {
-               clearInterval(interval);
-            }
-
-            iteration += 1 / 2;
-         }, speed);
-         return () => clearInterval(interval);
-      }, delay);
-      return () => clearTimeout(startTimeout);
-   }, [text, delay, speed]);
-
-   return <span>{display}</span>;
+   return (
+      <div ref={ref} className="text-center">
+         {icon && <div className="flex justify-center mb-3 text-tj-gold/60">{icon}</div>}
+         <div className="text-3xl md:text-5xl font-display text-white mb-2 tabular-nums">
+            <motion.span>{display}</motion.span>
+            {suffix && <span className="text-tj-gold">{suffix}</span>}
+         </div>
+         <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-gray-400">{label}</p>
+      </div>
+   );
 };
+
+// --- HERO SVG PATHS ---
+
+const heroSvgPaths = [
+   { d: "M -100 120 Q 200 40 450 180 T 1100 100", duration: 6, strokeWidth: 1.2, maxOpacity: 0.5 },
+   { d: "M -50 250 C 150 150 350 300 550 200 S 850 100 1100 280", duration: 7, strokeWidth: 0.8, maxOpacity: 0.6 },
+   { d: "M -80 380 Q 300 280 600 400 T 1100 350", duration: 5.5, strokeWidth: 1.5, maxOpacity: 0.45 },
+   { d: "M -120 480 C 200 400 400 550 650 430 S 900 350 1100 500", duration: 7.5, strokeWidth: 0.6, maxOpacity: 0.55 },
+   { d: "M -60 560 Q 250 480 500 580 T 1100 520", duration: 6.5, strokeWidth: 1, maxOpacity: 0.5 },
+   { d: "M -100 180 C 300 80 500 250 700 150 S 950 200 1100 160", duration: 8, strokeWidth: 0.7, maxOpacity: 0.4 },
+   { d: "M -70 640 Q 350 560 650 650 T 1100 600", duration: 5, strokeWidth: 1.3, maxOpacity: 0.5 },
+   { d: "M -90 320 C 200 220 450 380 700 300 S 1000 250 1100 340", duration: 6.8, strokeWidth: 0.9, maxOpacity: 0.55 },
+];
+
+const heroSvgCircles = [
+   { cx: 200, cyStart: 150, cyEnd: 120, r: 1.5, duration: 10, maxOpacity: 0.25 },
+   { cx: 600, cyStart: 400, cyEnd: 370, r: 2, duration: 12, maxOpacity: 0.2 },
+   { cx: 850, cyStart: 250, cyEnd: 220, r: 1, duration: 8, maxOpacity: 0.3 },
+];
 
 const Home = () => {
    const { vehicles } = useStore();
    const { t } = useLanguage();
-   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-   const { scrollY } = useScroll();
-
-   // Smooth Parallax
-   const y1 = useTransform(scrollY, [0, 500], [0, 200]);
-   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-
-   // Mouse Parallax for Hero
-   const mouseX = useSpring(0, { stiffness: 50, damping: 20 });
-   const mouseY = useSpring(0, { stiffness: 50, damping: 20 });
-
    // Get Top 3 Available Vehicles for Featured section
    const featuredVehicles = vehicles
       .filter(v => v.status === 'Available')
@@ -63,20 +62,15 @@ const Home = () => {
 
    const hasVehicles = featuredVehicles.length > 0;
 
-   useEffect(() => {
-      const handleMouseMove = (e: MouseEvent) => {
-         const x = (e.clientX / window.innerWidth) - 0.5;
-         const y = (e.clientY / window.innerHeight) - 0.5;
-         setMousePos({ x, y });
-         mouseX.set(x);
-         mouseY.set(y);
-      };
-
-      window.addEventListener('mousemove', handleMouseMove);
-      return () => {
-         window.removeEventListener('mousemove', handleMouseMove);
-      };
-   }, []);
+   // TODO(business-data): Authority metrics -- update with real business data
+   // These are conservative placeholder estimates; replace with actual figures when available
+   // Search for "TODO(business-data)" to find all placeholder values
+   const metrics = [
+      { value: 500, suffix: '+', label: t.home.authority.familiesServed, icon: <Users size={20} /> },
+      { value: 150, suffix: '+', label: t.home.authority.fiveStarReviews },
+      { value: 3, suffix: '+', label: t.home.authority.yearsInBusiness },
+      { value: 800, suffix: '+', label: t.home.authority.vehiclesDelivered },
+   ];
 
    const containerVariants = {
       hidden: { opacity: 0 },
@@ -103,91 +97,194 @@ const Home = () => {
       >
 
          {/* --- HERO SECTION --- */}
-         <div className="relative h-screen flex flex-col justify-center items-center overflow-hidden">
+         <div className="relative min-h-screen -mt-36 pt-36 flex flex-col justify-center items-center overflow-hidden">
+
+            {/* Abstract SVG Animation Background */}
             <div className="absolute inset-0 pointer-events-none">
-               <motion.div
-                  className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2830&auto=format&fit=crop')] bg-cover bg-center"
-                  style={{
-                     scale: 1.1,
-                     x: useTransform(mouseX, [-0.5, 0.5], [20, -20]),
-                     y: useTransform(mouseY, [-0.5, 0.5], [20, -20]),
-                     filter: 'grayscale(100%) contrast(110%) brightness(0.35)'
-                  }}
-               ></motion.div>
-               <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 animate-pulse"></div>
-               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)]"></div>
+               <svg
+                  className="absolute inset-0 w-full h-full"
+                  viewBox="0 0 1000 700"
+                  preserveAspectRatio="xMidYMid slice"
+               >
+                  <defs>
+                     <linearGradient id="heroGoldPath" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="rgba(212,175,55,0)" />
+                        <stop offset="50%" stopColor="rgba(212,175,55,0.3)" />
+                        <stop offset="100%" stopColor="rgba(212,175,55,0)" />
+                     </linearGradient>
+                     <linearGradient id="heroGoldGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="rgba(212,175,55,0)" />
+                        <stop offset="40%" stopColor="rgba(212,175,55,0.15)" />
+                        <stop offset="60%" stopColor="rgba(212,175,55,0.15)" />
+                        <stop offset="100%" stopColor="rgba(212,175,55,0)" />
+                     </linearGradient>
+                  </defs>
+
+                  {/* Animated flowing paths */}
+                  {heroSvgPaths.map((path, i) => (
+                     <motion.path
+                        key={`path-${i}`}
+                        d={path.d}
+                        stroke="url(#heroGoldPath)"
+                        strokeWidth={path.strokeWidth}
+                        fill="none"
+                        initial={{ pathLength: 0, opacity: 0 }}
+                        animate={{
+                           pathLength: [0, 1, 0],
+                           opacity: [0, path.maxOpacity, 0],
+                        }}
+                        transition={{
+                           duration: path.duration,
+                           repeat: Infinity,
+                           ease: "easeInOut",
+                           delay: i * 0.4,
+                        }}
+                     />
+                  ))}
+
+                  {/* Floating particle circles */}
+                  {heroSvgCircles.map((circle, i) => (
+                     <motion.circle
+                        key={`circle-${i}`}
+                        cx={circle.cx}
+                        r={circle.r}
+                        fill="rgba(212,175,55,0.4)"
+                        initial={{ cy: circle.cyStart, opacity: 0 }}
+                        animate={{
+                           cy: [circle.cyStart, circle.cyEnd, circle.cyStart],
+                           opacity: [0, circle.maxOpacity, 0],
+                        }}
+                        transition={{
+                           duration: circle.duration,
+                           repeat: Infinity,
+                           ease: "easeInOut",
+                           delay: i * 1.5,
+                        }}
+                     />
+                  ))}
+               </svg>
+
+               {/* Subtle radial gradient overlay */}
+               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgba(0,0,0,0.4)_70%,rgba(0,0,0,0.8)_100%)]" />
             </div>
 
-            <motion.div
-               style={{ y: y1, opacity }}
-               className="relative z-10 text-center px-6 w-full max-w-[1920px]"
-            >
+            {/* Hero Content */}
+            <div className="relative z-10 text-center px-6 max-w-4xl mx-auto">
 
-               {/* Main Typography */}
-               <h1 className="font-display text-[13vw] md:text-[11vw] leading-[0.8] text-white tracking-tighter mix-blend-difference mb-12 select-none perspective-1000">
-                  <motion.span
-                     initial={{ opacity: 0, rotateX: 90 }}
-                     animate={{ opacity: 1, rotateX: 0 }}
-                     transition={{ duration: 1, type: "spring", bounce: 0.4 }}
-                     className="block origin-bottom"
-                  >
-                     <DecryptText text={t.home.hero.title1} delay={300} speed={40} />
-                  </motion.span>
-                  <motion.span
-                     initial={{ opacity: 0, rotateX: -90 }}
-                     animate={{ opacity: 1, rotateX: 0 }}
-                     transition={{ duration: 1, delay: 0.2, type: "spring", bounce: 0.4 }}
-                     className="block text-transparent bg-clip-text bg-gradient-to-b from-tj-gold via-yellow-600 to-transparent origin-top"
-                  >
-                     <DecryptText text={t.home.hero.title2} delay={600} speed={40} />
-                  </motion.span>
-               </h1>
-
-               {/* Subtitle & CTAs */}
+               {/* Se Habla Espanol Badge */}
                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
+                  initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 1, type: "spring" }}
-                  className="flex flex-col items-center gap-6"
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                  className="inline-flex items-center gap-2 border border-tj-gold/30 rounded-full px-4 py-1.5 mb-8"
                >
-                  <p className="text-sm md:text-lg text-gray-400 font-serif italic max-w-xl">
-                     {t.home.hero.subtitle}
-                  </p>
-
-                  <div className="flex flex-col sm:flex-row items-center gap-4 mt-4">
-                     <Link to="/inventory" className="group relative overflow-hidden bg-white text-black px-12 md:px-16 py-5 md:py-6 text-xs font-bold tracking-[0.3em] uppercase hover:bg-tj-gold transition-colors duration-300">
-                        <span className="relative z-10 flex items-center gap-3">
-                           {t.home.hero.cta} <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                        </span>
-                        <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-                     </Link>
-
-                     <a
-                        href="tel:+18324009760"
-                        className="group relative overflow-hidden bg-transparent border-2 border-white text-white px-12 md:px-16 py-5 md:py-6 text-xs font-bold tracking-[0.3em] uppercase hover:bg-tj-gold hover:border-tj-gold hover:text-black transition-all duration-300"
-                     >
-                        <span className="relative z-10 flex items-center gap-3">
-                           <Phone size={14} className="group-hover:animate-pulse" />
-                           {t.home.hero.callNow}
-                        </span>
-                        <div className="absolute inset-0 bg-tj-gold/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-                     </a>
-                  </div>
+                  <span className="w-1.5 h-1.5 rounded-full bg-tj-gold/60" />
+                  <span className="text-tj-gold text-[10px] uppercase tracking-[0.3em] font-bold">
+                     {t.home.seHabla}
+                  </span>
                </motion.div>
-            </motion.div>
+
+               {/* Main Heading */}
+               <motion.h1
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5, type: "spring", stiffness: 50, damping: 20 }}
+                  className="font-display text-4xl md:text-6xl lg:text-7xl text-white tracking-tight mb-4"
+               >
+                  {t.home.hero.heading}
+               </motion.h1>
+
+               {/* Subheading */}
+               <motion.p
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7, duration: 0.6 }}
+                  className="text-tj-gold text-xs md:text-sm uppercase tracking-[0.3em] font-bold mb-6"
+               >
+                  {t.home.hero.subheading}
+               </motion.p>
+
+               {/* Tagline */}
+               <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9, duration: 0.8 }}
+                  className="font-serif italic text-sm md:text-lg text-gray-400 max-w-xl mx-auto mb-10"
+               >
+                  {t.home.hero.tagline}
+               </motion.p>
+
+               {/* CTA Buttons */}
+               <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.1, duration: 0.6 }}
+                  className="flex flex-col sm:flex-row items-center gap-4"
+               >
+                  {/* Primary: Schedule a Visit */}
+                  <Link
+                     to="/contact"
+                     className="bg-tj-gold text-black py-4 px-8 text-xs font-bold tracking-[0.3em] uppercase hover:bg-white transition-colors duration-300"
+                  >
+                     {t.home.hero.scheduleVisit}
+                  </Link>
+
+                  {/* Secondary: Call Now */}
+                  <a
+                     href="tel:+18324009760"
+                     className="inline-flex items-center gap-3 bg-transparent border-2 border-white text-white py-4 px-8 text-xs font-bold tracking-[0.3em] uppercase hover:bg-tj-gold hover:border-tj-gold hover:text-black transition-all duration-300"
+                  >
+                     <Phone size={14} />
+                     {t.home.hero.callNow}
+                  </a>
+               </motion.div>
+            </div>
 
             {/* Scroll Indicator */}
             <motion.div
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}
                transition={{ delay: 2, duration: 1 }}
-               className="absolute bottom-12 animate-bounce text-tj-gold/50 flex flex-col items-center gap-2 cursor-pointer mix-blend-difference"
+               className="absolute bottom-8 z-10 animate-bounce text-tj-gold/50 flex flex-col items-center gap-2 cursor-pointer"
                onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
             >
-               <span className="text-[9px] uppercase tracking-widest writing-vertical-rl">SCROLL</span>
+               <span className="text-[9px] uppercase tracking-widest">{t.home.hero.scrollPrompt}</span>
                <ChevronDown size={20} />
             </motion.div>
          </div>
+
+         {/* --- AUTHORITY METRICS --- */}
+         <section className="relative py-16 md:py-24 bg-black border-b border-white/10 overflow-hidden">
+            {/* Subtle gradient background accent */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.03)_0%,transparent_60%)]" />
+
+            <div className="relative max-w-5xl mx-auto px-4 md:px-6">
+               {/* Section title */}
+               <p className="text-center text-[10px] uppercase tracking-[0.4em] text-tj-gold/60 mb-12 font-display">
+                  {t.home.authority.title}
+               </p>
+
+               {/* Metrics grid */}
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+                  {metrics.map((metric, i) => (
+                     <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-50px" }}
+                        transition={{ delay: i * 0.1, duration: 0.5 }}
+                     >
+                        <CountUpNumber
+                           value={metric.value}
+                           suffix={metric.suffix}
+                           label={metric.label}
+                           icon={metric.icon}
+                        />
+                     </motion.div>
+                  ))}
+               </div>
+            </div>
+         </section>
 
          {/* --- TICKER (Infinite Marquee) --- */}
          <div className="bg-tj-gold text-black py-3 border-y border-black overflow-hidden relative z-20 select-none">
