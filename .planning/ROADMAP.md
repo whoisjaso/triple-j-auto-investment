@@ -119,7 +119,7 @@ Plans:
 - [x] 12-01-PLAN.md -- BrowserRouter migration, SEO component (React 19 native metadata), per-page title/description/OG tags on all 17 pages
 - [x] 12-02-PLAN.md -- Static file fixes: robots.txt disallow rules, sitemap.xml lastmod dates, index.html schema LocalBusiness + FAQ correction
 - [x] 12-03-PLAN.md -- (Gap closure) AI crawler access (robots.txt), enhanced schema (FinancialProduct, Service, sameAs, knowsLanguage), hreflang, expanded BreadcrumbList
-- [x] 12-04-PLAN.md -- (Gap closure) Conversational FAQ expansion (8→20+), answer capsule content, Finance/Services content for AI citation, FAQ schema update
+- [x] 12-04-PLAN.md -- (Gap closure) Conversational FAQ expansion (8->20+), answer capsule content, Finance/Services content for AI citation, FAQ schema update
 
 ### Phase 13: Focus Capture
 **Goal**: A visitor's first 3 seconds on the site break the "used car lot" script -- they register novelty, authority, and tribe belonging before conscious evaluation begins
@@ -130,11 +130,12 @@ Plans:
   2. Real authority metrics ("X families served", "X five-star reviews") are visible above the fold within the first viewport without scrolling
   3. A Spanish-first visitor immediately sees "Se Habla Espanol" and family-centered imagery reflecting the Hispanic community
   4. The overall design communicates competence and intentionality -- no visual clutter, no generic dealership template feel
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 13-01: TBD
-- [ ] 13-02: TBD
+- [ ] 13-01-PLAN.md -- Bilingual foundation: new hero/authority translation keys in both en/es + browser Accept-Language auto-detection in LanguageContext
+- [ ] 13-02-PLAN.md -- Hero rebuild: replace stock-photo hero with abstract SVG animation, positioning language, Se Habla badge, Schedule a Visit / Call Now CTAs + authority metrics strip with count-up numbers
+- [ ] 13-03-PLAN.md -- Navbar Se Habla indicator (desktop + mobile) + remove SplashScreen for immediate content visibility
 
 ### Phase 14: Expectancy Building
 **Goal**: Browsing inventory transforms from a transactional scan into an emotional experience where visitors begin to see themselves owning the vehicle
@@ -245,7 +246,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 10. Brand Truth | v2.0 | 6/6 | Complete | 2026-02-15 |
 | 11. Production Polish | v2.0 | 8/8 | Complete | 2026-02-16 |
 | 12. SEO Foundation | v2.0 | 4/4 | Complete | 2026-02-16 |
-| 13. Focus Capture | v2.0 | 0/TBD | Not started | - |
+| 13. Focus Capture | v2.0 | 0/3 | Planning complete | - |
 | 14. Expectancy Building | v2.0 | 0/TBD | Not started | - |
 | 15. Engagement Spectrum | v2.0 | 0/TBD | Not started | - |
 | 16. Behavioral Intelligence | v2.0 | 0/TBD | Not started | - |
