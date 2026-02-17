@@ -32,7 +32,7 @@ See: `.planning/milestones/v1-ROADMAP.md`
 - [x] **Phase 10: Brand Truth** - Align all content with "automotive investment firm" positioning using real business data
 - [x] **Phase 11: Production Polish** - Mobile-first verification, performance, accessibility, and production-grade error handling
 - [x] **Phase 12: SEO Foundation** - BrowserRouter migration, meta tags, sitemap, and schema markup for search visibility
-- [ ] **Phase 13: Focus Capture** - SOVEREIGN landing experience with pattern-interrupt, authority, and tribe signals
+- [x] **Phase 13: Focus Capture** - SOVEREIGN landing experience with pattern-interrupt, authority, and tribe signals
 - [ ] **Phase 14: Expectancy Building** - Vehicle listings as micro-stories with price anchoring and identity framing
 - [ ] **Phase 15: Engagement Spectrum** - Micro-commitment ladder from zero-friction saves to vehicle reservations
 - [ ] **Phase 16: Behavioral Intelligence** - Session tracking, smart recommendations, urgency calibration, and attribution
@@ -133,9 +133,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 13-01-PLAN.md -- Bilingual foundation: new hero/authority translation keys in both en/es + browser Accept-Language auto-detection in LanguageContext
-- [ ] 13-02-PLAN.md -- Hero rebuild: replace stock-photo hero with abstract SVG animation, positioning language, Se Habla badge, Schedule a Visit / Call Now CTAs + authority metrics strip with count-up numbers
-- [ ] 13-03-PLAN.md -- Navbar Se Habla indicator (desktop + mobile) + remove SplashScreen for immediate content visibility
+- [x] 13-01-PLAN.md -- Bilingual foundation: new hero/authority translation keys in both en/es + browser Accept-Language auto-detection in LanguageContext
+- [x] 13-02-PLAN.md -- Hero rebuild: replace stock-photo hero with abstract SVG animation, positioning language, Se Habla badge, Schedule a Visit / Call Now CTAs + authority metrics strip with count-up numbers
+- [x] 13-03-PLAN.md -- Navbar Se Habla indicator (desktop + mobile) + remove SplashScreen for immediate content visibility
 
 ### Phase 14: Expectancy Building
 **Goal**: Browsing inventory transforms from a transactional scan into an emotional experience where visitors begin to see themselves owning the vehicle
@@ -246,7 +246,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 10. Brand Truth | v2.0 | 6/6 | Complete | 2026-02-15 |
 | 11. Production Polish | v2.0 | 8/8 | Complete | 2026-02-16 |
 | 12. SEO Foundation | v2.0 | 4/4 | Complete | 2026-02-16 |
-| 13. Focus Capture | v2.0 | 0/3 | Planning complete | - |
+| 13. Focus Capture | v2.0 | 3/3 | Complete | 2026-02-17 |
 | 14. Expectancy Building | v2.0 | 0/TBD | Not started | - |
 | 15. Engagement Spectrum | v2.0 | 0/TBD | Not started | - |
 | 16. Behavioral Intelligence | v2.0 | 0/TBD | Not started | - |
