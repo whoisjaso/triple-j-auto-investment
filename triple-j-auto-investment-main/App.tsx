@@ -6,7 +6,6 @@ import { Menu, X, LayoutDashboard, Lock, ShieldCheck, MapPin, FileText, Car, Dat
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
-import { SplashScreen } from './components/SplashScreen';
 import { ScrollToTop } from './components/ScrollToTop';
 import { PageLoader } from './components/PageLoader';
 import { OfflineBanner } from './components/OfflineBanner';
@@ -639,9 +638,7 @@ export default function App() {
         <Router>
           <ScrollToTop />
           <HashRedirect />
-          <SplashScreen duration={1200}>
-            <AppContent />
-          </SplashScreen>
+          <AppContent />
         </Router>
       </StoreProvider>
     </LanguageProvider>
