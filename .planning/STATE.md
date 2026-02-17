@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-17
-**Session:** Phase 13 IN PROGRESS (13-01 complete, 13-02 and 13-03 remaining)
+**Session:** Phase 13 IN PROGRESS (13-01 and 13-03 complete, 13-02 remaining)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 13 - Focus Capture (IN PROGRESS -- 13-01 complete, 13-02 and 13-03 remaining)
+**Current focus:** Phase 13 - Focus Capture (IN PROGRESS -- 13-01 and 13-03 complete, 13-02 remaining)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 13 of 19 (Focus Capture)
-**Plan:** 1 of 3 completed (13-01)
+**Plan:** 2 of 3 completed (13-01, 13-03)
 **Status:** In progress
-**Last activity:** 2026-02-17 -- Completed 13-01-PLAN.md (bilingual translation keys + browser language auto-detection)
+**Last activity:** 2026-02-17 -- Completed 13-03-PLAN.md (Se Habla navbar indicator + SplashScreen removal)
 
-Progress: [█████████████████████] 100% (21/21 plans completed across v2.0 so far)
+Progress: [██████████████████████] 100% (22/22 plans completed across v2.0 so far)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 21 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01)
+- Total plans completed: 22 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-03)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -127,6 +127,10 @@ Progress: [█████████████████████] 100%
 - **[13-01]** Hero keys REPLACED not extended (title1/title2/subtitle/cta -> heading/subheading/tagline/scheduleVisit/scrollPrompt) -- Home.tsx intentionally broken until 13-02 fixes references
 - **[13-01]** seHabla key value is "Se Habla Espanol" in BOTH en and es blocks -- cultural identity signal always displayed in Spanish
 - **[13-01]** Browser language auto-detection saves to localStorage immediately so it only runs once per device
+- **[13-03]** Desktop Se Habla indicator: bordered pill badge (text-[9px], rounded-full, border-tj-gold/20) before language toggle
+- **[13-03]** Mobile Se Habla indicator: plain text only (text-[8px], no border) to conserve horizontal space
+- **[13-03]** SplashScreen removed entirely (not shortened) -- hero animation IS the new first impression for Phase 13's 3-second goal
+- **[13-03]** SplashScreen.tsx component file preserved (not deleted) for potential future reference
 
 ### Completed Work (Phase 9)
 
@@ -161,9 +165,10 @@ Progress: [█████████████████████] 100%
 - **12-03 (complete):** GEO/AEO gap closure. AI crawlers allowed in robots.txt (8 bots). AutoDealer schema enriched with knowsLanguage, additionalType AutoRental, sameAs (Facebook+Instagram). New FinancialProduct JSON-LD for BHPH financing. New Service JSON-LD for car rentals. BreadcrumbList expanded to all 10 public pages. hreflang en/es/x-default in index.html + per-page via SEO.tsx.
 - **12-04 (complete):** GEO/AEO gap closure. FAQ expanded from 8 to 23 questions per language (46 total) targeting conversational AI queries. Added BHPH process content to finance (en+es). All service descriptions rewritten with answer-capsule format. FAQ schema expanded to 23 English + 10 Spanish questions. All answers include branded attribution, specific data ($3K-$8K, phone, address).
 
-### Completed Work (Phase 13) -- IN PROGRESS
+### Completed Work (Phase 13) -- IN PROGRESS (13-02 remaining)
 
 - **13-01 (complete):** Added 24 bilingual translation key-value pairs: 6 hero keys (heading, subheading, tagline, scheduleVisit, callNow, scrollPrompt), 5 authority metric labels (familiesServed, fiveStarReviews, yearsInBusiness, vehiclesDelivered + title), 1 seHabla key. Enhanced LanguageContext with navigator.language auto-detection for Spanish-first visitors. Home.tsx intentionally broken (old hero key references) until 13-02.
+- **13-03 (complete):** Added persistent "Se Habla Espanol" indicator to navbar (desktop: bordered pill badge, mobile: plain text). Removed SplashScreen wrapper from App component (was 1.7s delay). Content now renders immediately. SplashScreen.tsx file preserved.
 
 ### Remaining Phase 9 Work
 
@@ -199,6 +204,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-17
-**Stopped at:** Completed 13-01-PLAN.md -- Phase 13 plan 1 of 3
+**Stopped at:** Completed 13-03-PLAN.md -- Phase 13 plans 1 and 3 of 3 done
 **Resume file:** None
-**Resume:** Completed 13-01: Added 24 bilingual translation keys for hero, authority metrics, and Se Habla badge. Enhanced LanguageContext with navigator.language auto-detection for Spanish-first visitors. Home.tsx intentionally broken (old hero key references) until 13-02 rebuilds the hero section. Next: 13-02 (hero rebuild) then 13-03 (authority metrics component).
+**Resume:** Completed 13-03: Added Se Habla Espanol indicator to both desktop (bordered pill badge) and mobile (plain text) navbar. Removed SplashScreen wrapper for immediate content visibility. Next: 13-02 (hero rebuild -- the final remaining plan in Phase 13).
