@@ -191,6 +191,11 @@ const Navbar = () => {
 
             {/* Right Axis: Philosophical */}
             <div className="hidden md:flex flex-1 items-center justify-end space-x-8 pr-12">
+              {/* Se Habla Espanol -- persistent cultural indicator */}
+              <span className="text-[9px] uppercase tracking-[0.2em] text-tj-gold/70 font-display border border-tj-gold/20 px-3 py-1 rounded-full select-none">
+                {t.home.seHabla}
+              </span>
+
               {/* Language Toggle */}
               <button
                 onClick={toggleLang}
@@ -231,6 +236,11 @@ const Navbar = () => {
 
             {/* Mobile Trigger */}
             <div className="flex flex-1 justify-end md:hidden z-[70] pr-2 items-center gap-4">
+              {/* Se Habla -- mobile indicator */}
+              <span className="text-[8px] uppercase tracking-[0.15em] text-tj-gold/70 font-display select-none whitespace-nowrap">
+                {t.home.seHabla}
+              </span>
+
               <button
                 onClick={toggleLang}
                 className="text-tj-gold p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
