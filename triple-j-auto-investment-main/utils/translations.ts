@@ -66,12 +66,21 @@ export const t = {
         },
         home: {
             hero: {
-                title1: "YOUR NEXT",
-                title2: "VEHICLE",
-                subtitle: "Reliable pre-owned cars for Houston families. Transparent pricing, no surprises.",
-                cta: "View Inventory",
-                callNow: "Call Now"
+                heading: "TRIPLE J AUTO INVESTMENT",
+                subheading: "AUTOMOTIVE INVESTMENT FIRM",
+                tagline: "Reliable pre-owned vehicles for Houston families. Transparent pricing, in-house financing, no surprises.",
+                scheduleVisit: "Schedule a Visit",
+                callNow: "Call Now",
+                scrollPrompt: "Explore"
             },
+            authority: {
+                title: "TRUSTED BY HOUSTON FAMILIES",
+                familiesServed: "Families Served",
+                fiveStarReviews: "Five-Star Reviews",
+                yearsInBusiness: "Years Serving Houston",
+                vehiclesDelivered: "Vehicles Delivered"
+            },
+            seHabla: "Se Habla Espanol",
             ticker: [
                 "SERVING HOUSTON FAMILIES",
                 "TRANSPARENT PRICING",
@@ -842,12 +851,21 @@ export const t = {
         },
         home: {
             hero: {
-                title1: "TU PROXIMO",
-                title2: "VEHICULO",
-                subtitle: "Carros usados confiables para familias de Houston. Precios transparentes, sin sorpresas.",
-                cta: "Ver Inventario",
-                callNow: "Llamar Ahora"
+                heading: "TRIPLE J AUTO INVESTMENT",
+                subheading: "FIRMA DE INVERSION AUTOMOTRIZ",
+                tagline: "Vehiculos usados confiables para familias de Houston. Precios transparentes, financiamiento interno, sin sorpresas.",
+                scheduleVisit: "Agendar Visita",
+                callNow: "Llamar Ahora",
+                scrollPrompt: "Explorar"
             },
+            authority: {
+                title: "LA CONFIANZA DE LAS FAMILIAS DE HOUSTON",
+                familiesServed: "Familias Atendidas",
+                fiveStarReviews: "Resenas de 5 Estrellas",
+                yearsInBusiness: "Anos Sirviendo a Houston",
+                vehiclesDelivered: "Vehiculos Entregados"
+            },
+            seHabla: "Se Habla Espanol",
             ticker: [
                 "AL SERVICIO DE FAMILIAS DE HOUSTON",
                 "PRECIOS TRANSPARENTES",
