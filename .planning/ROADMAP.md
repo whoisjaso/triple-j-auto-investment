@@ -147,12 +147,13 @@ Plans:
   3. Inspected vehicles display a visible "Triple J Verified" badge that is absent from non-inspected listings
   4. Each vehicle has its own page with a unique URL (e.g., /vehicles/2018-honda-accord) that can be shared and indexed
   5. Vehicle story sections show honest origin and condition information -- imperfections disclosed, not hidden
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 14-01: TBD
-- [ ] 14-02: TBD
-- [ ] 14-03: TBD
+- [ ] 14-01-PLAN.md -- Data foundation: Vehicle type extensions, store transforms, slug utility, market estimate service, bilingual translations
+- [ ] 14-02-PLAN.md -- AI content generation: Gemini headline/story generators + admin inventory form integration
+- [ ] 14-03-PLAN.md -- UI components: VehicleVerifiedBadge, VehiclePriceBlock, VehicleStorySection, VehicleJsonLd
+- [ ] 14-04-PLAN.md -- Vehicle detail page, route registration, and minimal inventory card updates
 
 ### Phase 15: Engagement Spectrum
 **Goal**: Visitors can take action at whatever commitment level they are psychologically ready for -- from anonymous saves to vehicle reservations -- and every action feeds the CRM pipeline
@@ -247,7 +248,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 11. Production Polish | v2.0 | 8/8 | Complete | 2026-02-16 |
 | 12. SEO Foundation | v2.0 | 4/4 | Complete | 2026-02-16 |
 | 13. Focus Capture | v2.0 | 3/3 | Complete | 2026-02-17 |
-| 14. Expectancy Building | v2.0 | 0/TBD | Not started | - |
+| 14. Expectancy Building | v2.0 | 0/4 | Planning complete | - |
 | 15. Engagement Spectrum | v2.0 | 0/TBD | Not started | - |
 | 16. Behavioral Intelligence | v2.0 | 0/TBD | Not started | - |
 | 17. Divine Response | v2.0 | 0/TBD | Not started | - |
