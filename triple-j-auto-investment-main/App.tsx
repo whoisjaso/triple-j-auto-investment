@@ -67,6 +67,7 @@ const About = lazyWithErrorHandling(() => import('./pages/About'), 'About');
 const Legal = lazyWithErrorHandling(() => import('./pages/Legal'), 'Legal');
 const RegistrationTracker = lazyWithErrorHandling(() => import('./pages/RegistrationTracker'), 'Registration Tracker');
 const CustomerStatusTracker = lazyWithErrorHandling(() => import('./pages/CustomerStatusTracker'), 'Customer Status Tracker');
+const VehicleDetail = lazyWithErrorHandling(() => import('./pages/VehicleDetail'), 'Vehicle Detail');
 
 // Customer Portal Pages (Lazy Loaded)
 const CustomerLogin = lazyWithErrorHandling(() => import('./pages/CustomerLogin'), 'Customer Login');
@@ -590,6 +591,7 @@ const AppContent = () => {
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
                   <Route path="/inventory" element={<Inventory />} />
+                  <Route path="/vehicles/:slug" element={<VehicleDetail />} />
                   <Route path="/vin" element={<VinLookup />} />
                   <Route path="/vin/free-check" element={<VinLookup />} />
                   <Route path="/contact" element={<Contact />} />
