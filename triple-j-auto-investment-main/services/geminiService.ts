@@ -10,6 +10,11 @@ const getClient = () => {
   return new GoogleGenAI({ apiKey });
 };
 
+/** Strip markdown code fences that Gemini sometimes wraps around JSON responses. */
+function cleanJsonResponse(text: string): string {
+  return text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+}
+
 export const generateVehicleDescription = async (make: string, model: string, year: number, diagnostics: string[] = []): Promise<string> => {
   const ai = getClient();
   if (!ai) return "System Error: AI Client not initialized.";
@@ -98,5 +103,124 @@ export const analyzeFinancialPerformance = async (financialData: string): Promis
   } catch (error) {
     console.error("Financial Analysis Error", error);
     return "Unable to compute financial strategy.";
+  }
+};
+
+export const generateIdentityHeadline = async (
+  make: string,
+  model: string,
+  year: number,
+  bodyType?: string,
+  diagnostics: string[] = []
+): Promise<{ en: string; es: string }> => {
+  const fallback = { en: `${year} ${make} ${model}`, es: `${year} ${make} ${model}` };
+  const ai = getClient();
+  if (!ai) return fallback;
+
+  try {
+    const diagContext = diagnostics.length > 0
+      ? `CONDITION NOTES (factor into word choice -- e.g. "Project-Ready" instead of "Family-Ready" if issues exist): ${diagnostics.join(', ')}`
+      : 'CONDITION: No major issues reported.';
+
+    const bodyContext = bodyType ? `Body type: ${bodyType}.` : '';
+
+    const prompt = `
+      Task: Generate a bilingual identity-first headline for a ${year} ${make} ${model} listing at Triple J Auto Investment, a Houston BHPH dealership.
+
+      ${bodyContext}
+      ${diagContext}
+
+      HEADLINE RULES:
+      1. Format: "[Identity Label] | [2-3 punchy descriptive words]."
+      2. Lead with WHO this car is for, not what it is.
+      3. Maximum 15 words total.
+      4. Warm, aspirational but honest tone.
+      5. If diagnostics mention issues, acknowledge in word choice (e.g., "Project-Ready" instead of "Family-Ready").
+      6. Examples:
+         - "Family-Ready Sedan | Reliable. Clean. Ready for Your Next Chapter."
+         - "Weekend Warrior | Tough. Capable. Built for Adventure."
+         - "Daily Driver | Efficient. Dependable. Your Everyday Companion."
+         - "First Car Ready | Safe. Simple. Perfect for New Drivers."
+
+      Return ONLY valid JSON (no markdown, no explanation):
+      {"en": "English headline", "es": "Spanish headline"}
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        thinkingConfig: { thinkingBudget: 1024 },
+      }
+    });
+
+    const raw = response.text || '';
+    const cleaned = cleanJsonResponse(raw);
+    const parsed = JSON.parse(cleaned) as { en: string; es: string };
+    return { en: parsed.en || fallback.en, es: parsed.es || fallback.es };
+  } catch (error) {
+    console.error("Identity Headline Generation Error:", error);
+    return fallback;
+  }
+};
+
+export const generateVehicleStory = async (
+  make: string,
+  model: string,
+  year: number,
+  mileage: number,
+  diagnostics: string[] = [],
+  description: string = ''
+): Promise<{ en: string; es: string }> => {
+  const fallback = {
+    en: `This ${year} ${make} ${model} is available at Triple J Auto Investment. Contact us to learn more.`,
+    es: `Este ${year} ${make} ${model} esta disponible en Triple J Auto Investment. Contactenos para mas informacion.`
+  };
+  const ai = getClient();
+  if (!ai) return fallback;
+
+  try {
+    const diagContext = diagnostics.length > 0
+      ? `KNOWN ISSUES (disclose honestly): ${diagnostics.join(', ')}`
+      : 'No known issues reported. Vehicle has been inspected.';
+
+    const descContext = description
+      ? `EXISTING DESCRIPTION FOR CONTEXT: ${description}`
+      : '';
+
+    const prompt = `
+      Task: Write a bilingual honest vehicle story for a ${year} ${make} ${model} with ${mileage.toLocaleString()} miles, listed at Triple J Auto Investment, a Houston BHPH dealership.
+
+      ${diagContext}
+      ${descContext}
+
+      STORY RULES:
+      1. Write a 3-5 sentence honest story about this vehicle.
+      2. Include: what type of owner this car is ideal for, its strengths, and any condition notes.
+      3. If diagnostics list any issues, disclose them honestly but frame them as known and transparent ("We noticed X and want you to know upfront").
+      4. If no issues, highlight reliability and value.
+      5. Tone: warm, transparent, trustworthy. Like a neighbor giving honest advice.
+      6. DO NOT fabricate history (no "one-owner" claims, no "garage-kept" unless stated in diagnostics).
+      7. End with a forward-looking statement about the vehicle's next chapter.
+
+      Return ONLY valid JSON (no markdown, no explanation):
+      {"en": "English story", "es": "Spanish story"}
+    `;
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: prompt,
+      config: {
+        thinkingConfig: { thinkingBudget: 1024 },
+      }
+    });
+
+    const raw = response.text || '';
+    const cleaned = cleanJsonResponse(raw);
+    const parsed = JSON.parse(cleaned) as { en: string; es: string };
+    return { en: parsed.en || fallback.en, es: parsed.es || fallback.es };
+  } catch (error) {
+    console.error("Vehicle Story Generation Error:", error);
+    return fallback;
   }
 };
