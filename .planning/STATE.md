@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-18
-**Session:** Phase 14 EXECUTING (Wave 2 complete, Plans 14-01 + 14-02 + 14-03 done)
+**Session:** Phase 14 COMPLETE (all 4 plans done: 14-01 + 14-02 + 14-03 + 14-04)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 14 - Expectancy Building (EXECUTING -- Wave 2 complete, 3/4 plans complete)
+**Current focus:** Phase 14 - Expectancy Building (COMPLETE -- all 4/4 plans done)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 14 of 19 (Expectancy Building)
-**Plan:** 3 of 4 complete (14-01 + 14-02 + 14-03 done, Wave 3 next: 14-04)
-**Status:** In progress
-**Last activity:** 2026-02-18 -- Completed 14-03-PLAN.md (vehicle detail components: badge, price block, story section, JSON-LD)
+**Plan:** 4 of 4 complete (14-01 + 14-02 + 14-03 + 14-04 done)
+**Status:** Phase complete
+**Last activity:** 2026-02-18 -- Completed 14-04-PLAN.md (vehicle detail page, route, inventory card updates)
 
-Progress: [██████████████████████████░] 96% (26/27 plans -- 1 Phase 14 plan pending)
+Progress: [███████████████████████████] 100% (27/27 plans -- Phase 14 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 26 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03)
+- Total plans completed: 27 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -146,6 +146,10 @@ Progress: [███████████████████████
 - **[14-03]** VehicleVerifiedBadge lg size shows tooltip text inline below badge label (not hover tooltip) -- mobile-friendly
 - **[14-03]** VehicleJsonLd uses Record<string, unknown> for flexible conditional field inclusion in JSON output
 - **[14-03]** VehiclePriceBlock disclaimer uses string replacement for ${amount} template (matches translation key pattern)
+- **[14-04]** Two-phase data fetch: check store first (fastest), Supabase fallback for direct URL navigation
+- **[14-04]** VIN partially masked on detail page (last 6 chars visible) for listed vehicle privacy
+- **[14-04]** "View Details" link added alongside (not replacing) Express Interest and Book Now buttons on cards
+- **[14-04]** Verified badge on inventory cards placed in right column below SALE & RENTAL badge using flex-col layout
 
 ### Completed Work (Phase 9)
 
@@ -186,11 +190,16 @@ Progress: [███████████████████████
 - **13-02 (complete):** Replaced stock-photo hero with abstract animated SVG background (8 gold bezier paths + 3 floating particles). Wired all hero text to new translation keys. Added Se Habla badge in hero area. Schedule a Visit (primary, /contact) + Call Now (secondary, tel:) CTAs. Added authority metrics strip with animated count-up numbers (useSpring + useInView). Families Served metric with Users icon (LAND-03). 4 metrics with TODO(business-data) placeholders. Removed DecryptText, mouse parallax, scroll parallax. Home.tsx now fully functional.
 - **13-03 (complete):** Added persistent "Se Habla Espanol" indicator to navbar (desktop: bordered pill badge, mobile: plain text). Removed SplashScreen wrapper from App component (was 1.7s delay). Content now renders immediately. SplashScreen.tsx file preserved.
 
-### Completed Work (Phase 14) -- IN PROGRESS
+### Completed Work (Phase 14) -- ALL COMPLETE
 
 - **14-01 (complete):** Data foundation. DB migration (7 new columns on vehicles table + slug index) via Supabase MCP. Extended Vehicle interface with 7 Phase 14 fields. Store transform (load/add/update) for all 7 fields. vehicleSlug.ts utility (generate/parse). marketEstimateService.ts (estimate market value + monthly payment). 60+ bilingual translation keys for vehicle detail page (vehicleDetail block in en+es).
 - **14-02 (complete):** AI content pipeline. Two new Gemini service functions (generateIdentityHeadline, generateVehicleStory) returning bilingual {en, es} JSON. Admin inventory form extended with headline/story textareas, generate buttons, verified checkbox, slug preview. Auto-compute slug and market estimate on save.
 - **14-03 (complete):** Vehicle detail page components. VehicleVerifiedBadge (gold opulent badge with crest, sm/lg sizes). VehiclePriceBlock (4-part price transparency with market estimate anchoring). VehicleStorySection (bilingual story with honest condition disclosure). VehicleJsonLd (Schema.org/Car structured data for SEO).
+- **14-04 (complete):** Vehicle detail page + route + inventory card updates. VehicleDetail.tsx (549 lines) with 9-section psychological flow: gallery, headline, badge, price block, story, specs, social proof, CTAs. Lazy-loaded via /vehicles/:slug route in App.tsx. Inventory cards augmented with verified badge, identity headline, and "View Details" link to detail page. Existing modal behavior unchanged.
+
+### Remaining Phase 14 Work
+
+None -- Phase 14 is fully complete (all 4 plans done).
 
 ### Remaining Phase 13 Work
 
@@ -230,6 +239,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-18
-**Stopped at:** Completed 14-03-PLAN.md
+**Stopped at:** Completed 14-04-PLAN.md -- Phase 14 fully complete
 **Resume file:** None
-**Resume:** Plans 14-01 + 14-02 + 14-03 complete. Next: Wave 3 -- 14-04 (vehicle detail page layout + inventory card updates).
+**Resume:** Phase 14 (Expectancy Building) complete. All 27 v2.0 plans done. Next: Phase 15+ or remaining Phase 9 manual items.
