@@ -34,7 +34,7 @@ See: `.planning/milestones/v1-ROADMAP.md`
 - [x] **Phase 12: SEO Foundation** - BrowserRouter migration, meta tags, sitemap, and schema markup for search visibility
 - [x] **Phase 13: Focus Capture** - SOVEREIGN landing experience with pattern-interrupt, authority, and tribe signals
 - [x] **Phase 14: Expectancy Building** - Vehicle listings as micro-stories with price anchoring and identity framing
-- [ ] **Phase 15: Engagement Spectrum** - Micro-commitment ladder from zero-friction saves to vehicle reservations
+- [x] **Phase 15: Engagement Spectrum** - Micro-commitment ladder from zero-friction saves to vehicle reservations
 - [ ] **Phase 16: Behavioral Intelligence** - Session tracking, smart recommendations, urgency calibration, and attribution
 - [ ] **Phase 17: Divine Response** - AI chat with behavioral profiling plus Retell voice agent updates
 - [ ] **Phase 18: Behavioral Follow-Up** - 4-tier automated re-engagement system triggered by visitor behavior
@@ -165,12 +165,12 @@ Plans:
   3. Level 1 actions (price alert, similar vehicles, vehicle report) require only a phone number and deliver the visitor into the leads pipeline in Supabase
   4. "Schedule a Visit" and "Ask a Question" forms collect name + phone + vehicle context and create leads in Supabase (no more setTimeout mock)
   5. All commitment levels are visible on the listing page but none are forced -- the visitor chooses their own entry point
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 15-01: TBD
-- [ ] 15-02: TBD
-- [ ] 15-03: TBD
+- [x] 15-01-PLAN.md -- CRM pipeline foundation: Lead type extensions, vehicle lead service, saved vehicles hook, bilingual translations
+- [x] 15-02-PLAN.md -- Level 0 + Level 1 components: SaveButton, PaymentCalculator, PhoneCaptureForm, inventory saved filter
+- [x] 15-03-PLAN.md -- Level 2 + Level 3 + integration: ScheduleVisitForm, AskQuestionForm, ReserveVehicleSection, VehicleDetail assembly, Contact/Finance updates
 
 ### Phase 16: Behavioral Intelligence
 **Goal**: The platform knows what visitors are doing, recommends the right vehicles, shows honest urgency signals, and tracks where conversions come from

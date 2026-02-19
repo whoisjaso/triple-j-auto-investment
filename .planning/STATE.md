@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-18
-**Session:** Phase 14 COMPLETE (all 4 plans done: 14-01 + 14-02 + 14-03 + 14-04)
+**Last Updated:** 2026-02-19
+**Session:** Phase 15 COMPLETE (all 3 plans done: 15-01 + 15-02 + 15-03)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 14 - Expectancy Building (COMPLETE -- verified 5/5 must-haves)
+**Current focus:** Phase 15 - Engagement Spectrum (COMPLETE -- verified 5/5 must-haves)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -30,17 +30,17 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
-**Phase:** 14 of 19 (Expectancy Building)
-**Plan:** 4 of 4 complete (14-01 + 14-02 + 14-03 + 14-04 done)
+**Phase:** 15 of 19 (Engagement Spectrum)
+**Plan:** 3 of 3 complete (15-01 + 15-02 + 15-03 done)
 **Status:** Phase complete
-**Last activity:** 2026-02-18 -- Completed 14-04-PLAN.md (vehicle detail page, route, inventory card updates)
+**Last activity:** 2026-02-19 -- Completed 15-03-PLAN.md (Level 2+3 components, VehicleDetail integration, Contact/Finance updates)
 
-Progress: [███████████████████████████] 100% (27/27 plans -- Phase 14 complete)
+Progress: [██████████████████████████████] 100% (30/30 plans -- Phase 15 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04)
+- Total plans completed: 30 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -197,6 +197,16 @@ Progress: [███████████████████████
 - **14-03 (complete):** Vehicle detail page components. VehicleVerifiedBadge (gold opulent badge with crest, sm/lg sizes). VehiclePriceBlock (4-part price transparency with market estimate anchoring). VehicleStorySection (bilingual story with honest condition disclosure). VehicleJsonLd (Schema.org/Car structured data for SEO).
 - **14-04 (complete):** Vehicle detail page + route + inventory card updates. VehicleDetail.tsx (549 lines) with 9-section psychological flow: gallery, headline, badge, price block, story, specs, social proof, CTAs. Lazy-loaded via /vehicles/:slug route in App.tsx. Inventory cards augmented with verified badge, identity headline, and "View Details" link to detail page. Existing modal behavior unchanged.
 
+### Completed Work (Phase 15) -- ALL COMPLETE
+
+- **15-01 (complete):** CRM pipeline foundation. DB migration added 4 columns to leads table (vehicle_id, action_type, commitment_level, message) with indexes. Extended Lead interface with 4 optional fields. vehicleLeadService.ts (createVehicleLead, isValidPhone, formatPhoneDisplay). useSavedVehicles.ts localStorage hook with cross-tab sync. ~55 bilingual engagement translation keys.
+- **15-02 (complete):** Level 0 + Level 1 components. SaveButton.tsx (heart toggle, 3 sizes, pop animation, localStorage). PaymentCalculator.tsx (expandable slider, down payment $0-2K, term 12/18/24/36 months, real-time estimate). PhoneCaptureForm.tsx (reusable phone capture for all Level 1 actions, formatting, validation, lead creation). Inventory.tsx integration: SaveButton on cards, saved filter toggle, saved empty state.
+- **15-03 (complete):** Level 2 + Level 3 components and integration. ScheduleVisitForm.tsx (name + phone + preferred time, schedule_visit leads). AskQuestionForm.tsx (name + phone + free-text question, ask_question leads). ReserveVehicleSection.tsx (gold-accented, name + phone, reserve leads at commitment=3). VehicleDetail.tsx: SaveButton in hero, PaymentCalculator after price, full engagement spectrum Section 9 (Level 1/2/3 + direct call). Contact.tsx + Finance.tsx: added actionType/commitmentLevel/message to existing addLead calls.
+
+### Remaining Phase 15 Work
+
+None -- Phase 15 is fully complete (all 3 plans done).
+
 ### Remaining Phase 14 Work
 
 None -- Phase 14 is fully complete (all 4 plans done).
@@ -238,7 +248,7 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 
 ## Session Continuity
 
-**Last session:** 2026-02-18
-**Stopped at:** Phase 14 complete and verified (5/5 must-haves passed)
+**Last session:** 2026-02-19
+**Stopped at:** Phase 15 complete and verified (5/5 must-haves passed)
 **Resume file:** None
-**Resume:** Phase 14 (Expectancy Building) complete and verified. 27 v2.0 plans done. Next: Phase 15 (Engagement Spectrum) needs discuss/plan, or remaining Phase 9 manual items.
+**Resume:** Phase 15 (Engagement Spectrum) complete and verified. 30 v2.0 plans done. Next: Phase 16 (Behavioral Intelligence) needs discuss/plan, or remaining Phase 9 manual items.
