@@ -10,6 +10,9 @@ import { SEO } from '../components/SEO';
 import { useScrollLock } from '../hooks/useScrollLock';
 import { ImageGallery } from '../components/ImageGallery';
 import { triggerOutboundCall } from '../services/retellService';
+import { Link } from 'react-router-dom';
+import { VehicleVerifiedBadge } from '../components/VehicleVerifiedBadge';
+import { generateVehicleSlug } from '../utils/vehicleSlug';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
 
@@ -23,7 +26,7 @@ interface VehicleCardProps {
 
 // --- VEHICLE CARD COMPONENT (Swipeable Carousel + Sleek Design) ---
 const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClick }) => {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [imgIndex, setImgIndex] = useState(0);
   const images = [vehicle.imageUrl, ...(vehicle.gallery || [])].filter(Boolean);
 
@@ -75,11 +78,18 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClic
           <div className={`px-2.5 py-1 text-[7px] font-bold uppercase tracking-[0.2em] backdrop-blur-md shadow-lg ${vehicle.status === 'Available' ? 'border border-tj-gold/60 text-tj-gold bg-black/80' : 'border border-gray-700 text-gray-400 bg-black/80'}`}>
             {vehicle.status === 'Available' ? `${t.common.available.toUpperCase()}` : vehicle.status.toUpperCase()}
           </div>
-          {vehicle.status === VehicleStatus.AVAILABLE && (
-            <div className="px-2.5 py-1 text-[7px] font-bold uppercase tracking-[0.15em] bg-tj-gold text-black shadow-lg">
-              {t.common.saleAndRental}
-            </div>
-          )}
+          <div className="flex flex-col items-end gap-1.5">
+            {vehicle.status === VehicleStatus.AVAILABLE && (
+              <div className="px-2.5 py-1 text-[7px] font-bold uppercase tracking-[0.15em] bg-tj-gold text-black shadow-lg">
+                {t.common.saleAndRental}
+              </div>
+            )}
+            {vehicle.isVerified && (
+              <div className="pointer-events-auto">
+                <VehicleVerifiedBadge isVerified={true} size="sm" />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* SOLD Overlay */}
@@ -152,6 +162,11 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClic
         {/* Vehicle Info Row */}
         <div className="flex justify-between items-start mb-3">
           <div className="min-w-0 flex-1">
+            {(lang === 'es' ? vehicle.identityHeadlineEs : vehicle.identityHeadline) && (
+              <p className="text-[8px] uppercase tracking-[0.15em] text-tj-gold/70 mb-1 truncate">
+                {lang === 'es' ? vehicle.identityHeadlineEs : vehicle.identityHeadline}
+              </p>
+            )}
             <p className="text-[9px] uppercase tracking-[0.2em] text-gray-400 mb-1 group-hover:text-tj-gold/60 transition-colors">{vehicle.year} {vehicle.make}</p>
             <h3 className="font-display text-xl md:text-2xl text-white group-hover:text-tj-gold transition-colors leading-none tracking-tight truncate">
               {vehicle.model}
@@ -187,6 +202,14 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClic
               >
                 {t.common.bookNow}
               </button>
+              <Link
+                to={`/vehicles/${vehicle.slug || generateVehicleSlug(vehicle.year, vehicle.make, vehicle.model, vehicle.id)}`}
+                onClick={(e) => e.stopPropagation()}
+                className="group/btn px-3 py-2.5 min-h-[44px] text-[9px] font-bold uppercase tracking-[0.2em] transition-all active:scale-95 bg-white/[0.04] text-gray-400 border border-white/[0.08] hover:bg-white/10 hover:text-white hover:border-white/20 flex items-center gap-1"
+              >
+                {t.vehicleDetail.viewDetails}
+                <ArrowUpRight size={10} />
+              </Link>
             </div>
           )}
         </div>
