@@ -321,11 +321,15 @@ export const t = {
             reserveNote: "No deposit required. We'll call you within the hour to discuss next steps.",
             reserved: "Reservation Submitted!",
             reservedDesc: "We'll hold this vehicle and call you shortly",
+            reserveNow: "Reserve Now",
             // General
             submit: "Submit",
             sending: "Sending...",
+            cancel: "Cancel",
             callUs: "Call Us",
-            orCallDirectly: "Or call us directly"
+            orCallDirectly: "Or call us directly",
+            nameRequired: "Name is required",
+            somethingWrong: "Something went wrong. Please try again.",
         },
         contact: {
             title: "CONTACT US",
@@ -1210,11 +1214,15 @@ export const t = {
             reserveNote: "No se requiere deposito. Te llamaremos dentro de una hora para discutir los siguientes pasos.",
             reserved: "Reservacion Enviada!",
             reservedDesc: "Apartaremos este vehiculo y te llamaremos pronto",
+            reserveNow: "Reservar Ahora",
             // General
             submit: "Enviar",
             sending: "Enviando...",
+            cancel: "Cancelar",
             callUs: "Llamanos",
-            orCallDirectly: "O llamanos directamente"
+            orCallDirectly: "O llamanos directamente",
+            nameRequired: "El nombre es obligatorio",
+            somethingWrong: "Algo salio mal. Intentalo de nuevo.",
         },
         contact: {
             title: "CONTACTENOS",
