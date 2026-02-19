@@ -9,6 +9,12 @@ import { VehicleVerifiedBadge } from '../components/VehicleVerifiedBadge';
 import { VehiclePriceBlock } from '../components/VehiclePriceBlock';
 import { VehicleStorySection } from '../components/VehicleStorySection';
 import { VehicleJsonLd } from '../components/VehicleJsonLd';
+import { SaveButton } from '../components/SaveButton';
+import { PaymentCalculator } from '../components/PaymentCalculator';
+import { PhoneCaptureForm } from '../components/PhoneCaptureForm';
+import { ScheduleVisitForm } from '../components/ScheduleVisitForm';
+import { AskQuestionForm } from '../components/AskQuestionForm';
+import { ReserveVehicleSection } from '../components/ReserveVehicleSection';
 import { parseVehicleSlug, generateVehicleSlug } from '../utils/vehicleSlug';
 import { supabase } from '../supabase/config';
 import { Vehicle, VehicleStatus } from '../types';
@@ -24,6 +30,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Bell,
+  FileText,
 } from 'lucide-react';
 
 // Transform snake_case Supabase row to camelCase Vehicle (matches vehicles.ts loadVehicles)
@@ -331,6 +339,11 @@ const VehicleDetail: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
 
+                  {/* Save Button */}
+                  <div className="absolute top-4 left-4 z-10">
+                    <SaveButton vehicleId={vehicle.id} size="lg" />
+                  </div>
+
                   {/* Image count badge */}
                   {images.length > 1 && (
                     <div className="absolute top-4 right-4 z-10 px-3 py-1.5 bg-black/60 backdrop-blur-sm text-[10px] font-mono text-white/80 tracking-wider pointer-events-none">
@@ -455,6 +468,13 @@ const VehicleDetail: React.FC = () => {
           </section>
 
           {/* ========================================== */}
+          {/* SECTION 5.5: Payment Calculator (Level 0)   */}
+          {/* ========================================== */}
+          <div className="py-6">
+            <PaymentCalculator price={vehicle.price} />
+          </div>
+
+          {/* ========================================== */}
           {/* SECTION 6: Vehicle Story                    */}
           {/* ========================================== */}
           <VehicleStorySection vehicle={vehicle} />
@@ -501,34 +521,73 @@ const VehicleDetail: React.FC = () => {
           )}
 
           {/* ========================================== */}
-          {/* SECTION 9: CTAs                             */}
+          {/* SECTION 9: Engagement Spectrum               */}
           {/* ========================================== */}
           <section className="py-8 border-t border-white/[0.04]">
-            <div className="flex flex-col sm:flex-row gap-3">
-              {/* Primary: Schedule a Visit */}
-              <Link
-                to="/contact"
-                className="flex-1 inline-flex items-center justify-center gap-2 py-4 px-8 text-xs font-bold uppercase tracking-[0.3em] bg-tj-gold text-black hover:bg-white transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-tj-gold/50"
-              >
-                {t.vehicleDetail.scheduleVisit}
-              </Link>
+            {/* Level 1: Phone-only actions */}
+            <div className="mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <PhoneCaptureForm
+                  actionType="price_alert"
+                  vehicleId={vehicle.id}
+                  vehicleVin={vehicle.vin}
+                  label={t.engagement?.getPriceAlert || 'Get Price Alert'}
+                  description={t.engagement?.priceAlertDesc || 'Get notified if the price drops'}
+                  icon={<Bell size={18} />}
+                />
+                <PhoneCaptureForm
+                  actionType="similar_vehicles"
+                  vehicleId={vehicle.id}
+                  vehicleVin={vehicle.vin}
+                  label={t.engagement?.similarVehicles || 'Similar Vehicles'}
+                  description={t.engagement?.similarDesc || "We'll text you matches"}
+                  icon={<Car size={18} />}
+                />
+                <PhoneCaptureForm
+                  actionType="vehicle_report"
+                  vehicleId={vehicle.id}
+                  vehicleVin={vehicle.vin}
+                  label={t.engagement?.vehicleReport || 'Vehicle Report'}
+                  description={t.engagement?.reportDesc || 'Get a detailed history report'}
+                  icon={<FileText size={18} />}
+                />
+              </div>
+            </div>
 
-              {/* Secondary: Call Us */}
+            {/* Level 2: Name + Phone actions */}
+            <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <ScheduleVisitForm
+                vehicleId={vehicle.id}
+                vehicleVin={vehicle.vin}
+                vehicleName={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+              />
+              <AskQuestionForm
+                vehicleId={vehicle.id}
+                vehicleVin={vehicle.vin}
+              />
+            </div>
+
+            {/* Level 3: Reserve */}
+            <div className="mb-6">
+              <ReserveVehicleSection
+                vehicleId={vehicle.id}
+                vehicleVin={vehicle.vin}
+                vehicleName={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+              />
+            </div>
+
+            {/* Direct contact -- always available */}
+            <div className="pt-4 border-t border-white/[0.04] text-center">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-3">
+                {t.engagement?.orCallDirectly || 'Or call us directly'}
+              </p>
               <a
                 href="tel:+18324009760"
-                className="flex-1 inline-flex items-center justify-center gap-2 py-4 px-8 text-xs font-bold uppercase tracking-[0.3em] border border-tj-gold/30 text-tj-gold hover:bg-tj-gold/10 transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-tj-gold/50"
+                className="inline-flex items-center gap-2 py-3 px-6 border border-tj-gold/30 text-tj-gold hover:bg-tj-gold/10 text-xs tracking-[0.2em] uppercase transition-all min-h-[44px]"
               >
                 <Phone size={14} />
-                {t.vehicleDetail.callUs}
+                {t.engagement?.callUs || 'Call Us'}: (832) 400-9760
               </a>
-
-              {/* Tertiary: Apply for Financing */}
-              <Link
-                to="/finance"
-                className="flex-1 inline-flex items-center justify-center gap-2 py-4 px-8 text-xs font-bold uppercase tracking-[0.3em] border border-white/[0.08] text-gray-400 hover:text-white hover:border-white/20 transition-colors min-h-[44px] focus:outline-none focus:ring-2 focus:ring-tj-gold/50"
-              >
-                {t.vehicleDetail.applyForFinancing}
-              </Link>
             </div>
           </section>
 
