@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-17
-**Session:** Phase 13 COMPLETE (all 3 plans done: 13-01, 13-02, 13-03)
+**Last Updated:** 2026-02-18
+**Session:** Phase 14 EXECUTING (Wave 1, Plan 14-01 complete)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 13 - Focus Capture (COMPLETE -- all 3 plans done)
+**Current focus:** Phase 14 - Expectancy Building (EXECUTING -- Wave 1 complete, 1/4 plans complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -30,17 +30,17 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
-**Phase:** 13 of 19 (Focus Capture)
-**Plan:** 3 of 3 completed (13-01, 13-02, 13-03)
-**Status:** Phase complete
-**Last activity:** 2026-02-17 -- Completed 13-02-PLAN.md (hero rebuild with abstract SVG animation + authority metrics)
+**Phase:** 14 of 19 (Expectancy Building)
+**Plan:** 1 of 4 complete (14-01 done, Wave 2 next: 14-02 + 14-03 parallel)
+**Status:** In progress
+**Last activity:** 2026-02-18 -- Completed 14-01-PLAN.md (data foundation: types, store, slug, market estimate, translations)
 
-Progress: [███████████████████████] 100% (23/23 plans completed across v2.0 so far)
+Progress: [████████████████████████░░░] 89% (24/27 plans -- 3 Phase 14 plans pending)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 23 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03)
+- Total plans completed: 24 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -138,6 +138,9 @@ Progress: [███████████████████████
 - **[13-03]** Mobile Se Habla indicator: plain text only (text-[8px], no border) to conserve horizontal space
 - **[13-03]** SplashScreen removed entirely (not shortened) -- hero animation IS the new first impression for Phase 13's 3-second goal
 - **[13-03]** SplashScreen.tsx component file preserved (not deleted) for potential future reference
+- **[14-01]** Market estimate uses age+mileage heuristic (1.10x-1.20x multiplier) rather than external API -- close enough for $3K-$8K BHPH range
+- **[14-01]** Monthly payment is simple principal/term division (no APR display) -- common BHPH practice
+- **[14-01]** Slug format is year-make-model-shortid (6 chars of UUID) for uniqueness across duplicate year/make/model listings
 
 ### Completed Work (Phase 9)
 
@@ -178,6 +181,10 @@ Progress: [███████████████████████
 - **13-02 (complete):** Replaced stock-photo hero with abstract animated SVG background (8 gold bezier paths + 3 floating particles). Wired all hero text to new translation keys. Added Se Habla badge in hero area. Schedule a Visit (primary, /contact) + Call Now (secondary, tel:) CTAs. Added authority metrics strip with animated count-up numbers (useSpring + useInView). Families Served metric with Users icon (LAND-03). 4 metrics with TODO(business-data) placeholders. Removed DecryptText, mouse parallax, scroll parallax. Home.tsx now fully functional.
 - **13-03 (complete):** Added persistent "Se Habla Espanol" indicator to navbar (desktop: bordered pill badge, mobile: plain text). Removed SplashScreen wrapper from App component (was 1.7s delay). Content now renders immediately. SplashScreen.tsx file preserved.
 
+### Completed Work (Phase 14) -- IN PROGRESS
+
+- **14-01 (complete):** Data foundation. DB migration (7 new columns on vehicles table + slug index) via Supabase MCP. Extended Vehicle interface with 7 Phase 14 fields. Store transform (load/add/update) for all 7 fields. vehicleSlug.ts utility (generate/parse). marketEstimateService.ts (estimate market value + monthly payment). 60+ bilingual translation keys for vehicle detail page (vehicleDetail block in en+es).
+
 ### Remaining Phase 13 Work
 
 None -- Phase 13 is fully complete (all 3 plans done).
@@ -215,7 +222,7 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 
 ## Session Continuity
 
-**Last session:** 2026-02-17
-**Stopped at:** Completed 13-02-PLAN.md -- Phase 13 fully complete (all 3 plans done)
+**Last session:** 2026-02-18
+**Stopped at:** Completed 14-01-PLAN.md
 **Resume file:** None
-**Resume:** Completed 13-02: Replaced stock-photo hero with abstract SVG animation, added authority metrics with count-up numbers. Phase 13 (Focus Capture) is now fully complete. Next: Phase 14 or next roadmap phase.
+**Resume:** Plan 14-01 complete (data foundation). Next: Wave 2 -- 14-02 (vehicle detail page) + 14-03 (AI headline/story generation) can run in parallel. Then Wave 3: 14-04 (inventory card updates).
