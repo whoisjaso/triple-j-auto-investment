@@ -35,13 +35,13 @@ Requirements for v2.0 Psychological Architecture & Production Launch. Organized 
 
 ### Vehicle Listings (FATE Stage 2: Expectancy Building)
 
-- [ ] **LIST-01**: Hero images presented magazine-style (aspiration, not fluorescent lot photos)
-- [ ] **LIST-02**: Identity-first headlines above specs ("Family-Ready Sedan | Reliable. Clean. Ready for Your Next Chapter.")
-- [ ] **LIST-03**: Triple J Verified badge on inspected vehicles (authority signal)
-- [ ] **LIST-04**: Price transparency architecture -- Triple J Price, Market Average, You Save, Estimated Monthly
-- [ ] **LIST-05**: Vehicle Story section -- origin, inspection summary, honest condition reporting
-- [ ] **LIST-06**: Social proof micro-layer -- "Sells within X days", "X families viewing this vehicle" (real data only)
-- [ ] **LIST-07**: Vehicle detail pages with unique URLs (indexable by search engines)
+- [x] **LIST-01**: Hero images presented magazine-style (aspiration, not fluorescent lot photos)
+- [x] **LIST-02**: Identity-first headlines above specs ("Family-Ready Sedan | Reliable. Clean. Ready for Your Next Chapter.")
+- [x] **LIST-03**: Triple J Verified badge on inspected vehicles (authority signal)
+- [x] **LIST-04**: Price transparency architecture -- Triple J Price, Market Average, You Save, Estimated Monthly
+- [x] **LIST-05**: Vehicle Story section -- origin, inspection summary, honest condition reporting
+- [x] **LIST-06**: Social proof micro-layer -- "Sells within X days", "X families viewing this vehicle" (real data only)
+- [x] **LIST-07**: Vehicle detail pages with unique URLs (indexable by search engines)
 
 ### Micro-Commitment Spectrum (FATE Stage 3: Engagement)
 
@@ -244,13 +244,13 @@ Deferred to future release. Tracked but not in current roadmap.
 | LAND-05 | Phase 13: Focus Capture | Pending |
 | LAND-06 | Phase 13: Focus Capture | Pending |
 | LAND-07 | Phase 13: Focus Capture | Pending |
-| LIST-01 | Phase 14: Expectancy Building | Pending |
-| LIST-02 | Phase 14: Expectancy Building | Pending |
-| LIST-03 | Phase 14: Expectancy Building | Pending |
-| LIST-04 | Phase 14: Expectancy Building | Pending |
-| LIST-05 | Phase 14: Expectancy Building | Pending |
-| LIST-06 | Phase 14: Expectancy Building | Pending |
-| LIST-07 | Phase 14: Expectancy Building | Pending |
+| LIST-01 | Phase 14: Expectancy Building | Complete |
+| LIST-02 | Phase 14: Expectancy Building | Complete |
+| LIST-03 | Phase 14: Expectancy Building | Complete |
+| LIST-04 | Phase 14: Expectancy Building | Complete |
+| LIST-05 | Phase 14: Expectancy Building | Complete |
+| LIST-06 | Phase 14: Expectancy Building | Complete |
+| LIST-07 | Phase 14: Expectancy Building | Complete |
 | COMMIT-01 | Phase 15: Engagement Spectrum | Pending |
 | COMMIT-02 | Phase 15: Engagement Spectrum | Pending |
 | COMMIT-03 | Phase 15: Engagement Spectrum | Pending |

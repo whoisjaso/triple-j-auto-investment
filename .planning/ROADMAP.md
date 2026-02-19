@@ -33,7 +33,7 @@ See: `.planning/milestones/v1-ROADMAP.md`
 - [x] **Phase 11: Production Polish** - Mobile-first verification, performance, accessibility, and production-grade error handling
 - [x] **Phase 12: SEO Foundation** - BrowserRouter migration, meta tags, sitemap, and schema markup for search visibility
 - [x] **Phase 13: Focus Capture** - SOVEREIGN landing experience with pattern-interrupt, authority, and tribe signals
-- [ ] **Phase 14: Expectancy Building** - Vehicle listings as micro-stories with price anchoring and identity framing
+- [x] **Phase 14: Expectancy Building** - Vehicle listings as micro-stories with price anchoring and identity framing
 - [ ] **Phase 15: Engagement Spectrum** - Micro-commitment ladder from zero-friction saves to vehicle reservations
 - [ ] **Phase 16: Behavioral Intelligence** - Session tracking, smart recommendations, urgency calibration, and attribution
 - [ ] **Phase 17: Divine Response** - AI chat with behavioral profiling plus Retell voice agent updates
@@ -150,10 +150,10 @@ Plans:
 **Plans**: 4 plans
 
 Plans:
-- [ ] 14-01-PLAN.md -- Data foundation: Vehicle type extensions, store transforms, slug utility, market estimate service, bilingual translations
-- [ ] 14-02-PLAN.md -- AI content generation: Gemini headline/story generators + admin inventory form integration
-- [ ] 14-03-PLAN.md -- UI components: VehicleVerifiedBadge, VehiclePriceBlock, VehicleStorySection, VehicleJsonLd
-- [ ] 14-04-PLAN.md -- Vehicle detail page, route registration, and minimal inventory card updates
+- [x] 14-01-PLAN.md -- Data foundation: Vehicle type extensions, store transforms, slug utility, market estimate service, bilingual translations
+- [x] 14-02-PLAN.md -- AI content generation: Gemini headline/story generators + admin inventory form integration
+- [x] 14-03-PLAN.md -- UI components: VehicleVerifiedBadge, VehiclePriceBlock, VehicleStorySection, VehicleJsonLd
+- [x] 14-04-PLAN.md -- Vehicle detail page, route registration, and minimal inventory card updates
 
 ### Phase 15: Engagement Spectrum
 **Goal**: Visitors can take action at whatever commitment level they are psychologically ready for -- from anonymous saves to vehicle reservations -- and every action feeds the CRM pipeline
@@ -248,7 +248,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 11. Production Polish | v2.0 | 8/8 | Complete | 2026-02-16 |
 | 12. SEO Foundation | v2.0 | 4/4 | Complete | 2026-02-16 |
 | 13. Focus Capture | v2.0 | 3/3 | Complete | 2026-02-17 |
-| 14. Expectancy Building | v2.0 | 0/4 | Planning complete | - |
+| 14. Expectancy Building | v2.0 | 4/4 | Complete | 2026-02-18 |
 | 15. Engagement Spectrum | v2.0 | 0/TBD | Not started | - |
 | 16. Behavioral Intelligence | v2.0 | 0/TBD | Not started | - |
 | 17. Divine Response | v2.0 | 0/TBD | Not started | - |
