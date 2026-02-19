@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { generateVehicleDescription } from '../../services/geminiService';
+import { generateVehicleDescription, generateIdentityHeadline, generateVehicleStory } from '../../services/geminiService';
 import { decodeVin } from '../../services/nhtsaService';
+import { generateVehicleSlug } from '../../utils/vehicleSlug';
+import { estimateMarketValue } from '../../services/marketEstimateService';
 import { Vehicle, VehicleStatus } from '../../types';
-import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer, LayoutDashboard, Car, LogOut, Menu, ClipboardCheck, Key, CreditCard } from 'lucide-react';
+import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer, LayoutDashboard, Car, LogOut, Menu, ClipboardCheck, Key, CreditCard, Sparkles, BookOpen, ShieldCheck, Link as LinkIcon } from 'lucide-react';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 
 // Shared Admin Header Component
@@ -26,7 +28,7 @@ const AdminHeader = () => {
 
   return (
     <>
-      <header className="bg-black backdrop-blur-md border-b border-tj-gold/30 sticky top-0 z-[100] shadow-lg">
+      <header className="bg-black/95 backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-[100]">
         <div className="max-w-[1800px] mx-auto px-4 md:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo Only - No Text */}
@@ -39,7 +41,7 @@ const AdminHeader = () => {
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-2">
+            <nav className="hidden md:flex items-center gap-1">
               {navItems.map(item => (
                 <Link
                   key={item.path}
@@ -47,7 +49,7 @@ const AdminHeader = () => {
                   className={`flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold transition-all border ${
                     location.pathname === item.path
                       ? 'bg-tj-gold text-black border-tj-gold'
-                      : 'text-gray-400 hover:text-white border-transparent hover:border-white/20 hover:bg-white/5'
+                      : 'text-gray-500 hover:text-white border-transparent hover:bg-white/[0.04]'
                   }`}
                 >
                   <item.icon size={14} />
@@ -58,17 +60,17 @@ const AdminHeader = () => {
               {/* Documents Button */}
               <button
                 onClick={() => setShowDocModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold text-gray-400 hover:text-white border border-transparent hover:border-white/20 hover:bg-white/5 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 text-[11px] uppercase tracking-widest font-bold text-gray-500 hover:text-white border border-transparent hover:bg-white/[0.04] transition-all"
               >
                 <FileText size={14} />
                 Documents
               </button>
 
-              <div className="h-6 w-px bg-gray-700 mx-2" />
+              <div className="h-5 w-px bg-white/[0.08] mx-2" />
 
               <button
                 onClick={() => { logout(); navigate('/'); }}
-                className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400 hover:text-red-300 hover:bg-red-900/20 transition-all"
+                className="flex items-center gap-2 px-4 py-2.5 text-[11px] uppercase tracking-widest font-bold text-red-400/70 hover:text-red-300 hover:bg-red-900/10 transition-all"
               >
                 <LogOut size={14} />
                 Logout
@@ -86,7 +88,7 @@ const AdminHeader = () => {
 
           {/* Mobile Navigation */}
           {mobileMenuOpen && (
-            <nav className="md:hidden border-t border-white/10 py-4 space-y-2">
+            <nav className="md:hidden border-t border-white/[0.06] py-4 space-y-2">
               {navItems.map(item => (
                 <Link
                   key={item.path}
@@ -95,7 +97,7 @@ const AdminHeader = () => {
                   className={`flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold transition-all ${
                     location.pathname === item.path
                       ? 'bg-tj-gold/10 text-tj-gold border-l-2 border-tj-gold'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                      : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
                   }`}
                 >
                   <item.icon size={18} />
@@ -105,16 +107,16 @@ const AdminHeader = () => {
 
               <button
                 onClick={() => { setShowDocModal(true); setMobileMenuOpen(false); }}
-                className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-gray-400 hover:text-white hover:bg-white/[0.04] transition-all"
               >
                 <FileText size={18} />
                 Documents
               </button>
 
-              <div className="border-t border-white/10 mt-2 pt-2">
+              <div className="border-t border-white/[0.06] mt-2 pt-2">
                 <button
                   onClick={() => { logout(); navigate('/'); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400 hover:bg-red-900/20 transition-all"
+                  className="w-full flex items-center gap-3 px-4 py-3 text-sm uppercase tracking-widest font-bold text-red-400/70 hover:text-red-300 hover:bg-red-900/10 transition-all"
                 >
                   <LogOut size={18} />
                   Logout
@@ -180,6 +182,8 @@ const resizeImage = (file: File): Promise<string> => {
 const AdminInventory = () => {
   const { vehicles, addVehicle, updateVehicle, removeVehicle, syncWithGoogleSheets, lastSync, resetToDefault, connectionError } = useStore();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isGeneratingHeadline, setIsGeneratingHeadline] = useState(false);
+  const [isGeneratingStory, setIsGeneratingStory] = useState(false);
   const [isDecoding, setIsDecoding] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncLog, setSyncLog] = useState<string[]>([]);
@@ -257,13 +261,17 @@ const AdminInventory = () => {
     try {
       const data = await decodeVin(vin);
       if (data) {
-         const hasError = data.ErrorCode && data.ErrorCode !== '0';
-         const textError = !data.ErrorCode && data.ErrorText && !data.ErrorText.startsWith('0') && !data.ErrorText.toLowerCase().includes('decoded');
+         // NHTSA returns comma-separated error codes: "0" = clean, "1" = check digit warning (still valid),
+         // "5" = VIN errors, "6" = incomplete, "7" = mfg unknown, "8" = year error
+         const errorCodes = (data.ErrorCode || '0').split(',').map((c: string) => c.trim());
+         const fatalCodes = ['5', '6', '7', '8'];
+         const hasFatalError = errorCodes.some((code: string) => fatalCodes.includes(code));
+         const hasData = !!(data.Make && data.Model && data.ModelYear);
 
-        if (hasError || textError) {
+        if (hasFatalError && !hasData) {
            const errorText = data.ErrorText || "Unknown error";
            setVinError(errorText.length > 30 ? "INVALID_VIN_RESPONSE" : errorText);
-        } else {
+        } else if (hasData) {
            const modelStrComponents = [data.Model];
            if (data.Series && data.Series !== data.Model && !data.Model?.includes(data.Series)) {
               modelStrComponents.push(data.Series);
@@ -289,6 +297,8 @@ const AdminInventory = () => {
            });
            
            // We do NOT auto-generate here anymore because we might want to enter diagnostics first
+        } else {
+           setVinError("NO_VEHICLE_DATA_RETURNED");
         }
       } else {
         setVinError("CONNECTION_FAILED");
@@ -448,14 +458,16 @@ const AdminInventory = () => {
   const handleCancelEdit = () => {
     setEditingId(null);
     setNewCar({
-      make: '', model: '', year: new Date().getFullYear(), price: 0, mileage: 0, vin: '', description: '', 
+      make: '', model: '', year: new Date().getFullYear(), price: 0, mileage: 0, vin: '', description: '',
       cost: 0, costTowing: 0, costMechanical: 0, costCosmetic: 0, costOther: 0, soldPrice: 0, soldDate: '',
       dateAdded: new Date().toISOString().split('T')[0],
       imageUrl: 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=2070&auto=format&fit=crop',
       gallery: [],
       diagnostics: [],
       status: VehicleStatus.AVAILABLE,
-      registrationStatus: 'Pending'
+      registrationStatus: 'Pending',
+      identityHeadline: '', identityHeadlineEs: '', vehicleStory: '', vehicleStoryEs: '',
+      isVerified: false, slug: '', marketEstimate: 0
     });
     setDiagText('');
     setVinError(null);
@@ -479,13 +491,24 @@ const AdminInventory = () => {
         finalSoldPrice = newCar.price;
     }
 
-    const vehiclePayload = {
+    const vehiclePayload: Partial<Vehicle> = {
         ...newCar,
         soldDate: finalSoldDate,
         soldPrice: finalSoldPrice,
         diagnostics: processedDiagnostics
     };
-    
+
+    // Phase 14: Auto-generate slug if empty
+    if (!vehiclePayload.slug && vehiclePayload.make && vehiclePayload.model && vehiclePayload.year) {
+      const tempId = editingId || Math.random().toString(36).substr(2, 9);
+      vehiclePayload.slug = generateVehicleSlug(vehiclePayload.year, vehiclePayload.make, vehiclePayload.model, tempId);
+    }
+
+    // Phase 14: Auto-calculate market estimate if empty
+    if (!vehiclePayload.marketEstimate && vehiclePayload.price && vehiclePayload.price > 0) {
+      vehiclePayload.marketEstimate = estimateMarketValue(vehiclePayload.price, vehiclePayload.year || new Date().getFullYear(), vehiclePayload.mileage || 0);
+    }
+
     try {
       if (editingId) {
         // Check if vehicle exists before updating
@@ -582,6 +605,7 @@ const AdminInventory = () => {
       )}
 
       <div className="min-h-screen bg-black p-4 md:p-8 lg:p-12 font-sans relative">
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.015)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.015)_1px,transparent_1px)] bg-[size:4rem_4rem] pointer-events-none" />
       {/* Sync Overlay */}
       {isSyncing && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center">
@@ -600,7 +624,7 @@ const AdminInventory = () => {
         </div>
       )}
 
-      <div className="max-w-[1800px] mx-auto">
+      <div className="max-w-[1800px] mx-auto relative z-10">
         
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-white/10 pb-6">
@@ -648,7 +672,7 @@ const AdminInventory = () => {
           
           {/* LEFT: INPUT TERMINAL */}
           <div className="xl:col-span-7 space-y-8">
-            <div className={`bg-tj-dark border transition-colors relative p-8 md:p-12 ${editingId ? 'border-tj-gold shadow-[0_0_30px_rgba(212,175,55,0.1)]' : 'border-white/10'}`}>
+            <div className={`bg-[#080808] border transition-colors relative p-8 md:p-12 ${editingId ? 'border-tj-gold shadow-[0_0_30px_rgba(212,175,55,0.1)]' : 'border-white/10'}`}>
               
               {editingId && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-tj-gold text-black px-6 py-1 text-[10px] font-bold uppercase tracking-widest shadow-lg flex items-center gap-2">
@@ -662,7 +686,7 @@ const AdminInventory = () => {
               <div className="absolute bottom-0 left-0 w-4 h-4 border-b border-l border-tj-gold"></div>
               <div className="absolute bottom-0 right-0 w-4 h-4 border-b border-r border-tj-gold"></div>
 
-              <div className="flex items-center justify-between mb-8 border-b border-gray-800 pb-4">
+              <div className="flex items-center justify-between mb-8 border-b border-white/[0.06] pb-4">
                  <div className="flex items-center gap-3">
                    <Terminal size={18} className="text-tj-gold" />
                    <h2 className="text-white text-sm uppercase tracking-[0.2em]">{editingId ? `Modifying Asset: ${newCar.make} ${newCar.model}` : 'New Asset Intake'}</h2>
@@ -677,7 +701,7 @@ const AdminInventory = () => {
               <form onSubmit={handleSubmit} className="space-y-8">
                 
                 {/* VIN SECTION */}
-                <div className="bg-black/50 p-6 border border-gray-800">
+                <div className="bg-black/50 p-6 border border-white/[0.06]">
                    <div className="flex justify-between items-center mb-4">
                       <label className="text-[10px] uppercase tracking-[0.2em] text-tj-gold">Unique Identifier (VIN)</label>
                       {vinError && <span className="text-[9px] text-red-500 font-bold tracking-widest flex items-center gap-1"><AlertTriangle size={10}/> {vinError}</span>}
@@ -715,7 +739,7 @@ const AdminInventory = () => {
                       type="text" 
                       value={newCar.make}
                       onChange={e => setNewCar({...newCar, make: e.target.value})}
-                      className="w-full bg-black border border-gray-800 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-800"
+                      className="w-full bg-black border border-white/[0.06] p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-800"
                       placeholder="AUTO-DETECTED"
                     />
                   </div>
@@ -726,7 +750,7 @@ const AdminInventory = () => {
                       type="text" 
                       value={newCar.model}
                       onChange={e => setNewCar({...newCar, model: e.target.value})}
-                      className="w-full bg-black border border-gray-800 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-800"
+                      className="w-full bg-black border border-white/[0.06] p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-800"
                       placeholder="AUTO-DETECTED"
                     />
                   </div>
@@ -737,7 +761,7 @@ const AdminInventory = () => {
                       type="number" 
                       value={newCar.year}
                       onChange={e => setNewCar({...newCar, year: parseInt(e.target.value)})}
-                      className="w-full bg-black border border-gray-800 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                      className="w-full bg-black border border-white/[0.06] p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                     />
                   </div>
                   <div className="group">
@@ -747,7 +771,7 @@ const AdminInventory = () => {
                       type="number" 
                       value={newCar.mileage}
                       onChange={e => setNewCar({...newCar, mileage: parseInt(e.target.value)})}
-                      className="w-full bg-black border border-gray-800 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                      className="w-full bg-black border border-white/[0.06] p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                     />
                   </div>
                 </div>
@@ -759,7 +783,7 @@ const AdminInventory = () => {
                           <DollarSign size={12} /> Live Margin Calculator
                       </h3>
                       <div className="text-right">
-                          <span className="text-[9px] uppercase tracking-widest text-gray-500 block">Projected Profit</span>
+                          <span className="text-[9px] uppercase tracking-widest text-gray-600 block">Projected Profit</span>
                           <span className={`text-lg font-mono border-b border-white/20 ${calculateProjectedProfit() >= 0 ? 'text-green-500' : 'text-red-500'}`}>${calculateProjectedProfit().toLocaleString()}</span>
                       </div>
                     </div>
@@ -767,49 +791,49 @@ const AdminInventory = () => {
                     {/* Expense Matrix */}
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
                         <div className="group relative">
-                            <label className="block text-[8px] uppercase tracking-widest text-gray-500 mb-2">Acquisition (Buy)</label>
+                            <label className="block text-[8px] uppercase tracking-widest text-gray-600 mb-2">Acquisition (Buy)</label>
                             <input 
                                 required
                                 type="number" 
                                 value={newCar.cost}
                                 onChange={e => setNewCar({...newCar, cost: parseInt(e.target.value)})}
-                                className="w-full bg-black border border-gray-800 p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
+                                className="w-full bg-black border border-white/[0.06] p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
                             />
                         </div>
                         <div className="group relative">
-                            <label className="block text-[8px] uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-1"><Truck size={10}/> Towing</label>
+                            <label className="block text-[8px] uppercase tracking-widest text-gray-600 mb-2 flex items-center gap-1"><Truck size={10}/> Towing</label>
                             <input 
                                 type="number" 
                                 value={newCar.costTowing}
                                 onChange={e => setNewCar({...newCar, costTowing: parseInt(e.target.value)})}
-                                className="w-full bg-black border border-gray-800 p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
+                                className="w-full bg-black border border-white/[0.06] p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
                             />
                         </div>
                         <div className="group relative">
-                            <label className="block text-[8px] uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-1"><Wrench size={10}/> Mechanical</label>
+                            <label className="block text-[8px] uppercase tracking-widest text-gray-600 mb-2 flex items-center gap-1"><Wrench size={10}/> Mechanical</label>
                             <input 
                                 type="number" 
                                 value={newCar.costMechanical}
                                 onChange={e => setNewCar({...newCar, costMechanical: parseInt(e.target.value)})}
-                                className="w-full bg-black border border-gray-800 p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
+                                className="w-full bg-black border border-white/[0.06] p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
                             />
                         </div>
                         <div className="group relative">
-                            <label className="block text-[8px] uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-1"><PaintBucket size={10}/> Cosmetic</label>
+                            <label className="block text-[8px] uppercase tracking-widest text-gray-600 mb-2 flex items-center gap-1"><PaintBucket size={10}/> Cosmetic</label>
                             <input 
                                 type="number" 
                                 value={newCar.costCosmetic}
                                 onChange={e => setNewCar({...newCar, costCosmetic: parseInt(e.target.value)})}
-                                className="w-full bg-black border border-gray-800 p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
+                                className="w-full bg-black border border-white/[0.06] p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
                             />
                         </div>
                         <div className="group relative">
-                            <label className="block text-[8px] uppercase tracking-widest text-gray-500 mb-2 flex items-center gap-1"><FileText size={10}/> Other / Fees</label>
+                            <label className="block text-[8px] uppercase tracking-widest text-gray-600 mb-2 flex items-center gap-1"><FileText size={10}/> Other / Fees</label>
                             <input 
                                 type="number" 
                                 value={newCar.costOther}
                                 onChange={e => setNewCar({...newCar, costOther: parseInt(e.target.value)})}
-                                className="w-full bg-black border border-gray-800 p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
+                                className="w-full bg-black border border-white/[0.06] p-3 text-white text-xs focus:border-red-500 outline-none transition-colors"
                             />
                         </div>
                     </div>
@@ -826,7 +850,7 @@ const AdminInventory = () => {
                                     type="number" 
                                     value={newCar.price}
                                     onChange={e => setNewCar({...newCar, price: parseInt(e.target.value)})}
-                                    className="w-full bg-black border border-gray-800 p-4 pl-8 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                                    className="w-full bg-black border border-white/[0.06] p-4 pl-8 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                                 />
                             </div>
                         </div>
@@ -835,7 +859,7 @@ const AdminInventory = () => {
                             <select 
                                 value={newCar.status}
                                 onChange={e => setNewCar({...newCar, status: e.target.value as VehicleStatus})}
-                                className="w-full bg-black border border-gray-800 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors appearance-none"
+                                className="w-full bg-black border border-white/[0.06] p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors appearance-none"
                             >
                                 {Object.values(VehicleStatus).map(s => (
                                     <option key={s} value={s}>{s}</option>
@@ -848,7 +872,7 @@ const AdminInventory = () => {
                                 type="date"
                                 value={newCar.dateAdded}
                                 onChange={e => setNewCar({...newCar, dateAdded: e.target.value})}
-                                className="w-full bg-black border border-gray-800 p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
+                                className="w-full bg-black border border-white/[0.06] p-4 text-white text-sm focus:border-tj-gold outline-none transition-colors"
                             />
                         </div>
                     </div>
@@ -865,7 +889,7 @@ const AdminInventory = () => {
                                         value={newCar.soldPrice || ''}
                                         onChange={e => setNewCar({...newCar, soldPrice: parseInt(e.target.value)})}
                                         placeholder={newCar.price?.toString()}
-                                        className="w-full bg-black border border-gray-800 p-4 pl-8 text-white text-sm focus:border-green-500 outline-none transition-colors"
+                                        className="w-full bg-black border border-white/[0.06] p-4 pl-8 text-white text-sm focus:border-green-500 outline-none transition-colors"
                                     />
                                 </div>
                             </div>
@@ -876,7 +900,7 @@ const AdminInventory = () => {
                                         type="date" 
                                         value={newCar.soldDate || ''}
                                         onChange={e => setNewCar({...newCar, soldDate: e.target.value})}
-                                        className="w-full bg-black border border-gray-800 p-4 text-white text-sm focus:border-green-500 outline-none transition-colors"
+                                        className="w-full bg-black border border-white/[0.06] p-4 text-white text-sm focus:border-green-500 outline-none transition-colors"
                                     />
                                 </div>
                             </div>
@@ -885,11 +909,11 @@ const AdminInventory = () => {
                 </div>
 
                 {/* VISUALS & NARRATIVE SECTION */}
-                <div className="bg-gradient-to-b from-gray-900 to-black p-6 border border-gray-800 relative overflow-hidden">
+                <div className="bg-gradient-to-b from-[#080808] to-black p-6 border border-white/[0.06] relative overflow-hidden">
                    <div className="absolute top-0 right-0 p-2">
                       <Cpu size={16} className="text-tj-gold opacity-20" />
                    </div>
-                   <h3 className="text-white text-xs uppercase tracking-[0.3em] mb-6 border-b border-gray-800 pb-2 flex items-center gap-2">
+                   <h3 className="text-white text-xs uppercase tracking-[0.3em] mb-6 border-b border-white/[0.06] pb-2 flex items-center gap-2">
                      <Wand2 size={12} className="text-tj-gold" /> Visuals & Narrative
                    </h3>
 
@@ -915,7 +939,7 @@ const AdminInventory = () => {
                                 className={`relative aspect-[4/3] cursor-pointer bg-white/5 border border-dashed transition-all flex flex-col items-center justify-center gap-2 group overflow-hidden ${isDragging ? 'border-tj-gold bg-tj-gold/10' : 'border-gray-700 hover:border-tj-gold hover:bg-white/10'}`}
                             >
                                 <input type="file" accept="image/*" multiple onChange={handleUnifiedUpload} className="hidden" />
-                                <div className={`p-3 rounded-full transition-colors border ${isDragging ? 'bg-tj-gold text-black border-tj-gold' : 'bg-black text-gray-400 border-gray-800 group-hover:bg-tj-gold group-hover:text-black group-hover:border-tj-gold'}`}>
+                                <div className={`p-3 rounded-full transition-colors border ${isDragging ? 'bg-tj-gold text-black border-tj-gold' : 'bg-black text-gray-400 border-white/[0.06] group-hover:bg-tj-gold group-hover:text-black group-hover:border-tj-gold'}`}>
                                     {isDragging ? <UploadCloud size={20} className="animate-bounce" /> : <Plus size={20} />}
                                 </div>
                                 <span className={`text-[9px] uppercase tracking-widest transition-colors text-center ${isDragging ? 'text-tj-gold' : 'text-gray-500 group-hover:text-white'}`}>
@@ -925,7 +949,7 @@ const AdminInventory = () => {
 
                             {/* 2. Image Cards */}
                             {allImages.map((img, idx) => (
-                                <div key={idx} className={`relative group aspect-[4/3] bg-gray-900 border ${idx === 0 ? 'border-tj-gold' : 'border-gray-800'} overflow-hidden`}>
+                                <div key={idx} className={`relative group aspect-[4/3] bg-[#080808] border ${idx === 0 ? 'border-tj-gold' : 'border-white/[0.06]'} overflow-hidden`}>
                                     <img src={img} alt={`View ${idx}`} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                                     
                                     {/* Badges & Controls */}
@@ -1001,8 +1025,139 @@ const AdminInventory = () => {
                    </div>
                 </div>
 
-                <button 
-                  type="submit" 
+                {/* PHASE 14: LISTING ENHANCEMENT SECTION */}
+                <div className="bg-gradient-to-b from-[#080808] to-black p-6 border border-white/[0.06] relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-2">
+                      <Sparkles size={16} className="text-tj-gold opacity-20" />
+                   </div>
+                   <h3 className="text-white text-xs uppercase tracking-[0.3em] mb-6 border-b border-white/[0.06] pb-2 flex items-center gap-2">
+                     <Sparkles size={12} className="text-tj-gold" /> Phase 14: Listing Enhancement
+                   </h3>
+
+                   <div className="space-y-6">
+                      {/* Identity Headlines */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="group">
+                          <label className="block text-[9px] uppercase tracking-widest text-gray-400 mb-2 flex items-center gap-2">
+                            <Type size={12} /> Identity Headline (EN)
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={newCar.identityHeadline || ''}
+                            onChange={e => setNewCar({...newCar, identityHeadline: e.target.value})}
+                            className="w-full bg-black border border-white/[0.06] p-3 text-gray-300 text-sm focus:border-tj-gold outline-none transition-colors"
+                            placeholder='e.g. "Family-Ready Sedan | Reliable. Clean. Ready."'
+                          />
+                        </div>
+                        <div className="group">
+                          <label className="block text-[9px] uppercase tracking-widest text-gray-400 mb-2 flex items-center gap-2">
+                            <Type size={12} /> Identity Headline (ES)
+                          </label>
+                          <textarea
+                            rows={2}
+                            value={newCar.identityHeadlineEs || ''}
+                            onChange={e => setNewCar({...newCar, identityHeadlineEs: e.target.value})}
+                            className="w-full bg-black border border-white/[0.06] p-3 text-gray-300 text-sm focus:border-tj-gold outline-none transition-colors"
+                            placeholder='e.g. "Listo para la Familia | Confiable. Limpio."'
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!newCar.make || !newCar.model) return;
+                          setIsGeneratingHeadline(true);
+                          const currentDiag = diagText.split('\n').map(s => s.trim()).filter(Boolean);
+                          const result = await generateIdentityHeadline(newCar.make, newCar.model, newCar.year || new Date().getFullYear(), undefined, currentDiag);
+                          setNewCar(prev => ({ ...prev, identityHeadline: result.en, identityHeadlineEs: result.es }));
+                          setIsGeneratingHeadline(false);
+                        }}
+                        disabled={isGeneratingHeadline || !newCar.make || !newCar.model}
+                        className="text-[9px] uppercase tracking-widest text-tj-gold hover:text-white flex items-center gap-2 disabled:opacity-30 transition-colors bg-tj-gold/10 border border-tj-gold/30 px-4 py-2 hover:bg-tj-gold hover:text-black"
+                      >
+                        {isGeneratingHeadline ? <Loader2 className="animate-spin" size={12} /> : <Wand2 size={12} />}
+                        Generate Headlines
+                      </button>
+
+                      {/* Vehicle Stories */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="group">
+                          <label className="block text-[9px] uppercase tracking-widest text-gray-400 mb-2 flex items-center gap-2">
+                            <BookOpen size={12} /> Vehicle Story (EN)
+                          </label>
+                          <textarea
+                            rows={4}
+                            value={newCar.vehicleStory || ''}
+                            onChange={e => setNewCar({...newCar, vehicleStory: e.target.value})}
+                            className="w-full bg-black border border-white/[0.06] p-3 text-gray-300 text-sm focus:border-tj-gold outline-none transition-colors"
+                            placeholder="Honest 3-5 sentence vehicle story..."
+                          />
+                        </div>
+                        <div className="group">
+                          <label className="block text-[9px] uppercase tracking-widest text-gray-400 mb-2 flex items-center gap-2">
+                            <BookOpen size={12} /> Vehicle Story (ES)
+                          </label>
+                          <textarea
+                            rows={4}
+                            value={newCar.vehicleStoryEs || ''}
+                            onChange={e => setNewCar({...newCar, vehicleStoryEs: e.target.value})}
+                            className="w-full bg-black border border-white/[0.06] p-3 text-gray-300 text-sm focus:border-tj-gold outline-none transition-colors"
+                            placeholder="Historia honesta de 3-5 oraciones..."
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!newCar.make || !newCar.model) return;
+                          setIsGeneratingStory(true);
+                          const currentDiag = diagText.split('\n').map(s => s.trim()).filter(Boolean);
+                          const result = await generateVehicleStory(newCar.make, newCar.model, newCar.year || new Date().getFullYear(), newCar.mileage || 0, currentDiag, newCar.description || '');
+                          setNewCar(prev => ({ ...prev, vehicleStory: result.en, vehicleStoryEs: result.es }));
+                          setIsGeneratingStory(false);
+                        }}
+                        disabled={isGeneratingStory || !newCar.make || !newCar.model}
+                        className="text-[9px] uppercase tracking-widest text-tj-gold hover:text-white flex items-center gap-2 disabled:opacity-30 transition-colors bg-tj-gold/10 border border-tj-gold/30 px-4 py-2 hover:bg-tj-gold hover:text-black"
+                      >
+                        {isGeneratingStory ? <Loader2 className="animate-spin" size={12} /> : <Wand2 size={12} />}
+                        Generate Story
+                      </button>
+
+                      <div className="h-px w-full bg-white/[0.06]"></div>
+
+                      {/* Verified Checkbox + Slug Preview */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            id="isVerified"
+                            checked={newCar.isVerified || false}
+                            onChange={e => setNewCar({...newCar, isVerified: e.target.checked})}
+                            className="w-4 h-4 accent-tj-gold bg-black border border-white/[0.06]"
+                          />
+                          <label htmlFor="isVerified" className="text-[9px] uppercase tracking-widest text-gray-400 flex items-center gap-2 cursor-pointer">
+                            <ShieldCheck size={12} className="text-green-500" /> Mark as Triple J Verified (inspected vehicle)
+                          </label>
+                        </div>
+                        <div>
+                          <label className="block text-[9px] uppercase tracking-widest text-gray-400 mb-2 flex items-center gap-2">
+                            <LinkIcon size={12} /> Slug Preview
+                          </label>
+                          <div className="bg-black border border-white/[0.06] p-3 text-gray-500 text-xs font-mono">
+                            {newCar.slug
+                              ? newCar.slug
+                              : (newCar.make && newCar.model && newCar.year)
+                                ? generateVehicleSlug(newCar.year, newCar.make, newCar.model, editingId || 'xxxxxx')
+                                : 'year-make-model-id'
+                            }
+                          </div>
+                        </div>
+                      </div>
+                   </div>
+                </div>
+
+                <button
+                  type="submit"
                   className={`w-full font-bold py-4 text-xs uppercase tracking-[0.3em] transition-all duration-300 flex items-center justify-center gap-2 mt-8 group ${editingId ? 'bg-tj-gold text-black hover:bg-white' : 'bg-white text-black hover:bg-tj-gold'}`}
                 >
                   <Save size={16} />
@@ -1022,7 +1177,7 @@ const AdminInventory = () => {
               </div>
 
               {/* Exact Card Replica */}
-              <div className="bg-black border border-white/10 group hover:bg-tj-dark transition-colors duration-500 relative">
+              <div className="bg-black border border-white/10 group hover:bg-[#080808] transition-colors duration-500 relative">
                  {/* Status Strip */}
                  <div className="absolute top-0 left-0 w-full flex justify-between items-center z-20 p-6 pointer-events-none">
                     <div className={`px-3 py-1 text-[8px] font-bold uppercase tracking-[0.2em] border ${newCar.status === 'Available' ? 'border-tj-gold text-tj-gold bg-black/80' : 'border-gray-700 text-gray-500 bg-black/80'}`}>
@@ -1151,7 +1306,7 @@ const AdminInventory = () => {
                     </div>
 
                     {/* Sort Buttons */}
-                    <div className="flex items-center gap-px bg-gray-800 border border-gray-800 p-px overflow-x-auto max-w-full">
+                    <div className="flex items-center gap-px bg-white/[0.06] border border-white/[0.06] p-px overflow-x-auto max-w-full">
                         {[
                             { id: 'make', label: 'Make' },
                             { id: 'year', label: 'Year' },
@@ -1172,15 +1327,15 @@ const AdminInventory = () => {
            </div>
 
            {/* TABLE STRUCTURE */}
-           <div className="bg-tj-dark border border-gray-800 overflow-x-auto">
+           <div className="bg-[#080808] border border-white/[0.06] overflow-x-auto">
              <table className="w-full text-left border-collapse">
                <thead className="bg-black text-gray-500 text-[9px] uppercase tracking-[0.2em]">
                  <tr>
-                    <th className="p-4 font-medium border-b border-gray-800">Asset Identity</th>
-                    <th className="p-4 font-medium border-b border-gray-800">VIN / Stock #</th>
-                    <th className="p-4 font-medium border-b border-gray-800">Financial Ledger (Acq + Fees = Total)</th>
-                    <th className="p-4 font-medium border-b border-gray-800">Status</th>
-                    <th className="p-4 font-medium border-b border-gray-800 text-right">Command</th>
+                    <th className="p-4 font-medium border-b border-white/[0.06]">Asset Identity</th>
+                    <th className="p-4 font-medium border-b border-white/[0.06]">VIN / Stock #</th>
+                    <th className="p-4 font-medium border-b border-white/[0.06]">Financial Ledger (Acq + Fees = Total)</th>
+                    <th className="p-4 font-medium border-b border-white/[0.06]">Status</th>
+                    <th className="p-4 font-medium border-b border-white/[0.06] text-right">Command</th>
                  </tr>
                </thead>
                <tbody className="divide-y divide-gray-800 text-sm">
@@ -1195,7 +1350,7 @@ const AdminInventory = () => {
                         <tr key={v.id} className="hover:bg-white/5 transition-colors group">
                             <td className="p-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-16 h-12 bg-gray-900 border border-gray-700 overflow-hidden relative">
+                                    <div className="w-16 h-12 bg-[#080808] border border-gray-700 overflow-hidden relative">
                                         <img src={v.imageUrl} className={`w-full h-full object-cover ${isSold ? 'grayscale opacity-50' : ''}`} alt="Thumb" />
                                     </div>
                                     <div>
@@ -1213,7 +1368,7 @@ const AdminInventory = () => {
                                         <span className="w-12">BASIS:</span> 
                                         <span>${acq.toLocaleString()} + ${fees.toLocaleString()} (Fees)</span>
                                     </div>
-                                    <div className="flex items-center gap-2 border-t border-gray-800 pt-1 mt-1">
+                                    <div className="flex items-center gap-2 border-t border-white/[0.06] pt-1 mt-1">
                                         <span className="text-white w-12">TOTAL:</span> 
                                         <span className="text-red-400">${totalCost.toLocaleString()}</span>
                                     </div>
