@@ -13,6 +13,9 @@ import { triggerOutboundCall } from '../services/retellService';
 import { Link } from 'react-router-dom';
 import { VehicleVerifiedBadge } from '../components/VehicleVerifiedBadge';
 import { generateVehicleSlug } from '../utils/vehicleSlug';
+import { SaveButton } from '../components/SaveButton';
+import { useSavedVehicles } from '../hooks/useSavedVehicles';
+import { Heart } from 'lucide-react';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
 
@@ -89,6 +92,9 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClic
                 <VehicleVerifiedBadge isVerified={true} size="sm" />
               </div>
             )}
+            <div className="pointer-events-auto">
+              <SaveButton vehicleId={vehicle.id} size="sm" />
+            </div>
           </div>
         </div>
 
@@ -221,11 +227,13 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClic
 const Inventory = () => {
   const { vehicles, addLead, isLoading, connectionError, refreshVehicles } = useStore();
   const { t, lang, toggleLang } = useLanguage();
+  const { savedIds, savedCount } = useSavedVehicles();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
   const [makeFilter, setMakeFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<SortOption>('alphabetical');
   const [searchTerm, setSearchTerm] = useState('');
   const [listingTypeFilter, setListingTypeFilter] = useState<'all' | 'sale' | 'rental'>('all');
+  const [showSavedOnly, setShowSavedOnly] = useState(false);
 
   // Modal State
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
@@ -322,6 +330,11 @@ const Inventory = () => {
       default: return 0;
     }
   });
+
+  // Phase 15: Saved vehicles filter
+  const displayVehicles = showSavedOnly
+    ? sortedVehicles.filter(v => savedIds.includes(v.id))
+    : sortedVehicles;
 
   const handleOpenModal = useCallback((vehicle: Vehicle) => {
     // Store trigger element for focus restoration
@@ -653,6 +666,21 @@ const Inventory = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Saved Vehicles Filter */}
+              {savedCount > 0 && (
+                <button
+                  onClick={() => setShowSavedOnly(!showSavedOnly)}
+                  className={`flex items-center gap-2 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.15em] border transition-all min-h-[44px] ${
+                    showSavedOnly
+                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                      : 'bg-white/[0.04] text-gray-400 border-white/[0.08] hover:bg-white/[0.08]'
+                  }`}
+                >
+                  <Heart size={12} className={showSavedOnly ? 'fill-red-400' : ''} />
+                  {t.engagement?.saved || 'Saved'} ({savedCount})
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -727,14 +755,33 @@ const Inventory = () => {
           </div>
         )}
 
+        {/* Saved Filter Empty State */}
+        {!isLoading && sortedVehicles.length > 0 && displayVehicles.length === 0 && showSavedOnly && (
+          <div className="py-20 text-center mt-8 md:mt-12">
+            <Heart size={48} className="mx-auto text-gray-600 mb-6" />
+            <p className="font-display text-2xl text-white tracking-widest uppercase mb-3">
+              {t.engagement?.noSavedVehicles || 'No Saved Vehicles'}
+            </p>
+            <p className="text-sm text-gray-400 max-w-md mx-auto mb-6">
+              {t.engagement?.tapToSave || 'Tap the heart icon on any vehicle to save it here.'}
+            </p>
+            <button
+              onClick={() => setShowSavedOnly(false)}
+              className="text-xs uppercase tracking-[0.3em] text-tj-gold hover:text-white border border-tj-gold/30 hover:border-tj-gold px-8 py-4 transition-all font-bold"
+            >
+              {t.engagement?.viewAllInventory || 'View All Inventory'}
+            </button>
+          </div>
+        )}
+
         {/* Vehicle Grid: Has vehicles to display */}
-        {!isLoading && sortedVehicles.length > 0 && (
+        {!isLoading && displayVehicles.length > 0 && (
           <motion.div
             layout
             className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mt-8 md:mt-12"
           >
             <AnimatePresence mode="popLayout">
-              {sortedVehicles.map((vehicle) => (
+              {displayVehicles.map((vehicle) => (
                 <VehicleCard
                   key={vehicle.id}
                   vehicle={vehicle}

@@ -269,6 +269,64 @@ export const t = {
             // Inventory card link
             viewDetails: "View Details"
         },
+        // Phase 15: Engagement Spectrum
+        engagement: {
+            // Level 0 - Save/Favorite
+            save: "Save",
+            saved: "Saved",
+            unsave: "Remove from Saved",
+            savedVehicles: "Saved Vehicles",
+            noSavedVehicles: "No saved vehicles yet",
+            tapToSave: "Tap the heart to save vehicles you like",
+            viewAllInventory: "View All Inventory",
+            // Level 0 - Payment Calculator
+            paymentCalculator: "Payment Calculator",
+            downPayment: "Down Payment",
+            loanTerm: "Loan Term",
+            months: "months",
+            estimatedMonthly: "Estimated Monthly",
+            paymentDisclaimer: "Estimate only. Subject to credit approval. See dealer for details.",
+            withDown: "with {amount} down",
+            // Level 1 - Phone-only actions
+            enterPhone: "Enter your phone number",
+            phoneNumber: "Phone Number",
+            invalidPhone: "Please enter a valid phone number",
+            getPriceAlert: "Get Price Alert",
+            priceAlertDesc: "We'll text you if the price drops",
+            similarVehicles: "Similar Vehicles",
+            similarDesc: "We'll text you matches from our inventory",
+            vehicleReport: "Vehicle Report",
+            reportDesc: "Get the full inspection details",
+            submitted: "Submitted!",
+            wellBeInTouch: "We'll be in touch soon",
+            // Level 2 - Name + Phone actions
+            yourName: "Your Name",
+            scheduleVisit: "Schedule a Visit",
+            scheduleDesc: "Come see this vehicle in person",
+            preferredTime: "Preferred Time",
+            morning: "Morning",
+            afternoon: "Afternoon",
+            anytime: "Anytime",
+            askQuestion: "Ask a Question",
+            askDesc: "We'll respond within the hour",
+            yourQuestion: "Your Question",
+            questionPlaceholder: "What would you like to know about this vehicle?",
+            visitConfirmed: "Visit Request Sent!",
+            visitConfirmedDesc: "We'll call you to confirm a time",
+            questionReceived: "Question Received!",
+            questionReceivedDesc: "We'll respond within the hour",
+            // Level 3 - Reserve
+            reserveVehicle: "Reserve This Vehicle",
+            reserveDesc: "Declare your serious interest -- we'll hold it for you",
+            reserveNote: "No deposit required. We'll call you within the hour to discuss next steps.",
+            reserved: "Reservation Submitted!",
+            reservedDesc: "We'll hold this vehicle and call you shortly",
+            // General
+            submit: "Submit",
+            sending: "Sending...",
+            callUs: "Call Us",
+            orCallDirectly: "Or call us directly"
+        },
         contact: {
             title: "CONTACT US",
             subtitle: "Get in Touch",
@@ -1099,6 +1157,64 @@ export const t = {
             seoDescription: "{year} {make} {model} - {mileage} millas. ${price}. Financiamiento interno disponible. Houston, TX.",
             // Enlace de tarjeta de inventario
             viewDetails: "Ver Detalles"
+        },
+        // Phase 15: Engagement Spectrum
+        engagement: {
+            // Nivel 0 - Guardar/Favorito
+            save: "Guardar",
+            saved: "Guardado",
+            unsave: "Quitar de Guardados",
+            savedVehicles: "Vehiculos Guardados",
+            noSavedVehicles: "Aun no has guardado vehiculos",
+            tapToSave: "Toca el corazon para guardar vehiculos que te gusten",
+            viewAllInventory: "Ver Todo el Inventario",
+            // Nivel 0 - Calculadora de Pagos
+            paymentCalculator: "Calculadora de Pagos",
+            downPayment: "Enganche",
+            loanTerm: "Plazo del Prestamo",
+            months: "meses",
+            estimatedMonthly: "Pago Mensual Estimado",
+            paymentDisclaimer: "Estimado solamente. Sujeto a aprobacion de credito. Consulte al distribuidor.",
+            withDown: "con {amount} de enganche",
+            // Nivel 1 - Acciones con telefono
+            enterPhone: "Ingresa tu numero de telefono",
+            phoneNumber: "Numero de Telefono",
+            invalidPhone: "Por favor ingresa un numero de telefono valido",
+            getPriceAlert: "Recibir Alerta de Precio",
+            priceAlertDesc: "Te enviaremos un mensaje si el precio baja",
+            similarVehicles: "Vehiculos Similares",
+            similarDesc: "Te enviaremos opciones similares de nuestro inventario",
+            vehicleReport: "Reporte del Vehiculo",
+            reportDesc: "Recibe los detalles completos de la inspeccion",
+            submitted: "Enviado!",
+            wellBeInTouch: "Nos comunicaremos pronto",
+            // Nivel 2 - Nombre + Telefono
+            yourName: "Tu Nombre",
+            scheduleVisit: "Agendar una Visita",
+            scheduleDesc: "Ven a ver este vehiculo en persona",
+            preferredTime: "Horario Preferido",
+            morning: "Manana",
+            afternoon: "Tarde",
+            anytime: "Cualquier Hora",
+            askQuestion: "Hacer una Pregunta",
+            askDesc: "Responderemos dentro de una hora",
+            yourQuestion: "Tu Pregunta",
+            questionPlaceholder: "Que te gustaria saber sobre este vehiculo?",
+            visitConfirmed: "Solicitud de Visita Enviada!",
+            visitConfirmedDesc: "Te llamaremos para confirmar un horario",
+            questionReceived: "Pregunta Recibida!",
+            questionReceivedDesc: "Responderemos dentro de una hora",
+            // Nivel 3 - Reservar
+            reserveVehicle: "Reservar Este Vehiculo",
+            reserveDesc: "Declara tu interes serio -- lo apartamos para ti",
+            reserveNote: "No se requiere deposito. Te llamaremos dentro de una hora para discutir los siguientes pasos.",
+            reserved: "Reservacion Enviada!",
+            reservedDesc: "Apartaremos este vehiculo y te llamaremos pronto",
+            // General
+            submit: "Enviar",
+            sending: "Enviando...",
+            callUs: "Llamanos",
+            orCallDirectly: "O llamanos directamente"
         },
         contact: {
             title: "CONTACTENOS",
