@@ -33,7 +33,10 @@ const Contact = () => {
         phone: form.phone,
         interest: `General Inquiry: ${form.message}`,
         date: new Date().toISOString(),
-        status: 'New'
+        status: 'New',
+        actionType: 'contact',
+        commitmentLevel: 2,
+        message: form.message,
       });
       setStatus('sent');
       setForm({ name: '', email: '', phone: '', message: '' });

@@ -35,7 +35,10 @@ const Finance = () => {
         phone: form.phone,
         interest: `Financing Inquiry: ${form.vehicleInterest} - Est. $${form.estimatedPrice}`,
         date: new Date().toISOString(),
-        status: 'New'
+        status: 'New',
+        actionType: 'finance',
+        commitmentLevel: 2,
+        message: `Vehicle: ${form.vehicleInterest}, Price: ${form.estimatedPrice}, Down: ${form.downPayment}, Credit: ${form.creditScore}`,
       });
       setStatus('submitted');
     } catch (error) {
