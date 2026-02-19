@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-18
-**Session:** Phase 14 EXECUTING (Wave 1, Plan 14-01 complete)
+**Session:** Phase 14 EXECUTING (Wave 2, Plans 14-01 + 14-02 complete)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 14 - Expectancy Building (EXECUTING -- Wave 1 complete, 1/4 plans complete)
+**Current focus:** Phase 14 - Expectancy Building (EXECUTING -- Wave 2 in progress, 2/4 plans complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 14 of 19 (Expectancy Building)
-**Plan:** 1 of 4 complete (14-01 done, Wave 2 next: 14-02 + 14-03 parallel)
+**Plan:** 2 of 4 complete (14-01 + 14-02 done, Wave 2 next: 14-03 parallel. Then Wave 3: 14-04)
 **Status:** In progress
-**Last activity:** 2026-02-18 -- Completed 14-01-PLAN.md (data foundation: types, store, slug, market estimate, translations)
+**Last activity:** 2026-02-18 -- Completed 14-02-PLAN.md (AI content pipeline: gemini generators + admin form Phase 14 fields)
 
-Progress: [████████████████████████░░░] 89% (24/27 plans -- 3 Phase 14 plans pending)
+Progress: [█████████████████████████░░] 93% (25/27 plans -- 2 Phase 14 plans pending)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01)
+- Total plans completed: 25 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -141,6 +141,8 @@ Progress: [███████████████████████
 - **[14-01]** Market estimate uses age+mileage heuristic (1.10x-1.20x multiplier) rather than external API -- close enough for $3K-$8K BHPH range
 - **[14-01]** Monthly payment is simple principal/term division (no APR display) -- common BHPH practice
 - **[14-01]** Slug format is year-make-model-shortid (6 chars of UUID) for uniqueness across duplicate year/make/model listings
+- **[14-02]** AI generators return bilingual {en, es} JSON; Gemini response cleaned of markdown code fences before parse
+- **[14-02]** Slug and market estimate auto-computed on save only if empty (not overwritten on every save)
 
 ### Completed Work (Phase 9)
 
@@ -184,6 +186,7 @@ Progress: [███████████████████████
 ### Completed Work (Phase 14) -- IN PROGRESS
 
 - **14-01 (complete):** Data foundation. DB migration (7 new columns on vehicles table + slug index) via Supabase MCP. Extended Vehicle interface with 7 Phase 14 fields. Store transform (load/add/update) for all 7 fields. vehicleSlug.ts utility (generate/parse). marketEstimateService.ts (estimate market value + monthly payment). 60+ bilingual translation keys for vehicle detail page (vehicleDetail block in en+es).
+- **14-02 (complete):** AI content pipeline. Two new Gemini service functions (generateIdentityHeadline, generateVehicleStory) returning bilingual {en, es} JSON. Admin inventory form extended with headline/story textareas, generate buttons, verified checkbox, slug preview. Auto-compute slug and market estimate on save.
 
 ### Remaining Phase 13 Work
 
@@ -223,6 +226,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-18
-**Stopped at:** Completed 14-01-PLAN.md
+**Stopped at:** Completed 14-02-PLAN.md
 **Resume file:** None
-**Resume:** Plan 14-01 complete (data foundation). Next: Wave 2 -- 14-02 (vehicle detail page) + 14-03 (AI headline/story generation) can run in parallel. Then Wave 3: 14-04 (inventory card updates).
+**Resume:** Plans 14-01 + 14-02 complete. Next: 14-03 (vehicle detail page) in Wave 2 parallel. Then Wave 3: 14-04 (inventory card updates).
