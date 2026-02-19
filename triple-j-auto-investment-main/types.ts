@@ -40,6 +40,15 @@ export interface Vehicle {
   weeklyRate?: number;
   minRentalDays?: number;
   maxRentalDays?: number;
+
+  // Phase 14: Expectancy Building
+  slug?: string;
+  identityHeadline?: string;
+  identityHeadlineEs?: string;
+  vehicleStory?: string;
+  vehicleStoryEs?: string;
+  isVerified?: boolean;
+  marketEstimate?: number;
 }
 
 export interface Lead {
@@ -103,6 +112,11 @@ export interface BillOfSaleData {
   amount: string;
   buyerName: string;
   buyerAddress: string;
+  buyerStreet?: string;
+  buyerCity?: string;
+  buyerState?: string;
+  buyerZip?: string;
+  buyerCounty?: string;
   sellerName: string;
   sellerAddress: string;
   sellerRepresentative: string;
@@ -130,6 +144,10 @@ export interface BillOfSaleData {
 export interface AddressSuggestion {
   display_name: string;
   place_id: number;
+  street?: string;
+  city?: string;
+  state?: string;
+  postcode?: string;
 }
 
 // ================================================================

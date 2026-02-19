@@ -171,6 +171,19 @@ export async function loadVehicles(
       registrationStatus: v.registration_status as any,
       registrationDueDate: v.registration_due_date || undefined,
       dateAdded: v.date_added,
+      listingType: v.listing_type || undefined,
+      dailyRate: v.daily_rate != null ? parseFloat(v.daily_rate) : undefined,
+      weeklyRate: v.weekly_rate != null ? parseFloat(v.weekly_rate) : undefined,
+      minRentalDays: v.min_rental_days || undefined,
+      maxRentalDays: v.max_rental_days || undefined,
+      // Phase 14: Expectancy Building
+      slug: v.slug || undefined,
+      identityHeadline: v.identity_headline || undefined,
+      identityHeadlineEs: v.identity_headline_es || undefined,
+      vehicleStory: v.vehicle_story || undefined,
+      vehicleStoryEs: v.vehicle_story_es || undefined,
+      isVerified: v.is_verified || false,
+      marketEstimate: v.market_estimate != null ? parseFloat(v.market_estimate) : undefined,
     }));
 
     setters.setVehicles(transformed);
@@ -246,6 +259,14 @@ export async function addVehicle(
         registration_status: vehicle.registrationStatus || 'Pending',
         registration_due_date: vehicle.registrationDueDate || null,
         date_added: dateAdded,
+        // Phase 14: Expectancy Building
+        slug: vehicle.slug || null,
+        identity_headline: vehicle.identityHeadline || null,
+        identity_headline_es: vehicle.identityHeadlineEs || null,
+        vehicle_story: vehicle.vehicleStory || null,
+        vehicle_story_es: vehicle.vehicleStoryEs || null,
+        is_verified: vehicle.isVerified || false,
+        market_estimate: vehicle.marketEstimate || null,
       }]);
 
     if (error) {
@@ -336,6 +357,14 @@ export async function updateVehicle(
     if (updatedVehicle.registrationStatus !== undefined) dbUpdate.registration_status = updatedVehicle.registrationStatus;
     if (updatedVehicle.registrationDueDate !== undefined) dbUpdate.registration_due_date = updatedVehicle.registrationDueDate || null;
     if (updatedVehicle.dateAdded !== undefined) dbUpdate.date_added = updatedVehicle.dateAdded;
+    // Phase 14: Expectancy Building
+    if (updatedVehicle.slug !== undefined) dbUpdate.slug = updatedVehicle.slug;
+    if (updatedVehicle.identityHeadline !== undefined) dbUpdate.identity_headline = updatedVehicle.identityHeadline;
+    if (updatedVehicle.identityHeadlineEs !== undefined) dbUpdate.identity_headline_es = updatedVehicle.identityHeadlineEs;
+    if (updatedVehicle.vehicleStory !== undefined) dbUpdate.vehicle_story = updatedVehicle.vehicleStory;
+    if (updatedVehicle.vehicleStoryEs !== undefined) dbUpdate.vehicle_story_es = updatedVehicle.vehicleStoryEs;
+    if (updatedVehicle.isVerified !== undefined) dbUpdate.is_verified = updatedVehicle.isVerified;
+    if (updatedVehicle.marketEstimate !== undefined) dbUpdate.market_estimate = updatedVehicle.marketEstimate;
 
     console.log('🔄 Updating vehicle:', id, 'with data:', dbUpdate);
     console.log('👤 Current user:', user?.email || 'Not authenticated');
