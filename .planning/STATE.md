@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-18
-**Session:** Phase 14 EXECUTING (Wave 2, Plans 14-01 + 14-02 complete)
+**Session:** Phase 14 EXECUTING (Wave 2 complete, Plans 14-01 + 14-02 + 14-03 done)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 14 - Expectancy Building (EXECUTING -- Wave 2 in progress, 2/4 plans complete)
+**Current focus:** Phase 14 - Expectancy Building (EXECUTING -- Wave 2 complete, 3/4 plans complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 14 of 19 (Expectancy Building)
-**Plan:** 2 of 4 complete (14-01 + 14-02 done, Wave 2 next: 14-03 parallel. Then Wave 3: 14-04)
+**Plan:** 3 of 4 complete (14-01 + 14-02 + 14-03 done, Wave 3 next: 14-04)
 **Status:** In progress
-**Last activity:** 2026-02-18 -- Completed 14-02-PLAN.md (AI content pipeline: gemini generators + admin form Phase 14 fields)
+**Last activity:** 2026-02-18 -- Completed 14-03-PLAN.md (vehicle detail components: badge, price block, story section, JSON-LD)
 
-Progress: [█████████████████████████░░] 93% (25/27 plans -- 2 Phase 14 plans pending)
+Progress: [██████████████████████████░] 96% (26/27 plans -- 1 Phase 14 plan pending)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02)
+- Total plans completed: 26 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -143,6 +143,9 @@ Progress: [███████████████████████
 - **[14-01]** Slug format is year-make-model-shortid (6 chars of UUID) for uniqueness across duplicate year/make/model listings
 - **[14-02]** AI generators return bilingual {en, es} JSON; Gemini response cleaned of markdown code fences before parse
 - **[14-02]** Slug and market estimate auto-computed on save only if empty (not overwritten on every save)
+- **[14-03]** VehicleVerifiedBadge lg size shows tooltip text inline below badge label (not hover tooltip) -- mobile-friendly
+- **[14-03]** VehicleJsonLd uses Record<string, unknown> for flexible conditional field inclusion in JSON output
+- **[14-03]** VehiclePriceBlock disclaimer uses string replacement for ${amount} template (matches translation key pattern)
 
 ### Completed Work (Phase 9)
 
@@ -187,6 +190,7 @@ Progress: [███████████████████████
 
 - **14-01 (complete):** Data foundation. DB migration (7 new columns on vehicles table + slug index) via Supabase MCP. Extended Vehicle interface with 7 Phase 14 fields. Store transform (load/add/update) for all 7 fields. vehicleSlug.ts utility (generate/parse). marketEstimateService.ts (estimate market value + monthly payment). 60+ bilingual translation keys for vehicle detail page (vehicleDetail block in en+es).
 - **14-02 (complete):** AI content pipeline. Two new Gemini service functions (generateIdentityHeadline, generateVehicleStory) returning bilingual {en, es} JSON. Admin inventory form extended with headline/story textareas, generate buttons, verified checkbox, slug preview. Auto-compute slug and market estimate on save.
+- **14-03 (complete):** Vehicle detail page components. VehicleVerifiedBadge (gold opulent badge with crest, sm/lg sizes). VehiclePriceBlock (4-part price transparency with market estimate anchoring). VehicleStorySection (bilingual story with honest condition disclosure). VehicleJsonLd (Schema.org/Car structured data for SEO).
 
 ### Remaining Phase 13 Work
 
@@ -226,6 +230,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-18
-**Stopped at:** Completed 14-02-PLAN.md
+**Stopped at:** Completed 14-03-PLAN.md
 **Resume file:** None
-**Resume:** Plans 14-01 + 14-02 complete. Next: 14-03 (vehicle detail page) in Wave 2 parallel. Then Wave 3: 14-04 (inventory card updates).
+**Resume:** Plans 14-01 + 14-02 + 14-03 complete. Next: Wave 3 -- 14-04 (vehicle detail page layout + inventory card updates).
