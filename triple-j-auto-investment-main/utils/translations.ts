@@ -223,6 +223,52 @@ export const t = {
                 genericError: "Something went wrong. Please call us directly at (832) 400-9760"
             }
         },
+        vehicleDetail: {
+            // Verified badge
+            verifiedBadge: "Triple J Verified",
+            verifiedTooltip: "This vehicle has been inspected and verified by Triple J Auto Investment.",
+            // Price block
+            tripleJPrice: "Triple J Price",
+            marketAverage: "Market Average",
+            youSave: "You Save",
+            estMonthly: "Est. Monthly",
+            priceDisclaimer: "Est. ${amount}/mo with $500 down. 24 months. Subject to approval. See dealer for details.",
+            marketEstimateNote: "Estimated Market Value",
+            // Vehicle story
+            vehicleStoryHeading: "Vehicle Story",
+            fallbackStory: "Contact us for more details about this vehicle.",
+            // Condition
+            conditionHeading: "Condition Report",
+            // Specs
+            specsHeading: "Vehicle Specifications",
+            specYear: "Year",
+            specMake: "Make",
+            specModel: "Model",
+            specMileage: "Mileage",
+            specVin: "VIN",
+            specStatus: "Status",
+            specBodyType: "Body Type",
+            specConditionNotes: "Condition Notes",
+            // Social proof
+            listedToday: "Listed today",
+            listedYesterday: "Listed yesterday",
+            listedDaysAgo: "Listed {days} days ago",
+            // CTAs (references: home.hero.scheduleVisit, common.callAgent, finance.applyNow)
+            scheduleVisit: "Schedule a Visit",
+            callUs: "Call Us",
+            applyForFinancing: "Apply for Financing",
+            // Navigation
+            backToInventory: "Back to Inventory",
+            // Share
+            share: "Share",
+            // Photo gallery
+            photoCount: "{current} of {total}",
+            noPhotos: "No photos available",
+            // SEO
+            seoDescription: "{year} {make} {model} - {mileage} miles. ${price}. In-house financing available. Houston, TX.",
+            // Inventory card link
+            viewDetails: "View Details"
+        },
         contact: {
             title: "CONTACT US",
             subtitle: "Get in Touch",
@@ -1007,6 +1053,52 @@ export const t = {
                 nameRequired: "Ingrese su nombre",
                 genericError: "Algo salio mal. Llamenos directamente al (832) 400-9760"
             }
+        },
+        vehicleDetail: {
+            // Verificado
+            verifiedBadge: "Verificado por Triple J",
+            verifiedTooltip: "Este vehiculo ha sido inspeccionado y verificado por Triple J Auto Investment.",
+            // Bloque de precio
+            tripleJPrice: "Precio Triple J",
+            marketAverage: "Promedio del Mercado",
+            youSave: "Usted Ahorra",
+            estMonthly: "Estimado Mensual",
+            priceDisclaimer: "Est. ${amount}/mes con $500 de enganche. 24 meses. Sujeto a aprobacion. Consulte con el concesionario.",
+            marketEstimateNote: "Valor Estimado del Mercado",
+            // Historia del vehiculo
+            vehicleStoryHeading: "Historia del Vehiculo",
+            fallbackStory: "Contactenos para mas detalles sobre este vehiculo.",
+            // Condicion
+            conditionHeading: "Reporte de Condicion",
+            // Especificaciones
+            specsHeading: "Especificaciones del Vehiculo",
+            specYear: "Ano",
+            specMake: "Marca",
+            specModel: "Modelo",
+            specMileage: "Millaje",
+            specVin: "VIN",
+            specStatus: "Estado",
+            specBodyType: "Tipo de Carroceria",
+            specConditionNotes: "Notas de Condicion",
+            // Prueba social
+            listedToday: "Publicado hoy",
+            listedYesterday: "Publicado ayer",
+            listedDaysAgo: "Publicado hace {days} dias",
+            // CTAs
+            scheduleVisit: "Agende una Visita",
+            callUs: "Llamenos",
+            applyForFinancing: "Solicitar Financiamiento",
+            // Navegacion
+            backToInventory: "Volver al Inventario",
+            // Compartir
+            share: "Compartir",
+            // Galeria de fotos
+            photoCount: "{current} de {total}",
+            noPhotos: "No hay fotos disponibles",
+            // SEO
+            seoDescription: "{year} {make} {model} - {mileage} millas. ${price}. Financiamiento interno disponible. Houston, TX.",
+            // Enlace de tarjeta de inventario
+            viewDetails: "Ver Detalles"
         },
         contact: {
             title: "CONTACTENOS",
