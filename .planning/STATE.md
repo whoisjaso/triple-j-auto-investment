@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-19
-**Session:** Phase 16 IN PROGRESS (16-01 + 16-02 complete)
+**Session:** Phase 16 IN PROGRESS (16-01 through 16-04 complete)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 16 - Behavioral Intelligence (IN PROGRESS -- 16-01 + 16-02 complete)
+**Current focus:** Phase 16 - Behavioral Intelligence (IN PROGRESS -- 16-01 through 16-04 complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 16 of 19 (Behavioral Intelligence)
-**Plan:** 16-01 + 16-02 complete (2 of 5 Phase 16 plans done)
+**Plan:** 16-01 through 16-04 complete (4 of 5 Phase 16 plans done)
 **Status:** In progress
-**Last activity:** 2026-02-19 -- Completed 16-01-PLAN.md (DB migration + tracking service + session hook)
+**Last activity:** 2026-02-19 -- Completed 16-04-PLAN.md (urgency badges + form tracking)
 
-Progress: [████████████████████████████████░░░] 91% (32/35 plans -- Phase 16 in progress)
+Progress: [██████████████████████████████████░] 97% (34/35 plans -- Phase 16 nearly complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02)
+- Total plans completed: 34 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -153,6 +153,9 @@ Progress: [███████████████████████
 - **[16-02]** Attribution auto-filled in addLead via dynamic import if caller doesn't provide sessionId (covers Contact.tsx, Finance.tsx)
 - **[16-02]** sessionStorage for UTM persistence (not localStorage) -- UTM params are campaign-specific, should not persist across sessions
 - **[16-02]** getDeviceType duplicated in attributionService (not shared from trackingService) to avoid cross-service dependency
+- **[16-04]** UrgencyBadge placed in image overlay top-right column on inventory cards (below verified badge + save button)
+- **[16-04]** Form tracking uses onClickCapture wrappers with Set ref (fire once per form per page view, no component modifications needed)
+- **[16-04]** PaymentCalculator onFirstInteraction fires on first expand toggle (not slider change) for simpler implementation
 
 ### Completed Work (Phase 9)
 
@@ -210,11 +213,11 @@ Progress: [███████████████████████
 
 - **16-01 (complete):** DB migration + tracking foundation. phase-16-migration.sql with session_events table (7 event types, JSONB metadata, device_type), vehicle_view_counts table (7d/30d/unique aggregates), 7 attribution columns on leads, RLS policies, indexes, 3 pg_cron jobs. trackingService.ts with buffer/flush/keepalive unload. useSessionTracking.ts page_view hook. TrackingEventType + TrackingEvent in types.ts.
 - **16-02 (complete):** Conversion attribution. attributionService.ts (captureInitialUtm, captureAttribution). Attribution interface + 7 optional fields on Lead interface. vehicleLeadService.ts wired with captureAttribution. leads.ts addLead auto-fills attribution via dynamic import. 7 attribution columns inserted (session_id, page_path, referrer, utm_source, utm_medium, utm_campaign, device_type). loadLeads maps 7 columns from snake_case to camelCase. Zero form component changes needed.
+- **16-03 (complete):** Recently viewed + recommendations. useRecentlyViewed.ts localStorage hook with cross-tab sync. RecentlyViewedRow.tsx horizontal scroll component. recommendationService.ts (price/make/year similarity scoring). VehicleDetail.tsx: vehicle_view + dwell tracking, "You Might Also Like" section. Inventory.tsx: RecentlyViewedRow above grid.
+- **16-04 (complete):** Urgency badges + form tracking. urgencyService.ts (computeBadges from dateAdded, views_7d, commitment_level). useUrgencyBadges.ts (parallel Supabase queries, 5-min refresh). UrgencyBadge.tsx (green/amber/red color-coded, bilingual). Inventory.tsx + VehicleDetail.tsx integrations. form_open tracking on engagement forms. calculator_use tracking on PaymentCalculator.
 
 ### Remaining Phase 16 Work
 
-- **16-03:** Recently viewed, vehicle_view tracking, urgency badges
-- **16-04:** Admin analytics dashboard components
 - **16-05:** Integration wiring (App.tsx captureInitialUtm call, page-level tracking)
 
 ### Remaining Phase 15 Work
@@ -263,6 +266,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-19
-**Stopped at:** Completed 16-01-PLAN.md (DB migration + tracking service + session hook)
+**Stopped at:** Completed 16-04-PLAN.md (urgency badges + form tracking)
 **Resume file:** None
-**Resume:** Phase 16 (Behavioral Intelligence) in progress. 16-01 + 16-02 complete. Next: 16-03 (recently viewed + urgency badges), 16-04 (admin analytics), 16-05 (integration wiring).
+**Resume:** Phase 16 (Behavioral Intelligence) nearly complete. 16-01 through 16-04 done. Next: 16-05 (integration wiring -- App.tsx captureInitialUtm call, page-level tracking).
