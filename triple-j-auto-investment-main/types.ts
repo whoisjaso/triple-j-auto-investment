@@ -59,7 +59,50 @@ export interface Lead {
   interest: string; // VIN or General
   date: string;
   status: 'New' | 'Contacted' | 'Closed';
+
+  // Phase 15: Engagement Spectrum
+  vehicleId?: string;
+  actionType?: string;
+  commitmentLevel?: number;
+  message?: string;
+
+  // Phase 16: Attribution
+  sessionId?: string;
+  pagePath?: string;
+  referrer?: string;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  deviceType?: string;
 }
+
+// Phase 16: Attribution
+export interface Attribution {
+  session_id: string;
+  page_path: string;
+  referrer: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  device_type: 'mobile' | 'tablet' | 'desktop';
+}
+
+// Phase 16: Behavioral Intelligence
+export type TrackingEventType = 'page_view' | 'vehicle_view' | 'cta_click' | 'form_open' | 'calculator_use' | 'save_toggle' | 'dwell';
+
+export interface TrackingEvent {
+  session_id: string;
+  event_type: TrackingEventType;
+  vehicle_id?: string;
+  page_path: string;
+  metadata?: Record<string, unknown>;
+  referrer?: string;
+  device_type?: 'mobile' | 'tablet' | 'desktop';
+  created_at: string;
+}
+
+export type LeadActionType = 'contact' | 'finance' | 'vehicle_inquiry' | 'price_alert' | 'similar_vehicles' | 'vehicle_report' | 'schedule_visit' | 'ask_question' | 'reserve';
+export type CommitmentLevel = 0 | 1 | 2 | 3;
 
 export interface User {
   email: string;
