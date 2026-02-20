@@ -181,11 +181,14 @@ Plans:
   2. Returning visitors see "You recently viewed" with vehicles from their previous sessions
   3. Urgency badges ("Just Arrived", "Popular", "Offer Received") appear only when backed by real inventory data -- no fake scarcity
   4. Every lead capture records its source (which page, which vehicle, which device, referring URL) for conversion attribution
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 16-01: TBD
-- [ ] 16-02: TBD
+- [ ] 16-01-PLAN.md -- Database migration + tracking service: session_events table, vehicle_view_counts table, leads attribution columns, event buffering with 30s flush
+- [ ] 16-02-PLAN.md -- Attribution capture: UTM persistence, captureAttribution service, auto-fill attribution on all lead creation
+- [ ] 16-03-PLAN.md -- Recently viewed + recommendations: useRecentlyViewed hook, recommendationService, RecentlyViewedRow component, VehicleDetail/Inventory integration
+- [ ] 16-04-PLAN.md -- Urgency badges: urgencyService, useUrgencyBadges hook, UrgencyBadge component, Inventory/VehicleDetail integration, CTA tracking
+- [ ] 16-05-PLAN.md -- Admin behavior panel + app initialization: AdminBehaviorPanel on Dashboard, useSessionTracking + captureInitialUtm in App.tsx
 
 ### Phase 17: Divine Response
 **Goal**: Visitors get intelligent, psychologically-adapted assistance through AI chat on the website and updated Retell voice calls -- with graceful fallbacks when AI services are unavailable
@@ -249,8 +252,8 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 12. SEO Foundation | v2.0 | 4/4 | Complete | 2026-02-16 |
 | 13. Focus Capture | v2.0 | 3/3 | Complete | 2026-02-17 |
 | 14. Expectancy Building | v2.0 | 4/4 | Complete | 2026-02-18 |
-| 15. Engagement Spectrum | v2.0 | 0/TBD | Not started | - |
-| 16. Behavioral Intelligence | v2.0 | 0/TBD | Not started | - |
+| 15. Engagement Spectrum | v2.0 | 3/3 | Complete | 2026-02-19 |
+| 16. Behavioral Intelligence | v2.0 | 0/5 | Planning complete | - |
 | 17. Divine Response | v2.0 | 0/TBD | Not started | - |
 | 18. Behavioral Follow-Up | v2.0 | 0/TBD | Not started | - |
 | 19. Retention Engine | v2.0 | 0/TBD | Not started | - |
