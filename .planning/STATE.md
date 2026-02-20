@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-19
-**Session:** Phase 15 COMPLETE (all 3 plans done: 15-01 + 15-02 + 15-03)
+**Session:** Phase 16 IN PROGRESS (16-02 complete)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 15 - Engagement Spectrum (COMPLETE -- verified 5/5 must-haves)
+**Current focus:** Phase 16 - Behavioral Intelligence (IN PROGRESS -- 16-02 complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -30,17 +30,17 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
-**Phase:** 15 of 19 (Engagement Spectrum)
-**Plan:** 3 of 3 complete (15-01 + 15-02 + 15-03 done)
-**Status:** Phase complete
-**Last activity:** 2026-02-19 -- Completed 15-03-PLAN.md (Level 2+3 components, VehicleDetail integration, Contact/Finance updates)
+**Phase:** 16 of 19 (Behavioral Intelligence)
+**Plan:** 16-02 complete (16-01 in progress concurrently)
+**Status:** In progress
+**Last activity:** 2026-02-19 -- Completed 16-02-PLAN.md (Conversion attribution service + lead pipeline wiring)
 
-Progress: [██████████████████████████████] 100% (30/30 plans -- Phase 15 complete)
+Progress: [███████████████████████████████░░░░] 89% (31/35 plans -- Phase 16 in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03)
+- Total plans completed: 31 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-02)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -150,6 +150,9 @@ Progress: [███████████████████████
 - **[14-04]** VIN partially masked on detail page (last 6 chars visible) for listed vehicle privacy
 - **[14-04]** "View Details" link added alongside (not replacing) Express Interest and Book Now buttons on cards
 - **[14-04]** Verified badge on inventory cards placed in right column below SALE & RENTAL badge using flex-col layout
+- **[16-02]** Attribution auto-filled in addLead via dynamic import if caller doesn't provide sessionId (covers Contact.tsx, Finance.tsx)
+- **[16-02]** sessionStorage for UTM persistence (not localStorage) -- UTM params are campaign-specific, should not persist across sessions
+- **[16-02]** getDeviceType duplicated in attributionService (not shared from trackingService) to avoid cross-service dependency
 
 ### Completed Work (Phase 9)
 
@@ -203,6 +206,17 @@ Progress: [███████████████████████
 - **15-02 (complete):** Level 0 + Level 1 components. SaveButton.tsx (heart toggle, 3 sizes, pop animation, localStorage). PaymentCalculator.tsx (expandable slider, down payment $0-2K, term 12/18/24/36 months, real-time estimate). PhoneCaptureForm.tsx (reusable phone capture for all Level 1 actions, formatting, validation, lead creation). Inventory.tsx integration: SaveButton on cards, saved filter toggle, saved empty state.
 - **15-03 (complete):** Level 2 + Level 3 components and integration. ScheduleVisitForm.tsx (name + phone + preferred time, schedule_visit leads). AskQuestionForm.tsx (name + phone + free-text question, ask_question leads). ReserveVehicleSection.tsx (gold-accented, name + phone, reserve leads at commitment=3). VehicleDetail.tsx: SaveButton in hero, PaymentCalculator after price, full engagement spectrum Section 9 (Level 1/2/3 + direct call). Contact.tsx + Finance.tsx: added actionType/commitmentLevel/message to existing addLead calls.
 
+### Completed Work (Phase 16) -- IN PROGRESS
+
+- **16-02 (complete):** Conversion attribution. attributionService.ts (captureInitialUtm, captureAttribution). Attribution interface + 7 optional fields on Lead interface. vehicleLeadService.ts wired with captureAttribution. leads.ts addLead auto-fills attribution via dynamic import. 7 attribution columns inserted (session_id, page_path, referrer, utm_source, utm_medium, utm_campaign, device_type). loadLeads maps 7 columns from snake_case to camelCase. Zero form component changes needed.
+
+### Remaining Phase 16 Work
+
+- **16-01:** DB migration for behavioral tracking events table (may be completing concurrently)
+- **16-03:** Tracking service + event collection hooks
+- **16-04:** Admin analytics dashboard components
+- **16-05:** Integration wiring (App.tsx captureInitialUtm call, page-level tracking)
+
 ### Remaining Phase 15 Work
 
 None -- Phase 15 is fully complete (all 3 plans done).
@@ -249,6 +263,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-19
-**Stopped at:** Phase 15 complete and verified (5/5 must-haves passed)
+**Stopped at:** Completed 16-02-PLAN.md (conversion attribution)
 **Resume file:** None
-**Resume:** Phase 15 (Engagement Spectrum) complete and verified. 30 v2.0 plans done. Next: Phase 16 (Behavioral Intelligence) needs discuss/plan, or remaining Phase 9 manual items.
+**Resume:** Phase 16 (Behavioral Intelligence) in progress. 16-02 complete. 16-01 may be completing concurrently. Next: 16-03 (tracking service), 16-04 (admin analytics), 16-05 (integration wiring).
