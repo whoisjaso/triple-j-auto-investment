@@ -67,6 +67,7 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClic
   };
 
   const isSold = vehicle.status === VehicleStatus.SOLD;
+  const badges = getBadges(vehicle);
 
   return (
     <motion.div

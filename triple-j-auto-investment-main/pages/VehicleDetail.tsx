@@ -15,6 +15,8 @@ import { PhoneCaptureForm } from '../components/PhoneCaptureForm';
 import { ScheduleVisitForm } from '../components/ScheduleVisitForm';
 import { AskQuestionForm } from '../components/AskQuestionForm';
 import { ReserveVehicleSection } from '../components/ReserveVehicleSection';
+import { useUrgencyBadges } from '../hooks/useUrgencyBadges';
+import { UrgencyBadge } from '../components/UrgencyBadge';
 import { parseVehicleSlug, generateVehicleSlug } from '../utils/vehicleSlug';
 import { supabase } from '../supabase/config';
 import { Vehicle, VehicleStatus } from '../types';
@@ -80,6 +82,7 @@ const VehicleDetail: React.FC = () => {
   const { t, lang } = useLanguage();
   const { vehicles } = useStore();
   const { addViewed, vehicleIds: recentIds } = useRecentlyViewed();
+  const { getBadges } = useUrgencyBadges();
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -495,13 +498,18 @@ const VehicleDetail: React.FC = () => {
           {/* ========================================== */}
           {/* SECTION 4: Badges (Verified + Urgency)     */}
           {/* ========================================== */}
-          {vehicle.isVerified && (
-            <section className="py-8 border-t border-white/[0.04]">
-              <div className="flex flex-wrap items-center gap-3">
-                <VehicleVerifiedBadge isVerified={true} size="lg" />
-              </div>
-            </section>
-          )}
+          {(() => {
+            const badges = getBadges(vehicle);
+            if (!vehicle.isVerified && badges.length === 0) return null;
+            return (
+              <section className="py-8 border-t border-white/[0.04]">
+                <div className="flex flex-wrap items-center gap-3">
+                  {vehicle.isVerified && <VehicleVerifiedBadge isVerified={true} size="lg" />}
+                  {badges.length > 0 && <UrgencyBadge badges={badges} />}
+                </div>
+              </section>
+            );
+          })()}
 
           {/* ========================================== */}
           {/* SECTION 5: Price Transparency Block         */}
