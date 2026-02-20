@@ -18,7 +18,23 @@ export async function loadLeads(
       return;
     }
 
-    setLeads(data || []);
+    const transformed = (data || []).map((row: any) => ({
+      ...row,
+      // Phase 15: Engagement Spectrum (snake_case -> camelCase)
+      vehicleId: row.vehicle_id || undefined,
+      actionType: row.action_type || undefined,
+      commitmentLevel: row.commitment_level != null ? row.commitment_level : undefined,
+      message: row.message || undefined,
+      // Phase 16: Attribution (snake_case -> camelCase)
+      sessionId: row.session_id || undefined,
+      pagePath: row.page_path || undefined,
+      referrer: row.referrer || undefined,
+      utmSource: row.utm_source || undefined,
+      utmMedium: row.utm_medium || undefined,
+      utmCampaign: row.utm_campaign || undefined,
+      deviceType: row.device_type || undefined,
+    }));
+    setLeads(transformed);
     console.log(`✅ Loaded ${data?.length || 0} leads from Supabase`);
   } catch (error) {
     console.error('Unexpected error loading leads:', error);
@@ -28,6 +44,22 @@ export async function loadLeads(
 // --- ADD LEAD TO SUPABASE ---
 export async function addLead(lead: Lead): Promise<void> {
   try {
+    // Phase 16: Auto-fill attribution if not provided by caller
+    if (!lead.sessionId) {
+      const { captureAttribution } = await import('../../services/attributionService');
+      const attr = captureAttribution();
+      lead = {
+        ...lead,
+        sessionId: attr.session_id,
+        pagePath: attr.page_path,
+        referrer: attr.referrer,
+        utmSource: attr.utm_source,
+        utmMedium: attr.utm_medium,
+        utmCampaign: attr.utm_campaign,
+        deviceType: attr.device_type,
+      };
+    }
+
     const { error } = await supabase
       .from('leads')
       .insert([{
@@ -37,6 +69,19 @@ export async function addLead(lead: Lead): Promise<void> {
         interest: lead.interest,
         status: lead.status || 'New',
         date: lead.date || new Date().toISOString(),
+        // Phase 15: Engagement Spectrum
+        vehicle_id: lead.vehicleId || null,
+        action_type: lead.actionType || null,
+        commitment_level: lead.commitmentLevel ?? null,
+        message: lead.message || null,
+        // Phase 16: Attribution
+        session_id: lead.sessionId || null,
+        page_path: lead.pagePath || null,
+        referrer: lead.referrer || null,
+        utm_source: lead.utmSource || null,
+        utm_medium: lead.utmMedium || null,
+        utm_campaign: lead.utmCampaign || null,
+        device_type: lead.deviceType || null,
       }]);
 
     if (error) {
