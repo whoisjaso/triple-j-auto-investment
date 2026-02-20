@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
@@ -198,6 +198,19 @@ const VehicleDetail: React.FC = () => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehicle?.id]);
+
+  // Phase 16: Fire-once form_open tracking
+  const trackedFormsRef = useRef<Set<string>>(new Set());
+  const trackFormOpen = useCallback((formType: string) => {
+    if (trackedFormsRef.current.has(formType)) return;
+    trackedFormsRef.current.add(formType);
+    trackEvent({
+      event_type: 'form_open',
+      vehicle_id: vehicle?.id,
+      page_path: window.location.pathname,
+      metadata: { form_type: formType },
+    });
   }, [vehicle?.id]);
 
   // Phase 16: Compute "You Might Also Like" recommendations
@@ -527,7 +540,16 @@ const VehicleDetail: React.FC = () => {
           {/* SECTION 5.5: Payment Calculator (Level 0)   */}
           {/* ========================================== */}
           <div className="py-6">
-            <PaymentCalculator price={vehicle.price} />
+            <PaymentCalculator
+              price={vehicle.price}
+              onFirstInteraction={() => {
+                trackEvent({
+                  event_type: 'calculator_use',
+                  vehicle_id: vehicle.id,
+                  page_path: window.location.pathname,
+                });
+              }}
+            />
           </div>
 
           {/* ========================================== */}
@@ -582,7 +604,7 @@ const VehicleDetail: React.FC = () => {
           <section className="py-8 border-t border-white/[0.04]">
             {/* Level 1: Phone-only actions */}
             <div className="mb-6">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3" onClickCapture={() => trackFormOpen('level_1')}>
                 <PhoneCaptureForm
                   actionType="price_alert"
                   vehicleId={vehicle.id}
@@ -611,7 +633,7 @@ const VehicleDetail: React.FC = () => {
             </div>
 
             {/* Level 2: Name + Phone actions */}
-            <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3" onClickCapture={() => trackFormOpen('level_2')}>
               <ScheduleVisitForm
                 vehicleId={vehicle.id}
                 vehicleVin={vehicle.vin}
@@ -624,7 +646,7 @@ const VehicleDetail: React.FC = () => {
             </div>
 
             {/* Level 3: Reserve */}
-            <div className="mb-6">
+            <div className="mb-6" onClickCapture={() => trackFormOpen('level_3')}>
               <ReserveVehicleSection
                 vehicleId={vehicle.id}
                 vehicleVin={vehicle.vin}
