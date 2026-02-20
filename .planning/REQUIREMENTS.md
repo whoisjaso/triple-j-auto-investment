@@ -77,11 +77,11 @@ Requirements for v2.0 Psychological Architecture & Production Launch. Organized 
 
 ### Intelligence Layer
 
-- [ ] **INTEL-01**: Session behavior tracking (views, clicks, dwell time, hesitation points)
-- [ ] **INTEL-02**: Smart vehicle recommendations based on browsing patterns
-- [ ] **INTEL-03**: Urgency calibration -- real data only (Just Arrived, Popular, Offer Received)
-- [ ] **INTEL-04**: Conversion attribution -- source tracking for all actions (ad, page, vehicle, device)
-- [ ] **INTEL-05**: Customer profile adaptive experience based on behavior signals
+- [x] **INTEL-01**: Session behavior tracking (views, clicks, dwell time, hesitation points)
+- [x] **INTEL-02**: Smart vehicle recommendations based on browsing patterns
+- [x] **INTEL-03**: Urgency calibration -- real data only (Just Arrived, Popular, Offer Received)
+- [x] **INTEL-04**: Conversion attribution -- source tracking for all actions (ad, page, vehicle, device)
+- [x] **INTEL-05**: Customer profile adaptive experience based on behavior signals
 
 ### Owner Portal & Retention
 
@@ -261,11 +261,11 @@ Deferred to future release. Tracked but not in current roadmap.
 | COMMIT-08 | Phase 15: Engagement Spectrum | Complete |
 | COMMIT-09 | Phase 15: Engagement Spectrum | Complete |
 | COMMIT-10 | Phase 15: Engagement Spectrum | Complete |
-| INTEL-01 | Phase 16: Behavioral Intelligence | Pending |
-| INTEL-02 | Phase 16: Behavioral Intelligence | Pending |
-| INTEL-03 | Phase 16: Behavioral Intelligence | Pending |
-| INTEL-04 | Phase 16: Behavioral Intelligence | Pending |
-| INTEL-05 | Phase 16: Behavioral Intelligence | Pending |
+| INTEL-01 | Phase 16: Behavioral Intelligence | Complete |
+| INTEL-02 | Phase 16: Behavioral Intelligence | Complete |
+| INTEL-03 | Phase 16: Behavioral Intelligence | Complete |
+| INTEL-04 | Phase 16: Behavioral Intelligence | Complete |
+| INTEL-05 | Phase 16: Behavioral Intelligence | Complete |
 | DIVINE-01 | Phase 17: Divine Response | Pending |
 | DIVINE-02 | Phase 17: Divine Response | Pending |
 | DIVINE-03 | Phase 17: Divine Response | Pending |

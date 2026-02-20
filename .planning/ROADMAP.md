@@ -35,7 +35,7 @@ See: `.planning/milestones/v1-ROADMAP.md`
 - [x] **Phase 13: Focus Capture** - SOVEREIGN landing experience with pattern-interrupt, authority, and tribe signals
 - [x] **Phase 14: Expectancy Building** - Vehicle listings as micro-stories with price anchoring and identity framing
 - [x] **Phase 15: Engagement Spectrum** - Micro-commitment ladder from zero-friction saves to vehicle reservations
-- [ ] **Phase 16: Behavioral Intelligence** - Session tracking, smart recommendations, urgency calibration, and attribution
+- [x] **Phase 16: Behavioral Intelligence** - Session tracking, smart recommendations, urgency calibration, and attribution
 - [ ] **Phase 17: Divine Response** - AI chat with behavioral profiling plus Retell voice agent updates
 - [ ] **Phase 18: Behavioral Follow-Up** - 4-tier automated re-engagement system triggered by visitor behavior
 - [ ] **Phase 19: Retention Engine** - Owner Portal, Family Circle referral program, review generation, and re-entry loop
@@ -189,7 +189,7 @@ Plans:
 - [ ] 16-03-PLAN.md -- Recently viewed + recommendations: useRecentlyViewed hook, recommendationService, RecentlyViewedRow component, VehicleDetail/Inventory integration
 - [ ] 16-04-PLAN.md -- Urgency badges: urgencyService, useUrgencyBadges hook, UrgencyBadge component, Inventory/VehicleDetail integration, CTA tracking
 - [ ] 16-05-PLAN.md -- Admin behavior panel + app initialization: AdminBehaviorPanel on Dashboard, useSessionTracking + captureInitialUtm in App.tsx
-- [ ] 16-06-PLAN.md -- (Gap closure) Fix urgency badge runtime crash in Inventory.tsx + VehicleDetail.tsx, wire form_open and calculator_use tracking
+- [x] 16-06-PLAN.md -- (Gap closure) Fix urgency badge runtime crash in Inventory.tsx + VehicleDetail.tsx, wire form_open and calculator_use tracking
 
 ### Phase 17: Divine Response
 **Goal**: Visitors get intelligent, psychologically-adapted assistance through AI chat on the website and updated Retell voice calls -- with graceful fallbacks when AI services are unavailable
@@ -254,7 +254,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 13. Focus Capture | v2.0 | 3/3 | Complete | 2026-02-17 |
 | 14. Expectancy Building | v2.0 | 4/4 | Complete | 2026-02-18 |
 | 15. Engagement Spectrum | v2.0 | 3/3 | Complete | 2026-02-19 |
-| 16. Behavioral Intelligence | v2.0 | 5/6 | Gap closure | - |
+| 16. Behavioral Intelligence | v2.0 | 6/6 | Complete | 2026-02-20 |
 | 17. Divine Response | v2.0 | 0/TBD | Not started | - |
 | 18. Behavioral Follow-Up | v2.0 | 0/TBD | Not started | - |
 | 19. Retention Engine | v2.0 | 0/TBD | Not started | - |
