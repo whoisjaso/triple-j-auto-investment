@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-19
-**Session:** Phase 16 COMPLETE (all 5 plans done)
+**Last Updated:** 2026-02-20
+**Session:** Phase 16 COMPLETE (all 5 plans + gap closure done)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 16 - Behavioral Intelligence (COMPLETE -- all 5 plans done)
+**Current focus:** Phase 16 - Behavioral Intelligence (COMPLETE -- all 5 plans + gap closure plan 06 done)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 16 of 19 (Behavioral Intelligence)
-**Plan:** All 5 Phase 16 plans complete
-**Status:** Phase complete
-**Last activity:** 2026-02-19 -- Completed 16-05-PLAN.md (admin panel + App.tsx tracking init)
+**Plan:** All 5 Phase 16 plans + gap closure plan 06 complete
+**Status:** Phase complete (verification gaps closed)
+**Last activity:** 2026-02-20 -- Completed 16-06-PLAN.md (urgency badges fix + form tracking wiring)
 
-Progress: [███████████████████████████████████] 100% (35/35 plans -- Phase 16 complete)
+Progress: [████████████████████████████████████] 100% (36/36 plans -- Phase 16 complete with gap closure)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 35 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05)
+- Total plans completed: 36 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -158,6 +158,7 @@ Progress: [███████████████████████
 - **[16-04]** PaymentCalculator onFirstInteraction fires on first expand toggle (not slider change) for simpler implementation
 - **[16-05]** Behavior Intelligence section default collapsed on admin dashboard (keeps financial view clean)
 - **[16-05]** Admin panel fetches once on mount/expand (no auto-refresh) to reduce unnecessary Supabase queries
+- **[16-06]** Section 4 in VehicleDetail uses IIFE pattern to compute badges inline and conditionally render section when either verified or urgency badges exist
 
 ### Completed Work (Phase 9)
 
@@ -218,10 +219,11 @@ Progress: [███████████████████████
 - **16-03 (complete):** Recently viewed + recommendations. useRecentlyViewed.ts localStorage hook with cross-tab sync. RecentlyViewedRow.tsx horizontal scroll component. recommendationService.ts (price/make/year similarity scoring). VehicleDetail.tsx: vehicle_view + dwell tracking, "You Might Also Like" section. Inventory.tsx: RecentlyViewedRow above grid.
 - **16-04 (complete):** Urgency badges + form tracking. urgencyService.ts (computeBadges from dateAdded, views_7d, commitment_level). useUrgencyBadges.ts (parallel Supabase queries, 5-min refresh). UrgencyBadge.tsx (green/amber/red color-coded, bilingual). Inventory.tsx + VehicleDetail.tsx integrations. form_open tracking on engagement forms. calculator_use tracking on PaymentCalculator.
 - **16-05 (complete):** Integration wiring. AdminBehaviorPanel.tsx (3-section admin panel: top viewed vehicles, recent sessions, attribution breakdown). Dashboard.tsx: collapsible Behavior Intelligence section (default collapsed). App.tsx: useSessionTracking() for page_view on every route change + captureInitialUtm() on mount for UTM capture.
+- **16-06 (complete):** Gap closure. Fixed Inventory.tsx VehicleCard runtime crash (undeclared badges variable). Added urgency badges to VehicleDetail.tsx Section 4 alongside verified badge. Wired fire-once form_open tracking on Level 1/2/3 engagement forms via onClickCapture. Passed onFirstInteraction to PaymentCalculator for calculator_use event. All Phase 16 verification gaps resolved.
 
 ### Remaining Phase 16 Work
 
-None -- Phase 16 is fully complete (all 5 plans done).
+None -- Phase 16 is fully complete (all 5 plans + gap closure plan 06 done).
 
 ### Remaining Phase 15 Work
 
@@ -268,7 +270,7 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 
 ## Session Continuity
 
-**Last session:** 2026-02-19
-**Stopped at:** Completed 16-05-PLAN.md (admin panel + App.tsx tracking init) -- Phase 16 COMPLETE
+**Last session:** 2026-02-20
+**Stopped at:** Completed 16-06-PLAN.md (urgency badges fix + form tracking wiring) -- Phase 16 gap closure COMPLETE
 **Resume file:** None
-**Resume:** Phase 16 (Behavioral Intelligence) fully complete. All 5 plans done (16-01 through 16-05). All v2.0 automated plans complete (35/35). Remaining work is manual (Phase 9 infrastructure items).
+**Resume:** Phase 16 (Behavioral Intelligence) fully complete including gap closure. All 6 plans done (16-01 through 16-06). All v2.0 automated plans complete (36/36). Remaining work is manual (Phase 9 infrastructure items).
