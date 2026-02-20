@@ -10,6 +10,8 @@ import { ScrollToTop } from './components/ScrollToTop';
 import { PageLoader } from './components/PageLoader';
 import { OfflineBanner } from './components/OfflineBanner';
 import { ConnectionErrorBanner } from './components/ConnectionErrorBanner';
+import { useSessionTracking } from './hooks/useSessionTracking';
+import { captureInitialUtm } from './services/attributionService';
 
 // Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
@@ -564,6 +566,14 @@ class ErrorBoundary extends React.Component<
 const AppContent = () => {
   const location = useLocation();
   const { t } = useLanguage();
+
+  // Phase 16: Track page views on every route change
+  useSessionTracking();
+
+  // Phase 16: Capture UTM params from landing URL before SPA navigation strips them
+  useEffect(() => {
+    captureInitialUtm();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">

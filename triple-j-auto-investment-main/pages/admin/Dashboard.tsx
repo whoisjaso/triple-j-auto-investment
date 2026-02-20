@@ -3,10 +3,11 @@ import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { analyzeFinancialPerformance } from '../../services/geminiService';
-import { Target, Globe, Radio, User, Phone, Mail, Clock, MessageSquare, FileText, Car, TrendingUp, DollarSign, Activity, Wrench, Truck, PaintBucket, X, PieChart, ChevronRight, AlertTriangle, Hourglass, LayoutDashboard, LogOut, Menu, ClipboardCheck, Key, CreditCard } from 'lucide-react';
+import { Target, Globe, Radio, User, Phone, Mail, Clock, MessageSquare, FileText, Car, TrendingUp, DollarSign, Activity, Wrench, Truck, PaintBucket, X, PieChart, ChevronRight, ChevronDown, AlertTriangle, Hourglass, LayoutDashboard, LogOut, Menu, ClipboardCheck, Key, CreditCard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Markdown from 'react-markdown';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
+import { AdminBehaviorPanel } from '../../components/admin/AdminBehaviorPanel';
 
 // Admin Navigation Header Component
 const AdminHeader = () => {
@@ -139,6 +140,7 @@ const Dashboard = () => {
   const [financialReport, setFinancialReport] = useState<string>("Initializing financial analysis...");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showProfitDetails, setShowProfitDetails] = useState(false);
+  const [showBehavior, setShowBehavior] = useState(false);
 
   // --- FINANCIAL CALCULATIONS ---
   const soldVehicles = vehicles.filter(v => v.status === 'Sold');
@@ -341,13 +343,10 @@ const Dashboard = () => {
             className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 pb-6 border-b border-white/[0.06]"
           >
             <div>
-              <div className="flex items-center gap-3 mb-3">
+              <div className="flex items-center gap-3">
                 <div className="w-2 h-2 bg-tj-gold animate-pulse" />
-                <p className="text-tj-gold uppercase tracking-[0.4em] text-[10px]">Financial Intelligence</p>
+                <h1 className="text-tj-gold uppercase tracking-[0.4em] text-[10px] font-bold">Financial Intelligence</h1>
               </div>
-              <h1 className="font-display text-3xl md:text-4xl text-white tracking-tight leading-none">
-                Command Center
-              </h1>
             </div>
             <div className="mt-6 md:mt-0 flex flex-wrap items-end gap-6 md:gap-8">
               <div className="text-right">
@@ -495,6 +494,39 @@ const Dashboard = () => {
               </motion.div>
             </div>
           </div>
+
+          {/* BEHAVIOR INTELLIGENCE (collapsible) */}
+          <motion.div
+            custom={3.5}
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="bg-[#080808] border border-white/[0.06] overflow-hidden mb-10"
+          >
+            <button
+              onClick={() => setShowBehavior(!showBehavior)}
+              className="w-full p-5 md:p-6 flex justify-between items-center hover:bg-white/[0.02] transition-colors"
+            >
+              <h3 className="text-white font-display text-lg tracking-wider flex items-center gap-3">
+                <Activity size={16} className="text-tj-gold" />
+                Behavior Intelligence
+              </h3>
+              <div className="flex items-center gap-3">
+                <span className="text-[9px] uppercase tracking-[0.2em] text-gray-600 font-mono">
+                  {showBehavior ? 'Collapse' : 'Expand'}
+                </span>
+                {showBehavior
+                  ? <ChevronDown size={16} className="text-gray-400" />
+                  : <ChevronRight size={16} className="text-gray-400" />
+                }
+              </div>
+            </button>
+            {showBehavior && (
+              <div className="p-5 md:p-6 border-t border-white/[0.06]">
+                <AdminBehaviorPanel />
+              </div>
+            )}
+          </motion.div>
 
           {/* LEADS TABLE */}
           <motion.div
