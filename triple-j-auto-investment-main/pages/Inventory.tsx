@@ -15,7 +15,12 @@ import { VehicleVerifiedBadge } from '../components/VehicleVerifiedBadge';
 import { generateVehicleSlug } from '../utils/vehicleSlug';
 import { SaveButton } from '../components/SaveButton';
 import { useSavedVehicles } from '../hooks/useSavedVehicles';
+import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
+import { RecentlyViewedRow } from '../components/RecentlyViewedRow';
 import { Heart } from 'lucide-react';
+import { useUrgencyBadges } from '../hooks/useUrgencyBadges';
+import { UrgencyBadge } from '../components/UrgencyBadge';
+import type { UrgencyBadgeData } from '../services/urgencyService';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
 
@@ -25,10 +30,11 @@ interface VehicleCardProps {
   vehicle: Vehicle;
   onClick: () => void;
   onImageClick: (imgIndex: number) => void;
+  getBadges: (vehicle: Vehicle) => UrgencyBadgeData[];
 }
 
 // --- VEHICLE CARD COMPONENT (Swipeable Carousel + Sleek Design) ---
-const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClick }) => {
+const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClick, getBadges }) => {
   const { t, lang } = useLanguage();
   const [imgIndex, setImgIndex] = useState(0);
   const images = [vehicle.imageUrl, ...(vehicle.gallery || [])].filter(Boolean);
@@ -95,6 +101,9 @@ const VehicleCard: React.FC<VehicleCardProps> = ({ vehicle, onClick, onImageClic
             <div className="pointer-events-auto">
               <SaveButton vehicleId={vehicle.id} size="sm" />
             </div>
+            {badges.length > 0 && (
+              <UrgencyBadge badges={badges} />
+            )}
           </div>
         </div>
 
@@ -228,6 +237,8 @@ const Inventory = () => {
   const { vehicles, addLead, isLoading, connectionError, refreshVehicles } = useStore();
   const { t, lang, toggleLang } = useLanguage();
   const { savedIds, savedCount } = useSavedVehicles();
+  const { vehicleIds: recentIds } = useRecentlyViewed();
+  const { getBadges } = useUrgencyBadges();
   const [filter, setFilter] = useState<VehicleStatus | 'All'>('All');
   const [makeFilter, setMakeFilter] = useState<string>('All');
   const [sortBy, setSortBy] = useState<SortOption>('alphabetical');
@@ -685,6 +696,13 @@ const Inventory = () => {
           </div>
         </div>
 
+        {/* Phase 16: Recently Viewed Row */}
+        {!isLoading && recentIds.length > 0 && (
+          <div className="py-8 border-b border-white/[0.06] mb-8">
+            <RecentlyViewedRow vehicleIds={recentIds} />
+          </div>
+        )}
+
         {/* Loading State: Skeleton Grid */}
         {isLoading && (
           <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 mt-8 md:mt-12">
@@ -787,6 +805,7 @@ const Inventory = () => {
                   vehicle={vehicle}
                   onClick={() => handleOpenModal(vehicle)}
                   onImageClick={(imgIndex) => handleCardImageClick(vehicle, imgIndex)}
+                  getBadges={getBadges}
                 />
               ))}
             </AnimatePresence>

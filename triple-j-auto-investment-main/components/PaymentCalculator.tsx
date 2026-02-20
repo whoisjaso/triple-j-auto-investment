@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Calculator, ChevronDown, ChevronUp } from 'lucide-react';
 import { estimateMonthlyPayment } from '../services/marketEstimateService';
@@ -8,16 +8,18 @@ import { Link } from 'react-router-dom';
 interface PaymentCalculatorProps {
   price: number;
   className?: string;
+  onFirstInteraction?: () => void;
 }
 
 const DOWN_PRESETS = [0, 500, 1000, 1500, 2000];
 const TERM_OPTIONS = [12, 18, 24, 36];
 
-export const PaymentCalculator: React.FC<PaymentCalculatorProps> = ({ price, className = '' }) => {
+export const PaymentCalculator: React.FC<PaymentCalculatorProps> = ({ price, className = '', onFirstInteraction }) => {
   const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [downPayment, setDownPayment] = useState(500);
   const [termMonths, setTermMonths] = useState(24);
+  const interactedRef = useRef(false);
 
   const monthly = useMemo(
     () => estimateMonthlyPayment(price, downPayment, termMonths),
@@ -30,7 +32,14 @@ export const PaymentCalculator: React.FC<PaymentCalculatorProps> = ({ price, cla
     <div className={`bg-white/[0.03] border border-white/[0.06] rounded-lg overflow-hidden ${className}`}>
       {/* Collapsed header */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => {
+          const willOpen = !isOpen;
+          setIsOpen(willOpen);
+          if (willOpen && !interactedRef.current && onFirstInteraction) {
+            interactedRef.current = true;
+            onFirstInteraction();
+          }
+        }}
         className="w-full flex items-center justify-between p-4 cursor-pointer hover:bg-white/[0.02] transition-colors min-h-[44px]"
         aria-expanded={isOpen}
       >

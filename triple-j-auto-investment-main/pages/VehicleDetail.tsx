@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
@@ -18,6 +18,9 @@ import { ReserveVehicleSection } from '../components/ReserveVehicleSection';
 import { parseVehicleSlug, generateVehicleSlug } from '../utils/vehicleSlug';
 import { supabase } from '../supabase/config';
 import { Vehicle, VehicleStatus } from '../types';
+import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
+import { trackEvent } from '../services/trackingService';
+import { getRecommendations } from '../services/recommendationService';
 import {
   ArrowLeft,
   Phone,
@@ -76,6 +79,7 @@ const VehicleDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { t, lang } = useLanguage();
   const { vehicles } = useStore();
+  const { addViewed, vehicleIds: recentIds } = useRecentlyViewed();
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -159,6 +163,48 @@ const VehicleDetail: React.FC = () => {
 
     fetchFromSupabase();
   }, [slug, vehicles]);
+
+  // Phase 16: Track vehicle view + dwell, add to recently viewed
+  const dwellStartRef = useRef<number>(0);
+  useEffect(() => {
+    if (!vehicle) return;
+
+    // Record in recently viewed
+    addViewed(vehicle.id);
+
+    // Track vehicle_view event
+    trackEvent({
+      event_type: 'vehicle_view',
+      vehicle_id: vehicle.id,
+      page_path: window.location.pathname,
+    });
+
+    // Capture dwell start time
+    dwellStartRef.current = Date.now();
+
+    return () => {
+      // Track dwell time on unmount (only if >= 3 seconds)
+      const dwellSeconds = Math.round((Date.now() - dwellStartRef.current) / 1000);
+      if (dwellSeconds >= 3) {
+        trackEvent({
+          event_type: 'dwell',
+          vehicle_id: vehicle.id,
+          page_path: window.location.pathname,
+          metadata: { dwell_seconds: dwellSeconds },
+        });
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [vehicle?.id]);
+
+  // Phase 16: Compute "You Might Also Like" recommendations
+  const recommendations = useMemo(() => {
+    if (!vehicle) return [];
+    const viewedVehicles = recentIds
+      .map(id => vehicles.find(v => v.id === id))
+      .filter(Boolean) as Vehicle[];
+    return getRecommendations(viewedVehicles, vehicles, 4);
+  }, [vehicle, recentIds, vehicles]);
 
   // Days since listed
   const daysListed = useMemo(() => {
@@ -447,11 +493,13 @@ const VehicleDetail: React.FC = () => {
           </section>
 
           {/* ========================================== */}
-          {/* SECTION 4: Triple J Verified Badge         */}
+          {/* SECTION 4: Badges (Verified + Urgency)     */}
           {/* ========================================== */}
           {vehicle.isVerified && (
             <section className="py-8 border-t border-white/[0.04]">
-              <VehicleVerifiedBadge isVerified={true} size="lg" />
+              <div className="flex flex-wrap items-center gap-3">
+                <VehicleVerifiedBadge isVerified={true} size="lg" />
+              </div>
             </section>
           )}
 
@@ -590,6 +638,64 @@ const VehicleDetail: React.FC = () => {
               </a>
             </div>
           </section>
+
+          {/* ========================================== */}
+          {/* SECTION 10: You Might Also Like            */}
+          {/* ========================================== */}
+          {recommendations.length > 0 && (
+            <section className="py-8 border-t border-white/[0.04]">
+              <h3 className="font-display text-lg tracking-[0.2em] uppercase text-white mb-6">
+                {(t as any).vehicleDetail?.recommendations || (lang === 'es' ? 'Tambien Te Puede Gustar' : 'You Might Also Like')}
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {recommendations.map(rec => {
+                  const recSlug = rec.slug || generateVehicleSlug(rec.year, rec.make, rec.model, rec.id);
+                  const recImages = [rec.imageUrl, ...(rec.gallery || [])].filter(Boolean);
+                  return (
+                    <Link
+                      key={rec.id}
+                      to={`/vehicles/${recSlug}`}
+                      className="group block"
+                    >
+                      <div className="relative aspect-video overflow-hidden rounded bg-gray-900">
+                        {recImages.length > 0 ? (
+                          <img
+                            src={recImages[0]}
+                            alt={`${rec.year} ${rec.make} ${rec.model}`}
+                            loading="lazy"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-800">
+                            <Car className="text-gray-600" size={24} />
+                          </div>
+                        )}
+                      </div>
+                      <div className="mt-2">
+                        <p className="text-sm font-bold text-white truncate group-hover:text-tj-gold transition-colors">
+                          {rec.year} {rec.make} {rec.model}
+                        </p>
+                        <p className="text-sm text-tj-gold">
+                          {rec.price > 0 ? `$${rec.price.toLocaleString()}` : 'Inquire'}
+                        </p>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Back to inventory link */}
+          <div className="py-8 text-center">
+            <Link
+              to="/inventory"
+              className="inline-flex items-center gap-2 text-gray-400 hover:text-tj-gold transition-colors text-[10px] uppercase tracking-[0.2em]"
+            >
+              <ArrowLeft size={14} />
+              {t.vehicleDetail.backToInventory}
+            </Link>
+          </div>
 
         </div>
       </motion.div>
