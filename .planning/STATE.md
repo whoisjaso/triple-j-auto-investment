@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-19
-**Session:** Phase 16 IN PROGRESS (16-02 complete)
+**Session:** Phase 16 IN PROGRESS (16-01 + 16-02 complete)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 16 - Behavioral Intelligence (IN PROGRESS -- 16-02 complete)
+**Current focus:** Phase 16 - Behavioral Intelligence (IN PROGRESS -- 16-01 + 16-02 complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 16 of 19 (Behavioral Intelligence)
-**Plan:** 16-02 complete (16-01 in progress concurrently)
+**Plan:** 16-01 + 16-02 complete (2 of 5 Phase 16 plans done)
 **Status:** In progress
-**Last activity:** 2026-02-19 -- Completed 16-02-PLAN.md (Conversion attribution service + lead pipeline wiring)
+**Last activity:** 2026-02-19 -- Completed 16-01-PLAN.md (DB migration + tracking service + session hook)
 
-Progress: [███████████████████████████████░░░░] 89% (31/35 plans -- Phase 16 in progress)
+Progress: [████████████████████████████████░░░] 91% (32/35 plans -- Phase 16 in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-02)
+- Total plans completed: 32 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -208,12 +208,12 @@ Progress: [███████████████████████
 
 ### Completed Work (Phase 16) -- IN PROGRESS
 
+- **16-01 (complete):** DB migration + tracking foundation. phase-16-migration.sql with session_events table (7 event types, JSONB metadata, device_type), vehicle_view_counts table (7d/30d/unique aggregates), 7 attribution columns on leads, RLS policies, indexes, 3 pg_cron jobs. trackingService.ts with buffer/flush/keepalive unload. useSessionTracking.ts page_view hook. TrackingEventType + TrackingEvent in types.ts.
 - **16-02 (complete):** Conversion attribution. attributionService.ts (captureInitialUtm, captureAttribution). Attribution interface + 7 optional fields on Lead interface. vehicleLeadService.ts wired with captureAttribution. leads.ts addLead auto-fills attribution via dynamic import. 7 attribution columns inserted (session_id, page_path, referrer, utm_source, utm_medium, utm_campaign, device_type). loadLeads maps 7 columns from snake_case to camelCase. Zero form component changes needed.
 
 ### Remaining Phase 16 Work
 
-- **16-01:** DB migration for behavioral tracking events table (may be completing concurrently)
-- **16-03:** Tracking service + event collection hooks
+- **16-03:** Recently viewed, vehicle_view tracking, urgency badges
 - **16-04:** Admin analytics dashboard components
 - **16-05:** Integration wiring (App.tsx captureInitialUtm call, page-level tracking)
 
@@ -263,6 +263,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-19
-**Stopped at:** Completed 16-02-PLAN.md (conversion attribution)
+**Stopped at:** Completed 16-01-PLAN.md (DB migration + tracking service + session hook)
 **Resume file:** None
-**Resume:** Phase 16 (Behavioral Intelligence) in progress. 16-02 complete. 16-01 may be completing concurrently. Next: 16-03 (tracking service), 16-04 (admin analytics), 16-05 (integration wiring).
+**Resume:** Phase 16 (Behavioral Intelligence) in progress. 16-01 + 16-02 complete. Next: 16-03 (recently viewed + urgency badges), 16-04 (admin analytics), 16-05 (integration wiring).
