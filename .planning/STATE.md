@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-20
-**Session:** Phase 17 IN PROGRESS (17-01 complete, 2 plans remaining)
+**Session:** Phase 17 IN PROGRESS (17-01, 17-02 complete, 1 plan remaining)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 17 IN PROGRESS (Divine Response) -- 17-01 complete, 17-02 and 17-03 remaining
+**Current focus:** Phase 17 IN PROGRESS (Divine Response) -- 17-01, 17-02 complete, 17-03 remaining
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 17 of 19 (Divine Response) -- IN PROGRESS
-**Plan:** 1 of 3 Phase 17 plans complete (17-01)
+**Plan:** 2 of 3 Phase 17 plans complete (17-01, 17-02)
 **Status:** In progress
-**Last activity:** 2026-02-20 -- Completed 17-01-PLAN.md (AI chat foundation)
+**Last activity:** 2026-02-20 -- Completed 17-02-PLAN.md (chat UI components + hook)
 
-Progress: [█████████████████████████████████████░░] 95% (37/39 plans -- Phase 17 plan 01 complete)
+Progress: [██████████████████████████████████████░] 97% (38/39 plans -- Phase 17 plan 02 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01)
+- Total plans completed: 38 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -164,10 +164,16 @@ Progress: [███████████████████████
 - **[17-01]** Chat history cap at 20 messages sent to Gemini; each text sanitized to 500 chars max
 - **[17-01]** Chat localStorage persistence with LRU eviction (50 messages/vehicle, 5 vehicles max)
 - **[17-01]** Profile identification requires 2+ messages before classification (prevents premature profiling from single keyword)
+- **[17-02]** useDivineChat reuses getSessionId from trackingService (consistent session across tracking and chat)
+- **[17-02]** ChatWidget focus management uses 100ms setTimeout for post-animation input focus
+- **[17-02]** react-markdown used only for model messages (user messages plain text to avoid markdown injection)
+- **[17-02]** Chat panel z-index 9998 (below mobile menu z-99999 so menu overlays chat)
+- **[17-02]** Streaming placeholder uses 3-dot CSS animate-pulse with 0/150/300ms staggered delays
 
 ### Completed Work (Phase 17) -- IN PROGRESS
 
 - **17-01 (complete):** AI chat foundation. chatProfiles.ts (5 profile types, bilingual keyword signals, identifyProfile function with priority scoring). divine-chat/index.ts Edge Function (Gemini proxy with CORS, rate limiting, input validation, PCP-adapted system prompts, streaming response, error fallback). divineChatService.ts (sendChatMessage fetch wrapper, localStorage chat persistence with LRU eviction, VehicleContext/ChatMessage/ChatRequest interfaces).
+- **17-02 (complete):** Chat UI components + hook. useDivineChat.ts (streaming response parsing, profile identification, localStorage auto-save, abort controller, bilingual error messages). ChatWidget.tsx (floating gold button bottom-right z-9998, mobile fullscreen / desktop 400x600 panel, Escape key, focus management). ChatMessage.tsx (role-based styling, react-markdown for model, pulsing dots for streaming). ChatInput.tsx (single-line, Enter submit, auto-focus, 48px touch target). ChatFallback.tsx (error state with phone CTA). 12 chat translation keys in en + es.
 
 ### Completed Work (Phase 9)
 
@@ -281,6 +287,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-20
-**Stopped at:** Completed 17-01-PLAN.md (AI chat foundation: profiles + Edge Function + client service)
+**Stopped at:** Completed 17-02-PLAN.md (chat UI components + hook)
 **Resume file:** None
-**Resume:** Phase 17 plan 01 complete (3 files created). Next: 17-02 (chat hook + widget components) then 17-03 (integration + translations). Edge Function needs GEMINI_API_KEY secret set before live testing.
+**Resume:** Phase 17 plans 01+02 complete (8 files created). Next: 17-03 (integration into VehicleDetail + App.tsx wiring). Edge Function needs GEMINI_API_KEY secret set before live testing.
