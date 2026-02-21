@@ -216,11 +216,11 @@ Plans:
   2. A visitor who saved a vehicle receives an SMS within 4 hours with a scarcity signal based on real view data
   3. A visitor who abandoned a form mid-completion receives a message within 1 hour acknowledging their saved progress
   4. A returning visitor sees their previously viewed vehicles surfaced prominently without needing to search again
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 18-01: TBD
-- [ ] 18-02: TBD
+- [ ] 18-01-PLAN.md -- Database migration (follow_up_queue, enqueue function, cancel trigger, pg_cron) + process-follow-up-queue Edge Function (SMS/email/voice dispatch)
+- [ ] 18-02-PLAN.md -- Frontend: preferred_language capture, consent text on forms, AdminFollowUpPanel, FOLLOW-05 return visitor badge
 
 ### Phase 19: Retention Engine
 **Goal**: Every buyer becomes a node in a referral network -- the Owner Portal reinforces their purchase decision, the Family Circle program incentivizes referrals, and the review engine builds social proof
