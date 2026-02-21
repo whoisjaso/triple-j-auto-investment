@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-20
-**Session:** Phase 17 IN PROGRESS (17-01, 17-02 complete, 1 plan remaining)
+**Session:** Phase 17 COMPLETE (all 3 plans done)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 17 IN PROGRESS (Divine Response) -- 17-01, 17-02 complete, 17-03 remaining
+**Current focus:** Phase 17 COMPLETE (Divine Response) -- all 3 plans done. v2.0 automated phases complete.
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -30,17 +30,17 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
-**Phase:** 17 of 19 (Divine Response) -- IN PROGRESS
-**Plan:** 2 of 3 Phase 17 plans complete (17-01, 17-02)
-**Status:** In progress
-**Last activity:** 2026-02-20 -- Completed 17-02-PLAN.md (chat UI components + hook)
+**Phase:** 17 of 19 (Divine Response) -- COMPLETE
+**Plan:** 3 of 3 Phase 17 plans complete (17-01, 17-02, 17-03)
+**Status:** Phase 17 complete
+**Last activity:** 2026-02-20 -- Completed 17-03-PLAN.md (chat integration + Retell updates)
 
-Progress: [██████████████████████████████████████░] 97% (38/39 plans -- Phase 17 plan 02 complete)
+Progress: [████████████████████████████████████████] 100% (39/39 plans -- Phase 17 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02)
+- Total plans completed: 39 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02, 17-03)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -169,11 +169,16 @@ Progress: [███████████████████████
 - **[17-02]** react-markdown used only for model messages (user messages plain text to avoid markdown injection)
 - **[17-02]** Chat panel z-index 9998 (below mobile menu z-99999 so menu overlays chat)
 - **[17-02]** Streaming placeholder uses 3-dot CSS animate-pulse with 0/150/300ms staggered delays
+- **[17-03]** chat_open tracking uses prevOpenRef pattern in ChatWidget (not callback prop) to avoid indirection
+- **[17-03]** chat_message tracking placed in useDivineChat sendMessage (centralizes tracking with chat logic)
+- **[17-03]** General dealership chat on Inventory uses Vehicle object with id='general', price=0, mileage=0 so system prompt focuses on dealership knowledge
+- **[17-03]** Retell rental detection checks three inquiry_source values for backward compatibility
 
-### Completed Work (Phase 17) -- IN PROGRESS
+### Completed Work (Phase 17) -- ALL COMPLETE
 
 - **17-01 (complete):** AI chat foundation. chatProfiles.ts (5 profile types, bilingual keyword signals, identifyProfile function with priority scoring). divine-chat/index.ts Edge Function (Gemini proxy with CORS, rate limiting, input validation, PCP-adapted system prompts, streaming response, error fallback). divineChatService.ts (sendChatMessage fetch wrapper, localStorage chat persistence with LRU eviction, VehicleContext/ChatMessage/ChatRequest interfaces).
 - **17-02 (complete):** Chat UI components + hook. useDivineChat.ts (streaming response parsing, profile identification, localStorage auto-save, abort controller, bilingual error messages). ChatWidget.tsx (floating gold button bottom-right z-9998, mobile fullscreen / desktop 400x600 panel, Escape key, focus management). ChatMessage.tsx (role-based styling, react-markdown for model, pulsing dots for streaming). ChatInput.tsx (single-line, Enter submit, auto-focus, 48px touch target). ChatFallback.tsx (error state with phone CTA). 12 chat translation keys in en + es.
+- **17-03 (complete):** Integration wiring. ChatWidget integrated into VehicleDetail.tsx (with vehicle prop) and Inventory.tsx (with general dealership context). TrackingEventType extended with chat_open + chat_message. chat_open tracked on panel open via prevOpenRef. chat_message tracked on each user send with messageCount + profile. retellService.ts updated: is_rental/daily_rate/weekly_rate dynamic variables for rental inquiries, preferred_language in metadata for bilingual support, phone number (832) 400-9760 in all error paths.
 
 ### Completed Work (Phase 9)
 
@@ -236,6 +241,10 @@ Progress: [███████████████████████
 - **16-05 (complete):** Integration wiring. AdminBehaviorPanel.tsx (3-section admin panel: top viewed vehicles, recent sessions, attribution breakdown). Dashboard.tsx: collapsible Behavior Intelligence section (default collapsed). App.tsx: useSessionTracking() for page_view on every route change + captureInitialUtm() on mount for UTM capture.
 - **16-06 (complete):** Gap closure. Fixed Inventory.tsx VehicleCard runtime crash (undeclared badges variable). Added urgency badges to VehicleDetail.tsx Section 4 alongside verified badge. Wired fire-once form_open tracking on Level 1/2/3 engagement forms via onClickCapture. Passed onFirstInteraction to PaymentCalculator for calculator_use event. All Phase 16 verification gaps resolved.
 
+### Remaining Phase 17 Work
+
+None -- Phase 17 is fully complete (all 3 plans done).
+
 ### Remaining Phase 16 Work
 
 None -- Phase 16 is fully complete (all 5 plans + gap closure plan 06 done).
@@ -287,6 +296,6 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 ## Session Continuity
 
 **Last session:** 2026-02-20
-**Stopped at:** Completed 17-02-PLAN.md (chat UI components + hook)
+**Stopped at:** Completed 17-03-PLAN.md (chat integration + Retell updates) -- Phase 17 COMPLETE
 **Resume file:** None
-**Resume:** Phase 17 plans 01+02 complete (8 files created). Next: 17-03 (integration into VehicleDetail + App.tsx wiring). Edge Function needs GEMINI_API_KEY secret set before live testing.
+**Resume:** Phase 17 fully complete (all 3 plans). 39/39 v2.0 automated plans done. Remaining work: Phase 9 manual items (secrets, deployment, data migration, E2E test). Edge Function needs GEMINI_API_KEY secret set for live chat testing.
