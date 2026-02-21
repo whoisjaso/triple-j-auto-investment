@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-20
-**Session:** Phase 16 VERIFIED COMPLETE (all 6 plans done, 4/4 must-haves passed)
+**Session:** Phase 17 IN PROGRESS (17-01 complete, 2 plans remaining)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 16 VERIFIED COMPLETE -- next up: Phase 17 (Divine Response)
+**Current focus:** Phase 17 IN PROGRESS (Divine Response) -- 17-01 complete, 17-02 and 17-03 remaining
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -30,17 +30,17 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
-**Phase:** 16 of 19 (Behavioral Intelligence) -- VERIFIED COMPLETE
-**Plan:** All 6 Phase 16 plans complete (including gap closure 16-06)
-**Status:** Phase verified (4/4 must-haves passed)
-**Last activity:** 2026-02-20 -- Phase 16 verification passed, ROADMAP/REQUIREMENTS updated
+**Phase:** 17 of 19 (Divine Response) -- IN PROGRESS
+**Plan:** 1 of 3 Phase 17 plans complete (17-01)
+**Status:** In progress
+**Last activity:** 2026-02-20 -- Completed 17-01-PLAN.md (AI chat foundation)
 
-Progress: [████████████████████████████████████] 100% (36/36 plans -- Phase 16 complete with gap closure)
+Progress: [█████████████████████████████████████░░] 95% (37/39 plans -- Phase 17 plan 01 complete)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 36 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06)
+- Total plans completed: 37 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -159,6 +159,15 @@ Progress: [███████████████████████
 - **[16-05]** Behavior Intelligence section default collapsed on admin dashboard (keeps financial view clean)
 - **[16-05]** Admin panel fetches once on mount/expand (no auto-refresh) to reduce unnecessary Supabase queries
 - **[16-06]** Section 4 in VehicleDetail uses IIFE pattern to compute badges inline and conditionally render section when either verified or urgency badges exist
+- **[17-01]** Gemini API key stored as Deno.env.get server-side secret for chat (not VITE_ prefixed) to prevent public exposure
+- **[17-01]** In-memory rate limiting (3 messages per 10 seconds per session) sufficient for Edge Function short-lived instances
+- **[17-01]** Chat history cap at 20 messages sent to Gemini; each text sanitized to 500 chars max
+- **[17-01]** Chat localStorage persistence with LRU eviction (50 messages/vehicle, 5 vehicles max)
+- **[17-01]** Profile identification requires 2+ messages before classification (prevents premature profiling from single keyword)
+
+### Completed Work (Phase 17) -- IN PROGRESS
+
+- **17-01 (complete):** AI chat foundation. chatProfiles.ts (5 profile types, bilingual keyword signals, identifyProfile function with priority scoring). divine-chat/index.ts Edge Function (Gemini proxy with CORS, rate limiting, input validation, PCP-adapted system prompts, streaming response, error fallback). divineChatService.ts (sendChatMessage fetch wrapper, localStorage chat persistence with LRU eviction, VehicleContext/ChatMessage/ChatRequest interfaces).
 
 ### Completed Work (Phase 9)
 
@@ -265,12 +274,13 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 - A2P 10DLC registration may take days/weeks -- start early
 - Resend domain verification needs 48+ hours DNS propagation
 - Edge Function secrets not set yet -- functions will fail on invocation until configured
+- divine-chat Edge Function needs GEMINI_API_KEY secret set for live chat testing
 
 ---
 
 ## Session Continuity
 
 **Last session:** 2026-02-20
-**Stopped at:** Phase 16 verified complete (4/4 must-haves passed). ROADMAP, STATE, REQUIREMENTS updated.
+**Stopped at:** Completed 17-01-PLAN.md (AI chat foundation: profiles + Edge Function + client service)
 **Resume file:** None
-**Resume:** Phase 16 (Behavioral Intelligence) fully verified. All 6 plans done (16-01 through 16-06). Next: Phase 17 (Divine Response) needs planning. Remaining Phase 9 items are manual.
+**Resume:** Phase 17 plan 01 complete (3 files created). Next: 17-02 (chat hook + widget components) then 17-03 (integration + translations). Edge Function needs GEMINI_API_KEY secret set before live testing.
