@@ -88,7 +88,7 @@ export interface Attribution {
 }
 
 // Phase 16: Behavioral Intelligence
-export type TrackingEventType = 'page_view' | 'vehicle_view' | 'cta_click' | 'form_open' | 'calculator_use' | 'save_toggle' | 'dwell';
+export type TrackingEventType = 'page_view' | 'vehicle_view' | 'cta_click' | 'form_open' | 'calculator_use' | 'save_toggle' | 'dwell' | 'chat_open' | 'chat_message';
 
 export interface TrackingEvent {
   session_id: string;

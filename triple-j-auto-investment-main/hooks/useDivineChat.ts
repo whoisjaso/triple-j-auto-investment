@@ -13,7 +13,8 @@ import {
 import type { ChatMessage, VehicleContext } from '../services/divineChatService';
 import { identifyProfile } from '../utils/chatProfiles';
 import type { ProfileType } from '../utils/chatProfiles';
-import { getSessionId } from '../services/trackingService';
+import { getSessionId, trackEvent } from '../services/trackingService';
+import type { TrackingEventType } from '../types';
 
 export function useDivineChat(
   vehicleContext: VehicleContext,
@@ -82,6 +83,14 @@ export function useDivineChat(
       ];
       const identified = identifyProfile(allUserTexts);
       setProfile(identified);
+
+      // Track chat_message event
+      trackEvent({
+        event_type: 'chat_message' as TrackingEventType,
+        vehicle_id: vehicleId,
+        page_path: window.location.pathname,
+        metadata: { messageCount: allUserTexts.length, profile: identified },
+      });
 
       // Create placeholder model message for streaming
       const placeholderId = crypto.randomUUID();

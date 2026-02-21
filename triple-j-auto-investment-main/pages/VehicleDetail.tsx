@@ -15,6 +15,7 @@ import { PhoneCaptureForm } from '../components/PhoneCaptureForm';
 import { ScheduleVisitForm } from '../components/ScheduleVisitForm';
 import { AskQuestionForm } from '../components/AskQuestionForm';
 import { ReserveVehicleSection } from '../components/ReserveVehicleSection';
+import { ChatWidget } from '../components/chat/ChatWidget';
 import { useUrgencyBadges } from '../hooks/useUrgencyBadges';
 import { UrgencyBadge } from '../components/UrgencyBadge';
 import { parseVehicleSlug, generateVehicleSlug } from '../utils/vehicleSlug';
@@ -737,6 +738,9 @@ const VehicleDetail: React.FC = () => {
         isOpen={galleryOpen}
         onClose={() => setGalleryOpen(false)}
       />
+
+      {/* Phase 17: Chat Widget with vehicle context */}
+      <ChatWidget vehicle={vehicle} />
     </>
   );
 };

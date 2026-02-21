@@ -12,8 +12,9 @@ import { useDivineChat } from '../../hooks/useDivineChat';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
 import { ChatFallback } from './ChatFallback';
-import type { Vehicle } from '../../types';
+import type { Vehicle, TrackingEventType } from '../../types';
 import type { VehicleContext } from '../../services/divineChatService';
+import { trackEvent, getSessionId } from '../../services/trackingService';
 
 interface ChatWidgetProps {
   vehicle: Vehicle;
@@ -79,6 +80,23 @@ export const ChatWidget: React.FC<ChatWidgetProps> = ({ vehicle }) => {
       chatButtonRef.current?.focus();
     }
   }, [isOpen]);
+
+  // ================================================================
+  // TRACKING: fire chat_open when panel opens
+  // ================================================================
+
+  const prevOpenRef = useRef(false);
+  useEffect(() => {
+    if (isOpen && !prevOpenRef.current) {
+      trackEvent({
+        event_type: 'chat_open' as TrackingEventType,
+        vehicle_id: vehicle.id,
+        page_path: window.location.pathname,
+        metadata: {},
+      });
+    }
+    prevOpenRef.current = isOpen;
+  }, [isOpen, vehicle.id]);
 
   // ================================================================
   // CHAT TRANSLATIONS

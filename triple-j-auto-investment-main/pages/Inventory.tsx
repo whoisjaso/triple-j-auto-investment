@@ -20,11 +20,27 @@ import { RecentlyViewedRow } from '../components/RecentlyViewedRow';
 import { Heart } from 'lucide-react';
 import { useUrgencyBadges } from '../hooks/useUrgencyBadges';
 import { UrgencyBadge } from '../components/UrgencyBadge';
+import { ChatWidget } from '../components/chat/ChatWidget';
 import type { UrgencyBadgeData } from '../services/urgencyService';
 
 type SortOption = 'alphabetical' | 'price_desc' | 'price_asc' | 'year_desc' | 'year_asc' | 'mileage_asc';
 
 const isRentable = (_v: Vehicle): boolean => true;
+
+// General dealership context for inventory page chat (no specific vehicle)
+const generalChatVehicle: Vehicle = {
+  id: 'general',
+  make: 'Triple J',
+  model: 'Auto Investment',
+  year: new Date().getFullYear(),
+  price: 0,
+  mileage: 0,
+  cost: 0,
+  vin: '',
+  status: VehicleStatus.AVAILABLE,
+  description: 'Browse our inventory of pre-owned vehicles in the $3,000-$8,000 range.',
+  imageUrl: '',
+};
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -1434,6 +1450,9 @@ const Inventory = () => {
         onClose={() => setCardGalleryOpen(false)}
       />
     </div>
+
+    {/* Phase 17: Chat Widget with general dealership context */}
+    <ChatWidget vehicle={generalChatVehicle} />
     </>
   );
 };
