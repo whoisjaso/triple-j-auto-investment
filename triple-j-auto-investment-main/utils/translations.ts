@@ -893,6 +893,20 @@ export const t = {
             openMenu: "Open menu",
             closeMenu: "Close menu",
             switchLanguage: "Switch language"
+        },
+        chat: {
+            title: "Triple J Assistant",
+            subtitle: "Ask about this vehicle",
+            openChat: "Chat with us",
+            closeChat: "Close chat",
+            placeholder: "Ask about this vehicle...",
+            welcome: "Hi! I can help you learn about this vehicle. What would you like to know?",
+            thinking: "Thinking...",
+            errorMessage: "Chat is temporarily unavailable. Call us at (832) 400-9760.",
+            callUs: "Call (832) 400-9760",
+            clearChat: "Clear conversation",
+            poweredBy: "AI Assistant",
+            maxReached: "For a longer conversation, call us at (832) 400-9760."
         }
     },
     es: {
@@ -1787,6 +1801,20 @@ export const t = {
             openMenu: "Abrir menu",
             closeMenu: "Cerrar menu",
             switchLanguage: "Cambiar idioma"
+        },
+        chat: {
+            title: "Asistente Triple J",
+            subtitle: "Pregunte sobre este vehiculo",
+            openChat: "Chatear con nosotros",
+            closeChat: "Cerrar chat",
+            placeholder: "Pregunte sobre este vehiculo...",
+            welcome: "Hola! Puedo ayudarle con informacion sobre este vehiculo. Que le gustaria saber?",
+            thinking: "Pensando...",
+            errorMessage: "El chat no esta disponible temporalmente. Llamenos al (832) 400-9760.",
+            callUs: "Llamar (832) 400-9760",
+            clearChat: "Borrar conversacion",
+            poweredBy: "Asistente IA",
+            maxReached: "Para una conversacion mas larga, llamenos al (832) 400-9760."
         }
     }
 };
