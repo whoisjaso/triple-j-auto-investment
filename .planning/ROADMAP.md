@@ -200,12 +200,12 @@ Plans:
   2. Within 2-3 exchanges, the chat adapts its communication style based on the visitor's identified profile (Provider/Skeptic/First-Timer/Struggler)
   3. The Retell AI voice agent correctly handles rental inquiries and responds in Spanish when the caller speaks Spanish
   4. When AI services are down, the chat widget shows a direct phone number and the Retell fallback displays the dealership contact information
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 17-01: TBD
-- [ ] 17-02: TBD
-- [ ] 17-03: TBD
+- [ ] 17-01-PLAN.md -- Chat foundation: profile identification utility, Supabase Edge Function (Gemini proxy with PCP framework), client chat service
+- [ ] 17-02-PLAN.md -- Chat UI: useDivineChat hook (streaming, profile tracking, persistence), ChatWidget/ChatMessage/ChatInput/ChatFallback components, bilingual translations
+- [ ] 17-03-PLAN.md -- Integration: ChatWidget on VehicleDetail + Inventory pages, Retell rental context + Spanish support + fallback, chat tracking events
 
 ### Phase 18: Behavioral Follow-Up
 **Goal**: Visitors who leave without converting receive timely, behavior-appropriate re-engagement messages that feel like service, not spam
@@ -255,7 +255,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 14. Expectancy Building | v2.0 | 4/4 | Complete | 2026-02-18 |
 | 15. Engagement Spectrum | v2.0 | 3/3 | Complete | 2026-02-19 |
 | 16. Behavioral Intelligence | v2.0 | 6/6 | Complete | 2026-02-20 |
-| 17. Divine Response | v2.0 | 0/TBD | Not started | - |
+| 17. Divine Response | v2.0 | 0/3 | Planning complete | - |
 | 18. Behavioral Follow-Up | v2.0 | 0/TBD | Not started | - |
 | 19. Retention Engine | v2.0 | 0/TBD | Not started | - |
 
