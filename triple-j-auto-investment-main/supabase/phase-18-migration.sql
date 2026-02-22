@@ -60,11 +60,13 @@ CREATE TABLE IF NOT EXISTS public.follow_up_queue (
 
 -- ---------------------------------------------------------------------------
 -- 2a. Deduplication index
--- Prevents duplicate pending messages per lead per trigger type.
--- A lead can only have one unsent/uncancelled message per trigger type.
+-- Prevents duplicate pending messages per lead per trigger type per channel.
+-- A lead can have one unsent/uncancelled message per (trigger_type, channel) combo.
+-- This permits Tier 3 (abandon) to enqueue BOTH sms and email rows for the same
+-- lead via CROSS JOIN unnest, while still blocking true duplicates.
 -- ---------------------------------------------------------------------------
 CREATE UNIQUE INDEX IF NOT EXISTS uq_pending_follow_up
-  ON public.follow_up_queue (lead_id, trigger_type)
+  ON public.follow_up_queue (lead_id, trigger_type, channel)
   WHERE sent = false AND cancelled = false;
 
 -- ---------------------------------------------------------------------------
