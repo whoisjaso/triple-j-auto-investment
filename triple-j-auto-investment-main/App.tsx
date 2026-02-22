@@ -12,6 +12,7 @@ import { OfflineBanner } from './components/OfflineBanner';
 import { ConnectionErrorBanner } from './components/ConnectionErrorBanner';
 import { useSessionTracking } from './hooks/useSessionTracking';
 import { captureInitialUtm } from './services/attributionService';
+import { NoiseOverlay, SmoothScroll } from './components/luxury';
 
 // Critical Pages (Eagerly Loaded)
 import Home from './pages/Home';
@@ -155,83 +156,68 @@ const Navbar = () => {
   const NavLink = ({ to, label }: { to: string, label: string }) => (
     <Link
       to={to}
-      className={`group relative flex flex-col items-center px-6 py-4 transition-all duration-700 ${location.pathname === to ? 'opacity-100' : 'opacity-50 hover:opacity-100'}`}
+      className={`link-brutal ${location.pathname === to ? 'opacity-100' : 'opacity-40 hover:opacity-100'}`}
       onClick={() => setIsOpen(false)}
     >
-      <span className={`text-[10px] uppercase tracking-[0.3em] font-display ${location.pathname === to ? 'text-tj-gold' : 'text-white'} group-hover:text-tj-gold transition-colors`}>
-        {label}
-      </span>
-      {/* Clean, sophisticated active indicator - Underline instead of floating dot */}
-      <span className={`absolute bottom-3 w-full h-[1px] bg-tj-gold transition-all duration-500 ${location.pathname === to ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0 group-hover:scale-x-50 group-hover:opacity-50'}`}></span>
+      {label}
     </Link>
   );
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50">
-      <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black via-black/90 to-transparent pointer-events-none h-32 transition-opacity duration-500"></div>
+    <nav className="fixed top-0 left-0 right-0 z-50 flex flex-col justify-start">
+      <div className="absolute inset-x-0 top-0 bg-gradient-to-b from-black via-black/90 to-transparent pointer-events-none h-32 transition-opacity duration-700"></div>
 
-      <div className="border-b border-white/5 relative z-10">
+      <div className="relative z-10">
         <div className="max-w-[1920px] mx-auto px-6 md:px-12">
-          <div className="relative flex justify-between items-center h-24 md:h-32">
+          <div className="relative flex justify-between items-start h-32 pt-8">
 
-            {/* Left Axis: Operational */}
-            <div className="hidden md:flex flex-1 items-center justify-start space-x-10 pl-12">
-              <NavLink to="/inventory" label={t.nav.inventory} />
-              <NavLink to="/vin" label={t.vinLookup.badge} />
-            </div>
-
-            {/* CENTER AXIS: OFFICIAL LOGO */}
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[100]">
-              <button onClick={handleLogoClick} className="group relative flex flex-col items-center justify-center cursor-pointer bg-transparent border-none p-0">
+            {/* STRICT LEFT ANCHOR: LOGO */}
+            <div className="flex-shrink-0 z-[100]">
+              <button
+                onClick={handleLogoClick}
+                className="group relative flex items-center justify-start cursor-pointer bg-transparent border-none p-0 focus:outline-none"
+              >
                 <img
                   src="/GoldTripleJLogo.png"
                   alt="Triple J Auto Investment Logo"
-                  className="w-20 h-20 md:w-24 md:h-24 object-contain transition-transform duration-700 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(212,175,55,0.5)]"
+                  className="w-16 h-16 md:w-20 md:h-20 object-contain text-left"
                 />
               </button>
             </div>
 
-            {/* Right Axis: Philosophical */}
-            <div className="hidden md:flex flex-1 items-center justify-end space-x-8 pr-12">
-              {/* Se Habla Espanol -- persistent cultural indicator */}
-              <span className="text-[9px] uppercase tracking-[0.2em] text-tj-gold/70 font-display border border-tj-gold/20 px-3 py-1 rounded-full select-none">
-                {t.home.seHabla}
-              </span>
+            {/* STRICT RIGHT ANCHOR: NAVIGATION & TOOLS */}
+            <div className="hidden md:flex items-start justify-end gap-12 z-[100]">
 
-              {/* Language Toggle */}
-              <button
-                onClick={toggleLang}
-                className="flex items-center gap-2 text-[9px] uppercase tracking-widest text-gray-400 hover:text-white transition-colors mr-4"
-              >
-                <Globe size={12} />
-                <span>{lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}</span>
-              </button>
-
-              {!user ? (
-                <>
+              <div className="flex flex-col items-end gap-6 pt-2">
+                <div className="flex items-center gap-8">
+                  <NavLink to="/inventory" label={t.nav.inventory} />
+                  <NavLink to="/vin" label={t.vinLookup.badge} />
                   <NavLink to="/about" label={t.nav.about} />
-                  <Link to="/login" className="opacity-50 hover:opacity-100 hover:text-tj-gold transition-all p-2" aria-label="Restricted Access">
-                    <Lock size={12} />
-                  </Link>
-                </>
-              ) : (
-                <div className="flex items-center gap-8 border-l border-white/10 pl-8">
-                  <Link to="/admin/dashboard" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('dashboard') ? 'text-tj-gold' : 'text-gray-400'}`}>
-                    <LayoutDashboard size={14} /> Command
-                  </Link>
-                  <Link to="/admin/inventory" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('inventory') ? 'text-tj-gold' : 'text-gray-400'}`}>
-                    <Car size={14} /> Assets
-                  </Link>
-                  <Link to="/admin/registrations" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('registrations') ? 'text-tj-gold' : 'text-gray-400'}`}>
-                    <ShieldCheck size={14} /> Ledger
-                  </Link>
-                  <Link to="/admin/rentals" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('rentals') ? 'text-tj-gold' : 'text-gray-400'}`}>
-                    <Key size={14} /> Rentals
-                  </Link>
-                  <Link to="/admin/plates" className={`flex items-center gap-2 text-[10px] uppercase tracking-widest hover:text-tj-gold transition-colors ${location.pathname.includes('plates') ? 'text-tj-gold' : 'text-gray-400'}`}>
-                    <CreditCard size={14} /> Plates
-                  </Link>
-                  <button onClick={logout} className="text-[10px] uppercase tracking-widest text-red-900 hover:text-red-500 transition-colors ml-4">Logout</button>
+                </div>
+
+                <div className="flex items-center gap-6 text-[9px] uppercase tracking-micro text-gray-500">
+                  <span className="font-display text-tj-gold">{t.home.seHabla}</span>
+                  <button onClick={toggleLang} className="hover:text-white transition-colors uppercase tracking-micro">
+                    {lang === 'en' ? 'ESPAÑOL' : 'ENGLISH'}
+                  </button>
+                  {!user ? (
+                    <Link to="/login" className="hover:text-white transition-colors uppercase tracking-micro" aria-label="Dealer Login">
+                      LOGIN
+                    </Link>
+                  ) : (
+                    <button onClick={logout} className="text-red-800 hover:text-red-500 transition-colors uppercase tracking-micro">Logout</button>
+                  )}
+                </div>
+              </div>
+
+              {user && (
+                <div className="flex flex-col items-end gap-4 hairline-l pl-8 pb-4">
+                  <span className="text-[8px] uppercase tracking-ultra text-tj-gold mb-2">Command</span>
+                  <Link to="/admin/dashboard" className={`link-brutal ${location.pathname.includes('dashboard') ? 'text-tj-gold' : 'text-gray-400'}`}>Dashboard</Link>
+                  <Link to="/admin/inventory" className={`link-brutal ${location.pathname.includes('inventory') ? 'text-tj-gold' : 'text-gray-400'}`}>Assets</Link>
+                  <Link to="/admin/registrations" className={`link-brutal ${location.pathname.includes('registrations') ? 'text-tj-gold' : 'text-gray-400'}`}>Ledger</Link>
+                  <Link to="/admin/rentals" className={`link-brutal ${location.pathname.includes('rentals') ? 'text-tj-gold' : 'text-gray-400'}`}>Rentals</Link>
+                  <Link to="/admin/plates" className={`link-brutal ${location.pathname.includes('plates') ? 'text-tj-gold' : 'text-gray-400'}`}>Plates</Link>
                 </div>
               )}
             </div>
@@ -380,13 +366,13 @@ const Footer = () => {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-black text-gray-400 py-16 md:py-20 border-t border-white/5 relative overflow-hidden">
-      {/* Background Crest Watermark */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none opacity-[0.03]">
+    <footer className="bg-tj-darker text-gray-400 py-24 md:py-32 hairline-t relative overflow-hidden">
+      {/* Background Crest Watermark (Slowly floating and pulsing) */}
+      <div className="absolute top-0 right-0 pointer-events-none select-none opacity-[0.03] mix-blend-screen -mt-20 -mr-20">
         <img
           src="/GoldTripleJLogo.png"
           alt=""
-          className="w-[40vw] max-w-[500px] h-auto"
+          className="w-[60vw] max-w-[800px] h-auto"
           aria-hidden="true"
         />
       </div>
@@ -394,110 +380,114 @@ const Footer = () => {
       <div className="max-w-[1400px] mx-auto px-6 relative z-10 grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-16">
 
         {/* ABOUT & BRANDING */}
-        <div className="flex flex-col items-start md:col-span-1">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-col items-start md:col-span-1 hairline-r pr-8">
+          <div className="flex items-start gap-3 mb-8">
             <img
               src="/GoldTripleJLogo.png"
               alt="Triple J Auto Investment"
-              className="w-12 h-12 object-contain"
+              className="w-16 h-16 object-contain"
             />
-            <div>
-              <p className="text-white font-display text-lg tracking-wider leading-tight">TRIPLE J</p>
-              <p className="text-gray-400 text-[10px] uppercase tracking-widest">Auto Investment</p>
+            <div className="pt-1">
+              <p className="text-white font-display text-2xl tracking-[0.2em] leading-none mb-2">TRIPLE J</p>
+              <p className="text-tj-gold text-[8px] uppercase tracking-ultra">Auto Investment</p>
             </div>
           </div>
-          <p className="text-xs text-gray-400 italic mb-6">{t.footer.tagline}</p>
+          <p className="text-[11px] text-gray-500 uppercase tracking-widest leading-loose mb-12">{t.footer.tagline}</p>
 
           {/* Social Media Links */}
-          <div className="mb-6">
-            <p className="text-[10px] uppercase tracking-widest text-gray-400 mb-3">{t.footer.followUs}</p>
-            <div className="flex items-center gap-2">
+          <div className="mb-8 w-full hairline-t pt-8">
+            <p className="text-[8px] uppercase tracking-ultra text-tj-gold mb-6 block w-full">{t.footer.followUs}</p>
+            <div className="flex items-start gap-4">
               <a
                 href="https://www.facebook.com/thetriplejauto"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-tj-gold transition-colors p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="text-gray-500 hover:text-white transition-colors"
                 aria-label="Facebook"
               >
-                <Facebook size={20} />
+                <Facebook size={16} />
               </a>
               <a
                 href="https://x.com/thetriplejauto"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-tj-gold transition-colors p-3 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                className="text-gray-500 hover:text-white transition-colors"
                 aria-label="X (Twitter)"
               >
-                <Twitter size={20} />
+                <Twitter size={16} />
               </a>
             </div>
           </div>
 
-          <p className="text-[10px] uppercase tracking-widest text-gray-400 mt-auto">
+          <p className="text-[8px] uppercase tracking-ultra text-gray-600 mt-auto pt-8 hairline-t w-full">
             &copy; {new Date().getFullYear()} {t.footer.copyright}. {t.footer.rights}
           </p>
         </div>
 
         {/* LOCATION & CONTACT */}
-        <div className="flex flex-col items-start">
-          <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">{t.footer.location.toUpperCase()}</h3>
-          <div className="mb-4">
+        <div className="flex flex-col items-start hairline-r pr-8">
+          <h3 className="text-white font-bold tracking-ultra text-[9px] uppercase mb-8 hairline-b border-white/10 pb-4 w-full">{t.footer.location.toUpperCase()}</h3>
+          <div className="mb-8 w-full">
             <button
               onClick={openSmartMap}
-              className="not-italic text-sm text-gray-400 leading-loose text-left hover:text-tj-gold transition-colors group"
+              className="not-italic text-[11px] uppercase tracking-widest text-gray-500 leading-loose text-left hover:text-white transition-colors group flex items-start gap-4"
             >
-              <div className="flex items-center gap-2 mb-1">
-                <MapPin size={14} className="text-tj-gold group-hover:animate-bounce" />
-                <span>{t.footer.address}</span>
+              <MapPin size={12} className="text-tj-gold mt-1 flex-shrink-0" />
+              <div>
+                <span className="block">{t.footer.address}</span>
+                <span className="block text-gray-600">{t.footer.city}</span>
               </div>
-              <span className="pl-6 block">{t.footer.city}</span>
             </button>
           </div>
-          <div className="space-y-3 text-sm text-gray-400">
-            <a href="tel:+18324009760" className="flex items-center gap-2 hover:text-tj-gold transition-colors">
-              <Phone size={14} className="text-tj-gold" />
+          <div className="space-y-6 text-[11px] uppercase tracking-widest text-gray-500 w-full hairline-t border-white/10 pt-8">
+            <a href="tel:+18324009760" className="flex items-start gap-4 hover:text-white transition-colors">
+              <Phone size={12} className="text-tj-gold mt-1 flex-shrink-0" />
               <span>{t.footer.phone}</span>
             </a>
-            <div className="flex items-center gap-2">
-              <Clock size={14} className="text-tj-gold" />
+            <div className="flex items-start gap-4">
+              <Clock size={12} className="text-tj-gold mt-1 flex-shrink-0" />
               <div>
-                <p>{t.footer.hoursDetail}</p>
-                <p className="text-gray-400 text-xs">{t.footer.closed}</p>
+                <p className="mb-1">{t.footer.hoursDetail}</p>
+                <p className="text-gray-600">{t.footer.closed}</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* COMPLIANCE & LEGAL */}
-        <div className="flex flex-col items-start">
-          <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full flex items-center gap-2">
-            <ShieldCheck size={14} /> {t.footer.legal.toUpperCase()}
+        <div className="flex flex-col items-start hairline-r pr-8">
+          <h3 className="text-white font-bold tracking-ultra text-[9px] uppercase mb-8 hairline-b border-white/10 pb-4 w-full flex items-center justify-between">
+            <span>{t.footer.legal.toUpperCase()}</span>
+            <ShieldCheck size={12} className="text-tj-gold" />
           </h3>
-          <div className="mb-6 w-full">
-            <div className="flex justify-between items-center border-b border-white/5 pb-3 mb-3">
-              <span className="text-[10px] uppercase tracking-widest text-gray-400">{t.footer.dealerLicense}</span>
-              <span className="font-mono text-tj-gold text-sm">P171632</span>
+          <div className="mb-8 w-full">
+            <div className="flex justify-between items-start hairline-b border-white/10 pb-4 mb-4">
+              <span className="text-[9px] uppercase tracking-ultra text-gray-600">{t.footer.dealerLicense}</span>
+              <span className="font-mono text-tj-gold text-[10px]">P171632</span>
             </div>
           </div>
-          <ul className="space-y-1 text-[10px] uppercase tracking-widest text-gray-400 w-full">
-            <li><Link to="/legal/dmv" className="hover:text-tj-gold transition-colors block py-3">Texas DMV</Link></li>
-            <li><Link to="/legal/privacy" className="hover:text-tj-gold transition-colors block py-3">{t.footer.privacy}</Link></li>
-            <li><Link to="/legal/terms" className="hover:text-tj-gold transition-colors block py-3">{t.footer.terms}</Link></li>
-            <li><Link to="/legal/arbitration" className="hover:text-tj-gold transition-colors block py-3">Arbitration</Link></li>
-          </ul>
+          <div className="flex flex-col gap-4 w-full">
+            <Link to="/legal/dmv" className="link-brutal text-gray-500 self-start">Texas DMV</Link>
+            <Link to="/legal/privacy" className="link-brutal text-gray-500 self-start">{t.footer.privacy}</Link>
+            <Link to="/legal/terms" className="link-brutal text-gray-500 self-start">{t.footer.terms}</Link>
+            <Link to="/legal/arbitration" className="link-brutal text-gray-500 self-start">Arbitration</Link>
+          </div>
         </div>
 
         {/* QUICK LINKS */}
         <div className="flex flex-col items-start">
-          <h3 className="text-tj-gold font-bold tracking-[0.2em] text-[10px] uppercase mb-6 border-b border-tj-gold/20 pb-2 w-full">{t.footer.quickLinks.toUpperCase()}</h3>
-          <ul className="space-y-1 text-[10px] uppercase tracking-widest w-full">
-            <li><Link to="/inventory" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.nav.inventory}</Link></li>
-            <li><Link to="/about" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.nav.about}</Link></li>
-            <li><Link to="/services" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.nav.services}</Link></li>
-            <li><Link to="/vin" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.vinLookup.title}</Link></li>
-            <li><Link to="/contact" className="hover:text-white transition-colors block py-3 hover:translate-x-2 transition-transform duration-300">{t.footer.contact}</Link></li>
-            <li className="pt-4 border-t border-white/5 mt-4"><Link to="/login" className="hover:text-white transition-colors text-gray-400 flex items-center gap-2 py-3"><Lock size={10} /> {t.nav.login}</Link></li>
-          </ul>
+          <h3 className="text-white font-bold tracking-ultra text-[9px] uppercase mb-8 hairline-b border-white/10 pb-4 w-full">{t.footer.quickLinks.toUpperCase()}</h3>
+          <div className="flex flex-col gap-5 w-full">
+            <Link to="/inventory" className="link-brutal self-start text-gray-400">{t.nav.inventory}</Link>
+            <Link to="/about" className="link-brutal self-start text-gray-400">{t.nav.about}</Link>
+            <Link to="/services" className="link-brutal self-start text-gray-400">{t.nav.services}</Link>
+            <Link to="/vin" className="link-brutal self-start text-gray-400">{t.vinLookup.title}</Link>
+            <Link to="/contact" className="link-brutal self-start text-gray-400">{t.footer.contact}</Link>
+
+            <div className="hairline-t border-white/10 pt-5 mt-3 w-full">
+              <Link to="/login" className="link-brutal self-start text-tj-gold">{t.nav.login}</Link>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -576,6 +566,7 @@ const AppContent = () => {
   }, []);
 
   return (
+    <SmoothScroll>
     <div className="min-h-screen flex flex-col bg-tj-green text-gray-200 font-sans">
       {/* Skip to content - hidden off-screen, slides in on keyboard focus */}
       <a
@@ -639,7 +630,9 @@ const AppContent = () => {
         </main>
       </ErrorBoundary>
       <Footer />
+      <NoiseOverlay opacity={0.03} />
     </div>
+    </SmoothScroll>
   );
 }
 
