@@ -1,43 +1,37 @@
 import React, { useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useStore } from '../context/Store';
-import { ArrowRight, Diamond, Heart, Zap, Fingerprint, Target, Activity, Star, ChevronDown, Phone, Key, Users } from 'lucide-react';
+import { ArrowRight, ChevronDown, Phone, Key, Star, Users } from 'lucide-react';
 import { motion, useTransform, useSpring, useInView } from 'framer-motion';
 import { useLanguage } from '../context/LanguageContext';
 import { SEO } from '../components/SEO';
 import { ScrollReveal, AnimatedText, MagneticButton } from '../components/luxury';
 
-// --- COUNT-UP METRIC COMPONENT ---
-
-const CountUpNumber = ({ value, suffix = '', label, icon }: { value: number; suffix?: string; label: string; icon?: React.ReactNode }) => {
+// --- COUNT-UP METRIC ---
+const CountUpNumber = ({ value, suffix = '', label }: { value: number; suffix?: string; label: string }) => {
    const ref = useRef<HTMLDivElement>(null);
    const isInView = useInView(ref, { once: true, margin: "-100px" });
    const spring = useSpring(0, { mass: 0.8, stiffness: 75, damping: 15 });
    const display = useTransform(spring, (current) => Math.round(current).toLocaleString());
 
    useEffect(() => {
-      if (isInView) {
-         spring.set(value);
-      }
+      if (isInView) spring.set(value);
    }, [isInView, spring, value]);
 
    return (
       <div ref={ref} className="text-center">
-         {icon && <div className="flex justify-center mb-3 text-tj-gold/60">{icon}</div>}
-         <div className="text-3xl md:text-5xl font-display text-tj-gold mb-2 tabular-nums">
+         <div className="text-4xl md:text-6xl font-display text-tj-gold mb-3 tabular-nums">
             <motion.span>{display}</motion.span>
-            {suffix && <span className="text-tj-gold/70">{suffix}</span>}
+            {suffix && <span className="text-tj-gold/60">{suffix}</span>}
          </div>
-         <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-gray-400">{label}</p>
+         <p className="text-[10px] md:text-xs uppercase tracking-[0.3em] text-gray-500">{label}</p>
       </div>
    );
 };
 
-
 const Home = () => {
    const { vehicles } = useStore();
    const { t } = useLanguage();
-   // Get Top 3 Available Vehicles for Featured section
    const featuredVehicles = vehicles
       .filter(v => v.status === 'Available')
       .sort((a, b) => b.price - a.price)
@@ -45,11 +39,8 @@ const Home = () => {
 
    const hasVehicles = featuredVehicles.length > 0;
 
-   // TODO(business-data): Authority metrics -- update with real business data
-   // These are conservative placeholder estimates; replace with actual figures when available
-   // Search for "TODO(business-data)" to find all placeholder values
    const metrics = [
-      { value: 500, suffix: '+', label: t.home.authority.familiesServed, icon: <Users size={20} /> },
+      { value: 500, suffix: '+', label: t.home.authority.familiesServed },
       { value: 150, suffix: '+', label: t.home.authority.fiveStarReviews },
       { value: 3, suffix: '+', label: t.home.authority.yearsInBusiness },
       { value: 800, suffix: '+', label: t.home.authority.vehiclesDelivered },
@@ -69,11 +60,10 @@ const Home = () => {
             className="bg-tj-green overflow-hidden font-sans selection:bg-tj-gold selection:text-black"
          >
 
-            {/* --- PREMIUM SHOWROOM HERO --- */}
-            <div className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-
-               {/* Background: Hero image with Ken Burns */}
-               <div className="absolute inset-0 z-0">
+            {/* ===== HERO ===== */}
+            <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden">
+               {/* Background: Ken Burns vehicle image */}
+               <div className="absolute inset-0">
                   <div
                      className="absolute inset-0 animate-ken-burns will-change-transform"
                      style={{
@@ -82,155 +72,99 @@ const Home = () => {
                         backgroundPosition: 'center',
                      }}
                   />
-                  {/* Green gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-b from-tj-green/95 via-tj-green/80 to-tj-greenDeep/95" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-tj-green/60 to-transparent" />
-                  {/* Gold dust radial */}
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.06)_0%,transparent_70%)]" />
+                  <div className="absolute inset-0 bg-tj-green/90" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.04)_0%,transparent_60%)]" />
                </div>
 
-               {/* Gold corner accents */}
-               <div className="absolute top-24 left-6 md:left-12 w-16 h-16 border-t-2 border-l-2 border-tj-gold/40 z-10" />
-               <div className="absolute bottom-12 right-6 md:right-12 w-16 h-16 border-b-2 border-r-2 border-tj-gold/40 z-10" />
+               {/* Content — dead center */}
+               <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
+                  <motion.p
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     transition={{ duration: 1, delay: 0.2 }}
+                     className="text-tj-gold/60 text-[10px] uppercase tracking-[0.5em] mb-8"
+                  >
+                     {t.home.seHabla}
+                  </motion.p>
 
-               {/* Meta badges — top */}
-               <div className="absolute top-32 left-6 md:left-12 right-6 md:right-12 flex justify-between items-start z-10">
+                  <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl text-white leading-[0.9] uppercase mb-4">
+                     <AnimatedText text="TRIPLE J" type="chars" animation="fadeUp" delay={0.4} stagger={0.03} className="block" />
+                  </h1>
+                  <motion.p
+                     initial={{ opacity: 0 }}
+                     animate={{ opacity: 1 }}
+                     transition={{ duration: 1, delay: 0.9 }}
+                     className="font-display text-sm md:text-base tracking-[0.4em] text-tj-gold/70 uppercase mb-12"
+                  >
+                     AUTO INVESTMENT
+                  </motion.p>
+
+                  <motion.p
+                     initial={{ opacity: 0, y: 15 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ duration: 0.8, delay: 1.2 }}
+                     className="font-serif italic text-base md:text-lg text-gray-400 max-w-lg mx-auto mb-14 leading-relaxed"
+                  >
+                     {t.home.hero.tagline}
+                  </motion.p>
+
                   <motion.div
-                     initial={{ opacity: 0, x: -20 }}
-                     animate={{ opacity: 1, x: 0 }}
-                     transition={{ duration: 0.8, delay: 0.2 }}
-                     className="flex items-center gap-3"
+                     initial={{ opacity: 0, y: 15 }}
+                     animate={{ opacity: 1, y: 0 }}
+                     transition={{ duration: 0.6, delay: 1.6 }}
+                     className="flex flex-col sm:flex-row items-center justify-center gap-4"
                   >
-                     <span className="w-1.5 h-1.5 bg-tj-gold" />
-                     <span className="text-tj-gold text-[9px] uppercase tracking-ultra font-bold">
-                        {t.home.seHabla}
-                     </span>
+                     <MagneticButton href="/contact" className="px-10 py-5 text-[11px]">
+                        {t.home.hero.scheduleVisit}
+                     </MagneticButton>
+                     <MagneticButton href="tel:+18324009760" className="px-10 py-5 text-[11px]" strength={0.3}>
+                        <Phone size={12} />
+                        {t.home.hero.callNow}
+                     </MagneticButton>
                   </motion.div>
-                  <motion.span
-                     initial={{ opacity: 0, x: 20 }}
-                     animate={{ opacity: 1, x: 0 }}
-                     transition={{ duration: 0.8, delay: 0.4 }}
-                     className="text-gray-500 text-[10px] uppercase tracking-ultra font-mono"
-                  >
-                     EST. 2021 // HOUSTON, TX
-                  </motion.span>
                </div>
 
-               {/* Center content */}
-               <div className="relative z-10 px-6 md:px-12 max-w-[1920px] mx-auto w-full">
-                  <div className="max-w-4xl">
-                     {/* Animated heading */}
-                     <h1 className="font-display text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-white leading-[0.85] uppercase mb-8">
-                        <AnimatedText
-                           text="TRIPLE J"
-                           type="chars"
-                           animation="fadeUp"
-                           delay={0.5}
-                           stagger={0.03}
-                           className="block"
-                        />
-                        <span className="block mt-2 text-[0.5em] tracking-[0.3em] text-tj-gold/80">
-                           <AnimatedText
-                              text="AUTO INVESTMENT"
-                              type="chars"
-                              animation="fadeUp"
-                              delay={0.9}
-                              stagger={0.02}
-                           />
-                        </span>
-                     </h1>
-
-                     {/* Tagline */}
-                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 1, delay: 1.4 }}
-                        className="flex items-start gap-6 mb-12 max-w-2xl"
-                     >
-                        <div className="w-12 h-px bg-tj-gold/60 mt-3 hidden md:block flex-shrink-0" />
-                        <p className="font-serif italic text-base md:text-xl text-gray-300 leading-relaxed">
-                           {t.home.hero.tagline}
-                        </p>
-                     </motion.div>
-
-                     {/* CTAs */}
-                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 1.8 }}
-                        className="flex flex-col sm:flex-row gap-4"
-                     >
-                        <MagneticButton
-                           href="/contact"
-                           className="px-10 py-5 text-[11px]"
-                        >
-                           {t.home.hero.scheduleVisit}
-                        </MagneticButton>
-                        <MagneticButton
-                           href="tel:+18324009760"
-                           className="px-10 py-5 text-[11px]"
-                           strength={0.3}
-                        >
-                           <Phone size={12} />
-                           {t.home.hero.callNow}
-                        </MagneticButton>
-                     </motion.div>
-                  </div>
-               </div>
-
-               {/* Scroll indicator */}
+               {/* Scroll hint */}
                <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 2.5, duration: 1 }}
-                  className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
+                  className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
                >
-                  <span className="text-[8px] uppercase tracking-ultra text-gray-500">Scroll</span>
-                  <motion.div
-                     animate={{ y: [0, 8, 0] }}
-                     transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  >
-                     <ChevronDown size={16} className="text-tj-gold/60" />
+                  <span className="text-[8px] uppercase tracking-[0.4em] text-gray-600">Scroll</span>
+                  <motion.div animate={{ y: [0, 6, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}>
+                     <ChevronDown size={14} className="text-tj-gold/40" />
                   </motion.div>
                </motion.div>
-            </div>
+            </section>
 
-
-            {/* --- AUTHORITY METRICS --- */}
-            <section className="relative py-20 md:py-28 bg-tj-greenDeep border-b border-white/10 overflow-hidden">
-               {/* Gold radial glow */}
-               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.08)_0%,transparent_60%)]" />
-
-               <div className="relative max-w-5xl mx-auto px-4 md:px-6">
+            {/* ===== METRICS ===== */}
+            <section className="py-24 md:py-32 border-t border-white/5">
+               <div className="max-w-4xl mx-auto px-6">
                   <ScrollReveal direction="up" distance={30}>
-                     <p className="text-center text-[10px] uppercase tracking-[0.4em] text-tj-gold/60 mb-16 font-display">
+                     <p className="text-center text-[10px] uppercase tracking-[0.5em] text-gray-600 mb-20">
                         {t.home.authority.title}
                      </p>
                   </ScrollReveal>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-                     {metrics.map((metric, i) => (
-                        <ScrollReveal key={i} direction="up" delay={i * 0.1} distance={40}>
-                           <CountUpNumber
-                              value={metric.value}
-                              suffix={metric.suffix}
-                              label={metric.label}
-                              icon={metric.icon}
-                           />
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-16">
+                     {metrics.map((m, i) => (
+                        <ScrollReveal key={i} direction="up" delay={i * 0.1} distance={30}>
+                           <CountUpNumber value={m.value} suffix={m.suffix} label={m.label} />
                         </ScrollReveal>
                      ))}
                   </div>
                </div>
             </section>
 
-            {/* --- TICKER (Infinite Marquee) --- */}
-            <div className="bg-tj-gold text-black py-3 border-y border-black overflow-hidden relative z-20 select-none">
+            {/* ===== GOLD TICKER ===== */}
+            <div className="bg-tj-gold text-black py-3 overflow-hidden select-none">
                <div className="animate-marquee whitespace-nowrap flex items-center font-display font-black tracking-[0.2em] text-xs md:text-sm will-change-transform">
                   {Array(3).fill(null).map((_, i) => (
                      <React.Fragment key={i}>
                         {t.home.ticker.map((text, idx) => (
                            <React.Fragment key={idx}>
-                              <span className="mx-8">{text}</span> <Star size={12} />
+                              <span className="mx-8">{text}</span>
+                              <Star size={10} className="mx-2" />
                            </React.Fragment>
                         ))}
                      </React.Fragment>
@@ -238,52 +172,42 @@ const Home = () => {
                </div>
             </div>
 
-            {/* --- FEATURED VEHICLES --- */}
-            <section className="py-20 md:py-28 bg-tj-green relative overflow-hidden border-b border-white/10">
-               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.05)_0%,transparent_60%)]" />
-
-               <div className="max-w-[1920px] mx-auto px-4 md:px-6 relative">
-                  <div className="flex flex-col md:flex-row justify-between items-end mb-16">
-                     <ScrollReveal direction="left">
-                        <div>
-                           <h2 className="text-3xl sm:text-4xl md:text-6xl font-display text-white mb-3 uppercase">
-                              {t.home.arsenal.title.toUpperCase()}
-                           </h2>
-                           <div className="flex items-center gap-4">
-                              <div className="w-12 h-px bg-tj-gold/40" />
-                              <p className="text-gray-400 text-xs font-mono uppercase tracking-widest">{t.home.arsenal.desc}</p>
-                           </div>
-                        </div>
-                     </ScrollReveal>
-                     <ScrollReveal direction="right" className="hidden md:block">
-                        <Link to="/inventory" className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white transition-colors group">
-                           {t.home.arsenal.viewAll}
-                           <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
-                        </Link>
-                     </ScrollReveal>
-                  </div>
+            {/* ===== FEATURED VEHICLES ===== */}
+            <section className="py-24 md:py-32 border-t border-white/5">
+               <div className="max-w-6xl mx-auto px-6">
+                  <ScrollReveal direction="up" distance={30}>
+                     <div className="text-center mb-20">
+                        <h2 className="font-display text-3xl md:text-5xl text-white uppercase tracking-wide mb-4">
+                           {t.home.arsenal.title.toUpperCase()}
+                        </h2>
+                        <p className="text-gray-500 text-xs uppercase tracking-[0.3em]">{t.home.arsenal.desc}</p>
+                     </div>
+                  </ScrollReveal>
 
                   {hasVehicles ? (
-                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                         {featuredVehicles.map((vehicle, idx) => (
-                           <ScrollReveal key={vehicle.id} direction="up" delay={idx * 0.15} distance={50}>
+                           <ScrollReveal key={vehicle.id} direction="up" delay={idx * 0.12} distance={40}>
                               <Link
                                  to="/inventory"
-                                 className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden border border-white/10 hover:border-tj-gold/30 bg-gray-900 cursor-pointer block transition-all duration-700 hover:shadow-[0_0_50px_rgba(212,175,55,0.12)] hover:-translate-y-1"
+                                 className="group relative aspect-[3/4] overflow-hidden bg-gray-900 block border border-white/5 hover:border-tj-gold/20 transition-all duration-700 hover:-translate-y-1"
                               >
-                                 <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 border border-green-500/30">
+                                 {/* Available badge */}
+                                 <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 backdrop-blur-sm px-3 py-1.5 border border-green-500/20">
                                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
                                     <span className="text-[8px] uppercase tracking-widest text-green-400 font-bold">{t.common.available}</span>
                                  </div>
 
+                                 {/* Price */}
                                  <div className="absolute top-4 right-4 z-20">
-                                    <span className="text-lg font-display text-white drop-shadow-lg tracking-wider bg-black/40 backdrop-blur-md px-3 py-1.5 border border-white/10">
+                                    <span className="text-base font-display text-white bg-black/40 backdrop-blur-sm px-3 py-1.5 border border-white/10">
                                        ${vehicle.price.toLocaleString()}
                                     </span>
                                  </div>
 
+                                 {/* Rental badge */}
                                  {vehicle.status === 'Available' && (
-                                    <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 bg-tj-gold/90 backdrop-blur px-2.5 py-1 border border-tj-gold">
+                                    <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 bg-tj-gold/90 px-2.5 py-1 border border-tj-gold">
                                        <Key size={10} className="text-black" />
                                        <span className="text-[8px] uppercase tracking-widest text-black font-bold">
                                           {vehicle.dailyRate ? `$${vehicle.dailyRate}${t.common.perDay}` : t.common.saleAndRental}
@@ -291,219 +215,87 @@ const Home = () => {
                                     </div>
                                  )}
 
-                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
-
+                                 {/* Image */}
                                  <motion.img
                                     src={vehicle.imageUrl}
                                     alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                                     loading="lazy"
                                     className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
-                                    whileHover={{ scale: 1.05 }}
+                                    whileHover={{ scale: 1.03 }}
                                     transition={{ duration: 0.7 }}
                                  />
 
-                                 {/* Gold accent line bottom */}
-                                 <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-tj-gold/40 to-transparent z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-
-                                 <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent z-20 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                 {/* Info overlay */}
+                                 <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/60 to-transparent z-20">
                                     <p className="text-tj-gold text-[10px] uppercase tracking-[0.2em] mb-1">{vehicle.year} {vehicle.make}</p>
-                                    <h3 className="text-2xl font-display text-white leading-none mb-4">{vehicle.model}</h3>
-                                    <div className="flex items-center gap-2 text-[9px] uppercase tracking-widest text-gray-400 group-hover:text-white transition-colors">
-                                       <span>{t.common.viewAll}</span>
-                                       <div className="w-8 h-px bg-current" />
-                                    </div>
+                                    <h3 className="text-xl font-display text-white leading-none">{vehicle.model}</h3>
                                  </div>
                               </Link>
                            </ScrollReveal>
                         ))}
                      </div>
                   ) : (
-                     <div className="py-16 text-center border border-white/5 bg-white/[0.02]">
-                        <p className="text-gray-400 text-sm mb-4">{t.polish.emptyInventory}</p>
+                     <div className="py-16 text-center">
+                        <p className="text-gray-500 text-sm mb-4">{t.polish.emptyInventory}</p>
                         <a href="tel:+18324009760" className="inline-flex items-center gap-2 text-tj-gold text-xs uppercase tracking-widest hover:text-white transition-colors">
                            <Phone size={14} /> {t.common.phone}
                         </a>
                      </div>
                   )}
 
-                  <div className="mt-12 text-center md:hidden">
-                     <MagneticButton href="/inventory" className="px-10 py-5 text-[11px]">
-                        {t.home.arsenal.viewAll}
-                     </MagneticButton>
+                  <ScrollReveal direction="up" delay={0.3}>
+                     <div className="text-center mt-16">
+                        <MagneticButton href="/inventory" className="px-10 py-5 text-[11px]">
+                           {t.home.arsenal.viewAll}
+                           <ArrowRight size={12} />
+                        </MagneticButton>
+                     </div>
+                  </ScrollReveal>
+               </div>
+            </section>
+
+            {/* ===== WHY TRIPLE J ===== */}
+            <section className="py-24 md:py-32 border-t border-white/5">
+               <div className="max-w-3xl mx-auto px-6">
+                  <ScrollReveal direction="up" distance={30}>
+                     <div className="text-center mb-20">
+                        <p className="text-[10px] uppercase tracking-[0.5em] text-gray-600 mb-6">{t.home.architecture}</p>
+                        <h2 className="font-display text-3xl md:text-5xl text-white uppercase tracking-wide">
+                           {t.home.pillars.title}
+                        </h2>
+                     </div>
+                  </ScrollReveal>
+
+                  <div className="space-y-20">
+                     {[
+                        { num: '01', title: t.home.pillars.p1Title, desc: t.home.pillars.p1Desc, highlight: t.home.pillars.p1Highlight },
+                        { num: '02', title: t.home.pillars.p2Title, desc: t.home.pillars.p2Desc, highlight: t.home.pillars.p2Highlight },
+                        { num: '03', title: t.home.pillars.p3Title, desc: t.home.pillars.p3Desc, highlight: t.home.pillars.p3Highlight },
+                     ].map((pillar, i) => (
+                        <ScrollReveal key={i} direction="up" delay={i * 0.1} distance={40}>
+                           <div className="text-center">
+                              <span className="font-display text-6xl md:text-7xl text-white/[0.03] block mb-4">{pillar.num}</span>
+                              <h3 className="font-display text-xl md:text-2xl text-white uppercase tracking-widest mb-6">{pillar.title}</h3>
+                              <p className="text-gray-500 text-sm leading-relaxed max-w-lg mx-auto">
+                                 {pillar.desc}
+                              </p>
+                              <p className="text-white text-sm mt-4 max-w-lg mx-auto">{pillar.highlight}</p>
+                              <div className="w-8 h-px bg-tj-gold/30 mx-auto mt-8" />
+                           </div>
+                        </ScrollReveal>
+                     ))}
                   </div>
                </div>
             </section>
 
-            {/* --- VALUE PILLARS --- */}
-            <section className="bg-tj-green w-full relative overflow-hidden">
-               <div className="absolute inset-0 bg-gradient-to-b from-tj-greenDeep/50 to-tj-green/50" />
-
-               <div className="relative flex flex-col">
-
-                  {/* Pillar 01 */}
-                  <ScrollReveal direction="left" distance={80}>
-                     <div className="w-full flex flex-col md:flex-row items-stretch border-b border-white/10">
-                        <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-r border-white/10 flex items-center justify-center bg-tj-greenDeep/80 relative overflow-hidden">
-                           <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -left-10 md:left-0 top-1/2 -translate-y-1/2">01</span>
-                           <div className="relative z-10 text-tj-gold">
-                              <Fingerprint size={48} className="opacity-80" />
-                           </div>
-                        </div>
-                        <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-start bg-tj-green/40 backdrop-blur-sm">
-                           <div className="w-8 h-px bg-tj-gold/40 mb-6" />
-                           <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p1Title}</h3>
-                           <p className="text-gray-400 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
-                              {t.home.pillars.p1Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p1Highlight}</span>
-                           </p>
-                        </div>
-                     </div>
-                  </ScrollReveal>
-
-                  {/* Pillar 02 (Reversed) */}
-                  <ScrollReveal direction="right" distance={80}>
-                     <div className="w-full flex flex-col md:flex-row-reverse items-stretch border-b border-white/10">
-                        <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-l border-white/10 flex items-center justify-center bg-tj-greenDeep/80 relative overflow-hidden">
-                           <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -right-10 md:right-0 top-1/2 -translate-y-1/2">02</span>
-                           <div className="relative z-10 text-tj-gold">
-                              <Zap size={48} className="opacity-80" />
-                           </div>
-                        </div>
-                        <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-end text-right bg-tj-green/40 backdrop-blur-sm">
-                           <div className="w-8 h-px bg-tj-gold/40 mb-6 self-end" />
-                           <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p2Title}</h3>
-                           <p className="text-gray-400 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
-                              {t.home.pillars.p2Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p2Highlight}</span>
-                           </p>
-                        </div>
-                     </div>
-                  </ScrollReveal>
-
-                  {/* Pillar 03 */}
-                  <ScrollReveal direction="left" distance={80}>
-                     <div className="w-full flex flex-col md:flex-row items-stretch border-b border-white/10">
-                        <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-r border-white/10 flex items-center justify-center bg-tj-greenDeep/80 relative overflow-hidden">
-                           <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -left-10 md:left-0 top-1/2 -translate-y-1/2">03</span>
-                           <div className="relative z-10 text-tj-gold">
-                              <Target size={48} className="opacity-80" />
-                           </div>
-                        </div>
-                        <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-start bg-tj-green/40 backdrop-blur-sm">
-                           <div className="w-8 h-px bg-tj-gold/40 mb-6" />
-                           <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p3Title}</h3>
-                           <p className="text-gray-400 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
-                              {t.home.pillars.p3Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p3Highlight}</span>
-                           </p>
-                        </div>
-                     </div>
-                  </ScrollReveal>
-
-               </div>
-            </section>
-
-            {/* --- DEALERSHIP INFO TICKER --- */}
-            <section className="bg-tj-greenDeep border-y border-white/10 py-12 overflow-hidden relative">
-               <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-tj-greenDeep to-transparent z-10" />
-               <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-tj-greenDeep to-transparent z-10" />
-
-               <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-900/50 rounded-full animate-pulse">
-                     <Activity size={12} className="text-green-500" />
-                     <span className="text-[9px] uppercase tracking-widest text-green-400">{t.home.signals.label}</span>
-                  </div>
-               </div>
-
-               <div className="flex gap-8 animate-marquee whitespace-nowrap items-center">
-                  {t.home.signals.items.map((item, i) => (
-                     <div key={i} className="flex items-center gap-4 bg-black/30 backdrop-blur-md border border-white/5 hover:border-tj-gold/20 px-6 py-3 transition-colors duration-500">
-                        <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping" />
-                        <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{item}</span>
-                     </div>
-                  ))}
-                  {t.home.signals.items.map((item, i) => (
-                     <div key={`dup-${i}`} className="flex items-center gap-4 bg-black/30 backdrop-blur-md border border-white/5 hover:border-tj-gold/20 px-6 py-3 transition-colors duration-500">
-                        <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping" />
-                        <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{item}</span>
-                     </div>
-                  ))}
-               </div>
-            </section>
-
-            {/* --- ARCHITECTURAL DIFFERENCES --- */}
-            <section className="w-full border-b border-white/10 relative">
-               <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/10">
-                  {[
-                     { to: "/vin", icon: <Diamond size={24} />, title: t.home.cards.vetting.title, desc: t.home.cards.vetting.desc, cta: t.home.cards.vetting.cta, isLink: true },
-                     { to: "/about", icon: <Heart size={24} />, title: t.home.cards.psych.title, desc: t.home.cards.psych.desc, cta: t.home.cards.psych.cta, isLink: true, highlight: true },
-                     { to: "#", icon: <Zap size={24} />, title: t.home.cards.velocity.title, desc: t.home.cards.velocity.desc, cta: t.home.cards.velocity.cta, isLink: false },
-                  ].map((card, idx) => (
-                     <ScrollReveal key={idx} direction="up" delay={idx * 0.15}>
-                        {card.isLink ? (
-                           <Link
-                              to={card.to}
-                              className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-tj-green hover:bg-tj-greenDeep transition-all duration-700 hover:shadow-[0_10px_40px_rgba(212,175,55,0.08)]"
-                           >
-                              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-tj-greenDeep/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                              <div className="mb-12 text-tj-gold relative z-10 group-hover:scale-110 transition-transform duration-500">
-                                 {card.icon}
-                              </div>
-                              <h3 className={`font-display text-2xl ${card.highlight ? 'text-tj-gold' : 'text-white'} mb-6 tracking-widest relative z-10 uppercase`}>{card.title}</h3>
-                              <p className="text-gray-500 text-[10px] leading-relaxed mb-12 relative z-10 uppercase tracking-widest">
-                                 {card.desc}
-                              </p>
-                              <span className="text-[10px] uppercase tracking-ultra text-white flex items-center gap-4 transition-all duration-700 mt-auto border-b border-transparent group-hover:border-tj-gold pb-1 w-max relative z-10">
-                                 {card.cta}
-                              </span>
-                           </Link>
-                        ) : (
-                           <div className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-tj-green hover:bg-tj-greenDeep transition-all duration-700">
-                              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-tj-greenDeep/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                              <div className="mb-12 text-tj-gold relative z-10 group-hover:scale-110 transition-transform duration-500">
-                                 {card.icon}
-                              </div>
-                              <h3 className="font-display text-2xl text-white mb-6 tracking-widest relative z-10 uppercase">{card.title}</h3>
-                              <p className="text-gray-500 text-[10px] leading-relaxed mb-12 relative z-10 uppercase tracking-widest">
-                                 {card.desc}
-                              </p>
-                              <span className="text-[10px] uppercase tracking-ultra text-white/50 flex items-center gap-4 mt-auto pb-1 w-max relative z-10">
-                                 {card.cta}
-                              </span>
-                           </div>
-                        )}
-                     </ScrollReveal>
-                  ))}
-               </div>
-            </section>
-
-            {/* --- INVENTORY CTA --- */}
-            <section className="relative min-h-[60vh] flex items-center overflow-hidden border-t border-white/10">
-               {/* Background with parallax effect */}
-               <div className="absolute inset-0">
-                  {featuredVehicles[1] && (
-                     <div
-                        className="absolute inset-0"
-                        style={{
-                           backgroundImage: `url(${featuredVehicles[1].imageUrl})`,
-                           backgroundSize: 'cover',
-                           backgroundPosition: 'center',
-                           backgroundAttachment: 'fixed',
-                        }}
-                     />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-r from-tj-green/95 via-tj-green/85 to-tj-green/75" />
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,rgba(212,175,55,0.08)_0%,transparent_60%)]" />
-               </div>
-
-               {/* Gold corner accents */}
-               <div className="absolute top-8 left-8 w-12 h-12 border-t-2 border-l-2 border-tj-gold/30" />
-               <div className="absolute bottom-8 right-8 w-12 h-12 border-b-2 border-r-2 border-tj-gold/30" />
-
-               <div className="max-w-[1920px] mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row items-center justify-between z-10 relative py-16">
-                  <ScrollReveal direction="left">
-                     <h2 className="text-5xl md:text-8xl font-display text-white tracking-tighter mb-8 md:mb-0 uppercase">
-                        {t.home.vault.title.toUpperCase()}
+            {/* ===== INVENTORY CTA ===== */}
+            <section className="py-32 md:py-40 border-t border-white/5">
+               <div className="max-w-3xl mx-auto px-6 text-center">
+                  <ScrollReveal direction="up" distance={30}>
+                     <h2 className="font-display text-4xl md:text-7xl text-white uppercase tracking-tight mb-8">
+                        {t.home.vault.title}
                      </h2>
-                  </ScrollReveal>
-                  <ScrollReveal direction="right" delay={0.2}>
+                     <p className="text-gray-500 text-sm mb-12 max-w-md mx-auto">{t.home.vault.access}</p>
                      <MagneticButton href="/inventory" className="px-12 py-6 text-[11px]">
                         {t.home.vault.enter}
                         <ArrowRight size={14} />
@@ -512,7 +304,7 @@ const Home = () => {
                </div>
             </section>
 
-         </motion.div >
+         </motion.div>
       </>
    );
 };
