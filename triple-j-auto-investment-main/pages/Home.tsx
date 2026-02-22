@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useStore } from '../context/Store';
 import { ArrowRight, Diamond, Heart, Zap, Fingerprint, Target, Activity, Star, ChevronDown, Phone, Key, Users } from 'lucide-react';
 import { motion, useTransform, useSpring, useInView } from 'framer-motion';
@@ -54,16 +54,6 @@ const Home = () => {
       { value: 3, suffix: '+', label: t.home.authority.yearsInBusiness },
       { value: 800, suffix: '+', label: t.home.authority.vehiclesDelivered },
    ];
-
-   const containerVariants = {
-      hidden: { opacity: 0 },
-      visible: { opacity: 1, transition: { staggerChildren: 0.2 } }
-   };
-
-   const itemVariants = {
-      hidden: { opacity: 0, y: 30 },
-      visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 50 } }
-   };
 
    return (
       <>
@@ -450,7 +440,7 @@ const Home = () => {
                         {card.isLink ? (
                            <Link
                               to={card.to}
-                              className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-tj-green hover:bg-tj-greenDeep transition-all duration-700 hover:shadow-[0_10px_40px_rgba(212,175,55,0.08)] block"
+                              className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-tj-green hover:bg-tj-greenDeep transition-all duration-700 hover:shadow-[0_10px_40px_rgba(212,175,55,0.08)]"
                            >
                               <div className="absolute inset-0 bg-gradient-to-b from-transparent to-tj-greenDeep/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
                               <div className="mb-12 text-tj-gold relative z-10 group-hover:scale-110 transition-transform duration-500">
