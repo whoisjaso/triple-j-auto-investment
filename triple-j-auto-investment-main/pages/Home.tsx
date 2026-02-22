@@ -267,49 +267,49 @@ const Home = () => {
             </div>
 
             {/* --- FEATURED VEHICLES --- */}
-            <section className="py-16 md:py-24 bg-[#050505] relative overflow-hidden border-b border-white/10">
-               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-tj-gold/5 via-transparent to-transparent"></div>
+            <section className="py-20 md:py-28 bg-tj-green relative overflow-hidden border-b border-white/10">
+               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.05)_0%,transparent_60%)]" />
 
-               <div className="max-w-[1920px] mx-auto px-4 md:px-6">
-                  <div className="flex flex-col md:flex-row justify-between items-end mb-12">
-                     <motion.div
-                        initial={{ opacity: 0, x: -50 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                     >
-                        <h2 className="text-3xl sm:text-4xl md:text-6xl font-display text-white mb-2 flex flex-wrap items-center gap-3 sm:gap-4">
-                           {t.home.arsenal.title.toUpperCase()} <span className="text-xs font-mono text-tj-gold bg-tj-gold/10 px-2 py-1 rounded border border-tj-gold/20 align-middle tracking-widest uppercase">{t.home.arsenal.subtitle}</span>
-                        </h2>
-                        <p className="text-gray-400 text-xs font-mono uppercase tracking-widest">{t.home.arsenal.desc}</p>
-                     </motion.div>
-                     <Link to="/inventory" className="hidden md:flex items-center gap-2 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white transition-colors">
-                        {t.home.arsenal.viewAll} <ArrowRight size={12} />
-                     </Link>
+               <div className="max-w-[1920px] mx-auto px-4 md:px-6 relative">
+                  <div className="flex flex-col md:flex-row justify-between items-end mb-16">
+                     <ScrollReveal direction="left">
+                        <div>
+                           <h2 className="text-3xl sm:text-4xl md:text-6xl font-display text-white mb-3 uppercase">
+                              {t.home.arsenal.title.toUpperCase()}
+                           </h2>
+                           <div className="flex items-center gap-4">
+                              <div className="w-12 h-px bg-tj-gold/40" />
+                              <p className="text-gray-400 text-xs font-mono uppercase tracking-widest">{t.home.arsenal.desc}</p>
+                           </div>
+                        </div>
+                     </ScrollReveal>
+                     <ScrollReveal direction="right" className="hidden md:block">
+                        <Link to="/inventory" className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-tj-gold hover:text-white transition-colors group">
+                           {t.home.arsenal.viewAll}
+                           <ArrowRight size={12} className="group-hover:translate-x-1 transition-transform" />
+                        </Link>
+                     </ScrollReveal>
                   </div>
 
                   {hasVehicles ? (
-                     <motion.div
-                        variants={containerVariants}
-                        initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, margin: "-100px" }}
-                        className="grid grid-cols-1 md:grid-cols-3 gap-6"
-                     >
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {featuredVehicles.map((vehicle, idx) => (
-                           <motion.div variants={itemVariants} key={vehicle.id}>
-                              <Link to="/inventory" className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden border border-white/10 bg-gray-900 cursor-pointer block">
-                                 <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/50 backdrop-blur px-3 py-1 rounded-full border border-green-500/30">
-                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                                    <span className="text-[8px] uppercase tracking-widest text-green-500 font-bold">{t.common.available}</span>
+                           <ScrollReveal key={vehicle.id} direction="up" delay={idx * 0.15} distance={50}>
+                              <Link
+                                 to="/inventory"
+                                 className="group relative aspect-[3/4] md:aspect-[4/5] overflow-hidden border border-white/10 hover:border-tj-gold/30 bg-gray-900 cursor-pointer block transition-all duration-700 hover:shadow-[0_0_50px_rgba(212,175,55,0.12)] hover:-translate-y-1"
+                              >
+                                 <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 border border-green-500/30">
+                                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                                    <span className="text-[8px] uppercase tracking-widest text-green-400 font-bold">{t.common.available}</span>
                                  </div>
 
                                  <div className="absolute top-4 right-4 z-20">
-                                    <span className="text-lg font-display text-white drop-shadow-md tracking-wider">
+                                    <span className="text-lg font-display text-white drop-shadow-lg tracking-wider bg-black/40 backdrop-blur-md px-3 py-1.5 border border-white/10">
                                        ${vehicle.price.toLocaleString()}
                                     </span>
                                  </div>
 
-                                 {/* Rental Badge — shown on all available vehicles */}
                                  {vehicle.status === 'Available' && (
                                     <div className="absolute bottom-4 right-4 z-30 flex items-center gap-1.5 bg-tj-gold/90 backdrop-blur px-2.5 py-1 border border-tj-gold">
                                        <Key size={10} className="text-black" />
@@ -319,45 +319,45 @@ const Home = () => {
                                     </div>
                                  )}
 
-                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10"></div>
+                                 <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
 
                                  <motion.img
                                     src={vehicle.imageUrl}
                                     alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                                     loading="lazy"
-                                    className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0"
-                                    whileHover={{ scale: 1.1 }}
+                                    className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700"
+                                    whileHover={{ scale: 1.05 }}
                                     transition={{ duration: 0.7 }}
                                  />
+
+                                 {/* Gold accent line bottom */}
+                                 <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-tj-gold/40 to-transparent z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
                                  <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black via-black/80 to-transparent z-20 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
                                     <p className="text-tj-gold text-[10px] uppercase tracking-[0.2em] mb-1">{vehicle.year} {vehicle.make}</p>
                                     <h3 className="text-2xl font-display text-white leading-none mb-4">{vehicle.model}</h3>
                                     <div className="flex items-center gap-2 text-[9px] uppercase tracking-widest text-gray-400 group-hover:text-white transition-colors">
                                        <span>{t.common.viewAll}</span>
-                                       <div className="w-8 h-px bg-current"></div>
+                                       <div className="w-8 h-px bg-current" />
                                     </div>
                                  </div>
                               </Link>
-                           </motion.div>
+                           </ScrollReveal>
                         ))}
-                     </motion.div>
+                     </div>
                   ) : (
                      <div className="py-16 text-center border border-white/5 bg-white/[0.02]">
                         <p className="text-gray-400 text-sm mb-4">{t.polish.emptyInventory}</p>
-                        <a
-                           href="tel:+18324009760"
-                           className="inline-flex items-center gap-2 text-tj-gold text-xs uppercase tracking-widest hover:text-white transition-colors"
-                        >
+                        <a href="tel:+18324009760" className="inline-flex items-center gap-2 text-tj-gold text-xs uppercase tracking-widest hover:text-white transition-colors">
                            <Phone size={14} /> {t.common.phone}
                         </a>
                      </div>
                   )}
 
-                  <div className="mt-8 text-center md:hidden">
-                     <Link to="/inventory" className="inline-block border border-tj-gold text-tj-gold px-8 py-4 text-xs uppercase tracking-[0.3em] font-bold hover:bg-tj-gold hover:text-black transition-colors">
+                  <div className="mt-12 text-center md:hidden">
+                     <MagneticButton href="/inventory" className="px-10 py-5 text-[11px]">
                         {t.home.arsenal.viewAll}
-                     </Link>
+                     </MagneticButton>
                   </div>
                </div>
             </section>
