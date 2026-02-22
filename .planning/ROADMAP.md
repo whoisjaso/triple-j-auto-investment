@@ -37,7 +37,7 @@ See: `.planning/milestones/v1-ROADMAP.md`
 - [x] **Phase 15: Engagement Spectrum** - Micro-commitment ladder from zero-friction saves to vehicle reservations
 - [x] **Phase 16: Behavioral Intelligence** - Session tracking, smart recommendations, urgency calibration, and attribution
 - [x] **Phase 17: Divine Response** - AI chat with behavioral profiling plus Retell voice agent updates
-- [ ] **Phase 18: Behavioral Follow-Up** - 4-tier automated re-engagement system triggered by visitor behavior
+- [x] **Phase 18: Behavioral Follow-Up** - 4-tier automated re-engagement system triggered by visitor behavior (completed 2026-02-22)
 - [ ] **Phase 19: Retention Engine** - Owner Portal, Family Circle referral program, review generation, and re-entry loop
 
 ## Phase Details
@@ -256,7 +256,7 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 15. Engagement Spectrum | v2.0 | 3/3 | Complete | 2026-02-19 |
 | 16. Behavioral Intelligence | v2.0 | 6/6 | Complete | 2026-02-20 |
 | 17. Divine Response | v2.0 | 3/3 | Complete | 2026-02-20 |
-| 18. Behavioral Follow-Up | 1/2 | In Progress|  | - |
+| 18. Behavioral Follow-Up | 2/2 | Complete   | 2026-02-22 | - |
 | 19. Retention Engine | v2.0 | 0/TBD | Not started | - |
 
 ---

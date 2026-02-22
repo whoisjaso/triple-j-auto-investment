@@ -73,7 +73,7 @@ Requirements for v2.0 Psychological Architecture & Production Launch. Organized 
 - [x] **FOLLOW-02**: Tier 2 -- SMS 4hr after save/favorite (scarcity + loss aversion trigger)
 - [x] **FOLLOW-03**: Tier 3 -- SMS/email 1hr after abandoned form ("Your info is saved")
 - [x] **FOLLOW-04**: Tier 4 -- AI voice call 2hr after question without scheduling
-- [ ] **FOLLOW-05**: Return visitor recognition -- surface previously viewed vehicles on return
+- [x] **FOLLOW-05**: Return visitor recognition -- surface previously viewed vehicles on return
 
 ### Intelligence Layer
 
@@ -278,7 +278,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | FOLLOW-02 | Phase 18: Behavioral Follow-Up | Complete |
 | FOLLOW-03 | Phase 18: Behavioral Follow-Up | Complete |
 | FOLLOW-04 | Phase 18: Behavioral Follow-Up | Complete |
-| FOLLOW-05 | Phase 18: Behavioral Follow-Up | Pending |
+| FOLLOW-05 | Phase 18: Behavioral Follow-Up | Complete |
 | PORTAL-01 | Phase 19: Retention Engine | Pending |
 | PORTAL-02 | Phase 19: Retention Engine | Pending |
 | PORTAL-03 | Phase 19: Retention Engine | Pending |

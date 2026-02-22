@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-02-22
-**Session:** Phase 18 Plan 01 complete -- behavioral follow-up backend (migration + Edge Function)
+**Session:** Phase 18 Plan 02 complete -- behavioral follow-up frontend (preferred_language, consent, AdminFollowUpPanel, FOLLOW-05 welcome badge)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 18 (Behavioral Follow-Up) -- Plan 01 complete, Plan 02 next
+**Current focus:** Phase 18 (Behavioral Follow-Up) -- ALL COMPLETE (Plan 01 + Plan 02 done)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -30,17 +30,17 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
-**Phase:** 18 of 19 (Behavioral Follow-Up) -- IN PROGRESS
-**Plan:** 1 of 2 complete (18-01 done)
-**Status:** Plan 01 complete -- follow_up_queue migration + Edge Function shipped
-**Last activity:** 2026-02-22 -- 18-01 executed (database migration + process-follow-up-queue Edge Function)
+**Phase:** 18 of 19 (Behavioral Follow-Up) -- COMPLETE
+**Plan:** 2 of 2 complete (18-01 + 18-02 done)
+**Status:** Phase 18 fully complete -- follow-up backend + frontend wiring shipped
+**Last activity:** 2026-02-22 -- 18-02 executed (preferred_language capture, consent text, AdminFollowUpPanel, FOLLOW-05 welcome badge)
 
-Progress: [████████████████████████████████████████] 40/40 plans (18-01 added)
+Progress: [████████████████████████████████████████] 41/41 plans (18-02 added)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02, 17-03, 18-01)
+- Total plans completed: 41 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02, 17-03, 18-01, 18-02)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -182,10 +182,17 @@ Progress: [███████████████████████
 - **[18-01]** Retell credentials use Deno.env.get server-side secrets (not VITE_ prefix) in Edge Function
 - **[18-01]** Twilio error 21610 (opted out) detected by string match -- marked twilio_21610_opted_out, no retry
 - **[18-01]** pg_cron schedules wrapped in DO block with EXCEPTION WHEN OTHERS THEN RAISE NOTICE for graceful degradation on Free plan
+- **[18-02]** localStorage key for language is tj_lang (set by LanguageContext.tsx) -- read directly in addLead + createVehicleLead, no circular import
+- **[18-02]** prevViewedIdsRef captures recentIds at mount before addViewed runs -- accurate returning visitor detection without extra state
+- **[18-02]** Admin panel fetches once on mount (no auto-refresh per Phase 16 decision for admin panels)
+- **[18-02]** Consent text styled text-gray-500 (per 11-05: placeholders/hints use gray-500, not primary content)
+- **[18-02]** Welcome badge uses bilingual t.followUp.welcomeBack; admin panel strings are English-only (admin always English)
+- [Phase 18]: localStorage key tj_lang used for language detection in addLead and createVehicleLead (no circular LanguageContext import)
 
-### Completed Work (Phase 18) -- IN PROGRESS
+### Completed Work (Phase 18) -- ALL COMPLETE
 
 - **18-01 (complete):** Behavioral follow-up backend. phase-18-migration.sql: follow_up_queue table (14 columns), partial unique deduplication index, preferred_language column on leads, enqueue_behavioral_follow_ups() SECURITY DEFINER function (4 tiers: voice 2h, abandon SMS+email 1h via CROSS JOIN unnest, save 4h DISTINCT ON, browse 24h DISTINCT ON), cancel_follow_ups_on_conversion() trigger on leads, pg_cron schedules in DO/EXCEPTION block. process-follow-up-queue/index.ts Edge Function: queries queue with sent=false/cancelled=false/send_after<=NOW, per-item try/catch, markSent-on-error, bilingual SMS (en/es) for browse/save/abandon, inline HTML email for abandon, Retell voice call with server-side credentials, Twilio 21610 opt-out detection.
+- **18-02 (complete):** Behavioral follow-up frontend. types.ts: preferredLanguage on Lead interface. leads.ts: auto-fill preferred_language from tj_lang localStorage in addLead, insert to DB, map in loadLeads. vehicleLeadService.ts: preferredLanguage in createVehicleLead. translations.ts: followUp block (10 keys each en+es: consent, welcomeBack, queue labels). Contact.tsx + Finance.tsx: consent small-print below submit button. AdminFollowUpPanel.tsx: stats row (4 parallel count queries) + 20-item recent queue list with trigger badge/channel/vehicle/status. Dashboard.tsx: Follow-Up Queue collapsible section (default collapsed). VehicleDetail.tsx: prevViewedIdsRef pattern + welcome back badge (FOLLOW-05).
 
 ### Completed Work (Phase 17) -- ALL COMPLETE
 
@@ -308,7 +315,7 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 
 ## Session Continuity
 
-**Last session:** 2026-02-22T02:02:50Z
-**Stopped at:** Completed 18-01-PLAN.md
-**Resume file:** .planning/phases/18-behavioral-follow-up/18-01-SUMMARY.md
-**Resume:** Phase 18 Plan 01 complete. follow_up_queue migration + process-follow-up-queue Edge Function shipped. Next: Phase 18 Plan 02 (frontend forms wiring preferred_language). Edge Function secrets still needed: RETELL_API_KEY, RETELL_OUTBOUND_AGENT_ID, RETELL_OUTBOUND_NUMBER. pg_cron must be enabled in Supabase dashboard before queue detection runs. Phase 9 manual items remain (secrets, deployment, data migration, E2E test). divine-chat Edge Function needs GEMINI_API_KEY secret for live chat testing.
+**Last session:** 2026-02-22T02:13:05Z
+**Stopped at:** Completed 18-02-PLAN.md
+**Resume file:** .planning/phases/18-behavioral-follow-up/18-02-SUMMARY.md
+**Resume:** Phase 18 fully complete (both plans done). Behavioral follow-up system end-to-end: backend queue (18-01) + frontend wiring (18-02). Next: Phase 19 (if exists) or production readiness. Manual items still needed: Edge Function secrets (RETELL_API_KEY, RETELL_OUTBOUND_AGENT_ID, RETELL_OUTBOUND_NUMBER, GEMINI_API_KEY), pg_cron enable in Supabase dashboard, Phase 9 deployment items.
