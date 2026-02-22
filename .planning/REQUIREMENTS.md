@@ -69,10 +69,10 @@ Requirements for v2.0 Psychological Architecture & Production Launch. Organized 
 
 ### Behavioral Follow-Up System
 
-- [ ] **FOLLOW-01**: Tier 1 -- SMS 24hr after browse-only with vehicle they viewed longest
-- [ ] **FOLLOW-02**: Tier 2 -- SMS 4hr after save/favorite (scarcity + loss aversion trigger)
-- [ ] **FOLLOW-03**: Tier 3 -- SMS/email 1hr after abandoned form ("Your info is saved")
-- [ ] **FOLLOW-04**: Tier 4 -- AI voice call 2hr after question without scheduling
+- [x] **FOLLOW-01**: Tier 1 -- SMS 24hr after browse-only with vehicle they viewed longest
+- [x] **FOLLOW-02**: Tier 2 -- SMS 4hr after save/favorite (scarcity + loss aversion trigger)
+- [x] **FOLLOW-03**: Tier 3 -- SMS/email 1hr after abandoned form ("Your info is saved")
+- [x] **FOLLOW-04**: Tier 4 -- AI voice call 2hr after question without scheduling
 - [ ] **FOLLOW-05**: Return visitor recognition -- surface previously viewed vehicles on return
 
 ### Intelligence Layer
@@ -274,10 +274,10 @@ Deferred to future release. Tracked but not in current roadmap.
 | DIVINE-06 | Phase 17: Divine Response | Complete |
 | DIVINE-07 | Phase 17: Divine Response | Complete |
 | DIVINE-08 | Phase 17: Divine Response | Complete |
-| FOLLOW-01 | Phase 18: Behavioral Follow-Up | Pending |
-| FOLLOW-02 | Phase 18: Behavioral Follow-Up | Pending |
-| FOLLOW-03 | Phase 18: Behavioral Follow-Up | Pending |
-| FOLLOW-04 | Phase 18: Behavioral Follow-Up | Pending |
+| FOLLOW-01 | Phase 18: Behavioral Follow-Up | Complete |
+| FOLLOW-02 | Phase 18: Behavioral Follow-Up | Complete |
+| FOLLOW-03 | Phase 18: Behavioral Follow-Up | Complete |
+| FOLLOW-04 | Phase 18: Behavioral Follow-Up | Complete |
 | FOLLOW-05 | Phase 18: Behavioral Follow-Up | Pending |
 | PORTAL-01 | Phase 19: Retention Engine | Pending |
 | PORTAL-02 | Phase 19: Retention Engine | Pending |
