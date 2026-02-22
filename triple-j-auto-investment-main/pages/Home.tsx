@@ -429,9 +429,9 @@ const Home = () => {
             </section>
 
             {/* --- DEALERSHIP INFO TICKER --- */}
-            <section className="bg-tj-dark border-y border-white/10 py-12 overflow-hidden relative">
-               <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-tj-dark to-transparent z-10"></div>
-               <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-tj-dark to-transparent z-10"></div>
+            <section className="bg-tj-greenDeep border-y border-white/10 py-12 overflow-hidden relative">
+               <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-tj-greenDeep to-transparent z-10" />
+               <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-tj-greenDeep to-transparent z-10" />
 
                <div className="max-w-7xl mx-auto px-6 mb-8 text-center">
                   <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-900/50 rounded-full animate-pulse">
@@ -442,14 +442,14 @@ const Home = () => {
 
                <div className="flex gap-8 animate-marquee whitespace-nowrap items-center">
                   {t.home.signals.items.map((item, i) => (
-                     <div key={i} className="flex items-center gap-4 bg-black/40 border border-white/5 px-6 py-3 rounded">
-                        <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping"></div>
+                     <div key={i} className="flex items-center gap-4 bg-black/30 backdrop-blur-md border border-white/5 hover:border-tj-gold/20 px-6 py-3 transition-colors duration-500">
+                        <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping" />
                         <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{item}</span>
                      </div>
                   ))}
                   {t.home.signals.items.map((item, i) => (
-                     <div key={`dup-${i}`} className="flex items-center gap-4 bg-black/40 border border-white/5 px-6 py-3 rounded">
-                        <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping"></div>
+                     <div key={`dup-${i}`} className="flex items-center gap-4 bg-black/30 backdrop-blur-md border border-white/5 hover:border-tj-gold/20 px-6 py-3 transition-colors duration-500">
+                        <div className="w-1.5 h-1.5 bg-tj-gold rounded-full animate-ping" />
                         <span className="text-xs font-mono text-gray-300 tracking-wider uppercase">{item}</span>
                      </div>
                   ))}
@@ -459,47 +459,46 @@ const Home = () => {
             {/* --- ARCHITECTURAL DIFFERENCES --- */}
             <section className="w-full border-b border-white/10 relative">
                <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/10">
-                  {/* Column 1 */}
-                  <Link to="/vin" className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-black hover:bg-tj-darker transition-colors duration-700">
-                     <div className="mb-12 text-tj-gold relative z-10">
-                        <Diamond size={24} />
-                     </div>
-                     <h3 className="font-display text-2xl text-white mb-6 tracking-widest relative z-10 uppercase">{t.home.cards.vetting.title}</h3>
-                     <p className="text-gray-500 text-[10px] leading-relaxed mb-12 relative z-10 uppercase tracking-widest">
-                        {t.home.cards.vetting.desc}
-                     </p>
-                     <span className="text-[10px] uppercase tracking-ultra text-white flex items-center gap-4 transition-all duration-700 mt-auto border-b border-transparent group-hover:border-tj-gold pb-1 w-max">
-                        {t.home.cards.vetting.cta}
-                     </span>
-                  </Link>
-
-                  {/* Column 2 */}
-                  <Link to="/about" className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-[#020202] hover:bg-tj-darker transition-colors duration-700">
-                     <div className="mb-12 text-tj-gold relative z-10">
-                        <Heart size={24} />
-                     </div>
-                     <h3 className="font-display text-2xl text-tj-gold mb-6 tracking-widest relative z-10 uppercase">{t.home.cards.psych.title}</h3>
-                     <p className="text-gray-500 text-[10px] leading-relaxed mb-12 relative z-10 uppercase tracking-widest">
-                        {t.home.cards.psych.desc}
-                     </p>
-                     <span className="text-[10px] uppercase tracking-ultra text-white flex items-center gap-4 transition-all duration-700 mt-auto border-b border-transparent group-hover:border-tj-gold pb-1 w-max">
-                        {t.home.cards.psych.cta}
-                     </span>
-                  </Link>
-
-                  {/* Column 3 */}
-                  <div className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-black hover:bg-tj-darker transition-colors duration-700">
-                     <div className="mb-12 text-tj-gold relative z-10">
-                        <Zap size={24} />
-                     </div>
-                     <h3 className="font-display text-2xl text-white mb-6 tracking-widest relative z-10 uppercase">{t.home.cards.velocity.title}</h3>
-                     <p className="text-gray-500 text-[10px] leading-relaxed mb-12 relative z-10 uppercase tracking-widest">
-                        {t.home.cards.velocity.desc}
-                     </p>
-                     <span className="text-[10px] uppercase tracking-ultra text-white flex items-center gap-4 transition-all duration-700 mt-auto border-b border-transparent group-hover:border-white pb-1 w-max opacity-50">
-                        {t.home.cards.velocity.cta}
-                     </span>
-                  </div>
+                  {[
+                     { to: "/vin", icon: <Diamond size={24} />, title: t.home.cards.vetting.title, desc: t.home.cards.vetting.desc, cta: t.home.cards.vetting.cta, isLink: true },
+                     { to: "/about", icon: <Heart size={24} />, title: t.home.cards.psych.title, desc: t.home.cards.psych.desc, cta: t.home.cards.psych.cta, isLink: true, highlight: true },
+                     { to: "#", icon: <Zap size={24} />, title: t.home.cards.velocity.title, desc: t.home.cards.velocity.desc, cta: t.home.cards.velocity.cta, isLink: false },
+                  ].map((card, idx) => (
+                     <ScrollReveal key={idx} direction="up" delay={idx * 0.15}>
+                        {card.isLink ? (
+                           <Link
+                              to={card.to}
+                              className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-tj-green hover:bg-tj-greenDeep transition-all duration-700 hover:shadow-[0_10px_40px_rgba(212,175,55,0.08)] block"
+                           >
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-tj-greenDeep/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                              <div className="mb-12 text-tj-gold relative z-10 group-hover:scale-110 transition-transform duration-500">
+                                 {card.icon}
+                              </div>
+                              <h3 className={`font-display text-2xl ${card.highlight ? 'text-tj-gold' : 'text-white'} mb-6 tracking-widest relative z-10 uppercase`}>{card.title}</h3>
+                              <p className="text-gray-500 text-[10px] leading-relaxed mb-12 relative z-10 uppercase tracking-widest">
+                                 {card.desc}
+                              </p>
+                              <span className="text-[10px] uppercase tracking-ultra text-white flex items-center gap-4 transition-all duration-700 mt-auto border-b border-transparent group-hover:border-tj-gold pb-1 w-max relative z-10">
+                                 {card.cta}
+                              </span>
+                           </Link>
+                        ) : (
+                           <div className="p-12 md:p-20 group relative overflow-hidden flex flex-col items-start bg-tj-green hover:bg-tj-greenDeep transition-all duration-700">
+                              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-tj-greenDeep/30 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+                              <div className="mb-12 text-tj-gold relative z-10 group-hover:scale-110 transition-transform duration-500">
+                                 {card.icon}
+                              </div>
+                              <h3 className="font-display text-2xl text-white mb-6 tracking-widest relative z-10 uppercase">{card.title}</h3>
+                              <p className="text-gray-500 text-[10px] leading-relaxed mb-12 relative z-10 uppercase tracking-widest">
+                                 {card.desc}
+                              </p>
+                              <span className="text-[10px] uppercase tracking-ultra text-white/50 flex items-center gap-4 mt-auto pb-1 w-max relative z-10">
+                                 {card.cta}
+                              </span>
+                           </div>
+                        )}
+                     </ScrollReveal>
+                  ))}
                </div>
             </section>
 
