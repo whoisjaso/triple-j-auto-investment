@@ -33,24 +33,6 @@ const CountUpNumber = ({ value, suffix = '', label, icon }: { value: number; suf
    );
 };
 
-// --- HERO SVG PATHS ---
-
-const heroSvgPaths = [
-   { d: "M -100 120 Q 200 40 450 180 T 1100 100", duration: 6, strokeWidth: 1.2, maxOpacity: 0.5 },
-   { d: "M -50 250 C 150 150 350 300 550 200 S 850 100 1100 280", duration: 7, strokeWidth: 0.8, maxOpacity: 0.6 },
-   { d: "M -80 380 Q 300 280 600 400 T 1100 350", duration: 5.5, strokeWidth: 1.5, maxOpacity: 0.45 },
-   { d: "M -120 480 C 200 400 400 550 650 430 S 900 350 1100 500", duration: 7.5, strokeWidth: 0.6, maxOpacity: 0.55 },
-   { d: "M -60 560 Q 250 480 500 580 T 1100 520", duration: 6.5, strokeWidth: 1, maxOpacity: 0.5 },
-   { d: "M -100 180 C 300 80 500 250 700 150 S 950 200 1100 160", duration: 8, strokeWidth: 0.7, maxOpacity: 0.4 },
-   { d: "M -70 640 Q 350 560 650 650 T 1100 600", duration: 5, strokeWidth: 1.3, maxOpacity: 0.5 },
-   { d: "M -90 320 C 200 220 450 380 700 300 S 1000 250 1100 340", duration: 6.8, strokeWidth: 0.9, maxOpacity: 0.55 },
-];
-
-const heroSvgCircles = [
-   { cx: 200, cyStart: 150, cyEnd: 120, r: 1.5, duration: 10, maxOpacity: 0.25 },
-   { cx: 600, cyStart: 400, cyEnd: 370, r: 2, duration: 12, maxOpacity: 0.2 },
-   { cx: 850, cyStart: 250, cyEnd: 220, r: 1, duration: 8, maxOpacity: 0.3 },
-];
 
 const Home = () => {
    const { vehicles } = useStore();
@@ -94,7 +76,7 @@ const Home = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="bg-black overflow-hidden font-sans selection:bg-tj-gold selection:text-black"
+            className="bg-tj-green overflow-hidden font-sans selection:bg-tj-gold selection:text-black"
          >
 
             {/* --- PREMIUM SHOWROOM HERO --- */}
@@ -503,18 +485,41 @@ const Home = () => {
             </section>
 
             {/* --- INVENTORY CTA --- */}
-            <section className="h-[50vh] relative flex items-center overflow-hidden border-t border-white/10 group bg-black">
-               <div className="max-w-[1920px] mx-auto w-full px-6 flex flex-col md:flex-row items-center justify-between z-10 relative">
-                  <h2 className="text-5xl md:text-8xl font-display text-white tracking-tighter mix-blend-difference mb-8 md:mb-0">
-                     {t.home.vault.title.toUpperCase()}
-                  </h2>
-                  <Link to="/inventory" className="brutal-outline px-12 py-8 bg-transparent text-white border-white/20 hover:bg-white hover:text-black">
-                     {t.home.vault.enter}
-                  </Link>
+            <section className="relative min-h-[60vh] flex items-center overflow-hidden border-t border-white/10">
+               {/* Background with parallax effect */}
+               <div className="absolute inset-0">
+                  {featuredVehicles[1] && (
+                     <div
+                        className="absolute inset-0"
+                        style={{
+                           backgroundImage: `url(${featuredVehicles[1].imageUrl})`,
+                           backgroundSize: 'cover',
+                           backgroundPosition: 'center',
+                           backgroundAttachment: 'fixed',
+                        }}
+                     />
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-r from-tj-green/95 via-tj-green/85 to-tj-green/75" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_right,rgba(212,175,55,0.08)_0%,transparent_60%)]" />
                </div>
-               {/* Architectural overlay lines */}
-               <div className="absolute top-1/2 left-0 w-full h-px bg-white/5 pointer-events-none" />
-               <div className="absolute top-0 left-1/2 w-px h-full bg-white/5 pointer-events-none" />
+
+               {/* Gold corner accents */}
+               <div className="absolute top-8 left-8 w-12 h-12 border-t-2 border-l-2 border-tj-gold/30" />
+               <div className="absolute bottom-8 right-8 w-12 h-12 border-b-2 border-r-2 border-tj-gold/30" />
+
+               <div className="max-w-[1920px] mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row items-center justify-between z-10 relative py-16">
+                  <ScrollReveal direction="left">
+                     <h2 className="text-5xl md:text-8xl font-display text-white tracking-tighter mb-8 md:mb-0 uppercase">
+                        {t.home.vault.title.toUpperCase()}
+                     </h2>
+                  </ScrollReveal>
+                  <ScrollReveal direction="right" delay={0.2}>
+                     <MagneticButton href="/inventory" className="px-12 py-6 text-[11px]">
+                        {t.home.vault.enter}
+                        <ArrowRight size={14} />
+                     </MagneticButton>
+                  </ScrollReveal>
+               </div>
             </section>
 
          </motion.div >
