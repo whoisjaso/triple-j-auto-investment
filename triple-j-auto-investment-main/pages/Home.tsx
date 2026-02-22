@@ -362,75 +362,68 @@ const Home = () => {
                </div>
             </section>
 
-            {/* --- VALUE PILLARS (BRUTALIST STACK) --- */}
-            <section className="bg-black w-full border-t border-white/10">
-               <div className="flex flex-col">
+            {/* --- VALUE PILLARS --- */}
+            <section className="bg-tj-green w-full relative overflow-hidden">
+               <div className="absolute inset-0 bg-gradient-to-b from-tj-greenDeep/50 to-tj-green/50" />
+
+               <div className="relative flex flex-col">
 
                   {/* Pillar 01 */}
-                  <motion.div
-                     initial={{ opacity: 0 }}
-                     whileInView={{ opacity: 1 }}
-                     transition={{ duration: 0.8 }}
-                     viewport={{ once: true, margin: "-100px" }}
-                     className="w-full flex flex-col md:flex-row items-stretch border-b border-white/10"
-                  >
-                     <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-r border-white/10 flex items-center justify-center bg-tj-darker relative overflow-hidden">
-                        <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -left-10 md:left-0 top-1/2 -translate-y-1/2">01</span>
-                        <div className="relative z-10 text-tj-gold">
-                           <Fingerprint size={48} className="opacity-80" />
+                  <ScrollReveal direction="left" distance={80}>
+                     <div className="w-full flex flex-col md:flex-row items-stretch border-b border-white/10">
+                        <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-r border-white/10 flex items-center justify-center bg-tj-greenDeep/80 relative overflow-hidden">
+                           <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -left-10 md:left-0 top-1/2 -translate-y-1/2">01</span>
+                           <div className="relative z-10 text-tj-gold">
+                              <Fingerprint size={48} className="opacity-80" />
+                           </div>
+                        </div>
+                        <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-start bg-tj-green/40 backdrop-blur-sm">
+                           <div className="w-8 h-px bg-tj-gold/40 mb-6" />
+                           <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p1Title}</h3>
+                           <p className="text-gray-400 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
+                              {t.home.pillars.p1Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p1Highlight}</span>
+                           </p>
                         </div>
                      </div>
-                     <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-start bg-[#020202]">
-                        <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p1Title}</h3>
-                        <p className="text-gray-500 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
-                           {t.home.pillars.p1Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p1Highlight}</span>
-                        </p>
-                     </div>
-                  </motion.div>
+                  </ScrollReveal>
 
-                  {/* Pillar 02 (Reversed Assembly) */}
-                  <motion.div
-                     initial={{ opacity: 0 }}
-                     whileInView={{ opacity: 1 }}
-                     transition={{ duration: 0.8 }}
-                     viewport={{ once: true, margin: "-100px" }}
-                     className="w-full flex flex-col md:flex-row-reverse items-stretch border-b border-white/10"
-                  >
-                     <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-l border-white/10 flex items-center justify-center bg-tj-darker relative overflow-hidden">
-                        <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -right-10 md:right-0 top-1/2 -translate-y-1/2">02</span>
-                        <div className="relative z-10 text-tj-gold">
-                           <Zap size={48} className="opacity-80" />
+                  {/* Pillar 02 (Reversed) */}
+                  <ScrollReveal direction="right" distance={80}>
+                     <div className="w-full flex flex-col md:flex-row-reverse items-stretch border-b border-white/10">
+                        <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-l border-white/10 flex items-center justify-center bg-tj-greenDeep/80 relative overflow-hidden">
+                           <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -right-10 md:right-0 top-1/2 -translate-y-1/2">02</span>
+                           <div className="relative z-10 text-tj-gold">
+                              <Zap size={48} className="opacity-80" />
+                           </div>
+                        </div>
+                        <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-end text-right bg-tj-green/40 backdrop-blur-sm">
+                           <div className="w-8 h-px bg-tj-gold/40 mb-6 self-end" />
+                           <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p2Title}</h3>
+                           <p className="text-gray-400 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
+                              {t.home.pillars.p2Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p2Highlight}</span>
+                           </p>
                         </div>
                      </div>
-                     <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-end text-right bg-black">
-                        <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p2Title}</h3>
-                        <p className="text-gray-500 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
-                           {t.home.pillars.p2Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p2Highlight}</span>
-                        </p>
-                     </div>
-                  </motion.div>
+                  </ScrollReveal>
 
                   {/* Pillar 03 */}
-                  <motion.div
-                     initial={{ opacity: 0 }}
-                     whileInView={{ opacity: 1 }}
-                     transition={{ duration: 0.8 }}
-                     viewport={{ once: true, margin: "-100px" }}
-                     className="w-full flex flex-col md:flex-row items-stretch border-b border-white/10"
-                  >
-                     <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-r border-white/10 flex items-center justify-center bg-tj-darker relative overflow-hidden">
-                        <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -left-10 md:left-0 top-1/2 -translate-y-1/2">03</span>
-                        <div className="relative z-10 text-tj-gold">
-                           <Target size={48} className="opacity-80" />
+                  <ScrollReveal direction="left" distance={80}>
+                     <div className="w-full flex flex-col md:flex-row items-stretch border-b border-white/10">
+                        <div className="md:w-1/3 p-12 md:p-24 border-b md:border-b-0 md:border-r border-white/10 flex items-center justify-center bg-tj-greenDeep/80 relative overflow-hidden">
+                           <span className="font-display text-[150px] md:text-[200px] text-white/5 font-black tracking-tighter mix-blend-screen absolute -left-10 md:left-0 top-1/2 -translate-y-1/2">03</span>
+                           <div className="relative z-10 text-tj-gold">
+                              <Target size={48} className="opacity-80" />
+                           </div>
+                        </div>
+                        <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-start bg-tj-green/40 backdrop-blur-sm">
+                           <div className="w-8 h-px bg-tj-gold/40 mb-6" />
+                           <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p3Title}</h3>
+                           <p className="text-gray-400 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
+                              {t.home.pillars.p3Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p3Highlight}</span>
+                           </p>
                         </div>
                      </div>
-                     <div className="md:w-2/3 p-12 md:p-24 flex flex-col justify-center items-start bg-[#020202]">
-                        <h3 className="text-white font-display text-4xl sm:text-6xl tracking-tighter mb-8 uppercase">{t.home.pillars.p3Title}</h3>
-                        <p className="text-gray-500 text-xs md:text-sm uppercase tracking-widest leading-loose max-w-xl">
-                           {t.home.pillars.p3Desc} <br /><span className="text-white mt-8 block font-xl tracking-tight normal-case">{t.home.pillars.p3Highlight}</span>
-                        </p>
-                     </div>
-                  </motion.div>
+                  </ScrollReveal>
 
                </div>
             </section>
