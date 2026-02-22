@@ -24,9 +24,9 @@ const CountUpNumber = ({ value, suffix = '', label, icon }: { value: number; suf
    return (
       <div ref={ref} className="text-center">
          {icon && <div className="flex justify-center mb-3 text-tj-gold/60">{icon}</div>}
-         <div className="text-3xl md:text-5xl font-display text-white mb-2 tabular-nums">
+         <div className="text-3xl md:text-5xl font-display text-tj-gold mb-2 tabular-nums">
             <motion.span>{display}</motion.span>
-            {suffix && <span className="text-tj-gold">{suffix}</span>}
+            {suffix && <span className="text-tj-gold/70">{suffix}</span>}
          </div>
          <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-gray-400">{label}</p>
       </div>
@@ -225,33 +225,27 @@ const Home = () => {
 
 
             {/* --- AUTHORITY METRICS --- */}
-            <section className="relative py-16 md:py-24 bg-black border-b border-white/10 overflow-hidden">
-               {/* Subtle gradient background accent */}
-               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(212,175,55,0.03)_0%,transparent_60%)]" />
+            <section className="relative py-20 md:py-28 bg-tj-greenDeep border-b border-white/10 overflow-hidden">
+               {/* Gold radial glow */}
+               <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(212,175,55,0.08)_0%,transparent_60%)]" />
 
                <div className="relative max-w-5xl mx-auto px-4 md:px-6">
-                  {/* Section title */}
-                  <p className="text-center text-[10px] uppercase tracking-[0.4em] text-tj-gold/60 mb-12 font-display">
-                     {t.home.authority.title}
-                  </p>
+                  <ScrollReveal direction="up" distance={30}>
+                     <p className="text-center text-[10px] uppercase tracking-[0.4em] text-tj-gold/60 mb-16 font-display">
+                        {t.home.authority.title}
+                     </p>
+                  </ScrollReveal>
 
-                  {/* Metrics grid */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
                      {metrics.map((metric, i) => (
-                        <motion.div
-                           key={i}
-                           initial={{ opacity: 0, y: 20 }}
-                           whileInView={{ opacity: 1, y: 0 }}
-                           viewport={{ once: true, margin: "-50px" }}
-                           transition={{ delay: i * 0.1, duration: 0.5 }}
-                        >
+                        <ScrollReveal key={i} direction="up" delay={i * 0.1} distance={40}>
                            <CountUpNumber
                               value={metric.value}
                               suffix={metric.suffix}
                               label={metric.label}
                               icon={metric.icon}
                            />
-                        </motion.div>
+                        </ScrollReveal>
                      ))}
                   </div>
                </div>
