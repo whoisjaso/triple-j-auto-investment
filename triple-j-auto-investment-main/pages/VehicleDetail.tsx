@@ -38,6 +38,7 @@ import {
   Loader2,
   Bell,
   FileText,
+  RotateCcw,
 } from 'lucide-react';
 
 // Transform snake_case Supabase row to camelCase Vehicle (matches vehicles.ts loadVehicles)
@@ -84,6 +85,12 @@ const VehicleDetail: React.FC = () => {
   const { vehicles } = useStore();
   const { addViewed, vehicleIds: recentIds } = useRecentlyViewed();
   const { getBadges } = useUrgencyBadges();
+
+  // Phase 18: Capture previously viewed IDs at mount (before addViewed runs for this vehicle)
+  const prevViewedIdsRef = useRef<string[]>([]);
+  if (prevViewedIdsRef.current.length === 0 && recentIds.length > 0) {
+    prevViewedIdsRef.current = recentIds;
+  }
 
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -488,6 +495,15 @@ const VehicleDetail: React.FC = () => {
           {/* SECTION 3: Identity Headline + Vehicle Info */}
           {/* ========================================== */}
           <section className="py-8 border-t border-white/[0.04]">
+            {/* Phase 18: FOLLOW-05 Return visitor welcome badge */}
+            {prevViewedIdsRef.current.includes(vehicle.id) && (
+              <div className="mb-3">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-tj-gold/10 border border-tj-gold/20 text-tj-gold text-[10px] uppercase tracking-[0.2em]">
+                  <RotateCcw size={10} />
+                  {t.followUp.welcomeBack}
+                </span>
+              </div>
+            )}
             <h1 className="font-display text-2xl md:text-3xl text-white leading-tight">
               {headline}
             </h1>

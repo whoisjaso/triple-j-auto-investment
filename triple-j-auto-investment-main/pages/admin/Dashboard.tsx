@@ -3,11 +3,12 @@ import React, { useEffect, useState } from 'react';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { analyzeFinancialPerformance } from '../../services/geminiService';
-import { Target, Globe, Radio, User, Phone, Mail, Clock, MessageSquare, FileText, Car, TrendingUp, DollarSign, Activity, Wrench, Truck, PaintBucket, X, PieChart, ChevronRight, ChevronDown, AlertTriangle, Hourglass, LayoutDashboard, LogOut, Menu, ClipboardCheck, Key, CreditCard } from 'lucide-react';
+import { Target, Globe, Radio, User, Phone, Mail, Clock, MessageSquare, FileText, Car, TrendingUp, DollarSign, Activity, Wrench, Truck, PaintBucket, X, PieChart, ChevronRight, ChevronDown, AlertTriangle, Hourglass, LayoutDashboard, LogOut, Menu, ClipboardCheck, Key, CreditCard, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Markdown from 'react-markdown';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 import { AdminBehaviorPanel } from '../../components/admin/AdminBehaviorPanel';
+import { AdminFollowUpPanel } from '../../components/admin/AdminFollowUpPanel';
 
 // Admin Navigation Header Component
 const AdminHeader = () => {
@@ -141,6 +142,7 @@ const Dashboard = () => {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showProfitDetails, setShowProfitDetails] = useState(false);
   const [showBehavior, setShowBehavior] = useState(false);
+  const [showFollowUp, setShowFollowUp] = useState(false);
 
   // --- FINANCIAL CALCULATIONS ---
   const soldVehicles = vehicles.filter(v => v.status === 'Sold');
@@ -524,6 +526,39 @@ const Dashboard = () => {
             {showBehavior && (
               <div className="p-5 md:p-6 border-t border-white/[0.06]">
                 <AdminBehaviorPanel />
+              </div>
+            )}
+          </motion.div>
+
+          {/* FOLLOW-UP QUEUE (collapsible) */}
+          <motion.div
+            custom={3.6}
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="bg-[#080808] border border-white/[0.06] overflow-hidden mb-10"
+          >
+            <button
+              onClick={() => setShowFollowUp(!showFollowUp)}
+              className="w-full p-5 md:p-6 flex justify-between items-center hover:bg-white/[0.02] transition-colors"
+            >
+              <h3 className="text-white font-display text-lg tracking-wider flex items-center gap-3">
+                <Send size={16} className="text-tj-gold" />
+                Follow-Up Queue
+              </h3>
+              <div className="flex items-center gap-3">
+                <span className="text-[9px] uppercase tracking-[0.2em] text-gray-600 font-mono">
+                  {showFollowUp ? 'Collapse' : 'Expand'}
+                </span>
+                {showFollowUp
+                  ? <ChevronDown size={16} className="text-gray-400" />
+                  : <ChevronRight size={16} className="text-gray-400" />
+                }
+              </div>
+            </button>
+            {showFollowUp && (
+              <div className="p-5 md:p-6 border-t border-white/[0.06]">
+                <AdminFollowUpPanel />
               </div>
             )}
           </motion.div>
