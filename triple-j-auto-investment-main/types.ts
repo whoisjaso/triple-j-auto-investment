@@ -74,6 +74,9 @@ export interface Lead {
   utmMedium?: string;
   utmCampaign?: string;
   deviceType?: string;
+
+  // Phase 18: Behavioral Follow-Up
+  preferredLanguage?: string;
 }
 
 // Phase 16: Attribution

@@ -907,6 +907,18 @@ export const t = {
             clearChat: "Clear conversation",
             poweredBy: "AI Assistant",
             maxReached: "For a longer conversation, call us at (832) 400-9760."
+        },
+        followUp: {
+            consent: "By submitting, you agree to receive follow-up messages about your inquiry. Reply STOP to opt out of SMS.",
+            welcomeBack: "Welcome back",
+            queueTitle: "Follow-Up Queue",
+            queued: "Queued",
+            sent: "Sent",
+            cancelled: "Cancelled",
+            errored: "Errored",
+            sendsIn: "Sends in",
+            sentAt: "Sent",
+            noItems: "No follow-up items yet"
         }
     },
     es: {
@@ -1815,6 +1827,18 @@ export const t = {
             clearChat: "Borrar conversacion",
             poweredBy: "Asistente IA",
             maxReached: "Para una conversacion mas larga, llamenos al (832) 400-9760."
+        },
+        followUp: {
+            consent: "Al enviar, aceptas recibir mensajes de seguimiento sobre tu consulta. Responde STOP para cancelar SMS.",
+            welcomeBack: "Bienvenido de nuevo",
+            queueTitle: "Cola de Seguimiento",
+            queued: "En cola",
+            sent: "Enviado",
+            cancelled: "Cancelado",
+            errored: "Con error",
+            sendsIn: "Se envia en",
+            sentAt: "Enviado",
+            noItems: "No hay elementos de seguimiento"
         }
     }
 };

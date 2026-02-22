@@ -275,6 +275,9 @@ const Finance = () => {
                   >
                     {status === 'submitting' ? t.contact.form.submitting : t.inventory.modal.submit}
                   </button>
+                  <p className="text-[10px] text-gray-500 mt-3 text-center leading-relaxed">
+                    {t.followUp.consent}
+                  </p>
                 </form>
               </>
             )}

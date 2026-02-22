@@ -59,6 +59,8 @@ export function createVehicleLead(params: CreateVehicleLeadParams): Lead {
     utmMedium: attr.utm_medium,
     utmCampaign: attr.utm_campaign,
     deviceType: attr.device_type,
+    // Phase 18: Behavioral Follow-Up
+    preferredLanguage: localStorage.getItem('tj_lang') || 'en',
   };
 }
 

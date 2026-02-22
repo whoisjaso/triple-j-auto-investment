@@ -33,6 +33,8 @@ export async function loadLeads(
       utmMedium: row.utm_medium || undefined,
       utmCampaign: row.utm_campaign || undefined,
       deviceType: row.device_type || undefined,
+      // Phase 18: Behavioral Follow-Up
+      preferredLanguage: row.preferred_language || 'en',
     }));
     setLeads(transformed);
     console.log(`✅ Loaded ${data?.length || 0} leads from Supabase`);
@@ -60,6 +62,14 @@ export async function addLead(lead: Lead): Promise<void> {
       };
     }
 
+    // Phase 18: Auto-fill preferred language from localStorage (key: tj_lang, set by LanguageContext)
+    if (!lead.preferredLanguage) {
+      lead = {
+        ...lead,
+        preferredLanguage: localStorage.getItem('tj_lang') || 'en',
+      };
+    }
+
     const { error } = await supabase
       .from('leads')
       .insert([{
@@ -82,6 +92,8 @@ export async function addLead(lead: Lead): Promise<void> {
         utm_medium: lead.utmMedium || null,
         utm_campaign: lead.utmCampaign || null,
         device_type: lead.deviceType || null,
+        // Phase 18: Behavioral Follow-Up
+        preferred_language: lead.preferredLanguage || 'en',
       }]);
 
     if (error) {
