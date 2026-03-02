@@ -233,12 +233,13 @@ Plans:
   3. Each owner has a unique Family Circle referral code they can share, and the referral page shows their referral count alongside a community counter ("X families referred this month")
   4. Three days after purchase, the customer receives a personalized review request that frames leaving a review as helping other families
   5. Twelve to eighteen months post-purchase, the customer sees a "Ready to Upgrade?" prompt with their vehicle's estimated trade-in value
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 19-01: TBD
-- [ ] 19-02: TBD
-- [ ] 19-03: TBD
+- [ ] 19-01-PLAN.md -- Data foundation: DB migration (owner_referrals, referral_clicks, review_requests tables), TypeScript interfaces, ownerPortalService, bilingual translations
+- [ ] 19-02-PLAN.md -- Owner Portal page + vehicle dashboard: OwnerVehicleCard, OwnerDocuments, OwnerServiceReminders, OwnerValueTracker with Recharts chart, /owner route
+- [ ] 19-03-PLAN.md -- Family Circle referral program: OwnerReferralSection, OwnerUpgradeSection, ReferralLanding page, /refer/:code route
+- [ ] 19-04-PLAN.md -- Review generation Edge Function (process-review-requests) + human verification checkpoint
 
 ## Progress
 
@@ -257,8 +258,8 @@ Phases execute in numeric order: 9 -> 10 -> 11 -> 12 -> 13 -> 14 -> 15 -> 16 -> 
 | 15. Engagement Spectrum | v2.0 | 3/3 | Complete | 2026-02-19 |
 | 16. Behavioral Intelligence | v2.0 | 6/6 | Complete | 2026-02-20 |
 | 17. Divine Response | v2.0 | 3/3 | Complete | 2026-02-20 |
-| 18. Behavioral Follow-Up | 3/3 | Complete   | 2026-02-22 | - |
-| 19. Retention Engine | v2.0 | 0/TBD | Not started | - |
+| 18. Behavioral Follow-Up | v2.0 | 3/3 | Complete | 2026-02-22 |
+| 19. Retention Engine | v2.0 | 0/4 | Planning complete | - |
 
 ---
 *Roadmap created: 2026-02-13*
