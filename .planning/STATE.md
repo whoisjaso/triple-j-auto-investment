@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
 **Last Updated:** 2026-03-02
-**Session:** Phase 19 Plan 01 complete -- Retention Engine data foundation (migration, TypeScript interfaces, service layer, bilingual translations)
+**Session:** Phase 19 Plan 03 complete -- Referral program UI (OwnerReferralSection, OwnerUpgradeSection, ReferralLanding, /refer/:code route, OwnerPortal wiring)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 19 (Retention Engine) -- IN PROGRESS (Plan 01 data foundation complete)
+**Current focus:** Phase 19 (Retention Engine) -- IN PROGRESS (Plans 01-03 complete, Plan 04 remaining)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -31,16 +31,16 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
 **Phase:** 19 of 19 (Retention Engine) -- IN PROGRESS
-**Plan:** 1 of 4 complete (19-01 data foundation done)
-**Status:** Phase 19 Plan 01 complete -- DB migration, TypeScript interfaces, service layer, 84 bilingual translation keys shipped
-**Last activity:** 2026-03-02 -- 19-01 executed (phase-19-migration.sql, ownerPortalService.ts, types.ts extensions, translations.ts ownerPortal block)
+**Plan:** 3 of 4 complete (19-01 data, 19-02 portal UI, 19-03 referral + upgrade UI)
+**Status:** Phase 19 Plan 03 complete -- OwnerReferralSection, OwnerUpgradeSection, ReferralLanding.tsx, /refer/:code route, OwnerPortal updated with all 6 sections
+**Last activity:** 2026-03-02 -- 19-03 executed (OwnerReferralSection, OwnerUpgradeSection, ReferralLanding, App.tsx /refer/:code route, OwnerPortal wiring)
 
-Progress: [█████████████████████████████████████████] 43/46 plans (19-01 added)
+Progress: [█████████████████████████████████████████] 45/48 plans (19-03 added)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 43 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02, 17-03, 18-01, 18-02, 18-03, 19-01)
+- Total plans completed: 45 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02, 17-03, 18-01, 18-02, 18-03, 19-01, 19-02, 19-03)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -193,8 +193,13 @@ Progress: [███████████████████████
 - [Phase 19-01]: Translation keys use flat naming (referralLandingIntro vs referralLanding.intro) consistent with all other blocks in translations.ts
 - [Phase 19-02]: purchasePrice not on Registration interface -- OwnerValueTracker uses BHPH midpoint fallback (5000) pending Plan 03 extension to JOIN vehicles price
 - [Phase 19-02]: OwnerDocuments always shows As-Is Disclosure entry (BHPH sales are always as-is), Bill of Sale uses alert() placeholder pending Supabase storage URL wiring
+- [Phase 19-03]: Share button uses native share on mobile (/Mobi|Android/i) with clipboard fallback on desktop -- same PURCHASE_PRICE_FALLBACK=5000 as OwnerValueTracker
+- [Phase 19-03]: logReferralClick in ReferralLanding is non-blocking (fire-and-forget) so it never delays UI render; invalid referral codes show dealership intro as graceful fallback
+- [Phase 19-03]: ReferralVehicleCard is simplified variant (no SaveButton/urgency badges/filters) to keep referral landing page fast and focused on conversion
 
 ### Completed Work (Phase 19) -- IN PROGRESS
+
+- **19-03 (complete):** Referral program UI and upgrade section. OwnerReferralSection.tsx: referral code display (font-mono text-tj-gold), share/copy buttons (native share on mobile, clipboard fallback), 3-tier progress from REFERRAL_TIERS, community counter via getCommunityReferralCount. OwnerUpgradeSection.tsx: 12-month gate (upgradeNotYet message if < 12 months), trade-in estimate via estimateMarketValue, up to 3 matching vehicles from getUpgradeMatches, Talk to Us CTA. ReferralLanding.tsx: public /refer/:code page with warm intro (referrer first name from getReferrerName), logReferralClick on mount, Available vehicles grid (3-col lg, 2-col md, 1-col mobile), graceful invalid-code fallback. App.tsx: /refer/:code route (fully public). OwnerPortal.tsx: all 6 sections rendered + "I Left a Review" button calling markReviewCompleted.
 
 - **19-01 (complete):** Retention Engine data foundation. phase-19-migration.sql: owner_referrals table (referral_code/link/counts/reward_tier, RLS authenticated SELECT by phone), referral_clicks table (anon INSERT for landing page tracking), review_requests table (UNIQUE per registration+channel+type, service_role only), mileage_at_purchase and review_completed columns on registrations, generate_referral_code() function (XXX-YYYY format, excludes confusable chars 0/O/I/1), auto_create_owner_referral() trigger (fires on sticker_delivered transition, idempotent ON CONFLICT DO NOTHING), snapshot_mileage_at_purchase() trigger, enqueue_review_requests() + enqueue_followup_review_requests() SECURITY DEFINER functions, pg_cron schedules in DO/EXCEPTION block, 4 indexes. types.ts: OwnerReferral, ReferralClick, ReviewRequest interfaces + SERVICE_REMINDER_INTERVALS + REFERRAL_TIERS constants. services/ownerPortalService.ts: 7 exported functions (getOwnerData, getReferralData, getCommunityReferralCount, logReferralClick, getReferrerName, getUpgradeMatches, markReviewCompleted). translations.ts: ownerPortal block with 42 bilingual keys per language (84 total strings).
 
@@ -325,7 +330,7 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 
 ## Session Continuity
 
-**Last session:** 2026-03-02T06:28:09.177Z
-**Stopped at:** Completed 19-02-PLAN.md
+**Last session:** 2026-03-02T06:29:36Z
+**Stopped at:** Completed 19-03-PLAN.md
 **Resume file:** None
-**Resume:** Phase 18 fully complete (both plans done). Behavioral follow-up system end-to-end: backend queue (18-01) + frontend wiring (18-02). Next: Phase 19 (if exists) or production readiness. Manual items still needed: Edge Function secrets (RETELL_API_KEY, RETELL_OUTBOUND_AGENT_ID, RETELL_OUTBOUND_NUMBER, GEMINI_API_KEY), pg_cron enable in Supabase dashboard, Phase 9 deployment items.
+**Resume:** Phase 19 Plans 01-03 complete. Remaining: 19-04 (Review Edge Function -- enqueues SMS/email review requests, processes review_requests table). Manual items still needed: Edge Function secrets (RETELL_API_KEY, RETELL_OUTBOUND_AGENT_ID, RETELL_OUTBOUND_NUMBER, GEMINI_API_KEY), pg_cron enable in Supabase dashboard, Phase 9 deployment items.
