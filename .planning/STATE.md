@@ -191,6 +191,8 @@ Progress: [███████████████████████
 - [Phase 18-behavioral-follow-up]: [18-03] Index uq_pending_follow_up columns expanded from (lead_id, trigger_type) to (lead_id, trigger_type, channel) to permit Tier 3 dual-channel rows while still blocking true duplicates
 - [Phase 19-retention-engine]: referral_code FK on referral_clicks for direct lookups; anon INSERT on referral_clicks for unauthenticated landing page tracking
 - [Phase 19-01]: Translation keys use flat naming (referralLandingIntro vs referralLanding.intro) consistent with all other blocks in translations.ts
+- [Phase 19-02]: purchasePrice not on Registration interface -- OwnerValueTracker uses BHPH midpoint fallback (5000) pending Plan 03 extension to JOIN vehicles price
+- [Phase 19-02]: OwnerDocuments always shows As-Is Disclosure entry (BHPH sales are always as-is), Bill of Sale uses alert() placeholder pending Supabase storage URL wiring
 
 ### Completed Work (Phase 19) -- IN PROGRESS
 
@@ -323,7 +325,7 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 
 ## Session Continuity
 
-**Last session:** 2026-03-02T06:18:19.734Z
-**Stopped at:** Completed 19-01-PLAN.md
+**Last session:** 2026-03-02T06:28:09.177Z
+**Stopped at:** Completed 19-02-PLAN.md
 **Resume file:** None
 **Resume:** Phase 18 fully complete (both plans done). Behavioral follow-up system end-to-end: backend queue (18-01) + frontend wiring (18-02). Next: Phase 19 (if exists) or production readiness. Manual items still needed: Edge Function secrets (RETELL_API_KEY, RETELL_OUTBOUND_AGENT_ID, RETELL_OUTBOUND_NUMBER, GEMINI_API_KEY), pg_cron enable in Supabase dashboard, Phase 9 deployment items.
