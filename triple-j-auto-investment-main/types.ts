@@ -720,3 +720,52 @@ export const INSURANCE_STATUS_LABELS: Record<InsuranceVerificationStatus, string
   failed: 'Failed',
   overridden: 'Overridden',
 };
+
+// ================================================================
+// OWNER PORTAL TYPES (Phase 19)
+// ================================================================
+
+export interface OwnerReferral {
+  id: string;
+  registrationId: string;
+  customerPhone: string;
+  referrerName: string;
+  referralCode: string;
+  referralLink: string;
+  referralCount: number;
+  convertedCount: number;
+  rewardTier: number;
+  createdAt: string;
+}
+
+export interface ReferralClick {
+  id: string;
+  referralCode: string;
+  clickedAt: string;
+  deviceType?: string;
+}
+
+export interface ReviewRequest {
+  id: string;
+  registrationId: string;
+  channel: 'sms' | 'email';
+  requestType: 'initial' | 'followup';
+  sendAfter: string;
+  sent: boolean;
+  sentAt?: string;
+  createdAt: string;
+}
+
+// Service reminder interval constants
+export const SERVICE_REMINDER_INTERVALS = [
+  { months: 3, label: '3-Month Service' },
+  { months: 6, label: '6-Month Service' },
+  { months: 12, label: '12-Month Service' },
+] as const;
+
+// Referral reward tiers
+export const REFERRAL_TIERS = [
+  { count: 1, reward: 50, label: '1st Referral' },
+  { count: 3, reward: 100, label: '3rd Referral' },
+  { count: 5, reward: 200, label: '5th Referral' },
+] as const;
