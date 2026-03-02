@@ -75,6 +75,7 @@ const VehicleDetail = lazyWithErrorHandling(() => import('./pages/VehicleDetail'
 const CustomerLogin = lazyWithErrorHandling(() => import('./pages/CustomerLogin'), 'Customer Login');
 const CustomerDashboard = lazyWithErrorHandling(() => import('./pages/CustomerDashboard'), 'Customer Dashboard');
 const OwnerPortal = lazyWithErrorHandling(() => import('./pages/OwnerPortal'), 'Owner Portal');
+const ReferralLanding = lazyWithErrorHandling(() => import('./pages/ReferralLanding'), 'Referral');
 
 // Admin Pages (Lazy Loaded)
 const AdminDashboard = lazyWithErrorHandling(() => import('./pages/admin/Dashboard'), 'Admin Dashboard');
@@ -474,6 +475,7 @@ const AppContent = () => {
                   <Route path="/customer/login" element={<CustomerLogin />} />
                   <Route path="/customer/dashboard" element={<CustomerDashboard />} />
                   <Route path="/owner" element={<OwnerPortal />} />
+                  <Route path="/refer/:code" element={<ReferralLanding />} />
 
                   <Route path="/admin/dashboard" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
                   <Route path="/admin/inventory" element={<ProtectedRoute><AdminInventory /></ProtectedRoute>} />

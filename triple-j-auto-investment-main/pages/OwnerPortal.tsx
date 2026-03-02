@@ -12,13 +12,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabase/config';
-import { getOwnerData, getReferralData } from '../services/ownerPortalService';
+import { getOwnerData, getReferralData, markReviewCompleted } from '../services/ownerPortalService';
 import { useLanguage } from '../context/LanguageContext';
 import { SEO } from '../components/SEO';
 import OwnerVehicleCard from '../components/owner/OwnerVehicleCard';
 import OwnerDocuments from '../components/owner/OwnerDocuments';
 import OwnerServiceReminders from '../components/owner/OwnerServiceReminders';
 import OwnerValueTracker from '../components/owner/OwnerValueTracker';
+import OwnerReferralSection from '../components/owner/OwnerReferralSection';
+import OwnerUpgradeSection from '../components/owner/OwnerUpgradeSection';
 import type { Registration, OwnerReferral } from '../types';
 
 const OwnerPortal: React.FC = () => {
@@ -30,6 +32,8 @@ const OwnerPortal: React.FC = () => {
   const [referral, setReferral] = useState<OwnerReferral | null>(null);
   const [loading, setLoading] = useState(true);
   const [firstName, setFirstName] = useState('');
+  const [reviewDone, setReviewDone] = useState(false);
+  const [reviewThanks, setReviewThanks] = useState(false);
 
   useEffect(() => {
     const init = async () => {
@@ -159,7 +163,33 @@ const OwnerPortal: React.FC = () => {
           {/* Value Tracker */}
           <OwnerValueTracker registration={registration} />
 
-          {/* Plan 03 will add: Referral section + Upgrade section */}
+          {/* Referral Section */}
+          <OwnerReferralSection referral={referral} />
+
+          {/* Upgrade Section */}
+          <OwnerUpgradeSection registration={registration} />
+
+          {/* I Left a Review */}
+          <div className="p-6 md:p-8 bg-black/40 border border-tj-gold/10 rounded-lg text-center">
+            {reviewThanks ? (
+              <p className="text-sm text-tj-gold">{tp.reviewThanks}</p>
+            ) : (
+              <button
+                onClick={async () => {
+                  if (reviewDone || !registration) return;
+                  const success = await markReviewCompleted(registration.id);
+                  if (success) {
+                    setReviewDone(true);
+                    setReviewThanks(true);
+                  }
+                }}
+                disabled={reviewDone}
+                className="min-h-[44px] py-4 px-8 text-xs tracking-[0.3em] uppercase border border-tj-gold/30 text-tj-gold hover:border-tj-gold/60 rounded transition-colors disabled:opacity-50"
+              >
+                {tp.reviewCompleted}
+              </button>
+            )}
+          </div>
 
         </div>
       </div>
