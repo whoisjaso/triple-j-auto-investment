@@ -196,6 +196,8 @@ Progress: [███████████████████████
 - [Phase 19-03]: Share button uses native share on mobile (/Mobi|Android/i) with clipboard fallback on desktop -- same PURCHASE_PRICE_FALLBACK=5000 as OwnerValueTracker
 - [Phase 19-03]: logReferralClick in ReferralLanding is non-blocking (fire-and-forget) so it never delays UI render; invalid referral codes show dealership intro as graceful fallback
 - [Phase 19-03]: ReferralVehicleCard is simplified variant (no SaveButton/urgency badges/filters) to keep referral landing page fast and focused on conversion
+- [Phase 19-04]: review_requests table has no error column -- error details logged to console only; markSent updates sent=true + sent_at only
+- [Phase 19-04]: GOOGLE_REVIEW_LINK: TODO(business-data) placeholder in process-review-requests -- replace with actual Triple J Google Business review link before production
 
 ### Completed Work (Phase 19) -- IN PROGRESS
 
@@ -330,7 +332,7 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 
 ## Session Continuity
 
-**Last session:** 2026-03-02T06:29:36Z
-**Stopped at:** Completed 19-03-PLAN.md
+**Last session:** 2026-03-02T06:41:30.375Z
+**Stopped at:** Completed 19-04 Task 1 (process-review-requests Edge Function) -- awaiting checkpoint Task 2 (Owner Portal human verify)
 **Resume file:** None
 **Resume:** Phase 19 Plans 01-03 complete. Remaining: 19-04 (Review Edge Function -- enqueues SMS/email review requests, processes review_requests table). Manual items still needed: Edge Function secrets (RETELL_API_KEY, RETELL_OUTBOUND_AGENT_ID, RETELL_OUTBOUND_NUMBER, GEMINI_API_KEY), pg_cron enable in Supabase dashboard, Phase 9 deployment items.
