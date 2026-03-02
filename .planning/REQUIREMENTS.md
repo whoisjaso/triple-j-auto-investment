@@ -85,12 +85,12 @@ Requirements for v2.0 Psychological Architecture & Production Launch. Organized 
 
 ### Owner Portal & Retention
 
-- [ ] **PORTAL-01**: Owner Portal section exclusive to Triple J customers (post-purchase)
-- [ ] **PORTAL-02**: Vehicle dashboard -- service reminders, warranty status, digital purchase documents
-- [ ] **PORTAL-03**: Vehicle value tracker (estimated current value -- endowment reinforcement)
-- [ ] **PORTAL-04**: Family Circle referral program -- unique codes, reward tracking, social proof counter
-- [ ] **PORTAL-05**: Review generation engine -- personalized request 3 days post-purchase
-- [ ] **PORTAL-06**: "Ready to Upgrade?" re-entry loop -- 12-18 months post-purchase curiosity trigger
+- [x] **PORTAL-01**: Owner Portal section exclusive to Triple J customers (post-purchase)
+- [x] **PORTAL-02**: Vehicle dashboard -- service reminders, warranty status, digital purchase documents
+- [x] **PORTAL-03**: Vehicle value tracker (estimated current value -- endowment reinforcement)
+- [x] **PORTAL-04**: Family Circle referral program -- unique codes, reward tracking, social proof counter
+- [x] **PORTAL-05**: Review generation engine -- personalized request 3 days post-purchase
+- [x] **PORTAL-06**: "Ready to Upgrade?" re-entry loop -- 12-18 months post-purchase curiosity trigger
 
 ### Content & Brand Alignment
 
@@ -279,12 +279,12 @@ Deferred to future release. Tracked but not in current roadmap.
 | FOLLOW-03 | Phase 18: Behavioral Follow-Up | Complete |
 | FOLLOW-04 | Phase 18: Behavioral Follow-Up | Complete |
 | FOLLOW-05 | Phase 18: Behavioral Follow-Up | Complete |
-| PORTAL-01 | Phase 19: Retention Engine | Pending |
-| PORTAL-02 | Phase 19: Retention Engine | Pending |
-| PORTAL-03 | Phase 19: Retention Engine | Pending |
-| PORTAL-04 | Phase 19: Retention Engine | Pending |
-| PORTAL-05 | Phase 19: Retention Engine | Pending |
-| PORTAL-06 | Phase 19: Retention Engine | Pending |
+| PORTAL-01 | Phase 19: Retention Engine | Complete |
+| PORTAL-02 | Phase 19: Retention Engine | Complete |
+| PORTAL-03 | Phase 19: Retention Engine | Complete |
+| PORTAL-04 | Phase 19: Retention Engine | Complete |
+| PORTAL-05 | Phase 19: Retention Engine | Complete |
+| PORTAL-06 | Phase 19: Retention Engine | Complete |
 
 **Coverage:**
 - v2.0 requirements: 95 total (85 original + 10 GEO/AEO)

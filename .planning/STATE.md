@@ -1,7 +1,7 @@
 # Project State: Triple J Auto Investment
 
-**Last Updated:** 2026-02-22
-**Session:** Phase 18 Plan 03 complete -- dedup index gap closure (uq_pending_follow_up channel column fix, FOLLOW-03 fully satisfied)
+**Last Updated:** 2026-03-02
+**Session:** Phase 19 Plan 01 complete -- Retention Engine data foundation (migration, TypeScript interfaces, service layer, bilingual translations)
 
 ---
 
@@ -10,7 +10,7 @@
 See: .planning/PROJECT.md (updated 2026-02-13)
 
 **Core Value:** Every page, every interaction engineered to move a stranger through a psychological funnel from skeptic to buyer to evangelist -- built on the SOVEREIGN framework (internal only; customer-facing content uses honest automotive dealership language).
-**Current focus:** Phase 18 (Behavioral Follow-Up) -- ALL COMPLETE (Plan 01 + Plan 02 + Plan 03 gap closure done)
+**Current focus:** Phase 19 (Retention Engine) -- IN PROGRESS (Plan 01 data foundation complete)
 
 **Key Files:**
 - `.planning/PROJECT.md` - Project definition
@@ -30,17 +30,17 @@ See: .planning/PROJECT.md (updated 2026-02-13)
 ## Current Position
 
 **Milestone:** v2.0 Psychological Architecture & Production Launch
-**Phase:** 18 of 19 (Behavioral Follow-Up) -- COMPLETE
-**Plan:** 3 of 3 complete (18-01 + 18-02 + 18-03 done)
-**Status:** Phase 18 fully complete -- follow-up backend + frontend wiring + dedup index gap closure shipped
-**Last activity:** 2026-02-22 -- 18-03 executed (uq_pending_follow_up index channel column fix, FOLLOW-03 fully satisfied)
+**Phase:** 19 of 19 (Retention Engine) -- IN PROGRESS
+**Plan:** 1 of 4 complete (19-01 data foundation done)
+**Status:** Phase 19 Plan 01 complete -- DB migration, TypeScript interfaces, service layer, 84 bilingual translation keys shipped
+**Last activity:** 2026-03-02 -- 19-01 executed (phase-19-migration.sql, ownerPortalService.ts, types.ts extensions, translations.ts ownerPortal block)
 
-Progress: [████████████████████████████████████████] 42/42 plans (18-03 added)
+Progress: [█████████████████████████████████████████] 43/46 plans (19-01 added)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 42 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02, 17-03, 18-01, 18-02, 18-03)
+- Total plans completed: 43 (v2.0: 09-03, 09-04, 10-01, 10-02, 10-03, 10-04, 10-05, 10-06, 11-01, 11-02, 11-03, 11-04, 11-05, 11-06, 11-07, 11-08, 12-01, 12-02, 12-03, 12-04, 13-01, 13-02, 13-03, 14-01, 14-02, 14-03, 14-04, 15-01, 15-02, 15-03, 16-01, 16-02, 16-03, 16-04, 16-05, 16-06, 17-01, 17-02, 17-03, 18-01, 18-02, 18-03, 19-01)
 - v1 baseline: 30 plans in 15 days (2 plans/day avg)
 
 ---
@@ -189,6 +189,12 @@ Progress: [███████████████████████
 - **[18-02]** Welcome badge uses bilingual t.followUp.welcomeBack; admin panel strings are English-only (admin always English)
 - [Phase 18]: localStorage key tj_lang used for language detection in addLead and createVehicleLead (no circular LanguageContext import)
 - [Phase 18-behavioral-follow-up]: [18-03] Index uq_pending_follow_up columns expanded from (lead_id, trigger_type) to (lead_id, trigger_type, channel) to permit Tier 3 dual-channel rows while still blocking true duplicates
+- [Phase 19-retention-engine]: referral_code FK on referral_clicks for direct lookups; anon INSERT on referral_clicks for unauthenticated landing page tracking
+- [Phase 19-01]: Translation keys use flat naming (referralLandingIntro vs referralLanding.intro) consistent with all other blocks in translations.ts
+
+### Completed Work (Phase 19) -- IN PROGRESS
+
+- **19-01 (complete):** Retention Engine data foundation. phase-19-migration.sql: owner_referrals table (referral_code/link/counts/reward_tier, RLS authenticated SELECT by phone), referral_clicks table (anon INSERT for landing page tracking), review_requests table (UNIQUE per registration+channel+type, service_role only), mileage_at_purchase and review_completed columns on registrations, generate_referral_code() function (XXX-YYYY format, excludes confusable chars 0/O/I/1), auto_create_owner_referral() trigger (fires on sticker_delivered transition, idempotent ON CONFLICT DO NOTHING), snapshot_mileage_at_purchase() trigger, enqueue_review_requests() + enqueue_followup_review_requests() SECURITY DEFINER functions, pg_cron schedules in DO/EXCEPTION block, 4 indexes. types.ts: OwnerReferral, ReferralClick, ReviewRequest interfaces + SERVICE_REMINDER_INTERVALS + REFERRAL_TIERS constants. services/ownerPortalService.ts: 7 exported functions (getOwnerData, getReferralData, getCommunityReferralCount, logReferralClick, getReferrerName, getUpgradeMatches, markReviewCompleted). translations.ts: ownerPortal block with 42 bilingual keys per language (84 total strings).
 
 ### Completed Work (Phase 18) -- ALL COMPLETE
 
@@ -317,7 +323,7 @@ None -- Phase 12 is fully complete (all 4 plans done, including gap closure).
 
 ## Session Continuity
 
-**Last session:** 2026-03-02T05:37:45.055Z
-**Stopped at:** Phase 19 context gathered
-**Resume file:** .planning/phases/19-retention-engine/19-CONTEXT.md
+**Last session:** 2026-03-02T06:18:19.734Z
+**Stopped at:** Completed 19-01-PLAN.md
+**Resume file:** None
 **Resume:** Phase 18 fully complete (both plans done). Behavioral follow-up system end-to-end: backend queue (18-01) + frontend wiring (18-02). Next: Phase 19 (if exists) or production readiness. Manual items still needed: Edge Function secrets (RETELL_API_KEY, RETELL_OUTBOUND_AGENT_ID, RETELL_OUTBOUND_NUMBER, GEMINI_API_KEY), pg_cron enable in Supabase dashboard, Phase 9 deployment items.
