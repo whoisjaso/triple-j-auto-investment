@@ -42,6 +42,15 @@ Every buyer becomes a node in a referral network. The Owner Portal reinforces th
 - Monthly recalculation based on age progression -- shows gradual change, feels alive
 - Mini chart display: small line chart showing value over time since purchase -- visual reinforcement of ownership journey
 
+### Mobile-First Design
+- All Phase 19 components must be mobile-first -- most Triple J customers will access the Owner Portal, referral links, and review prompts on their phones
+- Follow Phase 11 established patterns: 44px minimum touch targets, p-6 md:p-8 card padding, py-4 px-8 text-xs tracking-[0.3em] CTA buttons
+- Owner Portal dashboard: single-column stacked layout on mobile (vehicle photo, then stats, then documents, then value tracker), wider layout on desktop
+- Value tracker mini chart must be legible at 375px viewport -- full width on mobile, not squeezed into a sidebar
+- Referral sharing buttons (copy link, share code) need large tap targets -- these are the primary actions owners take on mobile
+- Referral landing page must load fast and look good on mobile -- this is where referred friends first encounter Triple J
+- Service reminder checklist items need comfortable tap/scroll spacing on mobile
+
 ### Claude's Discretion
 - Exact portal page layout and component structure
 - Chart library choice for value tracker mini chart
@@ -60,6 +69,7 @@ Every buyer becomes a node in a referral network. The Owner Portal reinforces th
 - Review request framing focuses on community ("help other families") rather than asking for a favor
 - Value tracker with mini chart reinforces the ownership journey visually over time
 - Cost-per-day framing shrinks the perceived cost as ownership duration increases
+- Mobile-first everything -- customers will access portal, referral links, and review prompts primarily from their phones
 
 </specifics>
 
