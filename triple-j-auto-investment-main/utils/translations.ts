@@ -141,7 +141,83 @@ export const t = {
                     "FINANCING AVAILABLE"
                 ]
             },
-            architecture: "What Sets Us Apart"
+            architecture: "What Sets Us Apart",
+            // Luxury homepage (current design)
+            luxury: {
+                // Maybach scroll animation
+                maybach: {
+                    loading: "Loading Sovereign Experience...",
+                    logoCaption: "Triple J Auto Investment",
+                    phase1Label: "The Standard",
+                    phase1Text: "Identity precedes",
+                    phase1Text2: "results.",
+                    phase2Label: "The Caliber",
+                    phase2Text: "Uncompromising",
+                    phase2Text2: "opulence.",
+                    phase3Label: "The Outcome",
+                    phase3Text: "Acquire your",
+                    phase3Text2: "vehicle asset.",
+                    phase3Cta: "Explore Collection"
+                },
+                // Key scroll animation
+                key: {
+                    loading: "Loading...",
+                    phase1Label: "The Instrument",
+                    phase1Text: "Possession",
+                    phase1Text2: "begins here.",
+                    phase2Label: "The Ritual",
+                    phase2Text: "Crafted for",
+                    phase2Text2: "the sovereign.",
+                    phase3Label: "The Acquisition",
+                    phase3Text: "Claim your key.",
+                    phase3Cta: "Browse Collection"
+                },
+                // Collection section
+                collection: {
+                    label: "The Collection",
+                    title: "Sovereign Assets",
+                    emptyMessage: "Our collection is currently undergoing curation. Please contact our concierge for off-market availability and private acquisitions.",
+                    contactConcierge: "Contact Concierge",
+                    viewAll: "View Complete Collection"
+                },
+                // Experience section
+                experience: {
+                    label: "The Experience",
+                    title: "Precision in every detail.",
+                    item1Title: "AI-Powered Operations",
+                    item1Desc: "Our 24/7 AI Concierge, Divine, ensures you have immediate access to information, scheduling, and support. Flawless execution, anytime.",
+                    item2Title: "Transparent Valuation",
+                    item2Desc: "We utilize rigorous data-backed algorithms to price our assets. No hidden fees. No opaque negotiations. Just sovereign value.",
+                    item3Title: "White-Glove Delivery",
+                    item3Desc: "Discreet, on-time delivery anywhere in Houston. Your asset arrives fully detailed, pristine, and ready for the road."
+                },
+                // Divine concierge CTA
+                concierge: {
+                    label: "Introducing Divine",
+                    title: "Your Personal Concierge.",
+                    title2: "Available 24/7.",
+                    connectNow: "Connect Now",
+                    exploreEthos: "Explore Ethos"
+                },
+                // Trust strip
+                trust: {
+                    established: "Est. 2024",
+                    location: "Houston, TX",
+                    license: "License P171632",
+                    bilingual: "Bilingual Service"
+                }
+            },
+            // Luxury nav labels
+            luxuryNav: {
+                sovereignAssets: "Sovereign Assets",
+                authentication: "Authentication",
+                philosophy: "Philosophy",
+                concierge: "Concierge",
+                portal: "Portal",
+                exit: "Exit",
+                dashboard: "Dashboard",
+                exitPortal: "Exit Portal"
+            }
         },
         inventory: {
             title: "Our Vehicles",
@@ -919,6 +995,62 @@ export const t = {
             sendsIn: "Sends in",
             sentAt: "Sent",
             noItems: "No follow-up items yet"
+        },
+        ownerPortal: {
+            title: "Owner Portal",
+            welcome: "Welcome back",
+            emptyState: "Your Owner Portal will be ready once your purchase is complete.",
+            loading: "Loading your portal...",
+            yourVehicle: "Your Vehicle",
+            purchased: "Purchased",
+            daysOwned: "Days Owned",
+            documents: "Your Documents",
+            billOfSale: "Bill of Sale",
+            asIsDisclosure: "As-Is Disclosure",
+            viewDocument: "View",
+            noDocuments: "Contact us for digital copies of your documents.",
+            serviceReminders: "Service Schedule",
+            month3: "3-Month Service",
+            month6: "6-Month Service",
+            month12: "12-Month Service",
+            due: "Due",
+            completed: "Completed",
+            upcoming: "Upcoming",
+            maintenanceChecklist: [
+                { item: "Oil Change" },
+                { item: "Tire Rotation" },
+                { item: "Brake Inspection" },
+                { item: "Fluid Check" },
+                { item: "Filter Replacement" },
+                { item: "Battery Check" }
+            ],
+            valueTracker: "Vehicle Value Tracker",
+            currentValue: "Estimated Value",
+            costPerDay: "Cost Per Day",
+            purchasePrice: "Purchase Price",
+            valueOverTime: "Value Over Time",
+            referralTitle: "Family Circle Referral Program",
+            yourCode: "Your Referral Code",
+            yourLink: "Your Referral Link",
+            shareLink: "Share Link",
+            copyCode: "Copy Code",
+            copied: "Copied!",
+            referralCount: "Your Referrals",
+            communityCount: "Families introduced to Triple J this month",
+            tierProgress: "Reward Progress",
+            tier1: "$50 reward at 1 referral",
+            tier2: "$100 reward at 3 referrals",
+            tier3: "$200 reward at 5 referrals",
+            referralLandingIntro: "A Personal Recommendation",
+            referralLandingHeading: "thinks you'd love Triple J",
+            referralLandingSubtext: "Browse our current inventory below -- trusted vehicles for Houston families.",
+            upgradeTitle: "Ready to Upgrade?",
+            tradeInEstimate: "Estimated Trade-In Value",
+            upgradeMatches: "Vehicles You Might Like",
+            talkToUs: "Talk to Us About Upgrading",
+            upgradeNotYet: "Your upgrade options will appear 12 months after purchase.",
+            reviewCompleted: "I Left a Review",
+            reviewThanks: "Thank you for helping other families!"
         }
     },
     es: {
@@ -1061,7 +1193,75 @@ export const t = {
                     "FINANCIAMIENTO DISPONIBLE"
                 ]
             },
-            architecture: "Lo Que Nos Diferencia"
+            architecture: "Lo Que Nos Diferencia",
+            luxury: {
+                maybach: {
+                    loading: "Cargando Experiencia Soberana...",
+                    logoCaption: "Triple J Auto Investment",
+                    phase1Label: "El Estandar",
+                    phase1Text: "La identidad precede",
+                    phase1Text2: "los resultados.",
+                    phase2Label: "El Calibre",
+                    phase2Text: "Opulencia",
+                    phase2Text2: "sin compromisos.",
+                    phase3Label: "El Resultado",
+                    phase3Text: "Adquiera su",
+                    phase3Text2: "activo vehicular.",
+                    phase3Cta: "Explorar Coleccion"
+                },
+                key: {
+                    loading: "Cargando...",
+                    phase1Label: "El Instrumento",
+                    phase1Text: "La posesion",
+                    phase1Text2: "comienza aqui.",
+                    phase2Label: "El Ritual",
+                    phase2Text: "Fabricado para",
+                    phase2Text2: "el soberano.",
+                    phase3Label: "La Adquisicion",
+                    phase3Text: "Reclame su llave.",
+                    phase3Cta: "Ver Coleccion"
+                },
+                collection: {
+                    label: "La Coleccion",
+                    title: "Activos Soberanos",
+                    emptyMessage: "Nuestra coleccion se encuentra en proceso de curacion. Contacte a nuestro concierge para disponibilidad fuera de mercado y adquisiciones privadas.",
+                    contactConcierge: "Contactar Concierge",
+                    viewAll: "Ver Coleccion Completa"
+                },
+                experience: {
+                    label: "La Experiencia",
+                    title: "Precision en cada detalle.",
+                    item1Title: "Operaciones con IA",
+                    item1Desc: "Nuestro Concierge de IA 24/7, Divine, le garantiza acceso inmediato a informacion, agenda y soporte. Ejecucion impecable, en todo momento.",
+                    item2Title: "Valuacion Transparente",
+                    item2Desc: "Utilizamos algoritmos rigurosos respaldados por datos para fijar precios. Sin cargos ocultos. Sin negociaciones opacas. Solo valor soberano.",
+                    item3Title: "Entrega de Primera Clase",
+                    item3Desc: "Entrega discreta y puntual en cualquier parte de Houston. Su activo llega completamente detallado, impecable y listo para el camino."
+                },
+                concierge: {
+                    label: "Presentamos a Divine",
+                    title: "Su Concierge Personal.",
+                    title2: "Disponible 24/7.",
+                    connectNow: "Conectar Ahora",
+                    exploreEthos: "Explorar Filosofia"
+                },
+                trust: {
+                    established: "Est. 2024",
+                    location: "Houston, TX",
+                    license: "Licencia P171632",
+                    bilingual: "Servicio Bilingue"
+                }
+            },
+            luxuryNav: {
+                sovereignAssets: "Activos Soberanos",
+                authentication: "Autenticacion",
+                philosophy: "Filosofia",
+                concierge: "Concierge",
+                portal: "Portal",
+                exit: "Salir",
+                dashboard: "Panel",
+                exitPortal: "Salir del Portal"
+            }
         },
         inventory: {
             title: "Nuestros Vehiculos",
@@ -1839,6 +2039,62 @@ export const t = {
             sendsIn: "Se envia en",
             sentAt: "Enviado",
             noItems: "No hay elementos de seguimiento"
+        },
+        ownerPortal: {
+            title: "Portal del Propietario",
+            welcome: "Bienvenido de nuevo",
+            emptyState: "Su Portal del Propietario estara listo una vez que se complete su compra.",
+            loading: "Cargando su portal...",
+            yourVehicle: "Su Vehiculo",
+            purchased: "Comprado",
+            daysOwned: "Dias de Propiedad",
+            documents: "Sus Documentos",
+            billOfSale: "Factura de Venta",
+            asIsDisclosure: "Divulgacion Tal Cual",
+            viewDocument: "Ver",
+            noDocuments: "Contactenos para copias digitales de sus documentos.",
+            serviceReminders: "Calendario de Servicio",
+            month3: "Servicio de 3 Meses",
+            month6: "Servicio de 6 Meses",
+            month12: "Servicio de 12 Meses",
+            due: "Vencimiento",
+            completed: "Completado",
+            upcoming: "Proximo",
+            maintenanceChecklist: [
+                { item: "Cambio de Aceite" },
+                { item: "Rotacion de Llantas" },
+                { item: "Inspeccion de Frenos" },
+                { item: "Revision de Fluidos" },
+                { item: "Cambio de Filtros" },
+                { item: "Revision de Bateria" }
+            ],
+            valueTracker: "Rastreador de Valor del Vehiculo",
+            currentValue: "Valor Estimado",
+            costPerDay: "Costo Por Dia",
+            purchasePrice: "Precio de Compra",
+            valueOverTime: "Valor a lo Largo del Tiempo",
+            referralTitle: "Programa de Referidos Circulo Familiar",
+            yourCode: "Su Codigo de Referido",
+            yourLink: "Su Enlace de Referido",
+            shareLink: "Compartir Enlace",
+            copyCode: "Copiar Codigo",
+            copied: "Copiado!",
+            referralCount: "Sus Referidos",
+            communityCount: "Familias presentadas a Triple J este mes",
+            tierProgress: "Progreso de Recompensa",
+            tier1: "Recompensa de $50 en 1 referido",
+            tier2: "Recompensa de $100 en 3 referidos",
+            tier3: "Recompensa de $200 en 5 referidos",
+            referralLandingIntro: "Una Recomendacion Personal",
+            referralLandingHeading: "piensa que te encantaria Triple J",
+            referralLandingSubtext: "Explore nuestro inventario actual -- vehiculos confiables para familias de Houston.",
+            upgradeTitle: "Listo para un Cambio?",
+            tradeInEstimate: "Valor Estimado de Intercambio",
+            upgradeMatches: "Vehiculos Que Podrian Interesarte",
+            talkToUs: "Hablemos Sobre Su Cambio",
+            upgradeNotYet: "Sus opciones de cambio apareceran 12 meses despues de la compra.",
+            reviewCompleted: "Ya Deje una Resena",
+            reviewThanks: "Gracias por ayudar a otras familias!"
         }
     }
 };
