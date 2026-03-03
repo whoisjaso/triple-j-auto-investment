@@ -9,6 +9,7 @@ import { estimateMarketValue } from '../../services/marketEstimateService';
 import { Vehicle, VehicleStatus } from '../../types';
 import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer, LayoutDashboard, Car, LogOut, Menu, ClipboardCheck, Key, CreditCard, Sparkles, BookOpen, ShieldCheck, Link as LinkIcon } from 'lucide-react';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
+import VehiclePhotoUploader from '../../components/admin/VehiclePhotoUploader';
 
 // Shared Admin Header Component
 const AdminHeader = () => {
@@ -340,6 +341,11 @@ const AdminInventory = () => {
   // Helper to get all images in a flat array
   const allImages = [newCar.imageUrl, ...(newCar.gallery || [])].filter(url => url && url.length > 0);
 
+  // Photos array for VehiclePhotoUploader (filters out placeholders and short strings)
+  const currentPhotos = [newCar.imageUrl, ...(newCar.gallery || [])].filter(
+    (url) => url && url.length > 10 // Filter out empty strings and placeholder-length strings
+  );
+
   const processFiles = async (files: FileList) => {
     const promises = Array.from(files).map((file: File) => resizeImage(file));
 
@@ -427,6 +433,19 @@ const AdminInventory = () => {
             gallery: newImages.slice(1)
         };
     });
+  };
+
+  // Handler for VehiclePhotoUploader
+  const handlePhotosChange = (photos: string[]) => {
+    if (photos.length === 0) {
+      setNewCar(prev => ({ ...prev, imageUrl: '', gallery: [] }));
+    } else {
+      setNewCar(prev => ({
+        ...prev,
+        imageUrl: photos[0],
+        gallery: photos.slice(1),
+      }));
+    }
   };
 
   // --- END IMAGE HANDLING ---
@@ -922,68 +941,12 @@ const AdminInventory = () => {
 
                    <div className="space-y-6">
                       
-                      {/* UNIFIED IMAGE UPLOAD (Facebook Style) */}
-                      <div className="group">
-                        <div className="flex justify-between items-center mb-3">
-                            <label className="text-[9px] uppercase tracking-widest text-tj-gold flex items-center gap-2">
-                                <ImageIcon size={14} /> Vehicle Gallery
-                            </label>
-                            <span className="text-[9px] text-gray-500">{allImages.length} Photos Selected</span>
-                        </div>
-
-                        {/* Grid Container */}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                            
-                            {/* 1. Upload Button (Drag & Drop Target) */}
-                            <label 
-                                onDragOver={handleDragOver}
-                                onDragLeave={handleDragLeave}
-                                onDrop={handleDrop}
-                                className={`relative aspect-[4/3] cursor-pointer bg-white/5 border border-dashed transition-all flex flex-col items-center justify-center gap-2 group overflow-hidden ${isDragging ? 'border-tj-gold bg-tj-gold/10' : 'border-gray-700 hover:border-tj-gold hover:bg-white/10'}`}
-                            >
-                                <input type="file" accept="image/*" multiple onChange={handleUnifiedUpload} className="hidden" />
-                                <div className={`p-3 rounded-full transition-colors border ${isDragging ? 'bg-tj-gold text-black border-tj-gold' : 'bg-black text-gray-400 border-white/[0.06] group-hover:bg-tj-gold group-hover:text-black group-hover:border-tj-gold'}`}>
-                                    {isDragging ? <UploadCloud size={20} className="animate-bounce" /> : <Plus size={20} />}
-                                </div>
-                                <span className={`text-[9px] uppercase tracking-widest transition-colors text-center ${isDragging ? 'text-tj-gold' : 'text-gray-500 group-hover:text-white'}`}>
-                                    {isDragging ? 'Drop Files Here' : 'Add Photos'}
-                                </span>
-                            </label>
-
-                            {/* 2. Image Cards */}
-                            {allImages.map((img, idx) => (
-                                <div key={idx} className={`relative group aspect-[4/3] bg-[#080808] border ${idx === 0 ? 'border-tj-gold' : 'border-white/[0.06]'} overflow-hidden`}>
-                                    <img src={img} alt={`View ${idx}`} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
-                                    
-                                    {/* Badges & Controls */}
-                                    {idx === 0 && (
-                                        <div className="absolute top-2 left-2 bg-tj-gold text-black text-[8px] font-bold px-2 py-1 uppercase tracking-widest z-10 shadow-md">
-                                            Cover Photo
-                                        </div>
-                                    )}
-
-                                    <div className="absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-all flex flex-col items-center justify-center gap-2 p-2 backdrop-blur-sm">
-                                        {idx !== 0 && (
-                                            <button 
-                                                type="button"
-                                                onClick={() => setAsCover(idx)}
-                                                className="text-[8px] uppercase tracking-widest text-white bg-tj-gold/20 hover:bg-tj-gold hover:text-black border border-tj-gold px-3 py-1.5 w-full transition-colors font-bold"
-                                            >
-                                                Make Cover
-                                            </button>
-                                        )}
-                                        <button 
-                                            type="button"
-                                            onClick={() => removeImage(idx)}
-                                            className="text-[8px] uppercase tracking-widest text-white bg-red-900/30 hover:bg-red-600 border border-red-900 hover:border-red-600 px-3 py-1.5 w-full transition-colors flex items-center justify-center gap-1"
-                                        >
-                                            <Trash2 size={10} /> Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                      </div>
+                      {/* Vehicle Photo Uploader (Supabase Storage) */}
+                      <VehiclePhotoUploader
+                        vehicleId={editingId || `new-${Date.now()}`}
+                        photos={currentPhotos}
+                        onChange={handlePhotosChange}
+                      />
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="group">
