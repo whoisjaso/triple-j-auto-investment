@@ -1,5 +1,6 @@
 
 export enum VehicleStatus {
+  DRAFT = 'Draft',
   AVAILABLE = 'Available',
   PENDING = 'Pending',
   SOLD = 'Sold',
@@ -49,6 +50,12 @@ export interface Vehicle {
   vehicleStoryEs?: string;
   isVerified?: boolean;
   marketEstimate?: number;
+
+  // Phase 20: Vehicle Intake Pipeline
+  intakeSource?: 'manheim_email' | 'manheim_api' | 'manual' | 'sheets';
+  purchasePrice?: number;
+  suggestedPrice?: number;
+  intakeAt?: string;
 }
 
 export interface Lead {
