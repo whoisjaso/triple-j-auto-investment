@@ -10,6 +10,7 @@ import { Vehicle, VehicleStatus } from '../../types';
 import { Wand2, Loader2, Search, AlertTriangle, Save, Eye, Database, Cpu, Terminal, ArrowRight, Sheet, RefreshCw, Edit2, X, ImageIcon, Type, Activity, UploadCloud, Trash2, Star, Plus, ShieldAlert, DollarSign, Calendar, Filter, ArrowUpRight, Wrench, Truck, PaintBucket, FileText, Printer, LayoutDashboard, Car, LogOut, Menu, ClipboardCheck, Key, CreditCard, Sparkles, BookOpen, ShieldCheck, Link as LinkIcon } from 'lucide-react';
 import { BillOfSaleModal } from '../../components/admin/BillOfSaleModal';
 import VehiclePhotoUploader from '../../components/admin/VehiclePhotoUploader';
+import VehicleIntakeWizard from '../../components/admin/VehicleIntakeWizard';
 
 // Shared Admin Header Component
 const AdminHeader = () => {
@@ -201,6 +202,7 @@ const AdminInventory = () => {
 
   // Bill of Sale Modal State
   const [showBOSModal, setShowBOSModal] = useState(false);
+  const [showIntakeWizard, setShowIntakeWizard] = useState(false);
   const [bosVehicle, setBosVehicle] = useState<Vehicle | null>(null);
 
   const handleOpenBOS = (vehicle?: Vehicle) => {
@@ -670,6 +672,13 @@ const AdminInventory = () => {
                 >
                 <Printer size={14} />
                 Generate Docs
+                </button>
+                <button
+                    onClick={() => setShowIntakeWizard(true)}
+                    className="flex items-center gap-2 text-xs uppercase tracking-widest text-black bg-green-500 hover:bg-green-400 px-6 py-3 border border-green-500 transition-all group font-bold"
+                >
+                <Plus size={14} />
+                Quick Intake
                 </button>
                 <button
                     onClick={handleSheetSync}
@@ -1441,6 +1450,12 @@ const AdminInventory = () => {
         }}
         vehicles={vehicles}
         preSelectedVehicle={bosVehicle}
+      />
+
+      <VehicleIntakeWizard
+        isOpen={showIntakeWizard}
+        onClose={() => setShowIntakeWizard(false)}
+        onCreated={() => setShowIntakeWizard(false)}
       />
     </div>
     </>

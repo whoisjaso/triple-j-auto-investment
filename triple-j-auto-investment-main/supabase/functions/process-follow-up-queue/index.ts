@@ -29,7 +29,7 @@ interface Lead {
 interface QueueItem {
   id: string;
   lead_id: string;
-  trigger_type: 'browse' | 'save' | 'abandon' | 'voice';
+  trigger_type: 'browse' | 'save' | 'abandon' | 'voice' | null;
   channel: 'sms' | 'email' | 'voice';
   vehicle_id: string | null;
   vehicle_year: number | null;
@@ -40,6 +40,15 @@ interface QueueItem {
   message_language: string;
   send_after: string;
   leads: Lead | null;
+  // Nurture pipeline fields (from automation foundation)
+  step_key: string | null;
+  template_key: string | null;
+}
+
+interface MessageTemplate {
+  body: string;
+  subject: string | null;
+  variables: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -116,7 +125,150 @@ Deno.serve(async (_req: Request) => {
         }
 
         // -------------------------------------------------------------------
-        // Dispatch by channel
+        // Handle nurture pipeline items (template-based)
+        // -------------------------------------------------------------------
+        if (item.step_key && item.template_key) {
+          // Special case: cold_14d just marks lead as Cold, no message sent
+          if (item.step_key === 'cold_14d') {
+            await supabase
+              .from('leads')
+              .update({ status: 'Cold', nurture_active: false })
+              .eq('id', item.lead_id);
+            await markSent(supabase, item.id);
+            processed++;
+            continue;
+          }
+
+          // Fetch template
+          const { data: tmpl } = await supabase
+            .from('message_templates')
+            .select('body, subject, variables')
+            .eq('template_key', item.template_key)
+            .eq('language', lang)
+            .eq('is_approved', true)
+            .eq('auto_send', true)
+            .single();
+
+          if (!tmpl || !tmpl.body) {
+            console.warn(`[follow-up] Template ${item.template_key}/${lang} not approved/auto-send or not found`);
+            await markSent(supabase, item.id, 'template_not_ready');
+            processed++;
+            continue;
+          }
+
+          // Fetch vehicle data for template variables if lead has a vehicle interest
+          const { data: leadData } = await supabase
+            .from('leads')
+            .select('interest, vehicle_id')
+            .eq('id', item.lead_id)
+            .single();
+
+          let vehicleVars: Record<string, string> = {};
+          if (leadData?.vehicle_id) {
+            const { data: veh } = await supabase
+              .from('vehicles')
+              .select('year, make, model, price, slug')
+              .eq('id', leadData.vehicle_id)
+              .single();
+            if (veh) {
+              vehicleVars = {
+                vehicle_year: String(veh.year || ''),
+                vehicle_make: veh.make || '',
+                vehicle_model: veh.model || '',
+                vehicle_price: veh.price ? String(veh.price) : '',
+                vehicle_url: veh.slug
+                  ? `https://triplejautoinvestment.com/vehicles/${veh.slug}`
+                  : 'https://triplejautoinvestment.com/inventory',
+              };
+            }
+          }
+
+          // Render template
+          const vars: Record<string, string> = {
+            customer_name: lead.name || 'there',
+            ...vehicleVars,
+          };
+          let body = tmpl.body;
+          for (const [key, value] of Object.entries(vars)) {
+            body = body.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+          }
+
+          // Dispatch rendered message
+          if (item.channel === 'sms' && lead.phone) {
+            const smsResult = await sendSms(lead.phone, body + ' Reply STOP to opt out.');
+            if (!smsResult.success) {
+              await markSent(supabase, item.id, `sms_failed: ${smsResult.error}`);
+              errors++;
+            } else {
+              // Log to sent_messages
+              await supabase.from('sent_messages').insert({
+                template_key: item.template_key,
+                channel: 'sms',
+                recipient: lead.phone,
+                body,
+                entity_type: 'lead',
+                entity_id: item.lead_id,
+                status: 'sent',
+                provider_message_id: smsResult.sid || null,
+              });
+              await markSent(supabase, item.id);
+            }
+          } else if (item.channel === 'email' && lead.email) {
+            const emailResult = await sendEmail({
+              to: lead.email,
+              subject: tmpl.subject || 'Triple J Auto Investment',
+              html: `<p>${body.replace(/\n/g, '<br>')}</p>`,
+            });
+            if (!emailResult.success) {
+              await markSent(supabase, item.id, `email_failed: ${emailResult.error}`);
+              errors++;
+            } else {
+              await supabase.from('sent_messages').insert({
+                template_key: item.template_key,
+                channel: 'email',
+                recipient: lead.email,
+                subject: tmpl.subject,
+                body,
+                entity_type: 'lead',
+                entity_id: item.lead_id,
+                status: 'sent',
+              });
+              await markSent(supabase, item.id);
+            }
+          } else if (item.channel === 'voice' && lead.phone) {
+            const voiceResult = await triggerRetellCall(item, lead);
+            if (!voiceResult.success) {
+              await markSent(supabase, item.id, `voice_failed: ${voiceResult.error}`);
+              errors++;
+            } else {
+              await supabase.from('sent_messages').insert({
+                template_key: item.template_key,
+                channel: 'voice',
+                recipient: lead.phone,
+                body: `Voice call initiated: ${body}`,
+                entity_type: 'lead',
+                entity_id: item.lead_id,
+                status: 'sent',
+                provider_message_id: voiceResult.callId || null,
+              });
+              await markSent(supabase, item.id);
+            }
+          } else {
+            await markSent(supabase, item.id, 'no_contact_info_for_channel');
+          }
+
+          // Update lead follow-up tracking
+          await supabase
+            .from('leads')
+            .update({ last_follow_up_at: new Date().toISOString(), follow_up_step: item.step_key })
+            .eq('id', item.lead_id);
+
+          processed++;
+          continue;
+        }
+
+        // -------------------------------------------------------------------
+        // Dispatch by channel (legacy behavioral follow-ups)
         // -------------------------------------------------------------------
         if (item.channel === 'sms') {
           if (!lead.phone) {

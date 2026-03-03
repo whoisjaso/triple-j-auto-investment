@@ -65,7 +65,7 @@ export interface Lead {
   phone: string;
   interest: string; // VIN or General
   date: string;
-  status: 'New' | 'Contacted' | 'Closed';
+  status: LeadStatus;
 
   // Phase 15: Engagement Spectrum
   vehicleId?: string;
