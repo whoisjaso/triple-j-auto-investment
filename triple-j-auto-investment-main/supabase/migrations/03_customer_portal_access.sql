@@ -106,4 +106,4 @@ WHERE access_token IS NULL;
 --   ALTER TABLE public.registrations DROP COLUMN IF EXISTS access_token;
 --   ALTER TABLE public.registrations DROP COLUMN IF EXISTS token_expires_at;
 --   ALTER TABLE public.registrations DROP COLUMN IF EXISTS vehicle_body_type;
--- ================================================================
+-- =========================================================

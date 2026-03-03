@@ -6,6 +6,7 @@ import { AddressSuggestion } from '../types';
 interface AddressInputProps {
   value: string;
   onChange: (value: string) => void;
+  onSelectSuggestion?: (suggestion: AddressSuggestion) => void;
   placeholder?: string;
   label?: string;
   required?: boolean;
@@ -14,6 +15,7 @@ interface AddressInputProps {
 export const AddressInput: React.FC<AddressInputProps> = ({
   value,
   onChange,
+  onSelectSuggestion,
   placeholder = 'Start typing an address...',
   label = 'Address',
   required = false
@@ -66,8 +68,10 @@ export const AddressInput: React.FC<AddressInputProps> = ({
   };
 
   const handleSelect = (suggestion: AddressSuggestion) => {
-    setInputValue(suggestion.display_name);
-    onChange(suggestion.display_name);
+    const streetValue = suggestion.street || suggestion.display_name;
+    setInputValue(streetValue);
+    onChange(streetValue);
+    onSelectSuggestion?.(suggestion);
     setShowDropdown(false);
     setSuggestions([]);
   };

@@ -2,145 +2,132 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Triple J Auto Investment - Custom Styles */
-
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  border-radius: 0 !important;
 }
 
 html {
   scroll-behavior: smooth;
+  background-color: #F7F7F7;
+  scroll-padding-top: 80px;
 }
 
 body {
-  background-color: #011c12;
-  color: #f3f4f6;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #F7F7F7;
+  color: #0e1b16;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #0e1b16;
+  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
 }
 
 ::selection {
-  background: #D4AF37;
-  color: #000;
+  background: rgba(212,175,55,0.3);
+  color: #0e1b16;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
+/* Custom Scrollbar */
+::-webkit-scrollbar { 
+  width: 4px; 
 }
-
 ::-webkit-scrollbar-track {
-  background: #000805;
+  background: #F7F7F7;
+}
+::-webkit-scrollbar-thumb { 
+  background: rgba(212,175,55,0.2); 
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: rgba(212,175,55,0.4); 
 }
 
-::-webkit-scrollbar-thumb {
-  background: #333;
-  border: 1px solid #011c12;
+/* Luxury Glow */
+.gold-glow {
+  filter: drop-shadow(0 0 40px rgba(212,175,55,0.15))
+          drop-shadow(0 0 80px rgba(212,175,55,0.05));
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: #D4AF37;
+.grain-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
 }
 
-.font-display {
-  font-family: 'Cinzel', serif;
+/* Ultra Luxury Buttons */
+.btn-luxury {
+  @apply relative inline-flex items-center justify-center px-12 py-5 text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-[#d4af37] overflow-hidden transition-all duration-700 w-full md:w-auto font-sans;
+  background: transparent;
+  border: 1px solid rgba(212,175,55,0.2);
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.no-scrollbar {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
-}
-
-/* Custom styled scrollbar for modals and content areas */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 4px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.3);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(212, 175, 55, 0.4);
-  border-radius: 2px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(212, 175, 55, 0.7);
-}
-
-/* Firefox */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(212, 175, 55, 0.4) rgba(0, 0, 0, 0.3);
-}
-
-/* Avant-Garde Brutalist Utilities */
-.hairline-b {
-  @apply border-b border-white/20;
-}
-
-.hairline-t {
-  @apply border-t border-white/20;
-}
-
-.hairline-l {
-  @apply border-l border-white/20;
-}
-
-.hairline-r {
-  @apply border-r border-white/20;
-}
-
-.link-brutal {
-  @apply relative inline-block text-[10px] font-bold uppercase tracking-micro text-white transition-colors duration-500 overflow-hidden;
-}
-
-.link-brutal::after {
+.btn-luxury::before {
   content: '';
   position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background-color: #D4AF37;
-  transform: translateX(-101%);
-  transition: transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #d4af37;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
 }
 
-.link-brutal:hover::after {
-  transform: translateX(0);
+.btn-luxury:hover {
+  color: #0e1b16;
+  border-color: #d4af37;
 }
 
-.brutal-cta {
-  @apply inline-flex items-center text-[10px] uppercase tracking-ultra bg-white text-black p-5 font-bold hover:bg-tj-gold transition-colors duration-700 w-full md:w-auto;
+.btn-luxury:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
-.brutal-outline {
-  @apply inline-flex items-center text-[10px] uppercase tracking-ultra border border-white/30 text-white p-5 font-bold hover:bg-white hover:text-black transition-colors duration-700 w-full md:w-auto;
+.btn-luxury-solid {
+  @apply relative inline-flex items-center justify-center px-12 py-5 text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-[#0e1b16] bg-[#d4af37] overflow-hidden transition-all duration-700 w-full md:w-auto font-sans;
+  border: 1px solid #d4af37;
 }
 
-/* Ken Burns slow zoom for hero backgrounds */
-@keyframes kenBurns {
-  0% { transform: scale(1); }
-  100% { transform: scale(1.12); }
+.btn-luxury-solid::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #0e1b16;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
 }
 
-.animate-ken-burns {
-  animation: kenBurns 20s ease-in-out alternate infinite;
+.btn-luxury-solid:hover {
+  color: #d4af37;
+  border-color: rgba(212,175,55,0.5);
 }
 
-/* Gold shimmer for ticker */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+.btn-luxury-solid:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Animations */
+.label-small-caps {
+  font-family: 'Cormorant Garamond', serif;
+  font-variant: small-caps;
+  letter-spacing: 0.2em;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.02); }
+}
+.animate-float {
+  animation: floatLogo 8s ease-in-out infinite;
 }

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { X, FileText, Car, Calendar, DollarSign, User, Globe, Loader2, CheckCircle, Eye, Printer, Download, FileX, Palette, CreditCard, Factory } from 'lucide-react';
+import { X, FileText, Car, Calendar, DollarSign, User, Globe, Loader2, CheckCircle, Eye, Printer, Download, FileX, Palette, CreditCard, Factory, MapPin, Scale, RectangleHorizontal, Gauge } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Vehicle, BillOfSaleData, PhotoIdType, PHOTO_ID_LABELS } from '../../types';
+import { Vehicle, BillOfSaleData, PhotoIdType, PHOTO_ID_LABELS, AddressSuggestion } from '../../types';
 import { AddressInput } from '../AddressInput';
 import { useScrollLock } from '../../hooks/useScrollLock';
 import {
@@ -28,14 +28,22 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
 }) => {
   const [selectedVehicleId, setSelectedVehicleId] = useState<string>('');
   const [buyerName, setBuyerName] = useState('');
-  const [buyerAddress, setBuyerAddress] = useState('');
+  const [buyerStreet, setBuyerStreet] = useState('');
+  const [buyerCity, setBuyerCity] = useState('');
+  const [buyerState, setBuyerState] = useState('TX');
+  const [buyerZip, setBuyerZip] = useState('');
+  const [buyerCounty, setBuyerCounty] = useState('');
   const [saleAmount, setSaleAmount] = useState('');
   const [saleDate, setSaleDate] = useState(new Date().toISOString().split('T')[0]);
   const [language, setLanguage] = useState<'EN' | 'ES'>('EN');
   const [generatingType, setGeneratingType] = useState<string | null>(null);
   const [lastGenerated, setLastGenerated] = useState<string | null>(null);
 
-  // New fields for Form 130-U
+  // Vehicle detail fields
+  const [bodyStyle, setBodyStyle] = useState('');
+  const [odometerOverride, setOdometerOverride] = useState('');
+  const [emptyWeight, setEmptyWeight] = useState('');
+  const [licensePlate, setLicensePlate] = useState('');
   const [majorColor, setMajorColor] = useState('');
   const [minorColor, setMinorColor] = useState('');
   const [texasPlantNo, setTexasPlantNo] = useState('');
@@ -62,10 +70,11 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     }
   }, [preSelectedVehicle]);
 
-  // Update sale amount when vehicle changes
+  // Update sale amount and mileage when vehicle changes
   useEffect(() => {
     if (selectedVehicle) {
       setSaleAmount(selectedVehicle.price.toString());
+      setOdometerOverride(selectedVehicle.mileage.toString());
     }
   }, [selectedVehicle]);
 
@@ -82,16 +91,26 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
 
     const baseData = createBillOfSaleFromVehicle(selectedVehicle);
 
+    // Compose full address from parts
+    const addressParts = [buyerStreet, buyerCity, `${buyerState} ${buyerZip}`.trim()].filter(Boolean);
+    const composedAddress = addressParts.join(', ');
+
     return {
       ...baseData,
       buyerName,
-      buyerAddress,
+      buyerAddress: composedAddress,
+      buyerStreet,
+      buyerCity,
+      buyerState,
+      buyerZip,
+      buyerCounty,
       amount: saleAmount,
       date: saleDate,
+      odometer: odometerOverride || baseData.odometer || '',
       printLanguage: language,
-      bodyStyle: '',
-      licensePlate: '',
-      emptyWeight: '',
+      bodyStyle,
+      licensePlate,
+      emptyWeight,
       exteriorColor: '',
       interiorColor: '',
       majorColor,
@@ -259,7 +278,7 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
     }
   };
 
-  const isFormValid = selectedVehicle && buyerName.trim() && buyerAddress.trim() && saleAmount;
+  const isFormValid = selectedVehicle && buyerName.trim() && buyerStreet.trim() && saleAmount;
 
   if (typeof document === 'undefined') return null;
 
@@ -372,12 +391,86 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                 </div>
 
                 <AddressInput
-                  value={buyerAddress}
-                  onChange={setBuyerAddress}
-                  label="Buyer Address"
+                  value={buyerStreet}
+                  onChange={setBuyerStreet}
+                  onSelectSuggestion={(s: AddressSuggestion) => {
+                    if (s.city) setBuyerCity(s.city);
+                    if (s.state) setBuyerState(s.state);
+                    if (s.postcode) setBuyerZip(s.postcode);
+                    // Auto-detect county from zip
+                    if (s.postcode) {
+                      import('../../utils/texasCountyLookup').then(m => {
+                        const county = m.getTexasCountyFromZip(s.postcode || '');
+                        if (county) setBuyerCounty(county);
+                      });
+                    }
+                  }}
+                  label="Street Address"
                   placeholder="Start typing address..."
                   required
                 />
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5">
+                      City
+                    </label>
+                    <input
+                      type="text"
+                      value={buyerCity}
+                      onChange={(e) => setBuyerCity(e.target.value)}
+                      placeholder="Houston"
+                      className="w-full bg-black border border-gray-700 p-3 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5">
+                      State
+                    </label>
+                    <input
+                      type="text"
+                      value={buyerState}
+                      onChange={(e) => setBuyerState(e.target.value)}
+                      placeholder="TX"
+                      maxLength={2}
+                      className="w-full bg-black border border-gray-700 p-3 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 uppercase"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5">
+                      Zip Code
+                    </label>
+                    <input
+                      type="text"
+                      value={buyerZip}
+                      onChange={(e) => {
+                        setBuyerZip(e.target.value);
+                        // Auto-detect county when zip changes
+                        if (e.target.value.length === 5) {
+                          import('../../utils/texasCountyLookup').then(m => {
+                            const county = m.getTexasCountyFromZip(e.target.value);
+                            if (county) setBuyerCounty(county);
+                          });
+                        }
+                      }}
+                      placeholder="77075"
+                      maxLength={10}
+                      className="w-full bg-black border border-gray-700 p-3 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-1">
+                      <MapPin size={12} /> County
+                    </label>
+                    <input
+                      type="text"
+                      value={buyerCounty}
+                      onChange={(e) => setBuyerCounty(e.target.value)}
+                      placeholder="Harris"
+                      className="w-full bg-black border border-gray-700 p-3 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600"
+                    />
+                  </div>
+                </div>
               </div>
 
               {/* Sale Details */}
@@ -438,12 +531,44 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                 </div>
               </div>
 
-              {/* Vehicle Colors & Texas Plant No (for Form 130-U) */}
+              {/* Vehicle Details */}
               <div className="space-y-3">
                 <h3 className="text-xs uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                  <Palette size={14} /> Vehicle Colors & Details
+                  <Car size={14} /> Vehicle Details
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5">
+                      Body Style
+                    </label>
+                    <select
+                      value={bodyStyle}
+                      onChange={(e) => setBodyStyle(e.target.value)}
+                      className="w-full bg-black border border-gray-700 p-3 text-white text-sm focus:border-tj-gold outline-none transition-colors appearance-none cursor-pointer"
+                    >
+                      <option value="">Select...</option>
+                      <option value="4D">4-Door Sedan (4D)</option>
+                      <option value="2D">2-Door Coupe (2D)</option>
+                      <option value="SUV">SUV</option>
+                      <option value="PK">Pickup (PK)</option>
+                      <option value="VAN">Van</option>
+                      <option value="CV">Convertible (CV)</option>
+                      <option value="HB">Hatchback (HB)</option>
+                      <option value="SW">Station Wagon (SW)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-2">
+                      <Gauge size={12} /> Odometer
+                    </label>
+                    <input
+                      type="text"
+                      value={odometerOverride}
+                      onChange={(e) => setOdometerOverride(e.target.value)}
+                      placeholder={selectedVehicle ? selectedVehicle.mileage.toLocaleString() : '0'}
+                      className="w-full bg-black border border-gray-700 p-3 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                    />
+                  </div>
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5">
                       Major Color
@@ -470,7 +595,31 @@ export const BillOfSaleModal: React.FC<BillOfSaleModalProps> = ({
                   </div>
                   <div>
                     <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-2">
-                      <Factory size={14} /> Texas Plant No.
+                      <Scale size={12} /> Empty Weight
+                    </label>
+                    <input
+                      type="text"
+                      value={emptyWeight}
+                      onChange={(e) => setEmptyWeight(e.target.value)}
+                      placeholder="lbs"
+                      className="w-full bg-black border border-gray-700 p-3 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-2">
+                      <RectangleHorizontal size={12} /> License Plate
+                    </label>
+                    <input
+                      type="text"
+                      value={licensePlate}
+                      onChange={(e) => setLicensePlate(e.target.value.toUpperCase())}
+                      placeholder="ABC-1234"
+                      className="w-full bg-black border border-gray-700 p-3 text-white text-sm focus:border-tj-gold outline-none transition-colors placeholder-gray-600 font-mono uppercase"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <label className="block text-xs uppercase tracking-wider text-gray-400 mb-1.5 flex items-center gap-2">
+                      <Factory size={12} /> Texas Plant No.
                     </label>
                     <input
                       type="text"

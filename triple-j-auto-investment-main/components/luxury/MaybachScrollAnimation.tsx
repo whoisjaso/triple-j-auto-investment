@@ -1,0 +1,207 @@
+import React, { useRef, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useLanguage } from '../../context/LanguageContext';
+
+const TOTAL_FRAMES = 151; // Matched to ffmpeg output count
+const BATCH_SIZE = 20;
+
+export const MaybachScrollAnimation = () => {
+  const { t } = useLanguage();
+  const m = t.home.luxury.maybach;
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const logoOverlayRef = useRef<HTMLDivElement>(null);
+  const [loaded, setLoaded] = useState(false);
+  const [progressText, setProgressText] = useState('0');
+  const [phase, setPhase] = useState(-1);
+
+  useEffect(() => {
+    let currentFrame = 0;
+    let drawnFrame = -1;
+    let animationFrameId: number;
+    let images: HTMLImageElement[] = [];
+
+    const loadFrames = async () => {
+      images = new Array(TOTAL_FRAMES);
+      for (let i = 0; i < TOTAL_FRAMES; i += BATCH_SIZE) {
+        const batch = [];
+        for (let j = i; j < Math.min(i + BATCH_SIZE, TOTAL_FRAMES); j++) {
+          batch.push(
+            new Promise<void>((resolve) => {
+              const img = new Image();
+              // 1-based index with 4-digit padding, matching frame-%04d.jpg
+              const frameNum = (j + 1).toString().padStart(4, '0');
+              img.src = `/maybach-frames/frame-${frameNum}.jpg`;
+              img.onload = () => {
+                images[j] = img;
+                resolve();
+              };
+              img.onerror = () => {
+                console.error(`Failed to load frame ${frameNum}`);
+                resolve();
+              };
+            })
+          );
+        }
+        await Promise.all(batch);
+        setProgressText(Math.min(100, Math.floor(((i + BATCH_SIZE) / TOTAL_FRAMES) * 100)).toString());
+      }
+      setLoaded(true);
+    };
+
+    loadFrames();
+
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const scrollDistance = rect.height - window.innerHeight;
+
+      // Calculate progress from 0 to 1 based on sticky container
+      let rawProgress = -rect.top / scrollDistance;
+      rawProgress = Math.max(0, Math.min(1, rawProgress));
+
+      currentFrame = Math.floor(rawProgress * (TOTAL_FRAMES - 1));
+
+      // Determine phase for text overlays based on precise scroll ranges
+      if (rawProgress >= 0.05 && rawProgress < 0.35) setPhase(1);
+      else if (rawProgress >= 0.40 && rawProgress < 0.70) setPhase(2);
+      else if (rawProgress >= 0.75 && rawProgress <= 1.0) setPhase(3);
+      else setPhase(-1);
+
+      // Subtly scale the canvas for a push-in cinematic effect
+      if (canvasRef.current) {
+        const scale = 1 + rawProgress * 0.05; // scales from 1.0 to 1.05
+        canvasRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+      }
+
+      // Fade logo out as scroll begins — fully gone by 8% progress
+      if (logoOverlayRef.current) {
+        const logoOpacity = Math.max(0, 1 - rawProgress / 0.08);
+        const logoScale = 1 - rawProgress * 0.3;
+        logoOverlayRef.current.style.opacity = String(logoOpacity);
+        logoOverlayRef.current.style.transform = `translate(-50%, -50%) scale(${Math.max(0.7, logoScale)})`;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+
+    const tick = () => {
+      if (currentFrame !== drawnFrame && images[currentFrame] && canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) {
+          const img = images[currentFrame];
+          const canvas = canvasRef.current;
+
+          if (canvas.width !== img.width || canvas.height !== img.height) {
+            canvas.width = img.width;
+            canvas.height = img.height;
+          }
+
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          // Make near-white pixels transparent so drop-shadow traces the car silhouette
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const d = imageData.data;
+          for (let i = 0; i < d.length; i += 4) {
+            const r = d[i], g = d[i + 1], b = d[i + 2];
+            // Threshold: if pixel is near-white, make fully transparent
+            if (r > 230 && g > 230 && b > 230) {
+              d[i + 3] = 0;
+            }
+            // Soft edge: slightly off-white pixels get partial transparency
+            else if (r > 210 && g > 210 && b > 210) {
+              const avg = (r + g + b) / 3;
+              d[i + 3] = Math.round(255 * (1 - (avg - 210) / 20));
+            }
+          }
+          ctx.putImageData(imageData, 0, 0);
+
+          drawnFrame = currentFrame;
+        }
+      }
+      animationFrameId = requestAnimationFrame(tick);
+    };
+
+    tick();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return (
+    <div ref={containerRef} className="relative h-[250vh] bg-[#F7F7F7]">
+      {!loaded && (
+        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center z-50 bg-[#F7F7F7]">
+          <img src="/GoldTripleJLogo.png" alt="Triple J Auto Investment" className="w-16 h-16 mb-8 opacity-50 animate-pulse" />
+          <p className="text-[#0e1b16] text-[9px] uppercase tracking-[0.4em] font-sans">
+            {m.loading} {progressText}%
+          </p>
+        </div>
+      )}
+
+      <div className={`sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center transition-opacity duration-[1500ms] ${loaded ? 'opacity-100' : 'opacity-0'}`}>
+
+        {/* Hero Logo — centered above car, fades out on scroll */}
+        <div
+          ref={logoOverlayRef}
+          className="absolute top-[18%] md:top-[20%] left-1/2 z-20 flex flex-col items-center pointer-events-none"
+          style={{ transform: 'translate(-50%, -50%) scale(1)' }}
+        >
+          <img
+            src="/GoldTripleJLogo.png"
+            alt="Triple J Auto Investment"
+            className="w-20 md:w-28 lg:w-32 object-contain mb-5"
+            style={{
+              filter: 'drop-shadow(0 0 30px rgba(212,175,55,0.15)) drop-shadow(0 0 60px rgba(212,175,55,0.06))'
+            }}
+          />
+          <span className="text-[8px] md:text-[9px] uppercase tracking-[0.5em] text-[#0e1b16]/40 font-sans">
+            {m.logoCaption}
+          </span>
+        </div>
+
+        <canvas
+          ref={canvasRef}
+          className="absolute top-1/2 left-1/2 w-[85vw] h-[50vh] md:h-[75vh] md:w-[55vw] lg:w-[50vw] object-contain pointer-events-none"
+          style={{
+            transform: 'translate(-50%, -50%) scale(1)',
+            filter: 'drop-shadow(0 0 1px rgba(212,175,55,0.6)) drop-shadow(0 0 4px rgba(212,175,55,0.25)) drop-shadow(0 0 12px rgba(212,175,55,0.1))'
+          }}
+        />
+
+        {/* Phase 1: Left side, vertically centered — clear of video */}
+        <div className={`absolute bottom-8 left-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-12 lg:left-20 max-w-[45%] md:max-w-[280px] lg:max-w-[320px] flex flex-col items-start transition-all duration-1000 ease-out ${phase === 1 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none'}`}>
+           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{m.phase1Label}</span>
+           <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light">
+              {m.phase1Text}<br />{m.phase1Text2}
+           </h3>
+        </div>
+
+        {/* Phase 2: Right side, vertically centered — clear of video */}
+        <div className={`absolute bottom-8 right-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:right-12 lg:right-20 max-w-[45%] md:max-w-[280px] lg:max-w-[320px] flex flex-col items-end text-right transition-all duration-1000 ease-out ${phase === 2 ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
+           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{m.phase2Label}</span>
+           <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light">
+              {m.phase2Text}<br />{m.phase2Text2}
+           </h3>
+        </div>
+
+        {/* Phase 3: Left side, near bottom — clear of video */}
+        <div className={`absolute bottom-8 left-6 md:bottom-[12%] md:left-12 lg:left-20 max-w-[45%] md:max-w-[320px] lg:max-w-[360px] flex flex-col items-start transition-all duration-1000 ease-out ${phase === 3 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none'}`}>
+           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{m.phase3Label}</span>
+           <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light italic mb-8">
+              {m.phase3Text}<br />{m.phase3Text2}
+           </h3>
+           <div className={`transition-opacity duration-1000 delay-300 ${phase === 3 ? 'opacity-100' : 'opacity-0'}`}>
+               <Link to="/inventory" className="border-b border-tj-gold/30 hover:border-tj-gold pb-2 text-[10px] uppercase tracking-[0.3em] text-tj-green transition-colors flex items-center gap-4 group">
+                    {m.phase3Cta} <span className="group-hover:translate-x-2 transition-transform duration-500">→</span>
+               </Link>
+           </div>
+        </div>
+
+      </div>
+    </div>
+  );
+};

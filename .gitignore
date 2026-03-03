@@ -1,0 +1,30 @@
+# Tool configs
+.claude/
+.gemini/
+.mcp.json
+
+# Temp/test files
+_verif_content.txt
+_write_v.js
+_write_v.py
+_write_verification.js
+_write_verify.js
+_writer.js
+_writer.py
+test_write.txt
+nul
+
+# Build outputs
+tsc_err.txt
+tsc_errors.txt
+tsc_out.txt
+vite_err.txt
+vite_out.txt
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.*

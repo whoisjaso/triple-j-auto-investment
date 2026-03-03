@@ -749,7 +749,12 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
 
         // Applicant/Buyer Information (Section 2)
         setTextField('16 Applicant First Name or Entity Name Middle Name Last Name Suffix if any', data.buyerName || '');
-        setTextField('18 Applicant Mailing Address City State Zip', data.buyerAddress || '');
+
+        // Compose address for field 18 from structured parts if available
+        const field18Address = data.buyerStreet
+            ? [data.buyerStreet, data.buyerCity, `${data.buyerState || ''} ${data.buyerZip || ''}`.trim()].filter(Boolean).join(', ')
+            : data.buyerAddress || '';
+        setTextField('18 Applicant Mailing Address City State Zip', field18Address);
 
         // Applicant Photo ID Information
         if (data.applicantIdType && data.applicantIdNumber) {
@@ -769,8 +774,8 @@ export const generateForm130U = async (data: BillOfSaleData, preview: boolean = 
             setTextField('17 Applicant ID Number', data.applicantIdNumber || '');
         }
 
-        // County - Auto-detect from zip code in address
-        const county = getCountyFromAddress(data.buyerAddress || '');
+        // County - Use direct field if available, otherwise auto-detect from zip
+        const county = data.buyerCounty || getCountyFromAddress(data.buyerAddress || '');
         if (county) {
             setTextField('19 Applicant County of Residence', county);
         }
