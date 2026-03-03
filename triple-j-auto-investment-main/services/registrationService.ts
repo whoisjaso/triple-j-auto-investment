@@ -920,3 +920,42 @@ export async function logNotification(input: {
     return false;
   }
 }
+
+// ============================================================
+// AUTO-PILOT QUERIES (for Command Center action items)
+// ============================================================
+
+/** Get registrations needing document reminders (sale_complete for 3+ days, docs incomplete) */
+export async function getRegistrationsNeedingDocs(): Promise<Registration[]> {
+  try {
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from('registrations')
+      .select('*')
+      .eq('current_stage', 'sale_complete')
+      .lt('created_at', threeDaysAgo)
+      .or('doc_title_front.eq.false,doc_title_back.eq.false,doc_130u.eq.false,doc_insurance.eq.false,doc_inspection.eq.false');
+    if (error || !data) { console.error('Error fetching registrations needing docs:', error); return []; }
+    return data.map(transformRegistration);
+  } catch (error) {
+    console.error('Error in getRegistrationsNeedingDocs:', error);
+    return [];
+  }
+}
+
+/** Get registrations stale in same stage (7+ days without progress) */
+export async function getStaleRegistrations(): Promise<Registration[]> {
+  try {
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data, error } = await supabase
+      .from('registrations')
+      .select('*')
+      .not('current_stage', 'in', '("sticker_delivered","rejected")')
+      .lt('updated_at', sevenDaysAgo);
+    if (error || !data) { console.error('Error fetching stale registrations:', error); return []; }
+    return data.map(transformRegistration);
+  } catch (error) {
+    console.error('Error in getStaleRegistrations:', error);
+    return [];
+  }
+}

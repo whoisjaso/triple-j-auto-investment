@@ -24,6 +24,7 @@ import {
   parseAccessKey,
   getRegistrationByAccessKey
 } from '../services/registrationService';
+import CustomerDocumentUpload from '../components/CustomerDocumentUpload';
 import { Registration, RegistrationStageKey } from '../types';
 import NotificationPreferences from '../components/NotificationPreferences';
 
@@ -204,6 +205,16 @@ const CustomerStatusTracker: React.FC = () => {
           rejectionNotes={registration?.rejectionNotes}
         />
       </div>
+
+      {/* Document Upload Section */}
+      {registration?.id && (
+        <div className="px-4">
+          <CustomerDocumentUpload
+            registrationId={registration.id}
+            currentStage={registration.currentStage || 'sale_complete'}
+          />
+        </div>
+      )}
 
       {/* Share button (mobile only) */}
       <div className="fixed bottom-6 right-6 md:hidden">
