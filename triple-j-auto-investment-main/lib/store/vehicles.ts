@@ -184,6 +184,11 @@ export async function loadVehicles(
       vehicleStoryEs: v.vehicle_story_es || undefined,
       isVerified: v.is_verified || false,
       marketEstimate: v.market_estimate != null ? parseFloat(v.market_estimate) : undefined,
+      // Phase 20: Vehicle Intake Pipeline
+      intakeSource: v.intake_source,
+      purchasePrice: v.purchase_price,
+      suggestedPrice: v.suggested_price,
+      intakeAt: v.intake_at,
     }));
 
     setters.setVehicles(transformed);
@@ -267,6 +272,11 @@ export async function addVehicle(
         vehicle_story_es: vehicle.vehicleStoryEs || null,
         is_verified: vehicle.isVerified || false,
         market_estimate: vehicle.marketEstimate || null,
+        // Phase 20: Vehicle Intake Pipeline
+        intake_source: vehicle.intakeSource || 'manual',
+        purchase_price: vehicle.purchasePrice || null,
+        suggested_price: vehicle.suggestedPrice || null,
+        intake_at: vehicle.intakeAt || null,
       }]);
 
     if (error) {
@@ -365,6 +375,11 @@ export async function updateVehicle(
     if (updatedVehicle.vehicleStoryEs !== undefined) dbUpdate.vehicle_story_es = updatedVehicle.vehicleStoryEs;
     if (updatedVehicle.isVerified !== undefined) dbUpdate.is_verified = updatedVehicle.isVerified;
     if (updatedVehicle.marketEstimate !== undefined) dbUpdate.market_estimate = updatedVehicle.marketEstimate;
+    // Phase 20: Vehicle Intake Pipeline
+    if (updatedVehicle.intakeSource !== undefined) dbUpdate.intake_source = updatedVehicle.intakeSource;
+    if (updatedVehicle.purchasePrice !== undefined) dbUpdate.purchase_price = updatedVehicle.purchasePrice;
+    if (updatedVehicle.suggestedPrice !== undefined) dbUpdate.suggested_price = updatedVehicle.suggestedPrice;
+    if (updatedVehicle.intakeAt !== undefined) dbUpdate.intake_at = updatedVehicle.intakeAt;
 
     console.log('🔄 Updating vehicle:', id, 'with data:', dbUpdate);
     console.log('👤 Current user:', user?.email || 'Not authenticated');

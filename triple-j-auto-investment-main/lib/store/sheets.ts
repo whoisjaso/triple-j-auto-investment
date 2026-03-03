@@ -51,6 +51,7 @@ export const parseCSVLine = (str: string) => {
 const normalizeStatus = (raw: string): VehicleStatus => {
   if (!raw) return VehicleStatus.AVAILABLE;
   const s = raw.trim().toLowerCase();
+  if (s === 'draft') return VehicleStatus.DRAFT;
   if (s === 'sold' || s === 'sold out') return VehicleStatus.SOLD;
   if (s === 'pending' || s === 'hold' || s === 'reserved') return VehicleStatus.PENDING;
   return VehicleStatus.AVAILABLE; // "available", "in stock", "active", or anything else
