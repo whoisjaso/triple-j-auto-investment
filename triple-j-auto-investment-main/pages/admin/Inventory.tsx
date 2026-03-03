@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../../context/Store';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { generateVehicleDescription, generateIdentityHeadline, generateVehicleStory } from '../../services/geminiService';
@@ -197,6 +197,7 @@ const AdminInventory = () => {
 
   // Editing State
   const [editingId, setEditingId] = useState<string | null>(null);
+  const tempVehicleId = useRef(`new-${Date.now()}`);  // Stable temp ID for photo uploads
 
   // Bill of Sale Modal State
   const [showBOSModal, setShowBOSModal] = useState(false);
@@ -943,7 +944,7 @@ const AdminInventory = () => {
                       
                       {/* Vehicle Photo Uploader (Supabase Storage) */}
                       <VehiclePhotoUploader
-                        vehicleId={editingId || `new-${Date.now()}`}
+                        vehicleId={editingId || tempVehicleId.current}
                         photos={currentPhotos}
                         onChange={handlePhotosChange}
                       />
