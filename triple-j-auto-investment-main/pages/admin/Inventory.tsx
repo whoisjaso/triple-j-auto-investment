@@ -553,6 +553,9 @@ const AdminInventory = () => {
   // Images for Preview
   const previewImages = [newCar.imageUrl, ...(newCar.gallery || [])].filter(Boolean);
 
+  // Draft count (across all vehicles, not just filtered)
+  const draftCount = vehicles.filter(v => v.status === VehicleStatus.DRAFT).length;
+
   // Sort & Filter Logic
   const filteredVehicles = vehicles.filter(v => {
      const q = searchQuery.toLowerCase();
@@ -1278,6 +1281,20 @@ const AdminInventory = () => {
                </div>
                
                <div className="flex flex-col xl:flex-row gap-4 w-full md:w-auto items-end xl:items-center">
+                    {/* Drafts Indicator */}
+                    {draftCount > 0 && (
+                      <button
+                        onClick={() => setFilterStatus(VehicleStatus.DRAFT)}
+                        className={`px-4 py-2 text-[9px] uppercase tracking-widest rounded border transition-all ${
+                          filterStatus === VehicleStatus.DRAFT
+                            ? 'bg-amber-500/20 border-amber-500 text-amber-400'
+                            : 'bg-amber-500/10 border-amber-500/30 text-amber-400/70 hover:border-amber-500/60'
+                        }`}
+                      >
+                        {draftCount} Draft{draftCount !== 1 ? 's' : ''} Awaiting Review
+                      </button>
+                    )}
+
                     {/* Status Filter */}
                     <div className="relative w-full md:w-auto">
                         <select
@@ -1360,7 +1377,14 @@ const AdminInventory = () => {
                                 </div>
                             </td>
                             <td className="p-4">
-                                <div className="font-mono text-xs text-gray-400">{v.vin}</div>
+                                <div className="font-mono text-xs text-gray-400">
+                                    {v.vin}
+                                    {v.intakeSource && v.intakeSource !== 'manual' && (
+                                        <span className="text-[8px] text-gray-500 ml-2">
+                                            via {v.intakeSource}{v.purchasePrice ? ` · Bought $${v.purchasePrice.toLocaleString()}` : ''}
+                                        </span>
+                                    )}
+                                </div>
                             </td>
                             <td className="p-4">
                                 <div className="space-y-1 font-mono text-[10px]">
@@ -1380,6 +1404,7 @@ const AdminInventory = () => {
                             </td>
                             <td className="p-4">
                                 <span className={`px-2 py-1 text-[9px] uppercase tracking-widest border ${
+                                    v.status === VehicleStatus.DRAFT ? 'border-amber-500/40 text-amber-400' :
                                     v.status === VehicleStatus.AVAILABLE ? 'border-green-500 text-green-500' :
                                     v.status === VehicleStatus.SOLD ? 'bg-green-900 text-green-400 border-green-900' :
                                     'border-yellow-500 text-yellow-500'
@@ -1394,6 +1419,19 @@ const AdminInventory = () => {
                             </td>
                             <td className="p-4 text-right">
                                 <div className="flex items-center justify-end gap-2">
+                                    {v.status === VehicleStatus.DRAFT && (
+                                      <button
+                                        onClick={async () => {
+                                          if (confirm(`Publish ${v.year} ${v.make} ${v.model} to the website?`)) {
+                                            await updateVehicle(v.id, { ...v, status: VehicleStatus.AVAILABLE });
+                                          }
+                                        }}
+                                        className="px-3 py-2 bg-green-600/20 border border-green-500/40 text-green-400 text-[9px] uppercase tracking-widest hover:bg-green-600/40 transition-all rounded"
+                                        title="Publish to website"
+                                      >
+                                        Publish
+                                      </button>
+                                    )}
                                     <button
                                         onClick={() => handleOpenBOS(v)}
                                         className="bg-tj-gold/10 hover:bg-tj-gold hover:text-black text-tj-gold border border-tj-gold/30 px-3 py-2 text-[10px] uppercase tracking-widest transition-all flex items-center gap-2"
