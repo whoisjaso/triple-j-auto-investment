@@ -776,3 +776,121 @@ export const REFERRAL_TIERS = [
   { count: 3, reward: 100, label: '3rd Referral' },
   { count: 5, reward: 200, label: '5th Referral' },
 ] as const;
+
+// ============================================================
+// MESSAGE TEMPLATES
+// ============================================================
+export type TemplateCategory = 'lead_nurture' | 'registration' | 'rental' | 'owner' | 'system';
+export type TemplateChannel = 'sms' | 'email' | 'voice';
+
+export interface MessageTemplate {
+  id: string;
+  category: TemplateCategory;
+  channel: TemplateChannel;
+  templateKey: string;
+  language: 'en' | 'es';
+  subject: string | null;
+  body: string;
+  variables: string[];
+  isApproved: boolean;
+  autoSend: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// ============================================================
+// FOLLOW-UP QUEUE
+// ============================================================
+export type FollowUpStepKey = 'sms_2h' | 'divine_24h' | 'sms_48h' | 'email_72h' | 'sms_7d' | 'cold_14d';
+
+export interface FollowUpQueueItem {
+  id: string;
+  leadId: string;
+  stepKey: FollowUpStepKey;
+  templateKey: string | null;
+  channel: TemplateChannel;
+  sendAfter: string;
+  sent: boolean;
+  sentAt: string | null;
+  cancelled: boolean;
+  cancelledReason: string | null;
+  error: string | null;
+  createdAt: string;
+}
+
+// ============================================================
+// SENT MESSAGES
+// ============================================================
+export type SentMessageStatus = 'sent' | 'delivered' | 'failed' | 'bounced';
+export type SentMessageEntityType = 'lead' | 'registration' | 'rental' | 'owner';
+
+export interface SentMessage {
+  id: string;
+  templateId: string | null;
+  templateKey: string;
+  channel: TemplateChannel;
+  recipient: string;
+  subject: string | null;
+  body: string;
+  entityType: SentMessageEntityType | null;
+  entityId: string | null;
+  status: SentMessageStatus;
+  providerMessageId: string | null;
+  error: string | null;
+  sentAt: string;
+  createdAt: string;
+}
+
+// ============================================================
+// MARKET COMPARABLES
+// ============================================================
+export interface MarketComparable {
+  id: string;
+  vehicleId: string;
+  source: string;
+  comparablePrice: number;
+  comparableYear: number | null;
+  comparableMake: string | null;
+  comparableModel: string | null;
+  comparableMileage: number | null;
+  comparableUrl: string | null;
+  fetchedAt: string;
+  createdAt: string;
+}
+
+// ============================================================
+// ACTION QUEUE ITEM (Command Center)
+// ============================================================
+export type ActionPriority = 'urgent' | 'high' | 'medium' | 'low' | 'info';
+export type ActionCategory = 'rental' | 'lead' | 'registration' | 'inventory' | 'insurance' | 'plate' | 'referral' | 'system';
+
+export interface ActionItem {
+  id: string;
+  priority: ActionPriority;
+  category: ActionCategory;
+  title: string;
+  description: string;
+  actionType: string;
+  actionLabel: string;
+  entityType: string;
+  entityId: string;
+  metadata: Record<string, unknown>;
+  createdAt: string;
+}
+
+// ============================================================
+// INTAKE CONDITION FLAGS
+// ============================================================
+export interface IntakeConditionFlag {
+  flag: 'check_engine' | 'dents' | 'scratches' | 'tire_wear' | 'interior_damage' | 'mechanical_issues' | 'other';
+  active: boolean;
+  notes?: string;
+}
+
+export type IntakeSource = 'manheim' | 'adesa' | 'other_auction' | 'wholesale' | 'private' | 'trade_in';
+
+// ============================================================
+// LEAD STATUS (extended)
+// ============================================================
+export type LeadStatus = 'New' | 'Contacted' | 'Engaged' | 'Scheduled' | 'Cold' | 'Closed';

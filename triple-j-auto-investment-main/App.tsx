@@ -83,6 +83,7 @@ const AdminInventory = lazyWithErrorHandling(() => import('./pages/admin/Invento
 const AdminRegistrations = lazyWithErrorHandling(() => import('./pages/admin/Registrations'), 'Admin Registrations');
 const AdminRentals = lazyWithErrorHandling(() => import('./pages/admin/Rentals'), 'Admin Rentals');
 const AdminPlates = lazyWithErrorHandling(() => import('./pages/admin/Plates'), 'Admin Plates');
+const AdminTemplates = lazyWithErrorHandling(() => import('./pages/admin/Templates'), 'Templates');
 
 export const openSmartMap = () => {
   const address = "8774 Almeda Genoa Road, Houston, TX 77075";
@@ -482,6 +483,7 @@ const AppContent = () => {
                   <Route path="/admin/registrations" element={<ProtectedRoute><AdminRegistrations /></ProtectedRoute>} />
                   <Route path="/admin/rentals" element={<ProtectedRoute><AdminRentals /></ProtectedRoute>} />
                   <Route path="/admin/plates" element={<ProtectedRoute><AdminPlates /></ProtectedRoute>} />
+                  <Route path="/admin/templates" element={<ProtectedRoute><AdminTemplates /></ProtectedRoute>} />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>
