@@ -1423,7 +1423,11 @@ const AdminInventory = () => {
                                       <button
                                         onClick={async () => {
                                           if (confirm(`Publish ${v.year} ${v.make} ${v.model} to the website?`)) {
-                                            await updateVehicle(v.id, { ...v, status: VehicleStatus.AVAILABLE });
+                                            try {
+                                              await updateVehicle(v.id, { status: VehicleStatus.AVAILABLE } as Vehicle);
+                                            } catch (error) {
+                                              console.error('Failed to publish vehicle:', error);
+                                            }
                                           }
                                         }}
                                         className="px-3 py-2 bg-green-600/20 border border-green-500/40 text-green-400 text-[9px] uppercase tracking-widest hover:bg-green-600/40 transition-all rounded"
