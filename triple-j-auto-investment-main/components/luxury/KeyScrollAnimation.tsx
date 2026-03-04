@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
+import { CrestLoader } from '../CrestLoader';
 
 const TOTAL_FRAMES = 121;
 const BATCH_SIZE = 20;
@@ -124,12 +125,7 @@ export const KeyScrollAnimation = () => {
     <div ref={containerRef} className="relative h-[250vh] bg-[#F7F7F7]">
       {/* Loading state */}
       {!loaded && (
-        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center z-50 bg-[#F7F7F7]">
-          <img src="/GoldTripleJLogo.png" alt="Triple J Auto Investment" className="w-12 h-12 mb-8 opacity-40 animate-pulse" />
-          <p className="text-[#0e1b16] text-[9px] uppercase tracking-[0.4em] font-sans">
-            {k.loading} {progressText}%
-          </p>
-        </div>
+        <CrestLoader mode="sticky" progress={parseInt(progressText)} />
       )}
 
       {/* Sticky viewport — canvas + text overlays */}

@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
+import { CrestLoader } from '../CrestLoader';
 
 const TOTAL_FRAMES = 151;
 const BATCH_SIZE = 20;
@@ -155,22 +156,7 @@ export const ScrollAnimation = () => {
     <div ref={containerRef} className="relative h-[200vh] md:h-[300vh] bg-[#F7F7F7] border-t border-tj-gold/15">
       {/* Loading overlay */}
       {!loaded && (
-        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center z-50 bg-[#F7F7F7]">
-          <img
-            src="/GoldTripleJLogo.png"
-            alt="Triple J Auto Investment"
-            className="w-14 h-14 mb-8 opacity-40 animate-pulse"
-          />
-          <div className="w-48 h-[2px] bg-[#0e1b16]/[0.06] overflow-hidden">
-            <div
-              className="h-full bg-tj-gold transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <p className="text-[#0e1b16]/30 text-[10px] uppercase tracking-[0.4em] mt-4 font-sans">
-            {progress}%
-          </p>
-        </div>
+        <CrestLoader mode="sticky" progress={progress} />
       )}
 
       {/* Sticky viewport */}

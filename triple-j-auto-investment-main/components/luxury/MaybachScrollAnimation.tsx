@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../context/LanguageContext';
+import { CrestLoader } from '../CrestLoader';
 
 const TOTAL_FRAMES = 151; // Matched to ffmpeg output count
 const BATCH_SIZE = 20;
@@ -110,12 +111,7 @@ export const MaybachScrollAnimation = () => {
   return (
     <div ref={containerRef} className="relative h-[250vh] bg-[#F7F7F7]">
       {!loaded && (
-        <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center z-50 bg-[#F7F7F7]">
-          <img src="/GoldTripleJLogo.png" alt="Triple J Auto Investment" className="w-16 h-16 mb-8 opacity-50 animate-pulse" />
-          <p className="text-[#0e1b16] text-[9px] uppercase tracking-[0.4em] font-sans">
-            {m.loading} {progressText}%
-          </p>
-        </div>
+        <CrestLoader mode="sticky" progress={parseInt(progressText)} />
       )}
 
       <div className={`sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center transition-opacity duration-[1500ms] ${loaded ? 'opacity-100' : 'opacity-0'}`}>
