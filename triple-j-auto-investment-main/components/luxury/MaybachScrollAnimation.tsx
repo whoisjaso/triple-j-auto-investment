@@ -116,6 +116,14 @@ export const MaybachScrollAnimation = () => {
 
       <div className={`sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center transition-opacity duration-[1500ms] ${loaded ? 'opacity-100' : 'opacity-0'}`}>
 
+        {/* Edge-feather vignette — dissolves canvas edges into page bg */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[1]"
+          style={{
+            background: 'radial-gradient(ellipse 80% 75% at center, transparent 50%, #F7F7F7 100%)',
+          }}
+        />
+
         {/* Hero Logo — centered above car, fades out on scroll */}
         <div
           ref={logoOverlayRef}
@@ -141,6 +149,7 @@ export const MaybachScrollAnimation = () => {
           style={{
             transform: 'translate(-50%, -50%) scale(1)',
             willChange: 'transform',
+            mixBlendMode: 'multiply',
           }}
         />
 

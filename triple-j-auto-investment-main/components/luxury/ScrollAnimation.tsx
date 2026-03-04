@@ -167,7 +167,7 @@ export const ScrollAnimation = () => {
         <div
           className="absolute inset-0 pointer-events-none z-[1]"
           style={{
-            background: 'radial-gradient(ellipse 70% 70% at center, transparent 40%, rgba(247,247,247,0.85) 100%)',
+            background: 'radial-gradient(ellipse 75% 70% at center, transparent 45%, #F7F7F7 100%)',
           }}
         />
 

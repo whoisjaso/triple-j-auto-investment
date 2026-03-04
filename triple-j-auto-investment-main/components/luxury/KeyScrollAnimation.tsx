@@ -116,6 +116,14 @@ export const KeyScrollAnimation = () => {
       {/* Sticky viewport — canvas + text overlays */}
       <div className={`sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center transition-opacity duration-[1500ms] ${loaded ? 'opacity-100' : 'opacity-0'}`}>
 
+        {/* Edge-feather vignette — dissolves canvas edges into page bg */}
+        <div
+          className="absolute inset-0 pointer-events-none z-[1]"
+          style={{
+            background: 'radial-gradient(ellipse 75% 70% at center, transparent 45%, #F7F7F7 100%)',
+          }}
+        />
+
         <canvas
           ref={canvasRef}
           className="absolute top-1/2 left-1/2 w-[80vw] h-[50vh] md:h-[70vh] md:w-[50vw] lg:w-[45vw] object-contain pointer-events-none"
