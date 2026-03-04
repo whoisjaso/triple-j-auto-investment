@@ -27,7 +27,7 @@ const Home = () => {
             path="/"
          />
          
-         <div className="bg-[#F7F7F7] text-[#0e1b16] min-h-screen selection:bg-tj-gold/30 selection:text-[#0e1b16] -mt-24">
+         <div className="bg-[#F7F7F7] text-[#0e1b16] min-h-screen selection:bg-tj-gold/30 selection:text-[#0e1b16]">
 
             {/* 1. THE CINEMATIC CAR HERO — First thing visitors see */}
             <MaybachScrollAnimation />

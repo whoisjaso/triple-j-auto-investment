@@ -457,7 +457,7 @@ const AppContent = () => {
       <BrowserCompatibilityCheck />
       <Navbar />
       <ErrorBoundary>
-        <main id="main-content" className="flex-grow pt-24">
+        <main id="main-content" className={`flex-grow ${location.pathname === '/' ? 'pt-0' : 'pt-24'}`}>
           <ConnectionErrorBanner />
           <AnimatePresence mode="wait">
             <Suspense fallback={<PageLoader />}>
