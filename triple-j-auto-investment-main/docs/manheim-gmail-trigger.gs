@@ -11,6 +11,8 @@
  * 3. Go to Project Settings > Script Properties, add:
  *    - SUPABASE_URL = https://scgmpliwlfabnpygvbsy.supabase.co
  *    - SUPABASE_ANON_KEY = (your anon key from .env.local)
+ *    - TELEGRAM_BOT_TOKEN = (from @BotFather)
+ *    - TELEGRAM_CHAT_ID = (group chat ID)
  * 4. Run setupTrigger() once (authorize when prompted)
  * 5. Done — it checks every 5 minutes automatically
  */
@@ -24,6 +26,8 @@ function getConfig() {
   return {
     SUPABASE_URL: props.getProperty('SUPABASE_URL'),
     SUPABASE_ANON_KEY: props.getProperty('SUPABASE_ANON_KEY'),
+    TELEGRAM_BOT_TOKEN: props.getProperty('TELEGRAM_BOT_TOKEN'),
+    TELEGRAM_CHAT_ID: props.getProperty('TELEGRAM_CHAT_ID'),
   };
 }
 
@@ -190,6 +194,9 @@ function processCentralDispatchEmails(config) {
           for (var i = 0; i < parsed.vins.length; i++) {
             var result = updateVehicleTowingCost(config, parsed.vins[i], costPerVehicle);
             Logger.log('Central Dispatch towing update VIN ' + parsed.vins[i] + ' ($' + costPerVehicle + '): ' + JSON.stringify(result));
+            if (result.status === 'updated') {
+              notifyTowingUpdate(config, { vin: parsed.vins[i], totalCost: result.newTowingCost }, costPerVehicle, parsed.carrier);
+            }
           }
         } else if (parsed.ymms.length > 0 && parsed.towingPrice) {
           // No VIN but have YMM — try matching by year/make/model
@@ -198,6 +205,9 @@ function processCentralDispatchEmails(config) {
           for (var j = 0; j < parsed.ymms.length; j++) {
             var result2 = updateVehicleTowingByYMM(config, parsed.ymms[j], costPerVehicle2);
             Logger.log('Central Dispatch towing update YMM ' + JSON.stringify(parsed.ymms[j]) + ' ($' + costPerVehicle2 + '): ' + JSON.stringify(result2));
+            if (result2.status === 'updated') {
+              notifyTowingUpdate(config, { year: parsed.ymms[j].year, make: parsed.ymms[j].make, model: parsed.ymms[j].model, totalCost: result2.newTowingCost }, costPerVehicle2, parsed.carrier);
+            }
           }
         } else {
           Logger.log('Could not parse Central Dispatch email: ' + messages[m].getSubject());
@@ -401,6 +411,60 @@ function updateVehicleTowingByYMM(config, ymm, cost) {
     vehicleId: vehicleId,
     newTowingCost: existingTowing + cost,
   };
+}
+
+// ================================================================
+// TELEGRAM NOTIFICATIONS
+// ================================================================
+
+/**
+ * Send a message to the Triple J Telegram group.
+ */
+function sendTelegramMessage(config, text) {
+  if (!config.TELEGRAM_BOT_TOKEN || !config.TELEGRAM_CHAT_ID) {
+    Logger.log('Telegram not configured — skipping notification');
+    return;
+  }
+
+  var url = 'https://api.telegram.org/bot' + config.TELEGRAM_BOT_TOKEN + '/sendMessage';
+  var options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    payload: JSON.stringify({
+      chat_id: config.TELEGRAM_CHAT_ID,
+      text: text,
+      parse_mode: 'HTML',
+      disable_web_page_preview: true,
+    }),
+    muteHttpExceptions: true,
+  };
+
+  try {
+    var response = UrlFetchApp.fetch(url, options);
+    var data = JSON.parse(response.getContentText());
+    if (!data.ok) {
+      Logger.log('Telegram error: ' + data.description);
+    }
+  } catch (e) {
+    Logger.log('Telegram send failed: ' + e.message);
+  }
+}
+
+/**
+ * Notify group about a towing cost update.
+ */
+function notifyTowingUpdate(config, vehicleInfo, towingCost, carrier) {
+  var vehicleLabel = vehicleInfo.vin
+    ? 'VIN: <code>' + vehicleInfo.vin + '</code>'
+    : vehicleInfo.year + ' ' + vehicleInfo.make + ' ' + vehicleInfo.model;
+
+  var text = '\uD83D\uDE9A <b>TOWING UPDATE</b>\n\n'
+    + vehicleLabel + '\n'
+    + (carrier ? 'Carrier: ' + carrier + '\n' : '')
+    + 'Towing Cost: <b>$' + towingCost.toFixed(2) + '</b>\n'
+    + (vehicleInfo.totalCost ? 'New Total Towing: $' + vehicleInfo.totalCost.toFixed(2) : '');
+
+  sendTelegramMessage(config, text);
 }
 
 // ================================================================

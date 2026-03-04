@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { sendTelegram } from '../_shared/telegram.ts';
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -59,7 +60,7 @@ async function decodeVin(vin: string): Promise<VinData | null> {
 }
 
 // ---------------------------------------------------------------------------
-// Gemini AI Content Generation (server-side — uses fetch, not browser SDK)
+// Gemini AI Content Generation
 // ---------------------------------------------------------------------------
 function cleanJson(text: string): string {
   return text.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
@@ -117,7 +118,78 @@ async function generateStory(make: string, model: string, year: number, mileage:
 }
 
 // ---------------------------------------------------------------------------
-// Market Estimate + Slug (replicated from browser-side utils)
+// AI Deal Analysis (NEW)
+// ---------------------------------------------------------------------------
+interface DealAnalysis {
+  marketValue: number;
+  profitPotential: 'HIGH' | 'MEDIUM' | 'LOW';
+  profitStars: string;
+  riskFlags: string[];
+  recommendation: string;
+  suggestedListPrice: number;
+  estimatedMargin: number;
+}
+
+async function analyzeDeal(
+  vinData: VinData,
+  purchasePrice: number,
+  mileage: number,
+  similarCount: number,
+): Promise<DealAnalysis> {
+  const fallback: DealAnalysis = {
+    marketValue: estimateMarketValue(suggestListingPrice(purchasePrice), vinData.year, mileage),
+    profitPotential: 'MEDIUM',
+    profitStars: '\u2605\u2605\u2606',
+    riskFlags: [],
+    recommendation: 'Standard BHPH markup applies.',
+    suggestedListPrice: suggestListingPrice(purchasePrice),
+    estimatedMargin: suggestListingPrice(purchasePrice) - purchasePrice,
+  };
+
+  try {
+    const prompt = `You are a used car dealer analyst for a Houston BHPH dealership (Triple J Auto Investment) that buys at auction and sells in the $3K-$12K range.
+
+Analyze this vehicle acquisition:
+- Vehicle: ${vinData.year} ${vinData.make} ${vinData.model} ${vinData.trim || ''}
+- Body: ${vinData.bodyClass}, Engine: ${vinData.engineCylinders}cyl ${vinData.fuelType}, ${vinData.driveType}
+- Purchase Price: $${purchasePrice}
+- Mileage: ${mileage || 'Unknown'}
+- Similar vehicles already in inventory: ${similarCount}
+
+Return ONLY valid JSON (no markdown):
+{
+  "marketValue": <estimated retail market value in dollars>,
+  "profitPotential": "HIGH" or "MEDIUM" or "LOW",
+  "riskFlags": [<array of short risk strings, empty if none>],
+  "recommendation": "<1-2 sentence dealer recommendation>",
+  "suggestedListPrice": <your suggested listing price>
+}
+
+Consider: age, mileage, brand reliability, parts availability, Houston market demand, BHPH customer base, reconditioning costs (~$500-$1500 typical). HIGH = 50%+ margin after costs, MEDIUM = 25-50%, LOW = <25%.`;
+
+    const raw = await callGemini(prompt);
+    const parsed = JSON.parse(cleanJson(raw));
+
+    const potential = parsed.profitPotential || 'MEDIUM';
+    const stars = potential === 'HIGH' ? '\u2605\u2605\u2605' : potential === 'MEDIUM' ? '\u2605\u2605\u2606' : '\u2605\u2606\u2606';
+
+    return {
+      marketValue: parsed.marketValue || fallback.marketValue,
+      profitPotential: potential,
+      profitStars: stars,
+      riskFlags: parsed.riskFlags || [],
+      recommendation: parsed.recommendation || fallback.recommendation,
+      suggestedListPrice: parsed.suggestedListPrice || fallback.suggestedListPrice,
+      estimatedMargin: (parsed.suggestedListPrice || fallback.suggestedListPrice) - purchasePrice,
+    };
+  } catch (err) {
+    console.error('[vehicle-intake] AI deal analysis failed, using fallback:', err);
+    return fallback;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Market Estimate + Slug
 // ---------------------------------------------------------------------------
 function estimateMarketValue(price: number, year: number, mileage: number): number {
   const age = new Date().getFullYear() - year;
@@ -141,9 +213,58 @@ function generateSlug(year: number, make: string, model: string, id: string): st
 }
 
 function suggestListingPrice(purchasePrice: number): number {
-  // Target ~40-50% gross margin for BHPH (covers reconditioning buffer + profit)
   const markup = purchasePrice < 3000 ? 1.50 : 1.40;
   return Math.round((purchasePrice * markup) / 100) * 100;
+}
+
+// ---------------------------------------------------------------------------
+// Telegram Notification
+// ---------------------------------------------------------------------------
+async function notifyNewVehicle(
+  vinData: VinData,
+  vin: string,
+  cost: number,
+  mileage: number,
+  analysis: DealAnalysis,
+  source: string,
+  similarCount: number,
+): Promise<void> {
+  const flags = analysis.riskFlags.length > 0
+    ? analysis.riskFlags.map(f => `\u26A0\uFE0F ${f}`).join('\n')
+    : '\u2705 None';
+
+  const similarNote = similarCount > 0
+    ? `\n\u26A0\uFE0F <b>Note:</b> You have ${similarCount} similar ${vinData.make} ${vinData.model}(s) in inventory`
+    : '';
+
+  const message = `\uD83D\uDE97 <b>NEW VEHICLE INTAKE</b>
+
+<b>${vinData.year} ${vinData.make} ${vinData.model}${vinData.trim ? ' ' + vinData.trim : ''}</b>
+VIN: <code>${vin}</code>
+${vinData.bodyClass} \u2022 ${vinData.engineCylinders}cyl ${vinData.fuelType} \u2022 ${vinData.driveType}
+${mileage > 0 ? `Mileage: ${mileage.toLocaleString()} mi` : 'Mileage: Unknown'}
+Source: ${source === 'manheim_email' ? 'Manheim Auction' : source}
+
+\uD83D\uDCB0 <b>DEAL ANALYSIS (AI)</b>
+\u2022 Purchase: $${cost.toLocaleString()}
+\u2022 Market Value: ~$${analysis.marketValue.toLocaleString()}
+\u2022 Suggested List: $${analysis.suggestedListPrice.toLocaleString()}
+\u2022 Profit Potential: ${analysis.profitStars} ${analysis.profitPotential}
+\u2022 Est. Margin: $${analysis.estimatedMargin.toLocaleString()}
+
+\uD83D\uDCA1 <b>AI Recommendation:</b>
+${analysis.recommendation}
+
+\u26A0\uFE0F <b>Risk Flags:</b>
+${flags}${similarNote}
+
+\uD83D\uDCCB Status: <b>Draft</b> — Review in admin panel`;
+
+  try {
+    await sendTelegram(message, 'HTML');
+  } catch (err) {
+    console.error('[vehicle-intake] Telegram notification failed:', err);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -193,20 +314,29 @@ Deno.serve(async (req: Request) => {
 
     const cost = parseFloat(String(purchasePrice)) || 0;
     const mileage = parseInt(String(inputMileage)) || 0;
-    const suggestedPrice = suggestListingPrice(cost);
-    const marketEst = estimateMarketValue(suggestedPrice, vinData.year, mileage);
 
     // -----------------------------------------------------------------------
-    // 3. AI content generation (parallel)
+    // 3. Check for similar vehicles already in inventory
     // -----------------------------------------------------------------------
-    const [description, headline, story] = await Promise.all([
+    const { count: similarCount } = await supabase
+      .from('vehicles')
+      .select('id', { count: 'exact', head: true })
+      .eq('make', vinData.make)
+      .eq('model', vinData.model)
+      .in('status', ['Available', 'Draft']);
+
+    // -----------------------------------------------------------------------
+    // 4. AI content generation + deal analysis (parallel)
+    // -----------------------------------------------------------------------
+    const [description, headline, story, dealAnalysis] = await Promise.all([
       generateDescription(vinData.make, vinData.model, vinData.year),
       generateHeadline(vinData.make, vinData.model, vinData.year, vinData.bodyClass),
       generateStory(vinData.make, vinData.model, vinData.year, mileage),
+      analyzeDeal(vinData, cost, mileage, similarCount || 0),
     ]);
 
     // -----------------------------------------------------------------------
-    // 4. Insert as Draft
+    // 5. Insert as Draft
     // -----------------------------------------------------------------------
     const { data: inserted, error: insertError } = await supabase
       .from('vehicles')
@@ -216,7 +346,7 @@ Deno.serve(async (req: Request) => {
         model: vinData.model,
         year: vinData.year,
         mileage: mileage,
-        price: suggestedPrice,
+        price: dealAnalysis.suggestedListPrice,
         cost: cost,
         status: 'Draft',
         description: description,
@@ -229,10 +359,10 @@ Deno.serve(async (req: Request) => {
         vehicle_story: story.en,
         vehicle_story_es: story.es,
         is_verified: false,
-        market_estimate: marketEst,
+        market_estimate: dealAnalysis.marketValue,
         intake_source: source || 'manheim_email',
         purchase_price: cost,
-        suggested_price: suggestedPrice,
+        suggested_price: dealAnalysis.suggestedListPrice,
         intake_at: new Date().toISOString(),
       })
       .select('id, slug')
@@ -246,10 +376,15 @@ Deno.serve(async (req: Request) => {
     }
 
     // -----------------------------------------------------------------------
-    // 5. Generate slug (needs the ID from insert) and update
+    // 6. Generate slug and update
     // -----------------------------------------------------------------------
     const slug = generateSlug(vinData.year, vinData.make, vinData.model, inserted.id);
     await supabase.from('vehicles').update({ slug }).eq('id', inserted.id);
+
+    // -----------------------------------------------------------------------
+    // 7. Telegram notification (fire-and-forget)
+    // -----------------------------------------------------------------------
+    notifyNewVehicle(vinData, vin.toUpperCase(), cost, mileage, dealAnalysis, source || 'manheim_email', similarCount || 0);
 
     return new Response(
       JSON.stringify({
@@ -261,8 +396,15 @@ Deno.serve(async (req: Request) => {
           year: vinData.year,
           make: vinData.make,
           model: vinData.model,
-          suggestedPrice,
-          marketEstimate: marketEst,
+          suggestedPrice: dealAnalysis.suggestedListPrice,
+          marketEstimate: dealAnalysis.marketValue,
+        },
+        dealAnalysis: {
+          profitPotential: dealAnalysis.profitPotential,
+          marketValue: dealAnalysis.marketValue,
+          estimatedMargin: dealAnalysis.estimatedMargin,
+          riskFlags: dealAnalysis.riskFlags,
+          recommendation: dealAnalysis.recommendation,
         },
       }),
       { headers: CORS_HEADERS }

@@ -13,6 +13,7 @@
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { sendEmail } from '../_shared/resend.ts';
+import { sendTelegram } from '../_shared/telegram.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -216,9 +217,34 @@ Deno.serve(async (req: Request) => {
 
     console.log(`[weekly-digest] Email sent: ${result.success}, id: ${result.id || 'n/a'}`);
 
+    // -----------------------------------------------------------------------
+    // Send Telegram summary
+    // -----------------------------------------------------------------------
+    const telegramMsg = buildTelegramDigest({
+      weekLabel,
+      vehiclesAdded,
+      vehiclesSold,
+      avgDaysOnLot,
+      grossRevenue,
+      netProfit,
+      margin,
+      newLeads,
+      responseRate,
+      activeRentals,
+      overdueRentals,
+      rentalRevenue,
+      topReferrerName,
+      recommendations,
+      staleCount: staleVehicles.length,
+    });
+
+    const tgResult = await sendTelegram(telegramMsg, 'HTML');
+    console.log(`[weekly-digest] Telegram sent: ${tgResult.success}`);
+
     return new Response(
       JSON.stringify({
         success: result.success,
+        telegram: tgResult.success,
         metrics: { vehiclesAdded, vehiclesSold, grossRevenue, netProfit, newLeads, activeRentals },
       }),
       { status: 200, headers: CORS_HEADERS },
@@ -409,4 +435,51 @@ function buildDigestEmail(d: DigestData): string {
   </table>
 </body>
 </html>`;
+}
+
+// ---------------------------------------------------------------------------
+// Telegram digest builder
+// ---------------------------------------------------------------------------
+
+interface TelegramDigestData {
+  weekLabel: string;
+  vehiclesAdded: number;
+  vehiclesSold: number;
+  avgDaysOnLot: number;
+  grossRevenue: number;
+  netProfit: number;
+  margin: number;
+  newLeads: number;
+  responseRate: number;
+  activeRentals: number;
+  overdueRentals: number;
+  rentalRevenue: number;
+  topReferrerName: string;
+  recommendations: string[];
+  staleCount: number;
+}
+
+function buildTelegramDigest(d: TelegramDigestData): string {
+  const fmt = (n: number) => `$${n.toLocaleString('en-US')}`;
+  const recs = d.recommendations.map(r => `\u2022 ${r}`).join('\n');
+
+  return `\uD83D\uDCCA <b>WEEKLY DIGEST</b> \u2014 ${d.weekLabel}
+
+<b>Sales & Revenue</b>
+\u2022 Added: ${d.vehiclesAdded} | Sold: ${d.vehiclesSold}
+\u2022 Avg Days on Lot: ${d.avgDaysOnLot}
+\u2022 Gross: ${fmt(d.grossRevenue)} | Net: ${fmt(d.netProfit)} (${d.margin}%)
+
+<b>Leads</b>
+\u2022 New: ${d.newLeads} | Response Rate: ${d.responseRate}%
+
+<b>Rentals</b>
+\u2022 Active: ${d.activeRentals} | Overdue: ${d.overdueRentals}
+\u2022 Revenue (MTD): ${fmt(d.rentalRevenue)}
+
+<b>Top Referrer:</b> ${d.topReferrerName}
+${d.staleCount > 0 ? `\u26A0\uFE0F <b>${d.staleCount} stale vehicle(s)</b> (21+ days on lot)` : '\u2705 Inventory is fresh'}
+
+<b>Recommended Actions:</b>
+${recs}`;
 }
