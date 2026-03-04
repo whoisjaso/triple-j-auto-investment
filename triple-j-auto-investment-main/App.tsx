@@ -197,7 +197,7 @@ const Navbar = () => {
   return (
     <nav className={navClasses}>
       <div className="w-full px-6 md:px-10 lg:px-16">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="relative flex items-center justify-between h-16 md:h-20">
 
           {/* Left nav group */}
           <div className="hidden md:flex items-center gap-8 lg:gap-10">
@@ -211,6 +211,19 @@ const Navbar = () => {
               </>
             )}
           </div>
+
+          {/* Center logo — all pages */}
+          <button
+            onClick={handleLogoClick}
+            className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 focus:outline-none group"
+            aria-label="Home"
+          >
+            <img
+              src="/GoldTripleJLogo.png"
+              alt="Triple J"
+              className="w-9 h-9 object-contain opacity-50 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110"
+            />
+          </button>
 
           {/* Right nav group */}
           <div className="hidden md:flex items-center gap-8 lg:gap-10">
@@ -230,8 +243,8 @@ const Navbar = () => {
             <button onClick={toggleLang} className={`p-2 text-[11px] font-medium tracking-widest uppercase transition-colors ${isWhiteSection ? 'text-[#0e1b16] hover:text-tj-gold' : 'text-tj-zinc400 hover:text-tj-zinc100'}`}>
               {lang === 'en' ? 'ES' : 'EN'}
             </button>
-            <button onClick={handleLogoClick} className="focus:outline-none">
-              <img src="/GoldTripleJLogo.png" alt="Triple J" className="w-8 h-8 object-contain opacity-70" />
+            <button onClick={handleLogoClick} className="focus:outline-none group">
+              <img src="/GoldTripleJLogo.png" alt="Triple J" className="w-8 h-8 object-contain opacity-60 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110" />
             </button>
             <button ref={menuToggleRef} onClick={() => setIsOpen(!isOpen)} className={`p-2 transition-colors ${isWhiteSection ? 'text-[#0e1b16] hover:text-tj-gold' : 'text-tj-zinc400 hover:text-tj-zinc100'}`}>
               {isOpen ? <X size={24} strokeWidth={1} /> : <Menu size={24} strokeWidth={1} />}
