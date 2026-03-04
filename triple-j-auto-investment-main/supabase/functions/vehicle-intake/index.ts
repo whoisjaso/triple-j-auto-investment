@@ -136,51 +136,60 @@ async function analyzeDeal(
   mileage: number,
   similarCount: number,
 ): Promise<DealAnalysis> {
+  const heuristicPrice = heuristicListingPrice(vinData.year, mileage);
   const fallback: DealAnalysis = {
-    marketValue: estimateMarketValue(suggestListingPrice(purchasePrice), vinData.year, mileage),
+    marketValue: heuristicPrice,
     profitPotential: 'MEDIUM',
     profitStars: '\u2605\u2605\u2606',
     riskFlags: [],
     recommendation: 'Standard BHPH markup applies.',
-    suggestedListPrice: suggestListingPrice(purchasePrice),
-    estimatedMargin: suggestListingPrice(purchasePrice) - purchasePrice,
+    suggestedListPrice: heuristicPrice,
+    estimatedMargin: purchasePrice > 0 ? heuristicPrice - purchasePrice : 0,
   };
 
   try {
+    const costLine = purchasePrice > 0
+      ? `- Purchase Price: $${purchasePrice}`
+      : '- Purchase Price: Unknown (estimate retail value from market data)';
+
     const prompt = `You are a used car dealer analyst for a Houston BHPH dealership (Triple J Auto Investment) that buys at auction and sells in the $3K-$12K range.
 
-Analyze this vehicle acquisition:
+Analyze this vehicle:
 - Vehicle: ${vinData.year} ${vinData.make} ${vinData.model} ${vinData.trim || ''}
 - Body: ${vinData.bodyClass}, Engine: ${vinData.engineCylinders}cyl ${vinData.fuelType}, ${vinData.driveType}
-- Purchase Price: $${purchasePrice}
+${costLine}
 - Mileage: ${mileage || 'Unknown'}
 - Similar vehicles already in inventory: ${similarCount}
 
 Return ONLY valid JSON (no markdown):
 {
-  "marketValue": <estimated retail market value in dollars>,
+  "marketValue": <estimated retail market value in dollars based on real market data for this year/make/model>,
   "profitPotential": "HIGH" or "MEDIUM" or "LOW",
   "riskFlags": [<array of short risk strings, empty if none>],
   "recommendation": "<1-2 sentence dealer recommendation>",
-  "suggestedListPrice": <your suggested listing price>
+  "suggestedListPrice": <your suggested BHPH listing price, typically $3000-$10000 range>
 }
 
-Consider: age, mileage, brand reliability, parts availability, Houston market demand, BHPH customer base, reconditioning costs (~$500-$1500 typical). HIGH = 50%+ margin after costs, MEDIUM = 25-50%, LOW = <25%.`;
+IMPORTANT: Even if purchase price is unknown, you MUST provide realistic marketValue and suggestedListPrice based on the vehicle's year, make, model, mileage, and current Houston used car market. Use your knowledge of real used car pricing. Never return 0 for these values.
+
+Consider: age, mileage, brand reliability, parts availability, Houston market demand, BHPH customer base, reconditioning costs (~$500-$1500 typical).`;
 
     const raw = await callGemini(prompt);
     const parsed = JSON.parse(cleanJson(raw));
 
+    const suggestedPrice = parsed.suggestedListPrice || fallback.suggestedListPrice;
+    const marketVal = parsed.marketValue || fallback.marketValue;
     const potential = parsed.profitPotential || 'MEDIUM';
     const stars = potential === 'HIGH' ? '\u2605\u2605\u2605' : potential === 'MEDIUM' ? '\u2605\u2605\u2606' : '\u2605\u2606\u2606';
 
     return {
-      marketValue: parsed.marketValue || fallback.marketValue,
+      marketValue: marketVal,
       profitPotential: potential,
       profitStars: stars,
       riskFlags: parsed.riskFlags || [],
       recommendation: parsed.recommendation || fallback.recommendation,
-      suggestedListPrice: parsed.suggestedListPrice || fallback.suggestedListPrice,
-      estimatedMargin: (parsed.suggestedListPrice || fallback.suggestedListPrice) - purchasePrice,
+      suggestedListPrice: suggestedPrice,
+      estimatedMargin: purchasePrice > 0 ? suggestedPrice - purchasePrice : 0,
     };
   } catch (err) {
     console.error('[vehicle-intake] AI deal analysis failed, using fallback:', err);
@@ -213,9 +222,32 @@ function generateSlug(year: number, make: string, model: string, id: string): st
 }
 
 function suggestListingPrice(purchasePrice: number): number {
+  if (purchasePrice <= 0) return 0;
   const markup = purchasePrice < 3000 ? 1.50 : 1.40;
   return Math.round((purchasePrice * markup) / 100) * 100;
 }
+
+// Heuristic fallback when AI fails and no purchase price is available
+function heuristicListingPrice(year: number, mileage: number): number {
+  const age = new Date().getFullYear() - year;
+  let base = 5000;
+  if (age <= 3) base = 9000;
+  else if (age <= 6) base = 7000;
+  else if (age <= 10) base = 5000;
+  else if (age <= 15) base = 3500;
+  else base = 2500;
+  if (mileage > 200000) base *= 0.7;
+  else if (mileage > 150000) base *= 0.8;
+  else if (mileage > 100000) base *= 0.9;
+  return Math.round(base / 100) * 100;
+}
+
+// Title-case a string: "FORD" -> "Ford", "MERCEDES-BENZ" -> "Mercedes-Benz"
+function titleCase(str: string): string {
+  return str.toLowerCase().replace(/(?:^|\s|-)(\w)/g, (_, c) => _.slice(0, -1) + c.toUpperCase());
+}
+
+const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=2830&auto=format&fit=crop';
 
 // ---------------------------------------------------------------------------
 // Telegram Notification
@@ -258,7 +290,7 @@ ${analysis.recommendation}
 \u26A0\uFE0F <b>Risk Flags:</b>
 ${flags}${similarNote}
 
-\uD83D\uDCCB Status: <b>Draft</b> — Review in admin panel`;
+\uD83D\uDCCB Status: <b>Available</b> — Live on website`;
 
   try {
     await sendTelegram(message, 'HTML');
@@ -315,6 +347,10 @@ Deno.serve(async (req: Request) => {
     const cost = parseFloat(String(purchasePrice)) || 0;
     const mileage = parseInt(String(inputMileage)) || 0;
 
+    // Normalize make/model to Title Case (NHTSA returns ALL CAPS)
+    vinData.make = titleCase(vinData.make);
+    vinData.model = titleCase(vinData.model);
+
     // -----------------------------------------------------------------------
     // 3. Check for similar vehicles already in inventory
     // -----------------------------------------------------------------------
@@ -336,7 +372,7 @@ Deno.serve(async (req: Request) => {
     ]);
 
     // -----------------------------------------------------------------------
-    // 5. Insert as Draft
+    // 5. Insert as Available (auto-publish)
     // -----------------------------------------------------------------------
     const { data: inserted, error: insertError } = await supabase
       .from('vehicles')
@@ -348,9 +384,9 @@ Deno.serve(async (req: Request) => {
         mileage: mileage,
         price: dealAnalysis.suggestedListPrice,
         cost: cost,
-        status: 'Draft',
+        status: 'Available',
         description: description,
-        image_url: '',
+        image_url: PLACEHOLDER_IMAGE,
         gallery: [],
         diagnostics: [],
         date_added: new Date().toISOString().split('T')[0],
