@@ -9,3 +9,4 @@ export { LuxurySplashScreen } from './LuxurySplashScreen';
 export { NoiseOverlay } from './NoiseOverlay';
 export { MaybachScrollAnimation } from './MaybachScrollAnimation';
 export { KeyScrollAnimation } from './KeyScrollAnimation';
+export { ScrollIndicator } from './ScrollIndicator';
