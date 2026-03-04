@@ -1,7 +1,7 @@
 import React, { useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
-import { ShieldCheck, MapPin, Phone, Clock, Facebook, Twitter } from 'lucide-react';
+import { RRFooter } from './components/RRFooter';
 import { LanguageProvider } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { RRNavbar } from './components/RRNavbar';
@@ -107,108 +107,6 @@ const HashRedirect = () => {
     }
   }, [navigate]);
   return null;
-};
-
-const Footer = () => {
-  return (
-    <footer className="bg-black text-tj-zinc500 py-24 md:py-32 border-t border-tj-gold/10 relative overflow-hidden">
-      <div className="absolute top-0 right-0 pointer-events-none select-none opacity-[0.02] mix-blend-screen -mt-20 -mr-20">
-        <img src="/GoldTripleJLogo.png" alt="" className="w-[60vw] max-w-[800px] h-auto" aria-hidden="true" />
-      </div>
-
-      <div className="max-w-[1280px] mx-auto px-6 md:px-8 lg:px-16 relative z-10 grid grid-cols-1 md:grid-cols-4 gap-16 md:gap-24">
-
-        <div className="flex flex-col items-start md:col-span-1 border-r border-tj-gold/10 pr-12">
-          <div className="flex items-center gap-4 mb-10">
-            <img src="/GoldTripleJLogo.png" alt="Triple J Auto Investment" className="w-12 h-12 object-contain opacity-80 hover:opacity-100 transition-all duration-700 gold-glow" />
-            <div className="pt-1">
-              <p className="text-tj-zinc100 font-serif text-xl tracking-wide leading-none mb-1">TRIPLE J</p>
-              <p className="text-tj-gold text-[10px] uppercase tracking-[0.3em] label-small-caps">Auto Investment</p>
-            </div>
-          </div>
-          <p className="text-[12px] text-tj-zinc400 leading-[1.8] mb-12">
-             Curators of mechanical excellence and understated luxury.
-          </p>
-
-          <div className="mb-8 w-full border-t border-tj-gold/10 pt-8">
-            <p className="text-[10px] uppercase tracking-[0.3em] text-tj-zinc500 mb-6 block w-full label-small-caps">Connect</p>
-            <div className="flex items-center gap-6">
-              <a href="https://www.facebook.com/thetriplejauto" target="_blank" rel="noopener noreferrer" className="text-tj-zinc400 hover:text-tj-gold transition-colors">
-                <Facebook size={16} strokeWidth={1.5} />
-              </a>
-              <a href="https://x.com/thetriplejauto" target="_blank" rel="noopener noreferrer" className="text-tj-zinc400 hover:text-tj-gold transition-colors">
-                <Twitter size={16} strokeWidth={1.5} />
-              </a>
-            </div>
-          </div>
-
-          <p className="text-[10px] uppercase tracking-[0.2em] text-tj-zinc500 mt-auto pt-8 border-t border-tj-gold/10 w-full">
-            &copy; {new Date().getFullYear()} Triple J. All rights reserved.
-          </p>
-        </div>
-
-        <div className="flex flex-col items-start md:border-r border-tj-gold/10 pr-12">
-          <h3 className="text-tj-zinc100 font-medium tracking-[0.2em] text-[11px] uppercase mb-8 border-b border-tj-gold/10 pb-4 w-full label-small-caps">Concierge</h3>
-          <div className="mb-10 w-full">
-            <button onClick={openSmartMap} className="not-italic text-[12px] leading-[1.8] text-left hover:text-tj-zinc100 transition-colors group flex items-start gap-4 text-tj-zinc400">
-              <MapPin size={16} strokeWidth={1} className="text-tj-gold mt-1 flex-shrink-0" />
-              <div>
-                <span className="block">8774 Almeda Genoa Rd</span>
-                <span className="block text-tj-zinc500">Houston, TX 77075</span>
-              </div>
-            </button>
-          </div>
-          <div className="space-y-8 text-[12px] text-tj-zinc400 w-full border-t border-tj-gold/10 pt-8">
-            <a href="tel:+18324009760" className="flex items-start gap-4 hover:text-tj-zinc100 transition-colors">
-              <Phone size={16} strokeWidth={1} className="text-tj-gold mt-1 flex-shrink-0" />
-              <span>(832) 400-9760</span>
-            </a>
-            <div className="flex items-start gap-4">
-              <Clock size={16} strokeWidth={1} className="text-tj-gold mt-1 flex-shrink-0" />
-              <div>
-                <p className="mb-1">Mon-Sat: 10:00 - 18:00</p>
-                <p className="text-tj-zinc500">Sunday: By Appointment</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-start md:border-r border-tj-gold/10 pr-12">
-          <h3 className="text-tj-zinc100 font-medium tracking-[0.2em] text-[11px] uppercase mb-8 border-b border-tj-gold/10 pb-4 w-full flex items-center justify-between label-small-caps">
-            <span>Compliance</span>
-            <ShieldCheck size={14} strokeWidth={1} className="text-tj-gold" />
-          </h3>
-          <div className="mb-10 w-full">
-            <div className="flex justify-between items-start border-b border-tj-gold/10 pb-4 mb-4">
-              <span className="text-[11px] uppercase tracking-[0.2em] text-tj-zinc400">Dealer License</span>
-              <span className="font-mono text-tj-gold text-[12px]">P171632</span>
-            </div>
-          </div>
-          <div className="flex flex-col gap-6 w-full">
-            <Link to="/legal/dmv" className="text-[12px] text-tj-zinc400 hover:text-tj-gold transition-colors">Texas DMV</Link>
-            <Link to="/legal/privacy" className="text-[12px] text-tj-zinc400 hover:text-tj-gold transition-colors">Privacy Policy</Link>
-            <Link to="/legal/terms" className="text-[12px] text-tj-zinc400 hover:text-tj-gold transition-colors">Terms of Service</Link>
-            <Link to="/legal/arbitration" className="text-[12px] text-tj-zinc400 hover:text-tj-gold transition-colors">Arbitration</Link>
-          </div>
-        </div>
-
-        <div className="flex flex-col items-start">
-          <h3 className="text-tj-zinc100 font-medium tracking-[0.2em] text-[11px] uppercase mb-8 border-b border-tj-gold/10 pb-4 w-full label-small-caps">Sovereign Assets</h3>
-          <div className="flex flex-col gap-6 w-full">
-            <Link to="/inventory" className="text-[12px] text-tj-zinc400 hover:text-tj-gold transition-colors">The Collection</Link>
-            <Link to="/about" className="text-[12px] text-tj-zinc400 hover:text-tj-gold transition-colors">Our Philosophy</Link>
-            <Link to="/services" className="text-[12px] text-tj-zinc400 hover:text-tj-gold transition-colors">Bespoke Services</Link>
-            <Link to="/vin" className="text-[12px] text-tj-zinc400 hover:text-tj-gold transition-colors">Authentication</Link>
-
-            <div className="border-t border-tj-gold/10 pt-8 mt-4 w-full">
-              <Link to="/login" className="text-[11px] uppercase tracking-[0.2em] text-tj-goldMuted hover:text-tj-gold transition-colors">Client Portal</Link>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </footer>
-  );
 };
 
 const ProtectedRoute = ({ children }: { children?: React.ReactNode }) => {
@@ -317,7 +215,7 @@ const AppContent = () => {
           </AnimatePresence>
         </main>
       </ErrorBoundary>
-      <Footer />
+      <RRFooter />
       <div className="grain-overlay"></div>
     </div>
   );
