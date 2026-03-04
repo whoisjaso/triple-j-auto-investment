@@ -75,7 +75,7 @@ function processAllEmails() {
 // ================================================================
 
 function processManheimEmails(config) {
-  var query = 'from:noreply@manheim.com subject:"Sale Documents from Manheim" -label:AutoProcessed/Manheim';
+  var query = 'in:anywhere from:noreply@manheim.com subject:"Sale Documents from Manheim" -label:AutoProcessed/Manheim';
   var threads = GmailApp.search(query, 0, 10);
 
   if (threads.length === 0) return;
@@ -171,7 +171,7 @@ function parseManheimEmail(body) {
 // ================================================================
 
 function processCentralDispatchEmails(config) {
-  var query = 'from:do-not-reply@centraldispatch.com subject:"has been DELIVERED" -label:AutoProcessed/CentralDispatch';
+  var query = 'in:anywhere from:do-not-reply@centraldispatch.com subject:"has been DELIVERED" -label:AutoProcessed/CentralDispatch';
   var threads = GmailApp.search(query, 0, 10);
 
   if (threads.length === 0) return;
