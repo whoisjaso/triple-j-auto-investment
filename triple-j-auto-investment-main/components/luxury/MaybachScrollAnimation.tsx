@@ -20,34 +20,6 @@ export const MaybachScrollAnimation = () => {
     let drawnFrame = -1;
     let animationFrameId: number;
     let images: HTMLImageElement[] = [];
-    // Cache processed frames as ImageBitmap to avoid per-frame pixel manipulation
-    const processedFrames: (ImageBitmap | null)[] = new Array(TOTAL_FRAMES).fill(null);
-
-    const processFrame = (img: HTMLImageElement): Promise<ImageBitmap | null> => {
-      try {
-        const offscreen = document.createElement('canvas');
-        offscreen.width = img.width;
-        offscreen.height = img.height;
-        const ctx = offscreen.getContext('2d');
-        if (!ctx) return Promise.resolve(null);
-        ctx.drawImage(img, 0, 0);
-        const imageData = ctx.getImageData(0, 0, offscreen.width, offscreen.height);
-        const d = imageData.data;
-        for (let i = 0; i < d.length; i += 4) {
-          const r = d[i], g = d[i + 1], b = d[i + 2];
-          if (r > 230 && g > 230 && b > 230) {
-            d[i + 3] = 0;
-          } else if (r > 210 && g > 210 && b > 210) {
-            const avg = (r + g + b) / 3;
-            d[i + 3] = Math.round(255 * (1 - (avg - 210) / 20));
-          }
-        }
-        ctx.putImageData(imageData, 0, 0);
-        return createImageBitmap(offscreen);
-      } catch {
-        return Promise.resolve(null);
-      }
-    };
 
     const loadFrames = async () => {
       images = new Array(TOTAL_FRAMES);
@@ -55,20 +27,12 @@ export const MaybachScrollAnimation = () => {
         const batch = [];
         for (let j = i; j < Math.min(i + BATCH_SIZE, TOTAL_FRAMES); j++) {
           batch.push(
-            new Promise<void>(async (resolve) => {
+            new Promise<void>((resolve) => {
               const img = new Image();
               const frameNum = (j + 1).toString().padStart(4, '0');
               img.src = `/maybach-frames/frame-${frameNum}.jpg`;
-              img.onload = async () => {
-                images[j] = img;
-                // Pre-process and cache the frame with transparency
-                processedFrames[j] = await processFrame(img);
-                resolve();
-              };
-              img.onerror = () => {
-                console.error(`Failed to load frame ${frameNum}`);
-                resolve();
-              };
+              img.onload = () => { images[j] = img; resolve(); };
+              img.onerror = () => { resolve(); };
             })
           );
         }
@@ -117,19 +81,17 @@ export const MaybachScrollAnimation = () => {
 
     const tick = () => {
       if (currentFrame !== drawnFrame && canvasRef.current) {
-        const cached = processedFrames[currentFrame];
         const img = images[currentFrame];
-        if (cached || img) {
+        if (img) {
           const ctx = canvasRef.current.getContext('2d');
           if (ctx) {
-            const source = cached || img;
             const canvas = canvasRef.current;
-            if (canvas.width !== source.width || canvas.height !== source.height) {
-              canvas.width = source.width;
-              canvas.height = source.height;
+            if (canvas.width !== img.width || canvas.height !== img.height) {
+              canvas.width = img.width;
+              canvas.height = img.height;
             }
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             drawnFrame = currentFrame;
           }
         }

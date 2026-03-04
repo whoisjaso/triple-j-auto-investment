@@ -452,7 +452,7 @@ const AppContent = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-black text-tj-zinc400 font-sans relative">
+    <div className={`min-h-screen flex flex-col text-tj-zinc400 font-sans relative ${location.pathname === '/' ? 'bg-[#F7F7F7]' : 'bg-black'}`}>
       <OfflineBanner />
       <BrowserCompatibilityCheck />
       <Navbar />

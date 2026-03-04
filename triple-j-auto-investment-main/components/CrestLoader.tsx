@@ -51,7 +51,7 @@ export const CrestLoader: React.FC<CrestLoaderProps> = ({
         bottom: 0,
         width: '100vw',
         height: '100vh',
-        backgroundColor: '#000',
+        backgroundColor: '#F7F7F7',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -67,7 +67,7 @@ export const CrestLoader: React.FC<CrestLoaderProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          background: 'radial-gradient(circle at center, rgba(212,175,55,0.08) 0%, transparent 50%)',
+          background: 'radial-gradient(circle at center, rgba(212,175,55,0.12) 0%, transparent 50%)',
           animation: 'crestBgPulse 3s ease-in-out infinite'
         }}
       />
@@ -111,7 +111,7 @@ export const CrestLoader: React.FC<CrestLoaderProps> = ({
           <path
             d={shieldPath}
             fill="none"
-            stroke="rgba(212,175,55,0.1)"
+            stroke="rgba(212,175,55,0.2)"
             strokeWidth="1"
           />
 
