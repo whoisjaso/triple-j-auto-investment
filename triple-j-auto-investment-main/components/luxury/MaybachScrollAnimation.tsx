@@ -145,7 +145,6 @@ export const MaybachScrollAnimation = () => {
           style={{
             transform: 'translate(-50%, -50%) scale(1)',
             willChange: 'transform',
-            filter: 'drop-shadow(0 0 1px rgba(212,175,55,0.6)) drop-shadow(0 0 4px rgba(212,175,55,0.25)) drop-shadow(0 0 12px rgba(212,175,55,0.1))'
           }}
         />
 

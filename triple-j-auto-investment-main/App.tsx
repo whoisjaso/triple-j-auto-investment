@@ -191,7 +191,7 @@ const Navbar = () => {
   };
 
   const navClasses = isWhiteSection
-    ? `fixed top-0 left-0 right-0 z-50 transition-all duration-1000 ease-out bg-[#F7F7F7]`
+    ? `fixed top-0 left-0 right-0 z-50 bg-[#F7F7F7]`
     : `fixed top-0 left-0 right-0 z-50 transition-all duration-1000 ease-out ${scrolled ? 'bg-black/95 backdrop-blur-xl' : 'bg-black'}`;
 
   return (
