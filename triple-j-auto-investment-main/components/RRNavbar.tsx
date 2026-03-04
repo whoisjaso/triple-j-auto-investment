@@ -46,9 +46,12 @@ const NAV_ITEMS: NavItem[] = [
 export const RRNavbar: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [navVisible, setNavVisible] = useState(true);
   const [activeSubIdx, setActiveSubIdx] = useState<number | null>(null);
   const [mobileScreen, setMobileScreen] = useState<'main' | 'sub'>('main');
   const [mobileSubIdx, setMobileSubIdx] = useState<number | null>(null);
+
+  const lastScrollYRef = useRef(0);
 
   const { user } = useStore();
   const { lang, toggleLang } = useLanguage();
@@ -67,13 +70,26 @@ export const RRNavbar: React.FC = () => {
 
   const isHome = location.pathname === '/';
 
-  /* ─── Scroll detection ─── */
+  /* ─── Scroll detection + smart hide ─── */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 80);
+
+      // Smart hide: hide on scroll down, show on scroll up
+      if (menuOpen || y < 100) {
+        setNavVisible(true);
+      } else if (y > lastScrollYRef.current + 5) {
+        setNavVisible(false); // scrolling down
+      } else if (y < lastScrollYRef.current - 5) {
+        setNavVisible(true); // scrolling up
+      }
+      lastScrollYRef.current = y;
+    };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [menuOpen]);
 
   /* ─── Body scroll lock ─── */
   useEffect(() => {
@@ -291,8 +307,8 @@ export const RRNavbar: React.FC = () => {
   const getNavBg = (): string => {
     if (menuOpen) return 'bg-transparent';
     if (!scrolled) return 'bg-transparent';
-    if (isHome) return 'bg-[#F7F7F7]/95 backdrop-blur-xl';
-    return 'bg-[rgba(10,10,10,0.92)] backdrop-blur-xl';
+    if (isHome) return 'bg-[#F7F7F7]/80 backdrop-blur-xl';
+    return 'bg-[rgba(10,10,10,0.80)] backdrop-blur-xl';
   };
 
   /* ─── Text color for nav bar ─── */
@@ -310,7 +326,7 @@ export const RRNavbar: React.FC = () => {
           PERSISTENT NAV BAR — 70px fixed
       ──────────────────────────────────────────────── */}
       <nav
-        className={`fixed top-0 left-0 right-0 h-[70px] z-[9999] flex items-center justify-between px-6 md:px-10 lg:px-16 transition-all duration-700 ${getNavBg()}`}
+        className={`fixed top-0 left-0 right-0 h-[50px] z-[9999] flex items-center justify-between px-6 md:px-10 lg:px-16 transition-all duration-700 ${getNavBg()} ${navVisible ? 'translate-y-0' : '-translate-y-full'}`}
         style={{ transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)' }}
         role="navigation"
         aria-label="Main navigation"
@@ -322,7 +338,7 @@ export const RRNavbar: React.FC = () => {
           aria-label="Home"
         >
           <span
-            className={`font-serif text-[16px] md:text-[18px] tracking-[0.08em] leading-none transition-colors duration-500 ${
+            className={`font-serif text-[14px] md:text-[15px] tracking-[0.08em] leading-none transition-colors duration-500 ${
               menuOpen ? 'text-tj-goldRR' : 'text-tj-goldRR'
             }`}
             style={{ fontWeight: 400 }}
@@ -330,7 +346,7 @@ export const RRNavbar: React.FC = () => {
             TRIPLE J
           </span>
           <span
-            className={`text-[9px] uppercase tracking-[0.25em] mt-[2px] transition-colors duration-500 ${
+            className={`text-[8px] uppercase tracking-[0.25em] mt-[2px] transition-colors duration-500 ${
               menuOpen
                 ? 'text-[#F5F0E8]/60'
                 : isHome
@@ -348,41 +364,53 @@ export const RRNavbar: React.FC = () => {
           {/* Language toggle */}
           <button
             onClick={toggleLang}
-            className={`text-[11px] uppercase tracking-[0.2em] font-medium transition-colors duration-500 hover:text-tj-goldRR ${barText}`}
+            className={`text-[9px] uppercase tracking-[0.2em] font-medium transition-colors duration-500 hover:text-tj-goldRR opacity-60 hover:opacity-100 ${barText}`}
             style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}
           >
             {lang === 'en' ? 'ES' : 'EN'}
           </button>
 
-          {/* MENU / CLOSE crossfade */}
+          {/* Hamburger → X morph */}
           <button
             ref={menuBtnRef}
             onClick={handleMenuToggle}
-            className={`relative w-[52px] h-[52px] flex items-center justify-center transition-colors duration-500 hover:text-tj-goldRR ${barText}`}
+            className={`relative w-[44px] h-[44px] flex items-center justify-center transition-colors duration-500 group ${barText}`}
             aria-expanded={menuOpen}
             aria-controls="rr-overlay"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           >
-            <span
-              className="absolute text-[11px] uppercase tracking-[0.2em] font-medium transition-opacity duration-500"
-              style={{
-                fontFamily: '"Plus Jakarta Sans", sans-serif',
-                opacity: menuOpen ? 0 : 1,
-                transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)',
-              }}
-            >
-              MENU
-            </span>
-            <span
-              className="absolute text-[11px] uppercase tracking-[0.2em] font-medium transition-opacity duration-500"
-              style={{
-                fontFamily: '"Plus Jakarta Sans", sans-serif',
-                opacity: menuOpen ? 1 : 0,
-                transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)',
-              }}
-            >
-              CLOSE
-            </span>
+            <div className="relative w-[22px] h-[14px]">
+              {/* Top line */}
+              <span
+                className="absolute left-0 w-full h-[1.5px] bg-current transition-all group-hover:bg-tj-goldRR"
+                style={{
+                  top: menuOpen ? '50%' : '0',
+                  transform: menuOpen ? 'translateY(-50%) rotate(45deg)' : 'translateY(0) rotate(0)',
+                  transitionDuration: '500ms',
+                  transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)',
+                }}
+              />
+              {/* Middle line */}
+              <span
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1.5px] bg-current transition-all group-hover:bg-tj-goldRR"
+                style={{
+                  opacity: menuOpen ? 0 : 1,
+                  transitionDuration: '300ms',
+                  transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)',
+                }}
+              />
+              {/* Bottom line */}
+              <span
+                className="absolute left-0 w-full h-[1.5px] bg-current transition-all group-hover:bg-tj-goldRR"
+                style={{
+                  bottom: menuOpen ? 'auto' : '0',
+                  top: menuOpen ? '50%' : 'auto',
+                  transform: menuOpen ? 'translateY(-50%) rotate(-45deg)' : 'translateY(0) rotate(0)',
+                  transitionDuration: '500ms',
+                  transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)',
+                }}
+              />
+            </div>
           </button>
         </div>
       </nav>
@@ -404,7 +432,7 @@ export const RRNavbar: React.FC = () => {
         aria-hidden={!menuOpen}
       >
         {/* ── DESKTOP LAYOUT (>=1024px) ── */}
-        <div className="hidden lg:flex h-full pt-[70px]">
+        <div className="hidden lg:flex h-full pt-[50px]">
           {/* Left panel */}
           <div
             className={`flex flex-col justify-between h-full px-10 xl:px-16 py-12 transition-all duration-500 ${
@@ -516,7 +544,7 @@ export const RRNavbar: React.FC = () => {
             }}
           >
             {activeSubIdx !== null && NAV_ITEMS[activeSubIdx]?.sub && (
-              <div ref={subItemsRef} className="px-10 xl:px-16 py-16 pt-[70px]">
+              <div ref={subItemsRef} className="px-10 xl:px-16 py-16 pt-[50px]">
                 <p
                   className="text-[10px] uppercase tracking-[0.3em] text-tj-goldRR/60 mb-10"
                   style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}
@@ -554,7 +582,7 @@ export const RRNavbar: React.FC = () => {
         </div>
 
         {/* ── MOBILE LAYOUT (<1024px) ── */}
-        <div className="lg:hidden h-full pt-[70px] overflow-hidden">
+        <div className="lg:hidden h-full pt-[50px] overflow-hidden">
           <div
             ref={mobileContainerRef}
             className="flex h-full"

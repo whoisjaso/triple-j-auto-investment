@@ -4,7 +4,7 @@ import { useStore } from '../context/Store';
 import { Sparkles } from 'lucide-react';
 
 import { SEO } from '../components/SEO';
-import { ScrollReveal, MaybachScrollAnimation, KeyScrollAnimation, ScrollIndicator } from '../components/luxury';
+import { ScrollReveal, MaybachScrollAnimation, KeyScrollAnimation } from '../components/luxury';
 import { ScrollAnimation } from '../components/luxury/ScrollAnimation';
 import { useLanguage } from '../context/LanguageContext';
 import { useGSAPAnimations } from '../hooks/useGSAPAnimations';
@@ -32,23 +32,7 @@ const Home = () => {
 
          <div className="bg-[#F7F7F7] text-[#0e1b16] min-h-screen selection:bg-tj-gold/30 selection:text-[#0e1b16]">
 
-            {/* 1. HERO — full viewport brand statement */}
-            <section className="relative h-screen flex flex-col items-center justify-center text-center overflow-hidden">
-               <img
-                  src="/GoldTripleJLogo.png"
-                  alt="Triple J Auto Investment"
-                  className="w-20 md:w-28 lg:w-32 h-auto object-contain mb-8 opacity-80"
-               />
-               <h1 className="font-serif text-[clamp(28px,6vw,56px)] font-light tracking-[0.04em] text-[#0e1b16] leading-[1.1] mb-4">
-                  {(lx as any).hero?.title || 'Triple J Auto Investment'}
-               </h1>
-               <p className="font-sans text-[12px] font-light tracking-[0.2em] uppercase text-[rgba(14,27,22,0.4)] mb-16">
-                  {(lx as any).hero?.subtitle || 'Serving Houston Families'}
-               </p>
-               <ScrollIndicator />
-            </section>
-
-            {/* 2. THE CINEMATIC CAR HERO — Maybach scroll animation */}
+            {/* 1. THE CINEMATIC CAR HERO — Maybach scroll animation */}
             <MaybachScrollAnimation />
 
             {/* 3. THE KEY — Scroll-driven key fob reveal */}

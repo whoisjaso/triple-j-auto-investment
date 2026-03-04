@@ -12,7 +12,7 @@ import { OfflineBanner } from './components/OfflineBanner';
 import { ConnectionErrorBanner } from './components/ConnectionErrorBanner';
 import { useSessionTracking } from './hooks/useSessionTracking';
 import { captureInitialUtm } from './services/attributionService';
-import { SplashScreen } from './components/SplashScreen';
+
 import { SmoothScroll } from './components/luxury';
 
 // Critical Pages (Eagerly Loaded)
@@ -162,7 +162,7 @@ const AppContent = () => {
       <BrowserCompatibilityCheck />
       <RRNavbar />
       <ErrorBoundary>
-        <main id="main-content" className={`flex-grow ${location.pathname === '/' ? 'pt-0' : 'pt-[70px]'}`}>
+        <main id="main-content" className={`flex-grow ${location.pathname === '/' ? 'pt-0' : 'pt-[50px]'}`}>
           <ConnectionErrorBanner />
           <AnimatePresence mode="wait">
             <Suspense fallback={<PageLoader />}>
@@ -229,9 +229,7 @@ export default function App() {
           <SmoothScroll>
           <ScrollToTop />
           <HashRedirect />
-          <SplashScreen duration={1800}>
             <AppContent />
-          </SplashScreen>
           </SmoothScroll>
         </Router>
       </StoreProvider>

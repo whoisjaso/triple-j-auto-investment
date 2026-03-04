@@ -174,11 +174,13 @@ export const ScrollAnimation = () => {
         {/* Canvas */}
         <canvas
           ref={canvasRef}
-          className="absolute top-1/2 left-1/2 w-[85vw] h-[85vw] md:w-[60vh] md:h-[60vh] lg:w-[70vh] lg:h-[70vh] object-contain pointer-events-none"
+          className="absolute top-1/2 left-1/2 w-[95vw] h-[95vw] md:w-[75vh] md:h-[75vh] lg:w-[85vh] lg:h-[85vh] object-contain pointer-events-none"
           style={{
             transform: 'translate(-50%, -50%)',
             willChange: 'transform',
             mixBlendMode: 'multiply',
+            WebkitMaskImage: 'radial-gradient(ellipse at center, black 50%, transparent 95%)',
+            maskImage: 'radial-gradient(ellipse at center, black 50%, transparent 95%)',
           }}
         />
 

@@ -126,11 +126,13 @@ export const KeyScrollAnimation = () => {
 
         <canvas
           ref={canvasRef}
-          className="absolute top-1/2 left-1/2 w-[80vw] h-[50vh] md:h-[70vh] md:w-[50vw] lg:w-[45vw] object-contain pointer-events-none"
+          className="absolute top-1/2 left-1/2 w-[95vw] h-[65vh] md:h-[85vh] md:w-[65vw] lg:w-[60vw] object-contain pointer-events-none"
           style={{
             transform: 'translate(-50%, -50%) scale(1)',
             willChange: 'transform',
             mixBlendMode: 'multiply',
+            WebkitMaskImage: 'radial-gradient(ellipse at center, black 50%, transparent 95%)',
+            maskImage: 'radial-gradient(ellipse at center, black 50%, transparent 95%)',
           }}
         />
 
