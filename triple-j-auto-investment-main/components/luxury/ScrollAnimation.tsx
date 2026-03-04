@@ -153,7 +153,7 @@ export const ScrollAnimation = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative h-[200vh] md:h-[300vh] bg-[#F7F7F7] border-t border-tj-gold/15">
+    <div ref={containerRef} className="relative h-[200vh] md:h-[300vh] bg-[#F7F7F7]">
       {/* Loading overlay */}
       {!loaded && (
         <CrestLoader mode="sticky" progress={progress} />
@@ -178,6 +178,7 @@ export const ScrollAnimation = () => {
           style={{
             transform: 'translate(-50%, -50%)',
             willChange: 'transform',
+            mixBlendMode: 'multiply',
           }}
         />
 
@@ -194,30 +195,28 @@ export const ScrollAnimation = () => {
           return (
             <div
               key={i}
-              className={`absolute z-10 max-w-[280px] md:max-w-[340px] flex flex-col ${
+              className={`absolute z-10 left-4 right-4 md:left-auto md:right-auto max-w-full md:max-w-[340px] flex flex-col items-center text-center ${
                 isRight
-                  ? 'right-6 md:right-12 lg:right-20 text-right items-end'
-                  : 'left-6 md:left-12 lg:left-20 text-left items-start'
-              } bottom-20 md:bottom-auto md:top-1/2 md:-translate-y-1/2`}
+                  ? 'md:right-12 lg:right-20 md:text-right md:items-end'
+                  : 'md:left-12 lg:left-20 md:text-left md:items-start'
+              } bottom-16 md:bottom-auto md:top-1/2 md:-translate-y-1/2`}
               style={{
                 opacity,
                 transform: `translateY(${(1 - opacity) * 12}px) scale(${0.97 + opacity * 0.03})`,
                 transition: 'none',
               }}
             >
-              <div className="bg-white/60 backdrop-blur-2xl border border-tj-gold/[0.15] p-6 md:p-8 shadow-sm">
-                <span className="text-tj-gold text-[9px] uppercase tracking-[0.4em] block mb-3 font-sans">
-                  {label}
-                </span>
-                <h3 className="font-serif text-xl md:text-2xl lg:text-3xl text-[#0e1b16] leading-tight mb-3">
-                  {heading}
-                </h3>
-                {body && (
-                  <p className="text-[#0e1b16]/50 text-sm leading-relaxed font-sans">
-                    {body}
-                  </p>
-                )}
-              </div>
+              <span className="text-tj-gold text-[9px] uppercase tracking-[0.4em] block mb-3 font-sans">
+                {label}
+              </span>
+              <h3 className="font-serif text-lg md:text-2xl lg:text-3xl text-[#0e1b16] leading-tight mb-3">
+                {heading}
+              </h3>
+              {body && (
+                <p className="text-[#0e1b16]/50 text-xs md:text-sm leading-relaxed font-sans max-w-[220px] md:max-w-none">
+                  {body}
+                </p>
+              )}
             </div>
           );
         })}

@@ -92,21 +92,6 @@ export const KeyScrollAnimation = () => {
           }
 
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          // Make near-white pixels transparent so the key floats on the page bg
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const d = imageData.data;
-          for (let i = 0; i < d.length; i += 4) {
-            const r = d[i], g = d[i + 1], b = d[i + 2];
-            if (r > 230 && g > 230 && b > 230) {
-              d[i + 3] = 0;
-            } else if (r > 210 && g > 210 && b > 210) {
-              const avg = (r + g + b) / 3;
-              d[i + 3] = Math.round(255 * (1 - (avg - 210) / 20));
-            }
-          }
-          ctx.putImageData(imageData, 0, 0);
-
           drawnFrame = currentFrame;
         }
       }
@@ -136,30 +121,31 @@ export const KeyScrollAnimation = () => {
           className="absolute top-1/2 left-1/2 w-[80vw] h-[50vh] md:h-[70vh] md:w-[50vw] lg:w-[45vw] object-contain pointer-events-none"
           style={{
             transform: 'translate(-50%, -50%) scale(1)',
-            filter: 'drop-shadow(0 0 2px rgba(212,175,55,0.5)) drop-shadow(0 0 8px rgba(212,175,55,0.2)) drop-shadow(0 0 20px rgba(212,175,55,0.08))'
+            willChange: 'transform',
+            mixBlendMode: 'multiply',
           }}
         />
 
         {/* Phase 1: Right side — "The Instrument" */}
-        <div className={`absolute bottom-8 right-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:right-12 lg:right-20 max-w-[45%] md:max-w-[280px] lg:max-w-[320px] flex flex-col items-end text-right transition-all duration-1000 ease-out ${phase === 1 ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
-          <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{k.phase1Label}</span>
-          <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#0e1b16] leading-[1.1] font-light">
+        <div className={`absolute bottom-16 left-4 right-4 md:bottom-auto md:left-auto md:top-1/2 md:-translate-y-1/2 md:right-12 lg:right-20 max-w-full md:max-w-[280px] lg:max-w-[320px] flex flex-col items-center md:items-end text-center md:text-right transition-all duration-1000 ease-out ${phase === 1 ? 'opacity-100 translate-x-0' : 'opacity-0 md:translate-x-8 pointer-events-none'}`}>
+          <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-3 md:mb-4">{k.phase1Label}</span>
+          <h3 className="font-serif text-xl md:text-4xl lg:text-5xl text-[#0e1b16] leading-[1.1] font-light">
             {k.phase1Text}<br />{k.phase1Text2}
           </h3>
         </div>
 
         {/* Phase 2: Left side — "The Ritual" */}
-        <div className={`absolute bottom-8 left-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-12 lg:left-20 max-w-[45%] md:max-w-[280px] lg:max-w-[320px] flex flex-col items-start transition-all duration-1000 ease-out ${phase === 2 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none'}`}>
-          <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{k.phase2Label}</span>
-          <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#0e1b16] leading-[1.1] font-light">
+        <div className={`absolute bottom-16 left-4 right-4 md:bottom-auto md:right-auto md:top-1/2 md:-translate-y-1/2 md:left-12 lg:left-20 max-w-full md:max-w-[280px] lg:max-w-[320px] flex flex-col items-center md:items-start text-center md:text-left transition-all duration-1000 ease-out ${phase === 2 ? 'opacity-100 translate-x-0' : 'opacity-0 md:-translate-x-8 pointer-events-none'}`}>
+          <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-3 md:mb-4">{k.phase2Label}</span>
+          <h3 className="font-serif text-xl md:text-4xl lg:text-5xl text-[#0e1b16] leading-[1.1] font-light">
             {k.phase2Text}<br />{k.phase2Text2}
           </h3>
         </div>
 
         {/* Phase 3: Center bottom — "The Acquisition" with CTA */}
-        <div className={`absolute bottom-12 left-1/2 -translate-x-1/2 md:bottom-[10%] max-w-[85%] md:max-w-[400px] flex flex-col items-center text-center transition-all duration-1000 ease-out ${phase === 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6 pointer-events-none'}`}>
-          <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{k.phase3Label}</span>
-          <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-[#0e1b16] leading-[1.1] font-light italic mb-8">
+        <div className={`absolute bottom-12 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:bottom-[10%] max-w-full md:max-w-[400px] flex flex-col items-center text-center transition-all duration-1000 ease-out ${phase === 3 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
+          <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-3 md:mb-4">{k.phase3Label}</span>
+          <h3 className="font-serif text-xl md:text-4xl lg:text-5xl text-[#0e1b16] leading-[1.1] font-light italic mb-6 md:mb-8">
             {k.phase3Text}
           </h3>
           <div className={`transition-opacity duration-1000 delay-300 ${phase === 3 ? 'opacity-100' : 'opacity-0'}`}>

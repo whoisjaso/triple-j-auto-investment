@@ -144,26 +144,26 @@ export const MaybachScrollAnimation = () => {
           }}
         />
 
-        {/* Phase 1: Left side, vertically centered — clear of video */}
-        <div className={`absolute bottom-8 left-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:left-12 lg:left-20 max-w-[45%] md:max-w-[280px] lg:max-w-[320px] flex flex-col items-start transition-all duration-1000 ease-out ${phase === 1 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none'}`}>
-           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{m.phase1Label}</span>
-           <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light">
+        {/* Phase 1: Left side */}
+        <div className={`absolute bottom-16 left-4 right-4 md:bottom-auto md:right-auto md:top-1/2 md:-translate-y-1/2 md:left-12 lg:left-20 max-w-full md:max-w-[280px] lg:max-w-[320px] flex flex-col items-center md:items-start text-center md:text-left transition-all duration-1000 ease-out ${phase === 1 ? 'opacity-100 translate-x-0' : 'opacity-0 md:-translate-x-8 pointer-events-none'}`}>
+           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-3 md:mb-4">{m.phase1Label}</span>
+           <h3 className="font-serif text-xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light">
               {m.phase1Text}<br />{m.phase1Text2}
            </h3>
         </div>
 
-        {/* Phase 2: Right side, vertically centered — clear of video */}
-        <div className={`absolute bottom-8 right-6 md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:right-12 lg:right-20 max-w-[45%] md:max-w-[280px] lg:max-w-[320px] flex flex-col items-end text-right transition-all duration-1000 ease-out ${phase === 2 ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8 pointer-events-none'}`}>
-           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{m.phase2Label}</span>
-           <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light">
+        {/* Phase 2: Right side */}
+        <div className={`absolute bottom-16 left-4 right-4 md:bottom-auto md:left-auto md:top-1/2 md:-translate-y-1/2 md:right-12 lg:right-20 max-w-full md:max-w-[280px] lg:max-w-[320px] flex flex-col items-center md:items-end text-center md:text-right transition-all duration-1000 ease-out ${phase === 2 ? 'opacity-100 translate-x-0' : 'opacity-0 md:translate-x-8 pointer-events-none'}`}>
+           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-3 md:mb-4">{m.phase2Label}</span>
+           <h3 className="font-serif text-xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light">
               {m.phase2Text}<br />{m.phase2Text2}
            </h3>
         </div>
 
-        {/* Phase 3: Left side, near bottom — clear of video */}
-        <div className={`absolute bottom-8 left-6 md:bottom-[12%] md:left-12 lg:left-20 max-w-[45%] md:max-w-[320px] lg:max-w-[360px] flex flex-col items-start transition-all duration-1000 ease-out ${phase === 3 ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-8 pointer-events-none'}`}>
-           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-4">{m.phase3Label}</span>
-           <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light italic mb-8">
+        {/* Phase 3: Bottom center on mobile, left side on desktop */}
+        <div className={`absolute bottom-12 left-4 right-4 md:left-12 lg:left-20 md:right-auto max-w-full md:max-w-[320px] lg:max-w-[360px] flex flex-col items-center md:items-start text-center md:text-left transition-all duration-1000 ease-out ${phase === 3 ? 'opacity-100 translate-y-0 md:translate-x-0' : 'opacity-0 translate-y-4 md:translate-y-0 md:-translate-x-8 pointer-events-none'}`}>
+           <span className="uppercase tracking-[0.3em] text-[9px] text-tj-gold mb-3 md:mb-4">{m.phase3Label}</span>
+           <h3 className="font-serif text-xl md:text-4xl lg:text-5xl text-tj-green leading-[1.1] font-light italic mb-6 md:mb-8">
               {m.phase3Text}<br />{m.phase3Text2}
            </h3>
            <div className={`transition-opacity duration-1000 delay-300 ${phase === 3 ? 'opacity-100' : 'opacity-0'}`}>
