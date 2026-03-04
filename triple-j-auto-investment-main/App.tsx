@@ -1,9 +1,10 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, Link, useNavigate } from 'react-router-dom';
 import { StoreProvider, useStore } from './context/Store';
-import { Menu, X, ShieldCheck, MapPin, Phone, Clock, Facebook, Twitter } from 'lucide-react';
-import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { ShieldCheck, MapPin, Phone, Clock, Facebook, Twitter } from 'lucide-react';
+import { LanguageProvider } from './context/LanguageContext';
 import { AnimatePresence, motion } from 'framer-motion';
+import { RRNavbar } from './components/RRNavbar';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck';
 import { ScrollToTop } from './components/ScrollToTop';
 import { PageLoader } from './components/PageLoader';
@@ -106,200 +107,6 @@ const HashRedirect = () => {
     }
   }, [navigate]);
   return null;
-};
-
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [isWhiteSection, setIsWhiteSection] = useState(false);
-  
-  const { user, logout } = useStore();
-  const { lang, toggleLang, t } = useLanguage();
-  const nav = t.home.luxuryNav;
-  const location = useLocation();
-  const navigate = useNavigate();
-  const menuToggleRef = React.useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-      // Home page is entirely light bg — keep navbar white throughout
-      if (location.pathname === '/') {
-        setIsWhiteSection(true);
-      } else {
-        setIsWhiteSection(false);
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // init
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [location.pathname]);
-
-  const handleLogoClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (location.pathname === '/') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      navigate('/');
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.touchAction = 'none';
-    } else {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.touchAction = '';
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsOpen(false);
-        menuToggleRef.current?.focus();
-      }
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [isOpen]);
-
-  const NavLink = ({ to, label }: { to: string, label: string }) => {
-    const isActive = location.pathname === to;
-    
-    // Dynamic text colors based on background
-    const textColor = isWhiteSection 
-      ? (isActive ? 'text-tj-gold' : 'text-[#0e1b16] hover:text-tj-gold')
-      : (isActive ? 'text-tj-gold' : 'text-tj-zinc400 hover:text-tj-zinc100');
-      
-    return (
-      <Link
-        to={to}
-        className={`relative inline-block text-[11px] font-medium uppercase tracking-[0.2em] transition-colors duration-500 pb-1 group ${textColor}`}
-        onClick={() => setIsOpen(false)}
-      >
-        {label}
-        <span className={`absolute bottom-0 left-0 w-full h-[1px] bg-tj-gold transform origin-left transition-transform duration-300 ease-out ${isActive ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100'}`}></span>
-      </Link>
-    );
-  };
-
-  const navClasses = isWhiteSection
-    ? `fixed top-0 left-0 right-0 z-50 bg-[#F7F7F7]`
-    : `fixed top-0 left-0 right-0 z-50 transition-all duration-1000 ease-out ${scrolled ? 'bg-black/95 backdrop-blur-xl' : 'bg-black'}`;
-
-  return (
-    <nav className={navClasses}>
-      <div className="w-full px-6 md:px-10 lg:px-16">
-        <div className="relative flex items-center justify-between h-16 md:h-20">
-
-          {/* Left nav group */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-10">
-            <NavLink to="/inventory" label={nav.sovereignAssets} />
-            <NavLink to="/vin" label={nav.authentication} />
-            <NavLink to="/about" label={nav.philosophy} />
-            {user && (
-              <>
-                <span className={`w-px h-4 ${isWhiteSection ? 'bg-[#0e1b16]/10' : 'bg-tj-gold/15'}`}></span>
-                <NavLink to="/admin/dashboard" label={nav.dashboard} />
-              </>
-            )}
-          </div>
-
-          {/* Center logo — hidden on home page */}
-          {location.pathname !== '/' && (
-            <button
-              onClick={handleLogoClick}
-              className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 focus:outline-none group"
-              aria-label="Home"
-            >
-              <img
-                src="/GoldTripleJLogo.png"
-                alt="Triple J"
-                className="w-9 h-9 object-contain opacity-50 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110"
-              />
-            </button>
-          )}
-
-          {/* Right nav group */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-10">
-            <a href="tel:+18324009760" className={`text-[11px] uppercase tracking-[0.2em] transition-colors font-medium ${isWhiteSection ? 'text-[#0e1b16] hover:text-tj-gold' : 'text-tj-zinc400 hover:text-tj-gold'}`}>{nav.concierge}</a>
-            <button onClick={toggleLang} className={`text-[11px] uppercase tracking-[0.2em] transition-colors font-medium ${isWhiteSection ? 'text-[#0e1b16] hover:text-tj-gold' : 'text-tj-zinc400 hover:text-tj-zinc100'}`}>
-              {lang === 'en' ? 'ES' : 'EN'}
-            </button>
-            {!user ? (
-              <Link to="/login" className={`text-[11px] uppercase tracking-[0.2em] transition-colors font-medium ${isWhiteSection ? 'text-[#0e1b16] hover:text-tj-gold' : 'text-tj-zinc400 hover:text-tj-zinc100'}`}>{nav.portal}</Link>
-            ) : (
-              <button onClick={logout} className={`text-[11px] uppercase tracking-[0.2em] transition-colors font-medium ${isWhiteSection ? 'text-tj-gold hover:text-[#0e1b16]' : 'text-tj-gold hover:text-tj-zinc100'}`}>{nav.exit}</button>
-            )}
-          </div>
-
-          {/* Mobile controls */}
-          <div className="flex items-center gap-5 md:hidden w-full justify-between">
-            <button onClick={toggleLang} className={`p-2 text-[11px] font-medium tracking-widest uppercase transition-colors ${isWhiteSection ? 'text-[#0e1b16] hover:text-tj-gold' : 'text-tj-zinc400 hover:text-tj-zinc100'}`}>
-              {lang === 'en' ? 'ES' : 'EN'}
-            </button>
-            <button onClick={handleLogoClick} className="focus:outline-none group">
-              <img src="/GoldTripleJLogo.png" alt="Triple J" className="w-8 h-8 object-contain opacity-60 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110" />
-            </button>
-            <button ref={menuToggleRef} onClick={() => setIsOpen(!isOpen)} className={`p-2 transition-colors ${isWhiteSection ? 'text-[#0e1b16] hover:text-tj-gold' : 'text-tj-zinc400 hover:text-tj-zinc100'}`}>
-              {isOpen ? <X size={24} strokeWidth={1} /> : <Menu size={24} strokeWidth={1} />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 w-screen h-screen flex flex-col justify-center items-center md:hidden bg-tj-green/95 backdrop-blur-2xl z-[99999]"
-          >
-            <button onClick={() => setIsOpen(false)} className="absolute top-8 right-6 text-tj-zinc400 hover:text-tj-zinc100 transition-colors p-2">
-              <X size={28} strokeWidth={1} />
-            </button>
-            <img src="/GoldTripleJLogo.png" alt="Crest" className="w-16 h-16 mb-12 opacity-60 gold-glow" />
-            <div className="flex flex-col items-center gap-10 w-full px-8">
-              {[
-                { to: "/", label: t.nav.home },
-                { to: "/inventory", label: nav.sovereignAssets },
-                { to: "/vin", label: nav.authentication },
-                { to: "/about", label: nav.philosophy },
-                { to: "/contact", label: nav.concierge }
-              ].map((link, idx) => (
-                <motion.div 
-                  key={link.to} 
-                  className="w-full text-center"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1 + 0.2 }}
-                >
-                  <Link to={link.to} onClick={() => setIsOpen(false)} className="block font-serif text-3xl text-tj-zinc100 hover:text-tj-gold transition-colors duration-500">
-                    {link.label}
-                  </Link>
-                </motion.div>
-              ))}
-              {user && (
-                 <div className="w-full border-t border-tj-gold/10 pt-10 mt-4 text-center">
-                    <Link to="/admin/dashboard" onClick={() => setIsOpen(false)} className="block text-sm uppercase tracking-[0.3em] text-tj-gold hover:text-tj-zinc100 transition-colors mb-6">{nav.dashboard}</Link>
-                    <button onClick={() => { logout(); setIsOpen(false); }} className="text-xs uppercase tracking-[0.3em] text-red-900/50 hover:text-red-500 transition-colors">{nav.exitPortal}</button>
-                 </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
-  );
 };
 
 const Footer = () => {
@@ -455,9 +262,9 @@ const AppContent = () => {
     <div className={`min-h-screen flex flex-col text-tj-zinc400 font-sans relative ${location.pathname === '/' ? 'bg-[#F7F7F7]' : 'bg-black'}`}>
       <OfflineBanner />
       <BrowserCompatibilityCheck />
-      <Navbar />
+      <RRNavbar />
       <ErrorBoundary>
-        <main id="main-content" className={`flex-grow ${location.pathname === '/' ? 'pt-0' : 'pt-24'}`}>
+        <main id="main-content" className={`flex-grow ${location.pathname === '/' ? 'pt-0' : 'pt-[70px]'}`}>
           <ConnectionErrorBanner />
           <AnimatePresence mode="wait">
             <Suspense fallback={<PageLoader />}>
