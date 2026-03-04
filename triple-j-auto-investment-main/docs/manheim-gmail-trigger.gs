@@ -1,9 +1,9 @@
 /**
- * Triple J Auto Investment — Gmail Automation Trigger
+ * Triple J Auto Investment - Gmail Automation Trigger
  *
  * Watches triplejautoinvestment@gmail.com for:
- *   1. Manheim "Sale Documents" → extracts VIN(s) → creates Draft vehicles via Edge Function
- *   2. Central Dispatch "DELIVERED" → extracts towing cost → updates vehicle costTowing
+ *   1. Manheim "Sale Documents" -> extracts VIN(s) -> creates Draft vehicles via Edge Function
+ *   2. Central Dispatch "DELIVERED" -> extracts towing cost -> updates vehicle costTowing
  *
  * SETUP:
  * 1. Go to https://script.google.com (logged in as triplejautoinvestment@gmail.com)
@@ -12,9 +12,9 @@
  *    - SUPABASE_URL = https://scgmpliwlfabnpygvbsy.supabase.co
  *    - SUPABASE_ANON_KEY = (your anon key from .env.local)
  *    - TELEGRAM_BOT_TOKEN = (from @BotFather)
- *    - TELEGRAM_CHAT_ID = (group chat ID)
+ *    - TELEGRAM_CHAT_ID = (chat ID)
  * 4. Run setupTrigger() once (authorize when prompted)
- * 5. Done — it checks every 5 minutes automatically
+ * 5. Done - it checks every 5 minutes automatically
  */
 
 // ================================================================
@@ -22,12 +22,12 @@
 // ================================================================
 
 function getConfig() {
-  const props = PropertiesService.getScriptProperties();
+  var props = PropertiesService.getScriptProperties();
   return {
     SUPABASE_URL: props.getProperty('SUPABASE_URL'),
     SUPABASE_ANON_KEY: props.getProperty('SUPABASE_ANON_KEY'),
     TELEGRAM_BOT_TOKEN: props.getProperty('TELEGRAM_BOT_TOKEN'),
-    TELEGRAM_CHAT_ID: props.getProperty('TELEGRAM_CHAT_ID'),
+    TELEGRAM_CHAT_ID: props.getProperty('TELEGRAM_CHAT_ID')
   };
 }
 
@@ -37,7 +37,10 @@ function getConfig() {
 
 function setupTrigger() {
   // Remove existing triggers to prevent duplicates
-  ScriptApp.getProjectTriggers().forEach(t => ScriptApp.deleteTrigger(t));
+  var triggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < triggers.length; i++) {
+    ScriptApp.deleteTrigger(triggers[i]);
+  }
 
   // Check every 5 minutes
   ScriptApp.newTrigger('processAllEmails')
@@ -53,11 +56,11 @@ function setupTrigger() {
 }
 
 // ================================================================
-// MAIN — called every 5 minutes by trigger
+// MAIN - called every 5 minutes by trigger
 // ================================================================
 
 function processAllEmails() {
-  const config = getConfig();
+  var config = getConfig();
   if (!config.SUPABASE_URL || !config.SUPABASE_ANON_KEY) {
     Logger.log('ERROR: SUPABASE_URL or SUPABASE_ANON_KEY not set in Script Properties');
     return;
@@ -68,43 +71,42 @@ function processAllEmails() {
 }
 
 // ================================================================
-// MANHEIM — Sale Documents → Vehicle Intake
+// MANHEIM - Sale Documents -> Vehicle Intake
 // ================================================================
 
 function processManheimEmails(config) {
-  // Real Manheim email pattern: from noreply@manheim.com, subject contains "Sale Documents"
-  const query = 'from:noreply@manheim.com subject:"Sale Documents from Manheim" -label:AutoProcessed/Manheim';
-  const threads = GmailApp.search(query, 0, 10);
+  var query = 'from:noreply@manheim.com subject:"Sale Documents from Manheim" -label:AutoProcessed/Manheim';
+  var threads = GmailApp.search(query, 0, 10);
 
   if (threads.length === 0) return;
 
-  const processedLabel = GmailApp.getUserLabelByName('AutoProcessed/Manheim')
+  var processedLabel = GmailApp.getUserLabelByName('AutoProcessed/Manheim')
     || GmailApp.createLabel('AutoProcessed/Manheim');
 
-  for (const thread of threads) {
-    const messages = thread.getMessages();
-    for (const message of messages) {
+  for (var t = 0; t < threads.length; t++) {
+    var messages = threads[t].getMessages();
+    for (var m = 0; m < messages.length; m++) {
       try {
-        const body = message.getPlainBody() || message.getBody();
-        const parsed = parseManheimEmail(body);
+        var body = messages[m].getPlainBody() || messages[m].getBody();
+        var parsed = parseManheimEmail(body);
 
         if (parsed.vins.length > 0) {
-          for (const vin of parsed.vins) {
-            const result = callVehicleIntake(config, {
-              vin: vin,
+          for (var v = 0; v < parsed.vins.length; v++) {
+            var result = callVehicleIntake(config, {
+              vin: parsed.vins[v],
               purchasePrice: parsed.paymentAmount,
-              mileage: null,
+              mileage: null
             });
-            Logger.log('Manheim intake VIN ' + vin + ': ' + JSON.stringify(result));
+            Logger.log('Manheim intake VIN ' + parsed.vins[v] + ': ' + JSON.stringify(result));
           }
         } else {
-          Logger.log('No VIN found in Manheim email: ' + message.getSubject());
+          Logger.log('No VIN found in Manheim email: ' + messages[m].getSubject());
         }
       } catch (e) {
-        Logger.log('Error processing Manheim email "' + message.getSubject() + '": ' + e.message);
+        Logger.log('Error processing Manheim email "' + messages[m].getSubject() + '": ' + e.message);
       }
     }
-    thread.addLabel(processedLabel);
+    threads[t].addLabel(processedLabel);
   }
 }
 
@@ -141,7 +143,7 @@ function parseManheimEmail(body) {
     }
   }
 
-  // Fallback: find any 17-char VIN in the body (if nothing else matched)
+  // Fallback: find any 17-char VIN in the body
   if (vins.length === 0) {
     var fallbackMatch = body.match(/\b([A-HJ-NPR-Z0-9]{17})\b/g);
     if (fallbackMatch) {
@@ -156,10 +158,8 @@ function parseManheimEmail(body) {
   var amountMatch = body.match(/\$\s*([\d,]+(?:\.\d{2})?)/);
   if (amountMatch) {
     paymentAmount = parseFloat(amountMatch[1].replace(/,/g, ''));
-    // If multiple VINs in one payment, we can't split the amount per vehicle
-    // So we only use it if there's exactly 1 VIN
     if (vins.length > 1) {
-      paymentAmount = null; // Can't determine per-vehicle price
+      paymentAmount = null;
     }
   }
 
@@ -167,11 +167,10 @@ function parseManheimEmail(body) {
 }
 
 // ================================================================
-// CENTRAL DISPATCH — DELIVERED → Update Towing Cost
+// CENTRAL DISPATCH - DELIVERED -> Update Towing Cost
 // ================================================================
 
 function processCentralDispatchEmails(config) {
-  // Only process DELIVERED emails (vehicle has arrived)
   var query = 'from:do-not-reply@centraldispatch.com subject:"has been DELIVERED" -label:AutoProcessed/CentralDispatch';
   var threads = GmailApp.search(query, 0, 10);
 
@@ -188,7 +187,6 @@ function processCentralDispatchEmails(config) {
         var parsed = parseCentralDispatchEmail(body);
 
         if (parsed.vins.length > 0 && parsed.towingPrice) {
-          // Split towing cost across vehicles
           var costPerVehicle = Math.round(parsed.towingPrice / parsed.vins.length * 100) / 100;
 
           for (var i = 0; i < parsed.vins.length; i++) {
@@ -199,7 +197,6 @@ function processCentralDispatchEmails(config) {
             }
           }
         } else if (parsed.ymms.length > 0 && parsed.towingPrice) {
-          // No VIN but have YMM — try matching by year/make/model
           var costPerVehicle2 = Math.round(parsed.towingPrice / parsed.ymms.length * 100) / 100;
 
           for (var j = 0; j < parsed.ymms.length; j++) {
@@ -222,22 +219,12 @@ function processCentralDispatchEmails(config) {
 
 /**
  * Parse Central Dispatch email body.
- *
- * Example body:
- *   "Load ID Call 281-912-4266
- *    Pick Up Location Euless, TX 76040
- *    Delivery Location Houston, TX 77075
- *    Price $350.00
- *    Number of Vehicles 2
- *    •YMM 2013 BMW 5 Series Sedan VIN WBAFU7C55DDU71300
- *    •YMM 2020 Ford Fusion VIN 3FA6P0HD5LR202453"
  */
 function parseCentralDispatchEmail(body) {
   var vins = [];
   var ymms = [];
   var towingPrice = null;
 
-  // Extract VINs: "VIN WBAFU7C55DDU71300"
   var vinMatches = body.match(/VIN\s+([A-HJ-NPR-Z0-9]{17})/gi);
   if (vinMatches) {
     for (var i = 0; i < vinMatches.length; i++) {
@@ -246,24 +233,21 @@ function parseCentralDispatchEmail(body) {
     }
   }
 
-  // Extract YMMs: "•YMM 2013 BMW 5 Series Sedan" or "•YMM 2020 Ford Fusion"
-  var ymmPattern = /YMM\s+(\d{4})\s+(\w+)\s+([^\n•VIN]+)/gi;
+  var ymmPattern = /YMM\s+(\d{4})\s+(\w+)\s+([^\n\u2022VIN]+)/gi;
   var ymmMatch;
   while ((ymmMatch = ymmPattern.exec(body)) !== null) {
     ymms.push({
       year: parseInt(ymmMatch[1]),
       make: ymmMatch[2].trim(),
-      model: ymmMatch[3].trim(),
+      model: ymmMatch[3].trim()
     });
   }
 
-  // Extract towing price: "Price $350.00"
   var priceMatch = body.match(/Price\s*\$\s*([\d,]+(?:\.\d{2})?)/i);
   if (priceMatch) {
     towingPrice = parseFloat(priceMatch[1].replace(/,/g, ''));
   }
 
-  // Extract carrier name from subject/body
   var carrierMatch = body.match(/(?:DELIVERED|PICKED UP|ACCEPTED)\s+by\s+(.+?)(?:\.|$)/i);
   var carrier = carrierMatch ? carrierMatch[1].trim() : null;
 
@@ -271,7 +255,7 @@ function parseCentralDispatchEmail(body) {
     vins: vins,
     ymms: ymms,
     towingPrice: towingPrice,
-    carrier: carrier,
+    carrier: carrier
   };
 }
 
@@ -279,24 +263,21 @@ function parseCentralDispatchEmail(body) {
 // SUPABASE API CALLS
 // ================================================================
 
-/**
- * Call vehicle-intake Edge Function to create a Draft vehicle.
- */
 function callVehicleIntake(config, parsed) {
   var url = config.SUPABASE_URL + '/functions/v1/vehicle-intake';
   var options = {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + config.SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + config.SUPABASE_ANON_KEY
     },
     payload: JSON.stringify({
       vin: parsed.vin,
       purchasePrice: parsed.purchasePrice,
       mileage: parsed.mileage,
-      source: 'manheim_email',
+      source: 'manheim_email'
     }),
-    muteHttpExceptions: true,
+    muteHttpExceptions: true
   };
 
   var response = UrlFetchApp.fetch(url, options);
@@ -312,20 +293,15 @@ function callVehicleIntake(config, parsed) {
   return { status: 'created', vehicleId: body.vehicleId };
 }
 
-/**
- * Update a vehicle's towing cost by VIN.
- * Uses Supabase REST API directly (PATCH on vehicles table).
- */
 function updateVehicleTowingCost(config, vin, cost) {
-  // Find vehicle by VIN
   var findUrl = config.SUPABASE_URL + '/rest/v1/vehicles?vin=eq.' + vin + '&select=id,cost_towing';
   var findOptions = {
     method: 'GET',
     headers: {
       'apikey': config.SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + config.SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + config.SUPABASE_ANON_KEY
     },
-    muteHttpExceptions: true,
+    muteHttpExceptions: true
   };
 
   var findResponse = UrlFetchApp.fetch(findUrl, findOptions);
@@ -338,7 +314,6 @@ function updateVehicleTowingCost(config, vin, cost) {
   var vehicleId = vehicles[0].id;
   var existingTowing = vehicles[0].cost_towing || 0;
 
-  // Update towing cost
   var updateUrl = config.SUPABASE_URL + '/rest/v1/vehicles?id=eq.' + vehicleId;
   var updateOptions = {
     method: 'PATCH',
@@ -346,27 +321,23 @@ function updateVehicleTowingCost(config, vin, cost) {
       'apikey': config.SUPABASE_ANON_KEY,
       'Authorization': 'Bearer ' + config.SUPABASE_ANON_KEY,
       'Content-Type': 'application/json',
-      'Prefer': 'return=minimal',
+      'Prefer': 'return=minimal'
     },
     payload: JSON.stringify({
-      cost_towing: existingTowing + cost,
+      cost_towing: existingTowing + cost
     }),
-    muteHttpExceptions: true,
+    muteHttpExceptions: true
   };
 
   var updateResponse = UrlFetchApp.fetch(updateUrl, updateOptions);
   return {
     status: updateResponse.getResponseCode() < 300 ? 'updated' : 'error',
     vehicleId: vehicleId,
-    newTowingCost: existingTowing + cost,
+    newTowingCost: existingTowing + cost
   };
 }
 
-/**
- * Update towing cost by Year/Make/Model match (fallback when no VIN in email).
- */
 function updateVehicleTowingByYMM(config, ymm, cost) {
-  // Search by year + make (model might have extra words like "Sedan")
   var findUrl = config.SUPABASE_URL + '/rest/v1/vehicles?year=eq.' + ymm.year
     + '&make=ilike.' + encodeURIComponent(ymm.make)
     + '&status=eq.Draft&select=id,vin,cost_towing&limit=1';
@@ -375,9 +346,9 @@ function updateVehicleTowingByYMM(config, ymm, cost) {
     method: 'GET',
     headers: {
       'apikey': config.SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + config.SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + config.SUPABASE_ANON_KEY
     },
-    muteHttpExceptions: true,
+    muteHttpExceptions: true
   };
 
   var findResponse = UrlFetchApp.fetch(findUrl, findOptions);
@@ -397,19 +368,19 @@ function updateVehicleTowingByYMM(config, ymm, cost) {
       'apikey': config.SUPABASE_ANON_KEY,
       'Authorization': 'Bearer ' + config.SUPABASE_ANON_KEY,
       'Content-Type': 'application/json',
-      'Prefer': 'return=minimal',
+      'Prefer': 'return=minimal'
     },
     payload: JSON.stringify({
-      cost_towing: existingTowing + cost,
+      cost_towing: existingTowing + cost
     }),
-    muteHttpExceptions: true,
+    muteHttpExceptions: true
   };
 
   var updateResponse = UrlFetchApp.fetch(updateUrl, updateOptions);
   return {
     status: updateResponse.getResponseCode() < 300 ? 'updated' : 'error',
     vehicleId: vehicleId,
-    newTowingCost: existingTowing + cost,
+    newTowingCost: existingTowing + cost
   };
 }
 
@@ -417,12 +388,9 @@ function updateVehicleTowingByYMM(config, ymm, cost) {
 // TELEGRAM NOTIFICATIONS
 // ================================================================
 
-/**
- * Send a message to the Triple J Telegram group.
- */
 function sendTelegramMessage(config, text) {
   if (!config.TELEGRAM_BOT_TOKEN || !config.TELEGRAM_CHAT_ID) {
-    Logger.log('Telegram not configured — skipping notification');
+    Logger.log('Telegram not configured - skipping notification');
     return;
   }
 
@@ -434,9 +402,9 @@ function sendTelegramMessage(config, text) {
       chat_id: config.TELEGRAM_CHAT_ID,
       text: text,
       parse_mode: 'HTML',
-      disable_web_page_preview: true,
+      disable_web_page_preview: true
     }),
-    muteHttpExceptions: true,
+    muteHttpExceptions: true
   };
 
   try {
@@ -450,15 +418,12 @@ function sendTelegramMessage(config, text) {
   }
 }
 
-/**
- * Notify group about a towing cost update.
- */
 function notifyTowingUpdate(config, vehicleInfo, towingCost, carrier) {
   var vehicleLabel = vehicleInfo.vin
     ? 'VIN: <code>' + vehicleInfo.vin + '</code>'
     : vehicleInfo.year + ' ' + vehicleInfo.make + ' ' + vehicleInfo.model;
 
-  var text = '\uD83D\uDE9A <b>TOWING UPDATE</b>\n\n'
+  var text = 'TOWING UPDATE\n\n'
     + vehicleLabel + '\n'
     + (carrier ? 'Carrier: ' + carrier + '\n' : '')
     + 'Towing Cost: <b>$' + towingCost.toFixed(2) + '</b>\n'
@@ -472,7 +437,6 @@ function notifyTowingUpdate(config, vehicleInfo, towingCost, carrier) {
 // ================================================================
 
 function testManheimParse() {
-  // Test with real email format
   var body1 = 'Post-Payment Documents from Manheim Dear Valued Customer, Please find attached the sale documents you requested for 5LMCJ2C96JUL33161 . As always, we are honored.';
   var result1 = parseManheimEmail(body1);
   Logger.log('Single VIN: ' + JSON.stringify(result1));
@@ -483,7 +447,7 @@ function testManheimParse() {
 }
 
 function testCentralDispatchParse() {
-  var body = 'Hello Triple J Auto Investment LLC, Load Details Load ID Call 281-912-4266 Pick Up Location Euless, TX 76040 Delivery Location Houston, TX 77075 Price $350.00 Number of Vehicles 2 •YMM 2013 BMW 5 Series Sedan VIN WBAFU7C55DDU71300 •YMM 2020 Ford Fusion VIN 3FA6P0HD5LR202453';
+  var body = 'Hello Triple J Auto Investment LLC, Load Details Load ID Call 281-912-4266 Pick Up Location Euless, TX 76040 Delivery Location Houston, TX 77075 Price $350.00 Number of Vehicles 2 YMM 2013 BMW 5 Series Sedan VIN WBAFU7C55DDU71300 YMM 2020 Ford Fusion VIN 3FA6P0HD5LR202453';
   var result = parseCentralDispatchEmail(body);
   Logger.log('Central Dispatch: ' + JSON.stringify(result));
 }
@@ -493,7 +457,13 @@ function testVehicleIntake() {
   var result = callVehicleIntake(config, {
     vin: '1HGCV1F34KA028465',
     purchasePrice: 3200,
-    mileage: null,
+    mileage: null
   });
   Logger.log('Test intake: ' + JSON.stringify(result));
+}
+
+function testTelegram() {
+  var config = getConfig();
+  sendTelegramMessage(config, 'Test from Triple J Gmail Trigger - all systems go!');
+  Logger.log('Telegram test sent');
 }
