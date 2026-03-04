@@ -152,7 +152,7 @@ export const ScrollAnimation = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative h-[300vh] md:h-[500vh] bg-[#F7F7F7] border-t border-tj-gold/15">
+    <div ref={containerRef} className="relative h-[200vh] md:h-[300vh] bg-[#F7F7F7] border-t border-tj-gold/15">
       {/* Loading overlay */}
       {!loaded && (
         <div className="sticky top-0 h-screen w-full flex flex-col items-center justify-center z-50 bg-[#F7F7F7]">

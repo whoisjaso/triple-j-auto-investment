@@ -123,9 +123,9 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 50);
-      // The Maybach (250vh) + Key (250vh) + brand reveal section. White navbar throughout.
+      // Home page is entirely light bg — keep navbar white throughout
       if (location.pathname === '/') {
-        setIsWhiteSection(window.scrollY < window.innerHeight * 6);
+        setIsWhiteSection(true);
       } else {
         setIsWhiteSection(false);
       }
