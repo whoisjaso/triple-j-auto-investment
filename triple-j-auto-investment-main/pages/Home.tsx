@@ -5,6 +5,7 @@ import { Sparkles } from 'lucide-react';
 
 import { SEO } from '../components/SEO';
 import { ScrollReveal, MaybachScrollAnimation, KeyScrollAnimation } from '../components/luxury';
+import { ScrollAnimation } from '../components/luxury/ScrollAnimation';
 import { useLanguage } from '../context/LanguageContext';
 
 const Home = () => {
@@ -97,51 +98,8 @@ const Home = () => {
                </div>
             </section>
 
-            {/* 4. THE EXPERIENCE / WHY TRIPLE J */}
-            <section className="py-32 md:py-48 bg-[#F7F7F7] relative overflow-hidden border-t border-tj-gold/15">
-               <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-20 lg:gap-32 relative z-10 items-center">
-                  <div className="lg:col-span-5 flex flex-col justify-center order-2 lg:order-1">
-                     <ScrollReveal direction="up" distance={30}>
-                        <h2 className="label-small-caps text-tj-gold text-sm mb-6">{lx.experience.label}</h2>
-                        <h3 className="font-serif text-4xl md:text-5xl text-[#0e1b16] mb-16 leading-tight">
-                           {lx.experience.title}
-                        </h3>
-                     </ScrollReveal>
-
-                     <div className="space-y-12">
-                        {[
-                           { title: lx.experience.item1Title, desc: lx.experience.item1Desc },
-                           { title: lx.experience.item2Title, desc: lx.experience.item2Desc },
-                           { title: lx.experience.item3Title, desc: lx.experience.item3Desc }
-                        ].map((item, idx) => (
-                           <ScrollReveal key={idx} direction="up" delay={idx * 0.15} distance={30}>
-                              <div className="flex gap-6 border-t border-tj-gold/15 pt-8">
-                                 <div className="font-serif text-tj-gold text-xl italic opacity-50 mt-1">
-                                    0{idx + 1}
-                                 </div>
-                                 <div>
-                                    <h4 className="font-serif text-2xl text-[#0e1b16] mb-3 tracking-wide">{item.title}</h4>
-                                    <p className="font-sans text-tj-greenAccent text-sm leading-[1.8]">{item.desc}</p>
-                                 </div>
-                              </div>
-                           </ScrollReveal>
-                        ))}
-                     </div>
-                  </div>
-
-                  <div className="lg:col-span-7 order-1 lg:order-2">
-                     <ScrollReveal direction="left" distance={40}>
-                         <div className="aspect-[3/4] md:aspect-[4/3] lg:aspect-square relative overflow-hidden bg-[#f5f5f4] border border-tj-gold/15">
-                            <img
-                               src={featuredVehicles[0]?.imageUrl || "/GoldTripleJLogo.png"}
-                               alt="The Triple J Experience"
-                               className={`absolute inset-0 w-full h-full object-cover grayscale-[0.3] opacity-90 ${!featuredVehicles[0] && 'opacity-10 p-24 object-contain'}`}
-                            />
-                         </div>
-                     </ScrollReveal>
-                  </div>
-               </div>
-            </section>
+            {/* 4. THE EXPERIENCE — Logo forge scroll animation with overlay cards */}
+            <ScrollAnimation />
 
             {/* 5. AI CONCIERGE CTA SECTION */}
             <section className="py-40 md:py-56 bg-[#F7F7F7] relative overflow-hidden border-t border-tj-gold/15">

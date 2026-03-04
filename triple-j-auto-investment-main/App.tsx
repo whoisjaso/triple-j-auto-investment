@@ -191,8 +191,8 @@ const Navbar = () => {
   };
 
   const navClasses = isWhiteSection
-    ? `fixed top-0 left-0 right-0 z-50 transition-all duration-700 bg-[#F7F7F7]`
-    : `fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-black/95 backdrop-blur-xl' : 'bg-black'}`;
+    ? `fixed top-0 left-0 right-0 z-50 transition-all duration-1000 ease-out bg-[#F7F7F7]`
+    : `fixed top-0 left-0 right-0 z-50 transition-all duration-1000 ease-out ${scrolled ? 'bg-black/95 backdrop-blur-xl' : 'bg-black'}`;
 
   return (
     <nav className={navClasses}>
@@ -212,18 +212,20 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Center logo — all pages */}
-          <button
-            onClick={handleLogoClick}
-            className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 focus:outline-none group"
-            aria-label="Home"
-          >
-            <img
-              src="/GoldTripleJLogo.png"
-              alt="Triple J"
-              className="w-9 h-9 object-contain opacity-50 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110"
-            />
-          </button>
+          {/* Center logo — hidden on home page */}
+          {location.pathname !== '/' && (
+            <button
+              onClick={handleLogoClick}
+              className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 focus:outline-none group"
+              aria-label="Home"
+            >
+              <img
+                src="/GoldTripleJLogo.png"
+                alt="Triple J"
+                className="w-9 h-9 object-contain opacity-50 group-hover:opacity-100 transition-all duration-700 group-hover:scale-110"
+              />
+            </button>
+          )}
 
           {/* Right nav group */}
           <div className="hidden md:flex items-center gap-8 lg:gap-10">
