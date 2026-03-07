@@ -1,0 +1,203 @@
+:root {
+  --tj-black: #0A0A0A;
+  --tj-forest: #1B3A2D;
+  --tj-forest-deep: #0F2A1E;
+  --tj-gold: #C9A84C;
+  --tj-gold-light: #D4BA6A;
+  --tj-cream: #F5F0E8;
+  --tj-white: #FAFAF8;
+  --tj-charcoal: #2A2A2A;
+  --tj-bg: #F7F7F7;
+
+  --text-primary: #0e1b16;
+  --text-muted: rgba(14, 27, 22, 0.5);
+  --text-ghost: rgba(14, 27, 22, 0.3);
+  --gold-muted: rgba(201, 168, 76, 0.5);
+  --border-rr: rgba(201, 168, 76, 0.08);
+  --border-rr-hover: rgba(201, 168, 76, 0.2);
+  --overlay-bg: rgba(15, 42, 30, 0.96);
+  --sub-panel-bg: rgba(10, 10, 10, 0.4);
+
+  --ease-rr: cubic-bezier(0.76, 0, 0.24, 1);
+
+  --space-section: clamp(120px, 18vh, 240px);
+  --space-inner: clamp(60px, 8vh, 120px);
+  --space-element: clamp(24px, 3vh, 48px);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background-color: #F7F7F7;
+  scroll-padding-top: 60px;
+}
+
+body {
+  background-color: #F7F7F7;
+  color: #0e1b16;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #0e1b16;
+  font-family: 'Cormorant Garamond', 'Playfair Display', serif;
+}
+
+::selection {
+  background: rgba(212,175,55,0.3);
+  color: #0e1b16;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { 
+  width: 4px; 
+}
+::-webkit-scrollbar-track {
+  background: #F7F7F7;
+}
+::-webkit-scrollbar-thumb { 
+  background: rgba(212,175,55,0.2); 
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: rgba(212,175,55,0.4); 
+}
+
+/* Luxury Glow */
+.gold-glow {
+  filter: drop-shadow(0 0 40px rgba(212,175,55,0.15))
+          drop-shadow(0 0 80px rgba(212,175,55,0.05));
+}
+
+.grain-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+}
+
+/* Ultra Luxury Buttons */
+.btn-luxury {
+  @apply relative inline-flex items-center justify-center px-12 py-5 text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-[#d4af37] overflow-hidden transition-all duration-700 w-full md:w-auto font-sans;
+  background: transparent;
+  border: 1px solid rgba(212,175,55,0.2);
+}
+
+.btn-luxury::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #d4af37;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
+}
+
+.btn-luxury:hover {
+  color: #0e1b16;
+  border-color: #d4af37;
+}
+
+.btn-luxury:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.btn-luxury-solid {
+  @apply relative inline-flex items-center justify-center px-12 py-5 text-[10px] md:text-[11px] uppercase tracking-[0.25em] text-[#0e1b16] bg-[#d4af37] overflow-hidden transition-all duration-700 w-full md:w-auto font-sans;
+  border: 1px solid #d4af37;
+}
+
+.btn-luxury-solid::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: #0e1b16;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: -1;
+}
+
+.btn-luxury-solid:hover {
+  color: #d4af37;
+  border-color: rgba(212,175,55,0.5);
+}
+
+.btn-luxury-solid:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* Animations */
+.label-small-caps {
+  font-family: 'Cormorant Garamond', serif;
+  font-variant: small-caps;
+  letter-spacing: 0.2em;
+}
+
+@keyframes floatLogo {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-10px) scale(1.02); }
+}
+.animate-float {
+  animation: floatLogo 8s ease-in-out infinite;
+}
+
+/* Rolls-Royce Button */
+.btn-rr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 15px 36px;
+  border: 1px solid rgba(201, 168, 76, 0.45);
+  background: transparent;
+  color: #C9A84C;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.45s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.btn-rr:hover {
+  background: #C9A84C;
+  color: #0A0A0A;
+  border-color: #C9A84C;
+}
+
+.btn-rr::after {
+  content: "\2192";
+  font-size: 13px;
+  transition: transform 0.35s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.btn-rr:hover::after {
+  transform: translateX(5px);
+}
+
+@media (max-width: 1023px) {
+  .btn-rr {
+    width: 100%;
+    justify-content: center;
+    padding: 18px 36px;
+  }
+}

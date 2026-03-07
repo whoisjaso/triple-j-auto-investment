@@ -1,0 +1,63 @@
+@import "tailwindcss" source("../../src");
+
+@theme inline {
+  /* Triple J Brand Colors */
+  --color-tj-green: #0e1b16;
+  --color-tj-green-elevated: #132a21;
+  --color-tj-green-accent: #1a3d2e;
+  --color-tj-green-atmo: #224137;
+  --color-tj-gold: #d4af37;
+  --color-tj-gold-muted: #b8962f;
+  --color-tj-zinc-100: #f4f4f5;
+  --color-tj-zinc-400: #a1a1aa;
+  --color-tj-zinc-500: #71717a;
+  --color-tj-black: #0A0A0A;
+  --color-tj-forest: #1B3A2D;
+  --color-tj-forest-deep: #0F2A1E;
+  --color-tj-gold-rr: #C9A84C;
+  --color-tj-gold-light: #D4BA6A;
+  --color-tj-cream: #F5F0E8;
+  --color-tj-charcoal: #2A2A2A;
+
+  /* Font Families */
+  --font-sans: var(--font-plus-jakarta-sans), "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-playfair-display), Georgia, "Times New Roman", serif;
+  --font-accent: var(--font-cormorant-garamond), Georgia, serif;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  background-color: #000000;
+  color: var(--color-tj-zinc-100);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Responsive canvas sizing — mobile-first */
+:root {
+  --canvas-maybach-w: 88vw;
+  --canvas-maybach-h: 48vw;
+  --canvas-keys-w: 85vw;
+  --canvas-keys-h: 46vw;
+  --canvas-crest-size: 70vw;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --canvas-maybach-w: min(58vw, 90vh);
+    --canvas-maybach-h: min(32vw, 49vh);
+    --canvas-keys-w: min(55vw, 90vh);
+    --canvas-keys-h: min(30vw, 49vh);
+    --canvas-crest-size: min(50vw, 50vh);
+  }
+}
