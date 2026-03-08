@@ -10,7 +10,7 @@ Advanced features (rental management, plate tracking, registration workflows, ow
 
 **v0.1 Initial Release** (v0.1.0)
 Status: In progress
-Phases: 3 of 8 complete
+Phases: 4 of 8 complete
 
 ## Phases
 
@@ -19,7 +19,7 @@ Phases: 3 of 8 complete
 | 1 | Project Foundation | 1/1 | Complete | 2026-03-07 |
 | 2 | Database & Types | 1/1 | Complete | 2026-03-07 |
 | 3 | Cinematic Homepage & Layout | 2/2 | Complete | 2026-03-07 |
-| 4 | Inventory System | 1/TBD | In progress | - |
+| 4 | Inventory System | 2/2 | Complete | 2026-03-07 |
 | 5 | Lead Capture & Contact | TBD | Not started | - |
 | 6 | Admin Core | TBD | Not started | - |
 | 7 | Bilingual (i18n) | TBD | Not started | - |

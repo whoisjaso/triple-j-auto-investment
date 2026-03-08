@@ -212,6 +212,10 @@ export function getMockVehicles(
   return results;
 }
 
+export function getMockVehicleBySlug(slug: string): Vehicle | null {
+  return MOCK_VEHICLES.find((v) => v.slug === slug) ?? null;
+}
+
 export function getMockMakes(): string[] {
   return [...new Set(MOCK_VEHICLES.map((v) => v.make))].sort();
 }

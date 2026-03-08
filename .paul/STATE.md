@@ -5,29 +5,30 @@
 See: .paul/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Every digital touchpoint engineers the neurological conditions under which buying becomes the only comfortable option -- a FATE-triggered, PCP-sequenced behavioral funnel from stranger to buyer to evangelist.
-**Current focus:** Phase 4 -- Inventory System
+**Current focus:** Phase 5 -- Lead Capture & Contact
 
 ## Current Position
 
 Milestone: v0.1 Initial Release
-Phase: 4 of 8 (Inventory System) -- In Progress
-Plan: 04-01 complete (Vehicle Listings Page + VIN Decoder)
-Status: Loop closed, ready for Plan 04-02
-Last activity: 2026-03-07 -- Unified Plan 04-01
+Phase: 5 of 8 (Lead Capture & Contact) -- Not started
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-03-07 -- Phase 4 complete, transitioned to Phase 5
 
 Progress:
-- Milestone: [#####░░░░░] 50%
+- Milestone: [######░░░░] 60%
 - Phase 1: [##########] 100% (complete)
 - Phase 2: [##########] 100% (complete)
 - Phase 3: [##########] 100% (complete)
-- Phase 4: [#####░░░░░] 50% (Plan 01 complete — listings + VIN decoder)
+- Phase 4: [##########] 100% (complete)
+- Phase 5: [░░░░░░░░░░] 0% (not started)
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Loop closed]
+  ○        ○        ○     [New loop — ready to plan Phase 5]
 ```
 
 ## Accumulated Context
@@ -57,24 +58,26 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Card hover uses translate-y (not scale) to avoid grid layout shifts
 - NHTSA VIN decoder proxied through /api/vin-decode route (avoids CORS, adds normalization)
 - VinDecoder component supports alwaysOpen prop for embedded vs standalone usage
+- Triple J is also a rental business — rentals feature confirmed for v0.2+
+- BHPH payment calculator: simple division (no interest — built into vehicle price)
+- Server components by default, client components only for interactivity (PaymentCalculator only)
+- Accessibility: aria-hidden on decorative SVGs, htmlFor/id on form labels, 44px+ tap targets
 
 ### Deferred Issues
-- Not a git repo -- should initialize git and push to GitHub
 - No Supabase project connected yet -- user needs to create project and run schema.sql
 - 363 WebP frames (~40MB) in public/ — consider CDN for production
-- Vehicle detail page /inventory/[slug] returns 404 (Plan 04-02)
 - No real vehicle images yet (placeholders)
+- No pagination on inventory (6 vehicles, not needed until inventory grows)
 
 ### Blockers/Concerns
-- Not a git repo -- should initialize git and push to GitHub
 - No Supabase project connected yet -- user needs to create project and run schema.sql
 
 ## Session Continuity
 
 Last session: 2026-03-07
-Stopped at: Plan 04-01 unified, user wants git push
-Next action: Initialize git, push to GitHub, then plan 04-02
-Resume file: .paul/phases/04-inventory/04-01-SUMMARY.md
+Stopped at: Phase 4 complete, ready to plan Phase 5
+Next action: /paul:plan for Phase 5 (Lead Capture & Contact)
+Resume file: .paul/ROADMAP.md
 
 ---
 *STATE.md -- Updated after every significant action*

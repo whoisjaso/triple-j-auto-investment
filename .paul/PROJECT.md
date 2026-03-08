@@ -24,6 +24,11 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 ### Validated
 - Next.js project foundation with App Router, TypeScript, Tailwind CSS v4 -- Phase 1
 - Supabase schema (vehicles, leads) with RLS and typed query helpers -- Phase 2
+- Cinematic scroll-driven homepage with frame animations (Maybach, Keys, Crest) -- Phase 3
+- Responsive navbar (Rolls Royce centered layout) + footer with compliance -- Phase 3
+- Vehicle listings with search, filter, sort + mock data fallback -- Phase 4
+- Vehicle detail page with gallery, specs, BHPH calculator, CTAs -- Phase 4
+- NHTSA VIN decoder (standalone page + embedded component) -- Phase 4
 
 ### Out of Scope (v0.1)
 - Rental management, plate tracking, registration workflows -- v0.2+
@@ -98,6 +103,9 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 | SOVEREIGN framework as internal reference | Guides design decisions without exposing psychological language to customers | 2026-03-06 | Active |
 | Next.js 16 + Tailwind v4 | create-next-app latest; CSS-first @theme config | 2026-03-07 | Active |
 | Plus Jakarta Sans + Playfair Display + Cormorant Garamond | Match old codebase brand identity | 2026-03-07 | Active |
+| BHPH payment calculator: simple division | No interest rate — BHPH builds cost into vehicle price | 2026-03-07 | Active |
+| Server components by default, client only for interactivity | PaymentCalculator is only client component on detail page | 2026-03-07 | Active |
+| NHTSA VIN decoder proxied through API route | Avoids CORS, adds normalization, alwaysOpen prop for dual usage | 2026-03-07 | Active |
 
 ## Success Metrics
 
@@ -132,4 +140,4 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 
 ---
 *PROJECT.md -- Updated when requirements or context change*
-*Last updated: 2026-03-07 after Phase 2*
+*Last updated: 2026-03-07 after Phase 4*
