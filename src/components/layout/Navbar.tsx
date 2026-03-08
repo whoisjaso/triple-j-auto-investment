@@ -223,8 +223,10 @@ export default function Navbar() {
       <div
         ref={menuRef}
         id="mobile-menu"
-        className={`fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center transition-opacity duration-500 ${
-          menuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+        className={`fixed inset-0 z-[60] bg-black flex flex-col items-center justify-center transition-all duration-500 ease-out ${
+          menuOpen
+            ? "opacity-100 scale-100"
+            : "opacity-0 scale-[0.97] pointer-events-none"
         }`}
         role="dialog"
         aria-modal={menuOpen || undefined}
@@ -268,22 +270,38 @@ export default function Navbar() {
           className="flex flex-col items-center gap-7"
           aria-label="Mobile navigation"
         >
-          {[...LEFT_LINKS, ...RIGHT_LINKS].map((link) => (
+          {[...LEFT_LINKS, ...RIGHT_LINKS].map((link, idx) => (
             <Link
               key={link.href}
               href={link.href}
-              className="font-accent text-sm uppercase tracking-[0.35em] text-tj-cream/60 hover:text-tj-cream transition-colors duration-300 min-h-[44px] flex items-center"
+              className="font-accent text-sm uppercase tracking-[0.35em] text-tj-cream/60 hover:text-tj-cream transition-all duration-500 min-h-[44px] flex items-center"
+              style={{
+                transitionDelay: menuOpen ? `${100 + idx * 60}ms` : "0ms",
+                opacity: menuOpen ? 1 : 0,
+                transform: menuOpen ? "translateY(0)" : "translateY(12px)",
+              }}
               onClick={() => setMenuOpen(false)}
             >
               {link.label}
             </Link>
           ))}
 
-          <span className="w-8 h-px bg-tj-gold/20 my-2" />
+          <span
+            className="w-8 h-px bg-tj-gold/20 my-2 transition-all duration-500"
+            style={{
+              transitionDelay: menuOpen ? `${100 + ([...LEFT_LINKS, ...RIGHT_LINKS].length) * 60}ms` : "0ms",
+              opacity: menuOpen ? 1 : 0,
+            }}
+          />
 
           <a
             href="tel:+18324009760"
-            className="font-serif text-lg text-tj-gold/80 hover:text-tj-gold transition-colors duration-300 min-h-[44px] flex items-center tracking-wide"
+            className="font-serif text-lg text-tj-gold/80 hover:text-tj-gold transition-all duration-500 min-h-[44px] flex items-center tracking-wide"
+            style={{
+              transitionDelay: menuOpen ? `${160 + ([...LEFT_LINKS, ...RIGHT_LINKS].length) * 60}ms` : "0ms",
+              opacity: menuOpen ? 1 : 0,
+              transform: menuOpen ? "translateY(0)" : "translateY(12px)",
+            }}
           >
             (832) 400-9760
           </a>

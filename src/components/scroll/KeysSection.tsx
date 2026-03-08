@@ -52,10 +52,8 @@ interface KeysSectionProps {
 export default function KeysSection({ onProgress }: KeysSectionProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const overlayRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [loaded, setLoaded] = useState(false);
-  const [phaseOpacities, setPhaseOpacities] = useState<number[]>(
-    new Array(PHASES.length).fill(0)
-  );
 
   const onProgressRef = useRef(onProgress);
   onProgressRef.current = onProgress;
@@ -102,8 +100,11 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
     let images: (HTMLImageElement | null)[] = [];
     let effectiveFrames = TOTAL_FRAMES;
     let isVisible = true;
+    let ctx: CanvasRenderingContext2D | null = null;
+    let canvasSized = false;
     const isMobile = window.innerWidth < 768;
     const canvasScale = isMobile ? 0.5 : 1;
+    const opacities = new Array(PHASES.length).fill(0);
 
     loadFrames().then((result) => {
       images = result.images;
@@ -133,53 +134,59 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
         return;
       }
 
-      smoothFrame = lerp(smoothFrame, targetFrame, 0.12);
+      smoothFrame = lerp(smoothFrame, targetFrame, 0.18);
       const displayFrame = Math.round(smoothFrame);
 
       if (displayFrame !== drawnFrame && canvasRef.current) {
         const img = images[displayFrame];
         if (img) {
-          const ctx = canvasRef.current.getContext("2d");
+          if (!ctx) ctx = canvasRef.current.getContext("2d");
           if (ctx) {
-            const cw = Math.round(img.naturalWidth * canvasScale);
-            const ch = Math.round(img.naturalHeight * canvasScale);
-            if (canvasRef.current.width !== cw) canvasRef.current.width = cw;
-            if (canvasRef.current.height !== ch) canvasRef.current.height = ch;
-            ctx.clearRect(0, 0, cw, ch);
-            ctx.drawImage(img, 0, 0, cw, ch);
+            if (!canvasSized) {
+              const cw = Math.round(img.naturalWidth * canvasScale);
+              const ch = Math.round(img.naturalHeight * canvasScale);
+              canvasRef.current.width = cw;
+              canvasRef.current.height = ch;
+              canvasSized = true;
+            }
+            ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height);
             drawnFrame = displayFrame;
           }
         }
       }
 
-      // Subtle push-in
       if (canvasRef.current) {
         const scale = 1 + rawProgress * 0.04;
-        canvasRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        canvasRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
       }
 
-      // Smooth phase opacities
-      setPhaseOpacities((prev) => {
-        let changed = false;
-        const next = prev.map((o, i) => {
-          const p = PHASES[i];
-          const fadeRange = 0.04;
-          let target: number;
-          if (rawProgress < p.start || rawProgress > p.end) {
-            target = 0;
-          } else if (rawProgress < p.start + fadeRange) {
-            target = (rawProgress - p.start) / fadeRange;
-          } else if (rawProgress > p.end - fadeRange) {
-            target = (p.end - rawProgress) / fadeRange;
+      // Direct DOM opacity updates — no React state
+      for (let i = 0; i < PHASES.length; i++) {
+        const p = PHASES[i];
+        const fadeRange = 0.04;
+        let target: number;
+        if (rawProgress < p.start || rawProgress > p.end) {
+          target = 0;
+        } else if (rawProgress < p.start + fadeRange) {
+          target = (rawProgress - p.start) / fadeRange;
+        } else if (rawProgress > p.end - fadeRange) {
+          target = (p.end - rawProgress) / fadeRange;
+        } else {
+          target = 1;
+        }
+        opacities[i] = Math.max(0, Math.min(1, lerp(opacities[i], target, 0.1)));
+
+        const el = overlayRefs.current[i];
+        if (el) {
+          if (opacities[i] < 0.01) {
+            el.style.visibility = "hidden";
           } else {
-            target = 1;
+            el.style.visibility = "visible";
+            el.style.opacity = String(opacities[i]);
+            el.style.transform = `translateY(${(1 - opacities[i]) * 12}px)`;
           }
-          const smoothed = Math.max(0, Math.min(1, lerp(o, target, 0.08)));
-          if (Math.abs(smoothed - o) > 0.001) changed = true;
-          return smoothed;
-        });
-        return changed ? next : prev;
-      });
+        }
+      }
 
       rafId = requestAnimationFrame(tick);
     };
@@ -219,7 +226,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
           ref={canvasRef}
           className="absolute top-1/2 left-1/2 pointer-events-none"
           style={{
-            transform: "translate(-50%, -50%) scale(1)",
+            transform: "translate3d(-50%, -50%, 0) scale(1)",
             willChange: "transform",
             width: "var(--canvas-keys-w)",
             height: "var(--canvas-keys-h)",
@@ -230,11 +237,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
           }}
         />
 
-        {/* Phase overlays */}
         {PHASES.map((phase, i) => {
-          const opacity = phaseOpacities[i];
-          if (opacity < 0.01) return null;
-
           const positionClasses =
             phase.side === "right"
               ? "bottom-20 left-4 right-4 md:bottom-auto md:left-auto md:top-1/2 md:-translate-y-1/2 md:right-12 lg:right-20 md:text-right md:items-end"
@@ -245,11 +248,9 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
           return (
             <div
               key={i}
+              ref={(el) => { overlayRefs.current[i] = el; }}
               className={`absolute z-10 max-w-full md:max-w-[340px] flex flex-col items-center text-center ${positionClasses}`}
-              style={{
-                opacity,
-                transform: `translateY(${(1 - opacity) * 12}px)`,
-              }}
+              style={{ visibility: "hidden", opacity: 0 }}
             >
               <span className="font-accent text-[10px] md:text-[9px] uppercase tracking-[0.4em] text-tj-gold-light mb-2 md:mb-4">
                 {phase.label}
@@ -264,12 +265,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
                 )}
               </h3>
               {phase.cta && (
-                <div
-                  className="mt-5 md:mt-8"
-                  style={{
-                    opacity: Math.max(0, (opacity - 0.5) * 2),
-                  }}
-                >
+                <div className="mt-5 md:mt-8">
                   <a
                     href={phase.cta.href}
                     className="border-b border-tj-gold-light/30 hover:border-tj-gold-light pb-2 text-[11px] md:text-[10px] uppercase tracking-[0.3em] text-tj-cream transition-colors flex items-center gap-4 group min-h-[44px]"
