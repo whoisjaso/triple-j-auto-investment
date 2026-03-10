@@ -18,8 +18,9 @@ export default function SmoothScrollProvider({
     if (isTouch) return;
 
     const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t: number) => 1 - Math.pow(1 - t, 3),
+      // Lerp mode: continuous interpolation (no discrete animations)
+      // Better for scroll-driven frame animations than duration mode
+      lerp: 0.08,
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,

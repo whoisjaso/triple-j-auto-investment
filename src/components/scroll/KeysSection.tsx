@@ -62,23 +62,23 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
     const isMobile = window.innerWidth < 768;
     const step = isMobile ? 2 : 1;
     const frameCount = Math.ceil(TOTAL_FRAMES / step);
-    const images: (HTMLImageElement | null)[] = new Array(frameCount).fill(null);
+    const bitmaps: (ImageBitmap | null)[] = new Array(frameCount).fill(null);
 
     for (let batch = 0; batch < frameCount; batch += BATCH_SIZE) {
       const promises: Promise<void>[] = [];
       const end = Math.min(batch + BATCH_SIZE, frameCount);
       for (let k = batch; k < end; k++) {
         promises.push(
-          new Promise<void>((resolve) => {
-            const img = new Image();
-            const num = (k * step + 1).toString().padStart(4, "0");
-            img.src = `/key-frames/frame-${num}.webp`;
-            img.onload = () => {
-              images[k] = img;
-              resolve();
-            };
-            img.onerror = () => resolve();
-          })
+          (async () => {
+            try {
+              const num = (k * step + 1).toString().padStart(4, "0");
+              const resp = await fetch(`/key-frames/frame-${num}.webp`);
+              const blob = await resp.blob();
+              bitmaps[k] = await createImageBitmap(blob);
+            } catch {
+              // skip failed frames
+            }
+          })()
         );
       }
       await Promise.all(promises);
@@ -88,16 +88,13 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
       );
     }
 
-    return { images, frameCount };
+    return { bitmaps, frameCount };
   }, []);
 
   useEffect(() => {
-    let targetFrame = 0;
-    let smoothFrame = 0;
     let drawnFrame = -1;
     let rafId: number | null = null;
-    let rawProgress = 0;
-    let images: (HTMLImageElement | null)[] = [];
+    let bitmaps: (ImageBitmap | null)[] = [];
     let effectiveFrames = TOTAL_FRAMES;
     let isVisible = true;
     let ctx: CanvasRenderingContext2D | null = null;
@@ -107,26 +104,10 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
     const opacities = new Array(PHASES.length).fill(0);
 
     loadFrames().then((result) => {
-      images = result.images;
+      bitmaps = result.bitmaps;
       effectiveFrames = result.frameCount;
       setLoaded(true);
     });
-
-    const handleScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const scrollDistance = rect.height - window.innerHeight;
-      if (scrollDistance <= 0) return;
-
-      rawProgress = Math.max(0, Math.min(1, -rect.top / scrollDistance));
-      targetFrame = Math.min(
-        Math.floor(rawProgress * (effectiveFrames - 1)),
-        effectiveFrames - 1
-      );
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
 
     const tick = () => {
       if (!isVisible) {
@@ -134,22 +115,35 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
         return;
       }
 
-      smoothFrame = lerp(smoothFrame, targetFrame, 0.18);
-      const displayFrame = Math.round(smoothFrame);
+      // Read scroll position inside rAF — single read/write cycle
+      let rawProgress = 0;
+      if (containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const scrollDistance = rect.height - window.innerHeight;
+        if (scrollDistance > 0) {
+          rawProgress = Math.max(0, Math.min(1, -rect.top / scrollDistance));
+        }
+      }
+
+      // Direct frame mapping — no lerp, Lenis already smooths scroll
+      const displayFrame = Math.min(
+        Math.round(rawProgress * (effectiveFrames - 1)),
+        effectiveFrames - 1
+      );
 
       if (displayFrame !== drawnFrame && canvasRef.current) {
-        const img = images[displayFrame];
-        if (img) {
-          if (!ctx) ctx = canvasRef.current.getContext("2d");
+        const bmp = bitmaps[displayFrame];
+        if (bmp) {
+          if (!ctx) ctx = canvasRef.current.getContext("2d", { alpha: false });
           if (ctx) {
             if (!canvasSized) {
-              const cw = Math.round(img.naturalWidth * canvasScale);
-              const ch = Math.round(img.naturalHeight * canvasScale);
+              const cw = Math.round(bmp.width * canvasScale);
+              const ch = Math.round(bmp.height * canvasScale);
               canvasRef.current.width = cw;
               canvasRef.current.height = ch;
               canvasSized = true;
             }
-            ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height);
+            ctx.drawImage(bmp, 0, 0, canvasRef.current.width, canvasRef.current.height);
             drawnFrame = displayFrame;
           }
         }
@@ -174,7 +168,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
         } else {
           target = 1;
         }
-        opacities[i] = Math.max(0, Math.min(1, lerp(opacities[i], target, 0.1)));
+        opacities[i] = Math.max(0, Math.min(1, lerp(opacities[i], target, 0.14)));
 
         const el = overlayRefs.current[i];
         if (el) {
@@ -205,7 +199,6 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
     tick();
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
       if (rafId !== null) cancelAnimationFrame(rafId);
       observer.disconnect();
     };
