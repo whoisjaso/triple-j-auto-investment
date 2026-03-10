@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans, Cormorant_Garamond } from "next/font/google";
-import SmoothScrollProvider from "@/components/scroll/SmoothScrollProvider";
-import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import PublicShell from "@/components/layout/PublicShell";
 import "./globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -49,11 +47,9 @@ export default function RootLayout({
       <body
         className={`${playfairDisplay.variable} ${plusJakartaSans.variable} ${cormorantGaramond.variable} antialiased`}
       >
-        <SmoothScrollProvider>
-          <Navbar />
+        <PublicShell>
           {children}
-          <Footer />
-        </SmoothScrollProvider>
+        </PublicShell>
       </body>
     </html>
   );

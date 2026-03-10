@@ -219,3 +219,34 @@ export function getMockVehicleBySlug(slug: string): Vehicle | null {
 export function getMockMakes(): string[] {
   return [...new Set(MOCK_VEHICLES.map((v) => v.make))].sort();
 }
+
+// ============================================================
+// Admin mock queries (no default status filter)
+// ============================================================
+
+export function getMockAdminVehicles(
+  filters: VehicleFilters = {}
+): Vehicle[] {
+  let results = [...MOCK_VEHICLES];
+
+  if (filters.status) {
+    results = results.filter((v) => v.status === filters.status);
+  }
+
+  if (filters.search) {
+    const term = filters.search.toLowerCase();
+    results = results.filter(
+      (v) =>
+        v.make.toLowerCase().includes(term) ||
+        v.model.toLowerCase().includes(term)
+    );
+  }
+
+  // Newest first
+  results.reverse();
+  return results;
+}
+
+export function getMockVehicleById(id: string): Vehicle | null {
+  return MOCK_VEHICLES.find((v) => v.id === id) ?? null;
+}
