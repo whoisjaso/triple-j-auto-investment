@@ -2,18 +2,18 @@
 
 ## Project Reference
 
-See: .paul/PROJECT.md (updated 2026-03-07)
+See: .paul/PROJECT.md (updated 2026-03-10)
 
 **Core value:** Every digital touchpoint engineers the neurological conditions under which buying becomes the only comfortable option -- a FATE-triggered, PCP-sequenced behavioral funnel from stranger to buyer to evangelist.
-**Current focus:** Phase 6 -- Admin Core (Plan 06-02 next: Lead Management)
+**Current focus:** Phase 7 -- Bilingual (i18n)
 
 ## Current Position
 
 Milestone: v0.1 Initial Release
-Phase: 6 of 8 (Admin Core) -- In progress
-Plan: 06-02 APPLY complete (Lead Management + Dashboard Stats + Admin Access)
-Status: APPLY complete, ready for UNIFY
-Last activity: 2026-03-10 -- Plan 06-02 APPLY complete
+Phase: 7 of 8 (Bilingual / i18n) -- Not started
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-03-10 -- Phase 6 complete, transitioned to Phase 7
 
 Progress:
 - Milestone: [########░░] 75%
@@ -22,14 +22,15 @@ Progress:
 - Phase 3: [##########] 100% (complete)
 - Phase 4: [##########] 100% (complete)
 - Phase 5: [##########] 100% (complete)
-- Phase 6: [#####░░░░░] 50% (plan 06-01 complete, 06-02 planned)
+- Phase 6: [##########] 100% (complete)
+- Phase 7: [░░░░░░░░░░] 0%
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ○     [Plan 06-02 applied, ready for UNIFY]
+  ✓        ✓        ✓     [06-02 loop closed, Phase 6 complete]
 ```
 
 ## Accumulated Context
@@ -47,29 +48,28 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - RLS: anon SELECT vehicles + INSERT leads; authenticated full access
 - Phase 3 redefined: "Layout Shell" + "Homepage" + "Animation" merged into "Cinematic Homepage & Layout"
 - Luxury-first design: Pure black (#000000) palette with gold accents, Apple/Rolls Royce/Loro Piana aesthetic
-- Scroll-driven frame animations: Canvas + batched preload + passive scroll + rAF + IntersectionObserver
-- Lenis for smooth scroll on desktop; native scroll on touch devices
+- Scroll-driven frame animations: Canvas + ImageBitmap + rAF-only + IntersectionObserver (no double-smoothing)
+- Lenis lerp mode (0.08) for smooth scroll on desktop; native scroll on touch devices
 - Frame assets extracted from user-provided MP4 videos via ffmpeg (not old codebase)
 - Rolls Royce-style centered navbar: logo center, links split left/right, phone CTA right with divider
 - All sections: 121 WebP frames, black backgrounds, edge-fade radial masks
 - Mobile: frame skipping (every 2nd), canvas buffer scaling (50%), IntersectionObserver rAF pausing
 - Crest section: no text overlay on animation — crest IS the brand identity
 - CSS custom properties for responsive canvas sizing (mobile-first breakpoints)
-- Footer as server component (no client JS, no hydration cost)
+- Footer as server component with subtle "Dealer Login" link in compliance bar
 - Card hover uses translate-y (not scale) to avoid grid layout shifts
 - NHTSA VIN decoder proxied through /api/vin-decode route (avoids CORS, adds normalization)
 - VinDecoder component supports alwaysOpen prop for embedded vs standalone usage
 - Triple J is also a rental business — rentals feature confirmed for v0.2+
 - BHPH payment calculator: simple division (no interest — built into vehicle price)
-- Server components by default, client components only for interactivity (PaymentCalculator only)
+- Server components by default, client components only for interactivity
 - Accessibility: aria-hidden on decorative SVGs, htmlFor/id on form labels, 44px+ tap targets
 - useActionState (React 19) for form handling, not deprecated useFormStatus
-- Scroll animation performance: direct DOM manipulation via refs, cached canvas ctx, translate3d GPU compositing
-- Lenis tuned: 1.2s duration, cubic easing, 1.0 wheelMultiplier
 - Mobile menu: staggered entrance animation with computed CSS transition delays
 - Admin auth: simple password-based with HMAC-signed cookies (no Supabase Auth for v0.1)
 - Admin layout: separate from public (PublicShell conditionally hides Navbar/Footer/Lenis)
 - VIN auto-decode in admin vehicle form (reuses /api/vin-decode endpoint)
+- Lead status cycling via form button (server component, no client JS on leads page)
 
 ### Deferred Issues
 - No Supabase project connected yet -- user needs to create project and run schema.sql
@@ -80,6 +80,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - CAPTCHA / rate limiting on forms (future enhancement)
 - Photo upload to Supabase Storage (future)
 - Next.js 16 "middleware" → "proxy" deprecation (monitor)
+- Mock lead status changes not persisted (page refresh resets in mock mode)
 
 ### Blockers/Concerns
 - No Supabase project connected yet -- user needs to create project and run schema.sql
@@ -87,9 +88,9 @@ PLAN ──▶ APPLY ──▶ UNIFY
 ## Session Continuity
 
 Last session: 2026-03-10
-Stopped at: Plan 06-02 APPLY complete
-Next action: Run /paul:unify .paul/phases/06-admin/06-02-PLAN.md
-Resume file: .paul/phases/06-admin/06-02-PLAN.md
+Stopped at: Phase 6 complete, ready to plan Phase 7
+Next action: /paul:plan for Phase 7 (Bilingual / i18n)
+Resume file: .paul/ROADMAP.md
 
 ---
 *STATE.md -- Updated after every significant action*

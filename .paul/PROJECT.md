@@ -29,6 +29,14 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 - Vehicle listings with search, filter, sort + mock data fallback -- Phase 4
 - Vehicle detail page with gallery, specs, BHPH calculator, CTAs -- Phase 4
 - NHTSA VIN decoder (standalone page + embedded component) -- Phase 4
+- Contact page + financing inquiry page with lead capture forms -- Phase 5
+- Lead submission server action (Supabase/mock fallback) -- Phase 5
+- Admin auth (password + HMAC cookies) + middleware route protection -- Phase 6
+- Admin dashboard with sidebar navigation -- Phase 6
+- Inventory CRUD with VIN auto-decode integration -- Phase 6
+- Lead management page with status cycling and filtering -- Phase 6
+- Dashboard statistics (vehicles, leads, new leads) + recent leads preview -- Phase 6
+- Dealer login link in footer for admin discoverability -- Phase 6
 
 ### Out of Scope (v0.1)
 - Rental management, plate tracking, registration workflows -- v0.2+
@@ -106,6 +114,8 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 | BHPH payment calculator: simple division | No interest rate — BHPH builds cost into vehicle price | 2026-03-07 | Active |
 | Server components by default, client only for interactivity | PaymentCalculator is only client component on detail page | 2026-03-07 | Active |
 | NHTSA VIN decoder proxied through API route | Avoids CORS, adds normalization, alwaysOpen prop for dual usage | 2026-03-07 | Active |
+| Lead status cycling (New→Contacted→Closed) via form button | No client component needed; server component page stays fast | 2026-03-10 | Active |
+| Subtle "Dealer Login" in footer compliance bar | Discoverable by owner, invisible to customers | 2026-03-10 | Active |
 
 ## Success Metrics
 
@@ -140,4 +150,4 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 
 ---
 *PROJECT.md -- Updated when requirements or context change*
-*Last updated: 2026-03-07 after Phase 4*
+*Last updated: 2026-03-10 after Phase 6*
