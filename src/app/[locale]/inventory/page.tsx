@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import type { VehicleFilters } from "@/types/database";
 import type { VehicleSortOption } from "@/lib/supabase/queries/vehicles";
@@ -7,6 +8,23 @@ import FilterBar from "@/components/inventory/FilterBar";
 import SortSelect from "@/components/inventory/SortSelect";
 import VinDecoder from "@/components/inventory/VinDecoder";
 import { Link } from "@/i18n/navigation";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata" });
+
+  return {
+    title: t("inventoryTitle"),
+    description: t("inventoryDescription"),
+    openGraph: {
+      locale: locale === "es" ? "es_US" : "en_US",
+    },
+  };
+}
 
 const VALID_SORTS: VehicleSortOption[] = [
   "newest",

@@ -80,8 +80,21 @@ export default function Footer() {
           </p>
           <a
             href="/admin/login"
-            className="text-white/20 text-[10px] tracking-wide hover:text-tj-gold/40 transition-colors"
+            className="flex items-center gap-1.5 text-white/25 text-[10px] tracking-wide hover:text-tj-gold/50 transition-colors"
           >
+            <svg
+              width="12"
+              height="12"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
             {t("dealerLogin")}
           </a>
           <p className="text-white/20 text-[10px] tracking-wide">

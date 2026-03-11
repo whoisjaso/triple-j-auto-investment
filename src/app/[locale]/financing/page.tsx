@@ -1,5 +1,23 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import ContactForm from "@/components/leads/ContactForm";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata" });
+
+  return {
+    title: t("financingTitle"),
+    description: t("financingDescription"),
+    openGraph: {
+      locale: locale === "es" ? "es_US" : "en_US",
+    },
+  };
+}
 
 const STEP_KEYS = [
   { number: "01", titleKey: "step1Title", descKey: "step1Desc" },

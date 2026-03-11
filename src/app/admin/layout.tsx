@@ -12,11 +12,9 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-neutral-950">
+    <div className="min-h-screen bg-[#050505]">
       <AdminSidebar />
-      <main className="md:ml-60 pt-14 md:pt-0 min-h-screen">
-        {children}
-      </main>
+      <main className="md:ml-60 min-h-screen pb-24 md:pb-0">{children}</main>
     </div>
   );
 }

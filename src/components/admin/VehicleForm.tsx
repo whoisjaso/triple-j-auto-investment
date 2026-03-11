@@ -38,7 +38,9 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
     setDecodeSuccess(false);
 
     try {
-      const res = await fetch(`/api/vin-decode?vin=${encodeURIComponent(vin)}`);
+      const res = await fetch(
+        `/api/vin-decode?vin=${encodeURIComponent(vin)}`
+      );
       const data = await res.json();
 
       if (!res.ok) {
@@ -60,7 +62,6 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
       for (const [name, value] of Object.entries(fields)) {
         const input = form.elements.namedItem(name) as HTMLInputElement;
         if (input && value) {
-          // Trigger React-compatible value setting
           const setter = Object.getOwnPropertyDescriptor(
             HTMLInputElement.prototype,
             "value"
@@ -79,20 +80,22 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
   };
 
   const inputClass =
-    "w-full bg-neutral-900 border border-neutral-700 rounded-md px-3 py-2.5 text-neutral-100 placeholder:text-neutral-500 focus:border-tj-gold/50 focus:ring-1 focus:ring-tj-gold/30 focus:outline-none min-h-[44px] text-sm";
-  const labelClass = "block text-xs font-medium text-neutral-400 mb-1.5";
+    "w-full bg-white/[0.03] border border-white/[0.06] rounded-xl px-3.5 py-2.5 text-tj-cream/90 placeholder:text-white/15 focus:border-tj-gold/30 focus:bg-white/[0.05] focus:outline-none transition-all duration-300 min-h-[44px] text-sm";
+  const labelClass =
+    "block text-[10px] font-accent text-white/30 uppercase tracking-[0.15em] mb-1.5";
   const sectionClass =
-    "text-xs font-medium text-neutral-500 uppercase tracking-wider mb-3 mt-8 first:mt-0";
+    "font-serif text-sm text-tj-cream/70 tracking-wide mb-3 mt-8 first:mt-0";
 
   return (
     <form ref={formRef} action={formAction} className="space-y-5 max-w-2xl">
-      {/* Hidden ID for edit mode */}
       {vehicle && <input type="hidden" name="id" value={vehicle.id} />}
 
-      {/* Error display */}
       {state.error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-md px-4 py-3" role="alert">
-          <p className="text-red-400 text-sm">{state.error}</p>
+        <div
+          className="bg-red-500/5 border border-red-500/10 rounded-xl px-4 py-3"
+          role="alert"
+        >
+          <p className="text-red-400/80 text-sm">{state.error}</p>
         </div>
       )}
 
@@ -116,17 +119,17 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
             type="button"
             onClick={handleDecode}
             disabled={decoding}
-            className="px-4 py-2.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs uppercase tracking-wider rounded-md border border-neutral-700 transition-colors min-h-[44px] whitespace-nowrap disabled:opacity-50"
+            className="px-4 py-2.5 bg-white/[0.03] hover:bg-white/[0.06] text-white/40 hover:text-white/70 text-[10px] font-accent uppercase tracking-[0.1em] rounded-xl border border-white/[0.06] transition-all duration-300 min-h-[44px] whitespace-nowrap disabled:opacity-40"
           >
             {decoding ? "Decoding\u2026" : "Decode VIN"}
           </button>
         </div>
         {decodeError && (
-          <p className="text-red-400 text-xs mt-1.5">{decodeError}</p>
+          <p className="text-red-400/70 text-xs mt-1.5">{decodeError}</p>
         )}
         {decodeSuccess && (
-          <p className="text-green-400 text-xs mt-1.5">
-            VIN decoded — fields auto-filled.
+          <p className="text-emerald-400/70 text-xs mt-1.5">
+            VIN decoded \u2014 fields auto-filled.
           </p>
         )}
       </div>
@@ -136,7 +139,7 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="make" className={labelClass}>
-            Make <span className="text-red-400">*</span>
+            Make <span className="text-red-400/60">*</span>
           </label>
           <input
             type="text"
@@ -150,7 +153,7 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
         </div>
         <div>
           <label htmlFor="model" className={labelClass}>
-            Model <span className="text-red-400">*</span>
+            Model <span className="text-red-400/60">*</span>
           </label>
           <input
             type="text"
@@ -164,7 +167,7 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
         </div>
         <div>
           <label htmlFor="year" className={labelClass}>
-            Year <span className="text-red-400">*</span>
+            Year <span className="text-red-400/60">*</span>
           </label>
           <input
             type="number"
@@ -180,10 +183,13 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
         </div>
         <div>
           <label htmlFor="price" className={labelClass}>
-            Price <span className="text-red-400">*</span>
+            Price <span className="text-red-400/60">*</span>
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-sm" aria-hidden="true">
+            <span
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/20 text-sm"
+              aria-hidden="true"
+            >
               $
             </span>
             <input
@@ -357,7 +363,9 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
       <div>
         <label htmlFor="gallery" className={labelClass}>
           Gallery URLs{" "}
-          <span className="text-neutral-600 font-normal">(one per line)</span>
+          <span className="text-white/10 font-normal normal-case tracking-normal">
+            (one per line)
+          </span>
         </label>
         <textarea
           id="gallery"
@@ -365,7 +373,9 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
           defaultValue={vehicle?.gallery?.join("\n") || ""}
           rows={3}
           className={`${inputClass} min-h-[80px]`}
-          placeholder={"https://example.com/photo1.jpg\nhttps://example.com/photo2.jpg"}
+          placeholder={
+            "https://example.com/photo1.jpg\nhttps://example.com/photo2.jpg"
+          }
         />
       </div>
 
@@ -374,13 +384,13 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full sm:w-auto px-8 py-3 bg-tj-gold/90 hover:bg-tj-gold text-black font-accent text-xs uppercase tracking-[0.15em] rounded-md min-h-[44px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-tj-gold/90 to-tj-gold-light/90 hover:from-tj-gold hover:to-tj-gold-light text-black font-accent text-xs uppercase tracking-[0.15em] rounded-xl min-h-[48px] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {isPending
             ? "Saving\u2026"
             : vehicle
-            ? "Save Changes"
-            : "Add Vehicle"}
+              ? "Save Changes"
+              : "Add Vehicle"}
         </button>
       </div>
     </form>

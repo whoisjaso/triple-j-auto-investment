@@ -31,9 +31,9 @@ async function getRecentLeads(): Promise<Lead[]> {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  New: "bg-blue-500/10 text-blue-400",
-  Contacted: "bg-yellow-500/10 text-yellow-400",
-  Closed: "bg-green-500/10 text-green-400",
+  New: "bg-blue-400/10 text-blue-400 border-blue-400/15",
+  Contacted: "bg-amber-400/10 text-amber-400 border-amber-400/15",
+  Closed: "bg-emerald-400/10 text-emerald-400 border-emerald-400/15",
 };
 
 function relativeDate(iso: string): string {
@@ -62,61 +62,94 @@ export default async function AdminDashboardPage() {
   ]);
 
   return (
-    <div className="p-6 md:p-8">
-      <h1 className="text-2xl font-serif text-neutral-100 mb-2">Dashboard</h1>
-      <p className="text-sm text-neutral-500 mb-8">
-        Welcome to the Triple J admin panel.
-      </p>
+    <div className="px-4 py-6 md:p-8 max-w-5xl">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="font-serif text-2xl md:text-3xl text-tj-cream/90 tracking-wide">
+          Dashboard
+        </h1>
+        <p className="text-xs text-white/25 mt-1 font-accent uppercase tracking-[0.15em]">
+          Triple J Auto Investment
+        </p>
+      </div>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="border border-neutral-800 rounded-lg bg-neutral-900/50 p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/60" aria-hidden="true">
-              <rect x="1" y="3" width="15" height="13" rx="2" />
-              <path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" />
-              <circle cx="5.5" cy="18.5" r="2.5" />
-              <circle cx="18.5" cy="18.5" r="2.5" />
-              <path d="M8 18.5h8" />
-            </svg>
-            <span className="text-xs text-neutral-500 uppercase tracking-wider">
-              Vehicles
-            </span>
-          </div>
-          <p className="text-3xl font-light text-neutral-100">
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-3 md:gap-4 mb-8">
+        <div className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-tj-gold/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-tj-gold/40 mb-3"
+            aria-hidden="true"
+          >
+            <rect x="1" y="3" width="15" height="13" rx="2" />
+            <path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" />
+            <circle cx="5.5" cy="18.5" r="2.5" />
+            <circle cx="18.5" cy="18.5" r="2.5" />
+            <path d="M8 18.5h8" />
+          </svg>
+          <p className="font-serif text-2xl md:text-4xl text-tj-cream/90">
             {stats.totalVehicles}
           </p>
-        </div>
-
-        <div className="border border-neutral-800 rounded-lg bg-neutral-900/50 p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/60" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-            <span className="text-xs text-neutral-500 uppercase tracking-wider">
-              Total Leads
-            </span>
-          </div>
-          <p className="text-3xl font-light text-neutral-100">
-            {stats.totalLeads}
+          <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
+            Vehicles
           </p>
         </div>
 
-        <div className="border border-neutral-800 rounded-lg bg-neutral-900/50 p-5">
-          <div className="flex items-center gap-3 mb-2">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/60" aria-hidden="true">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
-            <span className="text-xs text-neutral-500 uppercase tracking-wider">
-              New Leads
-            </span>
-          </div>
-          <p className="text-3xl font-light text-neutral-100">
+        <div className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-tj-gold/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-tj-gold/40 mb-3"
+            aria-hidden="true"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+          </svg>
+          <p className="font-serif text-2xl md:text-4xl text-tj-cream/90">
+            {stats.totalLeads}
+          </p>
+          <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
+            Total Leads
+          </p>
+        </div>
+
+        <div className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-400/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-blue-400/40 mb-3"
+            aria-hidden="true"
+          >
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <p className="font-serif text-2xl md:text-4xl text-tj-cream/90">
             {stats.newLeads}
+          </p>
+          <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
+            New Leads
           </p>
         </div>
       </div>
@@ -125,40 +158,38 @@ export default async function AdminDashboardPage() {
       {recentLeads.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-medium text-neutral-300 uppercase tracking-wider">
+            <h2 className="font-accent text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/30">
               Recent Leads
             </h2>
             <Link
               href="/admin/leads"
-              className="text-xs text-tj-gold/60 hover:text-tj-gold transition-colors"
+              className="font-accent text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
             >
               View All &rarr;
             </Link>
           </div>
-          <div className="border border-neutral-800 rounded-lg bg-neutral-900/50 divide-y divide-neutral-800/50">
+          <div className="space-y-2">
             {recentLeads.map((lead) => (
               <Link
                 key={lead.id}
                 href="/admin/leads"
-                className="flex items-center justify-between p-4 hover:bg-neutral-800/30 transition-colors min-h-[56px]"
+                className="flex items-center justify-between p-4 rounded-xl border border-white/[0.04] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.06] transition-all duration-300 min-h-[56px] group"
               >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="min-w-0">
-                    <p className="text-sm text-neutral-200 font-medium truncate">
-                      {lead.name}
-                    </p>
-                    <p className="text-xs text-neutral-500">
-                      {formatPhone(lead.phone)}
-                    </p>
-                  </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-tj-cream/80 font-medium truncate">
+                    {lead.name}
+                  </p>
+                  <p className="text-xs text-white/25 mt-0.5">
+                    {formatPhone(lead.phone)}
+                  </p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0 ml-3">
                   <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium ${STATUS_COLORS[lead.status] ?? ""}`}
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium border ${STATUS_COLORS[lead.status] ?? ""}`}
                   >
                     {lead.status}
                   </span>
-                  <span className="text-xs text-neutral-600 hidden sm:inline">
+                  <span className="text-[10px] text-white/15 hidden sm:inline font-accent tracking-wide">
                     {relativeDate(lead.createdAt)}
                   </span>
                 </div>
@@ -168,71 +199,89 @@ export default async function AdminDashboardPage() {
         </div>
       )}
 
-      {/* Quick-link cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Quick Actions */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
         <Link
           href="/admin/inventory"
-          className="border border-neutral-800 rounded-lg bg-neutral-900/50 p-6 hover:bg-neutral-900 hover:border-neutral-700 transition-colors group"
+          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
         >
-          <div className="flex items-center gap-3 mb-3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/70" aria-hidden="true">
-              <rect x="1" y="3" width="15" height="13" rx="2" />
-              <path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" />
-              <circle cx="5.5" cy="18.5" r="2.5" />
-              <circle cx="18.5" cy="18.5" r="2.5" />
-              <path d="M8 18.5h8" />
-            </svg>
-            <h2 className="text-lg font-medium text-neutral-200">Inventory</h2>
-          </div>
-          <p className="text-sm text-neutral-500">
-            Add, edit, and manage your vehicle listings.
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-tj-gold/50 mb-3"
+            aria-hidden="true"
+          >
+            <rect x="1" y="3" width="15" height="13" rx="2" />
+            <path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" />
+            <circle cx="5.5" cy="18.5" r="2.5" />
+            <circle cx="18.5" cy="18.5" r="2.5" />
+            <path d="M8 18.5h8" />
+          </svg>
+          <p className="text-sm text-tj-cream/80 font-medium">Inventory</p>
+          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
+            Manage &rarr;
           </p>
-          <span className="mt-4 inline-block text-xs text-tj-gold/60 uppercase tracking-wider group-hover:text-tj-gold transition-colors">
-            Manage Inventory &rarr;
-          </span>
         </Link>
 
         <Link
           href="/admin/leads"
-          className="border border-neutral-800 rounded-lg bg-neutral-900/50 p-6 hover:bg-neutral-900 hover:border-neutral-700 transition-colors group"
+          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
         >
-          <div className="flex items-center gap-3 mb-3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/70" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-            <h2 className="text-lg font-medium text-neutral-200">Leads</h2>
-          </div>
-          <p className="text-sm text-neutral-500">
-            View and manage customer inquiries.
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-tj-gold/50 mb-3"
+            aria-hidden="true"
+          >
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+          <p className="text-sm text-tj-cream/80 font-medium">Leads</p>
+          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
+            Manage &rarr;
           </p>
-          <span className="mt-4 inline-block text-xs text-tj-gold/60 uppercase tracking-wider group-hover:text-tj-gold transition-colors">
-            Manage Leads &rarr;
-          </span>
         </Link>
 
         <a
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="border border-neutral-800 rounded-lg bg-neutral-900/50 p-6 hover:bg-neutral-900 hover:border-neutral-700 transition-colors group"
+          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
         >
-          <div className="flex items-center gap-3 mb-3">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/70" aria-hidden="true">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              <polyline points="15 3 21 3 21 9" />
-              <line x1="10" y1="14" x2="21" y2="3" />
-            </svg>
-            <h2 className="text-lg font-medium text-neutral-200">View Site</h2>
-          </div>
-          <p className="text-sm text-neutral-500">
-            Open the public website in a new tab.
-          </p>
-          <span className="mt-4 inline-block text-xs text-tj-gold/60 uppercase tracking-wider group-hover:text-tj-gold transition-colors">
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-tj-gold/50 mb-3"
+            aria-hidden="true"
+          >
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+            <polyline points="15 3 21 3 21 9" />
+            <line x1="10" y1="14" x2="21" y2="3" />
+          </svg>
+          <p className="text-sm text-tj-cream/80 font-medium">View Site</p>
+          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
             Open &rarr;
-          </span>
+          </p>
         </a>
       </div>
     </div>

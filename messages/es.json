@@ -10,7 +10,8 @@
     "homeLink": "Triple J Auto Investment — Inicio",
     "mobileNav": "Navegación móvil",
     "mainNav": "Navegación principal",
-    "navMenu": "Menú de navegación"
+    "navMenu": "Menú de navegación",
+    "dealerPortal": "Portal"
   },
   "footer": {
     "brand": "Triple J Auto Investment",
@@ -178,5 +179,17 @@
   "languageToggle": {
     "en": "EN",
     "es": "ES"
+  },
+  "metadata": {
+    "siteTitle": "Triple J Auto Investment | Vehículos Usados de Calidad en Houston",
+    "siteDescription": "El concesionario de confianza de Houston para vehículos usados de calidad. Financiamiento Compre Aquí, Pague Aquí disponible. Visítenos en 8774 Almeda Genoa Rd, Houston, TX 77075 o llame al (832) 400-9760.",
+    "inventoryTitle": "Nuestra Colección de Vehículos",
+    "inventoryDescription": "Explore vehículos usados de calidad desde $3,000 hasta $8,000. Busque, filtre y encuentre su próximo auto en Triple J Auto Investment en Houston.",
+    "financingTitle": "Financiamiento Flexible — Compre Aquí, Pague Aquí",
+    "financingDescription": "Sin verificación de crédito. Enganches flexibles desde $500. Financiamiento propio que trabaja con usted en Triple J Auto Investment.",
+    "contactTitle": "Contáctenos",
+    "contactDescription": "Comuníquese con Triple J Auto Investment. Visítenos en 8774 Almeda Genoa Rd, Houston, TX 77075 o llame al (832) 400-9760.",
+    "vinDecoderTitle": "Decodificador de VIN Gratis",
+    "vinDecoderDescription": "Busque las especificaciones de fábrica de cualquier vehículo al instante. Decodificador de VIN gratis respaldado por la base de datos oficial de la NHTSA."
   }
 }

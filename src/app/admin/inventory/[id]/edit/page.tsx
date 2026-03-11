@@ -30,18 +30,28 @@ export default async function AdminEditVehiclePage({
   }
 
   return (
-    <div className="p-6 md:p-8">
+    <div className="px-4 py-6 md:p-8 max-w-5xl">
       <div className="mb-6">
         <Link
           href="/admin/inventory"
-          className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors inline-flex items-center gap-1.5 mb-3"
+          className="text-[10px] font-accent uppercase tracking-[0.12em] text-white/25 hover:text-white/50 transition-colors inline-flex items-center gap-1.5 mb-3 min-h-[44px]"
         >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
             <polyline points="15 18 9 12 15 6" />
           </svg>
           Back to Inventory
         </Link>
-        <h1 className="text-2xl font-serif text-neutral-100">
+        <h1 className="font-serif text-2xl md:text-3xl text-tj-cream/90 tracking-wide">
           Edit: {vehicle.year} {vehicle.make} {vehicle.model}
         </h1>
       </div>

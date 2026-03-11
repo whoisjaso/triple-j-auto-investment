@@ -26,7 +26,7 @@ function NavLink({
   return (
     <Link
       href={href}
-      className="relative font-accent text-[11px] uppercase tracking-[0.25em] text-tj-cream/60 hover:text-tj-cream transition-colors duration-300 group py-2"
+      className="relative font-accent text-[11px] uppercase tracking-[0.15em] lg:tracking-[0.25em] text-tj-cream/60 hover:text-tj-cream transition-colors duration-300 group py-2 whitespace-nowrap"
     >
       {children}
       <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-tj-gold/50 transition-all duration-500 ease-out group-hover:w-full" />
@@ -131,7 +131,7 @@ export default function Navbar() {
       >
         <div className="relative mx-auto max-w-7xl px-4 md:px-8 flex items-center h-16 md:h-[72px]">
           {/* LEFT: Desktop nav links */}
-          <div className="hidden md:flex flex-1 items-center gap-10">
+          <div className="hidden md:flex flex-1 items-center gap-5 lg:gap-8 xl:gap-10">
             {LEFT_LINKS.map((link) => (
               <NavLink key={link.href} href={link.href}>
                 {t(link.labelKey)}
@@ -183,7 +183,7 @@ export default function Navbar() {
           </Link>
 
           {/* RIGHT: Desktop nav links + language toggle + phone */}
-          <div className="hidden md:flex flex-1 items-center justify-end gap-10">
+          <div className="hidden md:flex flex-1 items-center justify-end gap-5 lg:gap-8 xl:gap-10">
             {RIGHT_LINKS.map((link) => (
               <NavLink key={link.href} href={link.href}>
                 {t(link.labelKey)}
@@ -196,6 +196,27 @@ export default function Navbar() {
               className="font-accent text-[11px] uppercase tracking-[0.15em] text-tj-gold/80 hover:text-tj-gold transition-colors duration-300"
             >
               (832) 400-9760
+            </a>
+            <span className="w-px h-3 bg-white/10" />
+            <a
+              href="/admin/login"
+              className="flex items-center gap-1.5 font-accent text-[10px] uppercase tracking-[0.2em] text-white/25 hover:text-tj-gold/60 transition-colors duration-300"
+              title={t("dealerPortal")}
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              {t("dealerPortal")}
             </a>
           </div>
 
@@ -279,7 +300,7 @@ export default function Navbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="font-accent text-sm uppercase tracking-[0.35em] text-tj-cream/60 hover:text-tj-cream transition-all duration-500 min-h-[44px] flex items-center"
+              className="font-accent text-sm uppercase tracking-[0.2em] text-tj-cream/60 hover:text-tj-cream transition-all duration-500 min-h-[44px] flex items-center"
               style={{
                 transitionDelay: menuOpen ? `${100 + idx * 60}ms` : "0ms",
                 opacity: menuOpen ? 1 : 0,
@@ -327,6 +348,44 @@ export default function Navbar() {
             }}
           >
             (832) 400-9760
+          </a>
+
+          {/* Dealer Portal divider + link */}
+          <span
+            className="w-6 h-px bg-white/10 my-1 transition-all duration-500"
+            style={{
+              transitionDelay: menuOpen
+                ? `${250 + ALL_LINKS.length * 60}ms`
+                : "0ms",
+              opacity: menuOpen ? 1 : 0,
+            }}
+          />
+          <a
+            href="/admin/login"
+            className="flex items-center gap-2.5 font-accent text-[11px] uppercase tracking-[0.3em] text-white/25 hover:text-tj-gold/50 transition-all duration-500 min-h-[44px]"
+            style={{
+              transitionDelay: menuOpen
+                ? `${280 + ALL_LINKS.length * 60}ms`
+                : "0ms",
+              opacity: menuOpen ? 1 : 0,
+              transform: menuOpen ? "translateY(0)" : "translateY(12px)",
+            }}
+            onClick={() => setMenuOpen(false)}
+          >
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            {t("dealerPortal")}
           </a>
         </nav>
       </div>

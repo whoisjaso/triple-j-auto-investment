@@ -1,5 +1,23 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import VinDecoder from "@/components/inventory/VinDecoder";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "metadata" });
+
+  return {
+    title: t("vinDecoderTitle"),
+    description: t("vinDecoderDescription"),
+    openGraph: {
+      locale: locale === "es" ? "es_US" : "en_US",
+    },
+  };
+}
 
 export default async function VinDecoderPage() {
   const t = await getTranslations("vinDecoder");

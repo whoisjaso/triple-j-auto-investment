@@ -27,7 +27,7 @@ export default function DeleteButton({ id, action }: DeleteButtonProps) {
           <button
             type="submit"
             disabled={deleting}
-            className="text-xs text-red-400 hover:text-red-300 bg-red-500/10 px-2 py-1.5 rounded min-h-[36px] transition-colors disabled:opacity-50"
+            className="text-[10px] font-accent uppercase tracking-[0.1em] text-red-400/80 hover:text-red-400 bg-red-500/[0.06] border border-red-500/10 px-2.5 py-1.5 rounded-lg min-h-[36px] transition-all duration-200 disabled:opacity-40"
           >
             {deleting ? "Deleting\u2026" : "Confirm"}
           </button>
@@ -35,7 +35,7 @@ export default function DeleteButton({ id, action }: DeleteButtonProps) {
         <button
           type="button"
           onClick={() => setConfirming(false)}
-          className="text-xs text-neutral-500 hover:text-neutral-300 px-2 py-1.5 rounded min-h-[36px] transition-colors"
+          className="text-[10px] font-accent uppercase tracking-[0.1em] text-white/30 hover:text-white/60 px-2.5 py-1.5 rounded-lg min-h-[36px] transition-colors"
         >
           Cancel
         </button>
@@ -47,7 +47,7 @@ export default function DeleteButton({ id, action }: DeleteButtonProps) {
     <button
       type="button"
       onClick={() => setConfirming(true)}
-      className="text-xs text-neutral-500 hover:text-red-400 transition-colors px-2 py-1.5 rounded min-h-[36px]"
+      className="text-[10px] font-accent uppercase tracking-[0.1em] text-white/20 hover:text-red-400/70 transition-colors px-2.5 py-1.5 rounded-lg min-h-[36px] hover:bg-red-500/[0.04]"
     >
       Delete
     </button>

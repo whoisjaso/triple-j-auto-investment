@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getMockVehicleBySlug } from "@/lib/mock-vehicles";
@@ -6,6 +7,46 @@ import VehicleSpecs from "@/components/inventory/VehicleSpecs";
 import PaymentCalculator from "@/components/inventory/PaymentCalculator";
 import VehicleInquiryButton from "@/components/inventory/VehicleInquiryButton";
 import { Link } from "@/i18n/navigation";
+
+async function getVehicle(slug: string) {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    const { createClient } = await import("@/lib/supabase/server");
+    const { getVehicleBySlug } = await import(
+      "@/lib/supabase/queries/vehicles"
+    );
+    const supabase = await createClient();
+    return getVehicleBySlug(supabase, slug);
+  }
+  return getMockVehicleBySlug(slug);
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; slug: string }>;
+}): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const vehicle = await getVehicle(slug);
+
+  if (!vehicle) {
+    return { title: "Vehicle Not Found" };
+  }
+
+  const vehicleName = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
+  const description =
+    vehicle.description ||
+    `${vehicleName} — $${vehicle.price.toLocaleString()} at Triple J Auto Investment, Houston TX.`;
+
+  return {
+    title: vehicleName,
+    description,
+    openGraph: {
+      locale: locale === "es" ? "es_US" : "en_US",
+      title: `${vehicleName} | Triple J Auto Investment`,
+      description,
+    },
+  };
+}
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("en-US", {
@@ -22,25 +63,49 @@ export default async function VehicleDetailPage({
   const t = await getTranslations("inventory");
   const { slug } = await params;
 
-  let vehicle;
-
-  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    const { createClient } = await import("@/lib/supabase/server");
-    const { getVehicleBySlug } = await import(
-      "@/lib/supabase/queries/vehicles"
-    );
-    const supabase = await createClient();
-    vehicle = await getVehicleBySlug(supabase, slug);
-  } else {
-    vehicle = getMockVehicleBySlug(slug);
-  }
+  const vehicle = await getVehicle(slug);
 
   if (!vehicle) notFound();
 
   const vehicleName = `${vehicle.year} ${vehicle.make} ${vehicle.model}`;
 
+  const vehicleJsonLd: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Car",
+    name: vehicleName,
+    brand: { "@type": "Brand", name: vehicle.make },
+    model: vehicle.model,
+    vehicleModelDate: String(vehicle.year),
+    mileageFromOdometer: {
+      "@type": "QuantitativeValue",
+      value: vehicle.mileage,
+      unitCode: "SMI",
+    },
+    vehicleIdentificationNumber: vehicle.vin,
+    offers: {
+      "@type": "Offer",
+      price: vehicle.price,
+      priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      seller: {
+        "@type": "AutoDealer",
+        name: "Triple J Auto Investment",
+      },
+    },
+  };
+  if (vehicle.exteriorColor) vehicleJsonLd.color = vehicle.exteriorColor;
+  if (vehicle.transmission) vehicleJsonLd.vehicleTransmission = vehicle.transmission;
+  if (vehicle.drivetrain) vehicleJsonLd.driveWheelConfiguration = vehicle.drivetrain;
+  if (vehicle.fuelType) vehicleJsonLd.fuelType = vehicle.fuelType;
+  if (vehicle.bodyStyle) vehicleJsonLd.bodyType = vehicle.bodyStyle;
+  if (vehicle.engine) vehicleJsonLd.vehicleEngine = { "@type": "EngineSpecification", name: vehicle.engine };
+
   return (
     <div className="min-h-screen pt-24 md:pt-28 pb-16 md:pb-24">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(vehicleJsonLd) }}
+      />
       <div className="mx-auto max-w-7xl px-4 md:px-8">
         <Link
           href="/inventory"

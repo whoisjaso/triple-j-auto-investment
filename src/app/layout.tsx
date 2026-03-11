@@ -1,4 +1,5 @@
-import type { Metadata, Viewport } from "next";
+import type { Viewport } from "next";
+import { getLocale } from "next-intl/server";
 import {
   Playfair_Display,
   Plus_Jakarta_Sans,
@@ -25,28 +26,21 @@ const cormorantGaramond = Cormorant_Garamond({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Triple J Auto Investment | Quality Pre-Owned Vehicles in Houston",
-    template: "%s | Triple J Auto Investment",
-  },
-  description:
-    "Houston's trusted dealership for quality pre-owned vehicles. Buy Here Pay Here financing available. Visit us at 8774 Almeda Genoa Rd, Houston, TX 77075 or call (832) 400-9760.",
-};
-
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: "#0A0A0A",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = await getLocale();
+
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body
         className={`${playfairDisplay.variable} ${plusJakartaSans.variable} ${cormorantGaramond.variable} antialiased`}
       >

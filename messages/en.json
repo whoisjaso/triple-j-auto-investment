@@ -10,7 +10,8 @@
     "homeLink": "Triple J Auto Investment — Home",
     "mobileNav": "Mobile navigation",
     "mainNav": "Main navigation",
-    "navMenu": "Navigation menu"
+    "navMenu": "Navigation menu",
+    "dealerPortal": "Dealer Portal"
   },
   "footer": {
     "brand": "Triple J Auto Investment",
@@ -178,5 +179,17 @@
   "languageToggle": {
     "en": "EN",
     "es": "ES"
+  },
+  "metadata": {
+    "siteTitle": "Triple J Auto Investment | Quality Pre-Owned Vehicles in Houston",
+    "siteDescription": "Houston's trusted dealership for quality pre-owned vehicles. Buy Here Pay Here financing available. Visit us at 8774 Almeda Genoa Rd, Houston, TX 77075 or call (832) 400-9760.",
+    "inventoryTitle": "Our Vehicle Collection",
+    "inventoryDescription": "Browse quality pre-owned vehicles from $3,000 to $8,000. Search, filter, and find your next car at Triple J Auto Investment in Houston.",
+    "financingTitle": "Flexible Financing — Buy Here Pay Here",
+    "financingDescription": "No credit check required. Flexible down payments starting at $500. In-house financing that works with you at Triple J Auto Investment.",
+    "contactTitle": "Contact Us",
+    "contactDescription": "Get in touch with Triple J Auto Investment. Visit us at 8774 Almeda Genoa Rd, Houston, TX 77075 or call (832) 400-9760.",
+    "vinDecoderTitle": "Free VIN Decoder",
+    "vinDecoderDescription": "Look up any vehicle's factory specifications instantly. Free VIN decoder powered by the official NHTSA database."
   }
 }
