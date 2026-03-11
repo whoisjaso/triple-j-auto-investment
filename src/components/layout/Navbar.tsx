@@ -362,7 +362,7 @@ export default function Navbar() {
           />
           <a
             href="/admin/login"
-            className="flex items-center gap-2.5 font-accent text-[11px] uppercase tracking-[0.3em] text-white/25 hover:text-tj-gold/50 transition-all duration-500 min-h-[44px]"
+            className="flex items-center gap-2.5 font-accent text-[11px] uppercase tracking-[0.2em] text-white/40 hover:text-tj-gold/70 transition-all duration-500 min-h-[44px]"
             style={{
               transitionDelay: menuOpen
                 ? `${280 + ALL_LINKS.length * 60}ms`
