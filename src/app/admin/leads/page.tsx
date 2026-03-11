@@ -5,7 +5,11 @@ import { updateLeadStatusAction } from "@/lib/actions/leads";
 const STATUS_COLORS: Record<LeadStatus, string> = {
   New: "bg-blue-400/10 text-blue-400 border-blue-400/15",
   Contacted: "bg-amber-400/10 text-amber-400 border-amber-400/15",
-  Closed: "bg-emerald-400/10 text-emerald-400 border-emerald-400/15",
+  Qualified: "bg-cyan-400/10 text-cyan-400 border-cyan-400/15",
+  Appointment: "bg-purple-400/10 text-purple-400 border-purple-400/15",
+  Negotiation: "bg-orange-400/10 text-orange-400 border-orange-400/15",
+  Sold: "bg-emerald-400/10 text-emerald-400 border-emerald-400/15",
+  Lost: "bg-red-400/10 text-red-400 border-red-400/15",
 };
 
 const SOURCE_LABELS: Record<LeadSource, string> = {
@@ -56,7 +60,11 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
     { label: "All", value: undefined },
     { label: "New", value: "New" },
     { label: "Contacted", value: "Contacted" },
-    { label: "Closed", value: "Closed" },
+    { label: "Qualified", value: "Qualified" },
+    { label: "Appointment", value: "Appointment" },
+    { label: "Negotiation", value: "Negotiation" },
+    { label: "Sold", value: "Sold" },
+    { label: "Lost", value: "Lost" },
   ];
 
   return (
@@ -73,8 +81,8 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
         </div>
       </div>
 
-      {/* Status filter tabs */}
-      <div className="flex gap-1 mb-6 overflow-x-auto pb-px -mx-4 px-4 md:mx-0 md:px-0">
+      {/* Status filter tabs — scrollable on mobile */}
+      <div className="flex gap-1 mb-6 overflow-x-auto pb-px -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none">
         {filters.map((f) => {
           const active =
             statusFilter === f.value ||
@@ -86,7 +94,7 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
             <Link
               key={f.label}
               href={href}
-              className={`px-4 py-2.5 text-xs font-accent uppercase tracking-[0.12em] transition-all duration-300 min-h-[44px] flex items-center rounded-lg whitespace-nowrap ${
+              className={`px-3 py-2 text-[10px] font-accent uppercase tracking-[0.12em] transition-all duration-300 min-h-[36px] flex items-center rounded-lg whitespace-nowrap ${
                 active
                   ? "text-tj-gold bg-tj-gold/[0.08] border border-tj-gold/10"
                   : "text-white/30 hover:text-white/60 hover:bg-white/[0.03] border border-transparent"
@@ -139,9 +147,12 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
                     className="group hover:bg-white/[0.02] transition-colors duration-200"
                   >
                     <td className="py-3.5 px-4">
-                      <span className="text-tj-cream/80 font-medium">
+                      <Link
+                        href={`/admin/leads/${lead.id}`}
+                        className="text-tj-cream/80 font-medium hover:text-tj-gold transition-colors"
+                      >
                         {lead.name}
-                      </span>
+                      </Link>
                       {lead.email && (
                         <span className="block text-[10px] text-white/20 mt-0.5">
                           {lead.email}
@@ -177,23 +188,25 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
           {/* Mobile cards */}
           <div className="md:hidden space-y-2">
             {leads.map((lead) => (
-              <div
+              <Link
                 key={lead.id}
-                className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-4"
+                href={`/admin/leads/${lead.id}`}
+                className="block rounded-xl border border-white/[0.04] bg-white/[0.015] p-4 hover:bg-white/[0.03] hover:border-white/[0.06] transition-all"
               >
                 <div className="flex items-start justify-between gap-3 mb-2">
                   <div className="min-w-0">
                     <p className="text-sm text-tj-cream/80 font-medium truncate">
                       {lead.name}
                     </p>
-                    <a
-                      href={`tel:+1${lead.phone}`}
-                      className="text-xs text-tj-gold/60 hover:text-tj-gold transition-colors"
-                    >
+                    <span className="text-xs text-tj-gold/60">
                       {formatPhone(lead.phone)}
-                    </a>
+                    </span>
                   </div>
-                  <StatusButton lead={lead} />
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium border ${STATUS_COLORS[lead.status]}`}
+                  >
+                    {lead.status}
+                  </span>
                 </div>
                 {lead.message && (
                   <p className="text-xs text-white/20 mb-2 line-clamp-2">
@@ -204,7 +217,7 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
                   <span>{SOURCE_LABELS[lead.source] ?? lead.source}</span>
                   <span>{formatDate(lead.createdAt)}</span>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </>

@@ -66,8 +66,12 @@ export async function submitLead(
 
 const NEXT_STATUS: Record<LeadStatus, LeadStatus> = {
   New: "Contacted",
-  Contacted: "Closed",
-  Closed: "New",
+  Contacted: "Qualified",
+  Qualified: "Appointment",
+  Appointment: "Negotiation",
+  Negotiation: "Sold",
+  Sold: "Lost",
+  Lost: "New",
 };
 
 export async function updateLeadStatusAction(

@@ -114,7 +114,14 @@ export type VehicleInsert = Omit<
 // Lead
 // ============================================================
 
-export type LeadStatus = "New" | "Contacted" | "Closed";
+export type LeadStatus =
+  | "New"
+  | "Contacted"
+  | "Qualified"
+  | "Appointment"
+  | "Negotiation"
+  | "Sold"
+  | "Lost";
 
 export type LeadSource =
   | "contact_form"
@@ -148,6 +155,74 @@ export interface LeadRow {
 }
 
 export type LeadInsert = Omit<LeadRow, "id" | "created_at">;
+
+// ============================================================
+// Lead Notes (CRM Communication Log)
+// ============================================================
+
+export type NoteType = "call" | "text" | "email" | "visit" | "note";
+
+export interface LeadNote {
+  id: string;
+  leadId: string;
+  content: string;
+  noteType: NoteType;
+  createdAt: string;
+}
+
+export interface LeadNoteRow {
+  id: string;
+  lead_id: string;
+  content: string;
+  note_type: NoteType;
+  created_at: string;
+}
+
+export function mapLeadNoteRow(row: LeadNoteRow): LeadNote {
+  return {
+    id: row.id,
+    leadId: row.lead_id,
+    content: row.content,
+    noteType: row.note_type,
+    createdAt: row.created_at,
+  };
+}
+
+// ============================================================
+// Lead Tasks (CRM Follow-up Reminders)
+// ============================================================
+
+export interface LeadTask {
+  id: string;
+  leadId: string;
+  title: string;
+  dueDate: string | null;
+  completed: boolean;
+  completedAt: string | null;
+  createdAt: string;
+}
+
+export interface LeadTaskRow {
+  id: string;
+  lead_id: string;
+  title: string;
+  due_date: string | null;
+  completed: boolean;
+  completed_at: string | null;
+  created_at: string;
+}
+
+export function mapLeadTaskRow(row: LeadTaskRow): LeadTask {
+  return {
+    id: row.id,
+    leadId: row.lead_id,
+    title: row.title,
+    dueDate: row.due_date,
+    completed: row.completed,
+    completedAt: row.completed_at,
+    createdAt: row.created_at,
+  };
+}
 
 // ============================================================
 // Query Filters

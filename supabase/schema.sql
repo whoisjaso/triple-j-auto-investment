@@ -65,7 +65,7 @@ create table if not exists leads (
   source text not null default 'contact_form'
     check (source in ('contact_form', 'financing_inquiry', 'vehicle_inquiry', 'schedule_visit')),
   status text not null default 'New'
-    check (status in ('New', 'Contacted', 'Closed')),
+    check (status in ('New', 'Contacted', 'Qualified', 'Appointment', 'Negotiation', 'Sold', 'Lost')),
   created_at timestamptz default now()
 );
 
@@ -153,3 +153,46 @@ create policy "Anon can insert vehicle events"
 
 create policy "Admin full access to vehicle events"
   on vehicle_events for all to authenticated using (true) with check (true);
+
+-- ============================================================
+-- LEAD NOTES (v0.2 CRM Communication Log)
+-- ============================================================
+
+create table if not exists lead_notes (
+  id uuid primary key default gen_random_uuid(),
+  lead_id uuid not null references leads(id) on delete cascade,
+  content text not null,
+  note_type text not null default 'note'
+    check (note_type in ('call', 'text', 'email', 'visit', 'note')),
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_lead_notes_lead_id on lead_notes(lead_id);
+create index if not exists idx_lead_notes_created_at on lead_notes(created_at desc);
+
+alter table lead_notes enable row level security;
+
+create policy "Admin can manage lead notes"
+  on lead_notes for all to anon using (true) with check (true);
+
+-- ============================================================
+-- LEAD TASKS (v0.2 CRM Follow-up Reminders)
+-- ============================================================
+
+create table if not exists lead_tasks (
+  id uuid primary key default gen_random_uuid(),
+  lead_id uuid not null references leads(id) on delete cascade,
+  title text not null,
+  due_date date,
+  completed boolean default false,
+  completed_at timestamptz,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_lead_tasks_lead_id on lead_tasks(lead_id);
+create index if not exists idx_lead_tasks_due_date on lead_tasks(due_date) where not completed;
+
+alter table lead_tasks enable row level security;
+
+create policy "Admin can manage lead tasks"
+  on lead_tasks for all to anon using (true) with check (true);

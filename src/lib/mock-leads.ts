@@ -57,7 +57,7 @@ const MOCK_LEADS: Lead[] = [
     message: "[Vehicle: 2017 Ford Explorer XLT] Can I schedule a test drive this Saturday?",
     vehicleId: "mock-4",
     source: "schedule_visit",
-    status: "Closed",
+    status: "Sold",
     createdAt: new Date(now - DAY * 5).toISOString(),
   },
   {
@@ -68,7 +68,7 @@ const MOCK_LEADS: Lead[] = [
     message: "I want to know about your financing options. My credit isn't great.",
     vehicleId: null,
     source: "financing_inquiry",
-    status: "Closed",
+    status: "Sold",
     createdAt: new Date(now - DAY * 6).toISOString(),
   },
   {

@@ -219,7 +219,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
   return (
     <section
       ref={containerRef}
-      className="relative h-[250vh]"
+      className="relative h-[130vh] md:h-[250vh]"
       style={{ backgroundColor: "#000" }}
     >
       <div
@@ -231,7 +231,13 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
         <img
           src="/key-frames/frame-0001.webp"
           alt=""
-          className="absolute inset-0 w-full h-full object-cover md:hidden"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[82vw] h-auto object-contain md:hidden"
+          style={{
+            WebkitMaskImage:
+              "radial-gradient(ellipse at center, black 70%, transparent 100%)",
+            maskImage:
+              "radial-gradient(ellipse at center, black 70%, transparent 100%)",
+          }}
         />
 
         {/* Canvas for desktop frame animation */}
