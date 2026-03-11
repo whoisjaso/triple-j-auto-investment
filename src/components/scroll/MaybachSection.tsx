@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 const TOTAL_FRAMES = 121;
 const BATCH_SIZE = 20;
@@ -9,11 +11,12 @@ interface Phase {
   start: number;
   end: number;
   side: "left" | "right" | "center";
-  label: string;
-  heading: string;
-  heading2?: string;
+  labelKey: string;
+  headingKey: string;
+  heading2Key?: string;
   body?: string;
-  cta?: { text: string; href: string };
+  ctaKey?: string;
+  ctaHref?: string;
 }
 
 const PHASES: Phase[] = [
@@ -21,25 +24,26 @@ const PHASES: Phase[] = [
     start: 0.05,
     end: 0.28,
     side: "right",
-    label: "THE STANDARD",
-    heading: "Uncompromising",
-    heading2: "Excellence",
+    labelKey: "maybachPhase1",
+    headingKey: "maybachHeading1",
+    heading2Key: "maybachSub1",
   },
   {
     start: 0.32,
     end: 0.55,
     side: "left",
-    label: "THE CRAFT",
-    heading: "Every Detail",
-    heading2: "Perfected",
+    labelKey: "maybachPhase2",
+    headingKey: "maybachHeading2",
+    heading2Key: "maybachSub2",
   },
   {
     start: 0.60,
     end: 0.92,
     side: "center",
-    label: "THE COLLECTION",
-    heading: "Your Journey Begins",
-    cta: { text: "Explore Inventory", href: "/inventory" },
+    labelKey: "maybachPhase3",
+    headingKey: "maybachHeading3",
+    ctaKey: "maybachCta",
+    ctaHref: "/inventory",
   },
 ];
 
@@ -51,6 +55,7 @@ interface MaybachSectionProps {
 }
 
 export default function MaybachSection({ onProgress }: MaybachSectionProps) {
+  const t = useTranslations("home");
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -249,33 +254,28 @@ export default function MaybachSection({ onProgress }: MaybachSectionProps) {
               style={{ visibility: "hidden", opacity: 0 }}
             >
               <span className="font-accent text-[10px] md:text-[9px] uppercase tracking-[0.4em] text-tj-gold mb-2 md:mb-4">
-                {phase.label}
+                {t(phase.labelKey)}
               </span>
               <h3 className="font-serif text-2xl md:text-4xl lg:text-5xl text-tj-cream leading-[1.1] font-light">
-                {phase.heading}
-                {phase.heading2 && (
+                {t(phase.headingKey)}
+                {phase.heading2Key && (
                   <>
                     <br />
-                    {phase.heading2}
+                    {t(phase.heading2Key)}
                   </>
                 )}
               </h3>
-              {phase.body && (
-                <p className="mt-3 text-white/50 text-xs md:text-sm leading-relaxed max-w-[260px]">
-                  {phase.body}
-                </p>
-              )}
-              {phase.cta && (
+              {phase.ctaKey && phase.ctaHref && (
                 <div className="mt-5 md:mt-8">
-                  <a
-                    href={phase.cta.href}
+                  <Link
+                    href={phase.ctaHref}
                     className="border-b border-tj-gold/30 hover:border-tj-gold pb-2 text-[11px] md:text-[10px] uppercase tracking-[0.3em] text-tj-cream transition-colors flex items-center gap-4 group min-h-[44px]"
                   >
-                    {phase.cta.text}{" "}
+                    {t(phase.ctaKey)}{" "}
                     <span className="group-hover:translate-x-2 transition-transform duration-500">
                       &rarr;
                     </span>
-                  </a>
+                  </Link>
                 </div>
               )}
             </div>

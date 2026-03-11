@@ -1,10 +1,11 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { getMockVehicleBySlug } from "@/lib/mock-vehicles";
 import VehicleGallery from "@/components/inventory/VehicleGallery";
 import VehicleSpecs from "@/components/inventory/VehicleSpecs";
 import PaymentCalculator from "@/components/inventory/PaymentCalculator";
 import VehicleInquiryButton from "@/components/inventory/VehicleInquiryButton";
+import { Link } from "@/i18n/navigation";
 
 const formatPrice = (price: number) =>
   new Intl.NumberFormat("en-US", {
@@ -18,6 +19,7 @@ export default async function VehicleDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
+  const t = await getTranslations("inventory");
   const { slug } = await params;
 
   let vehicle;
@@ -40,7 +42,6 @@ export default async function VehicleDetailPage({
   return (
     <div className="min-h-screen pt-24 md:pt-28 pb-16 md:pb-24">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        {/* Back link */}
         <Link
           href="/inventory"
           className="inline-flex items-center gap-1.5 font-accent text-[11px] uppercase tracking-[0.2em] text-white/40 hover:text-white/60 transition-colors mb-6 md:mb-8"
@@ -59,19 +60,15 @@ export default async function VehicleDetailPage({
             <path d="M19 12H5" />
             <path d="M12 19l-7-7 7-7" />
           </svg>
-          Back to Inventory
+          {t("backToInventory")}
         </Link>
 
-        {/* Two-column layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10">
-          {/* LEFT: Gallery */}
           <div className="lg:col-span-7">
             <VehicleGallery vehicle={vehicle} />
           </div>
 
-          {/* RIGHT: Details */}
           <div className="lg:col-span-5 space-y-6">
-            {/* Heading + Price */}
             <div>
               <h1 className="font-serif text-2xl md:text-3xl text-tj-cream font-light">
                 {vehicleName}
@@ -86,20 +83,14 @@ export default async function VehicleDetailPage({
               </div>
             </div>
 
-            {/* Description */}
             {vehicle.description && (
               <p className="text-sm text-white/50 leading-relaxed">
                 {vehicle.description}
               </p>
             )}
 
-            {/* Specs */}
             <VehicleSpecs vehicle={vehicle} />
-
-            {/* Payment Calculator */}
             <PaymentCalculator price={vehicle.price} />
-
-            {/* CTAs */}
             <VehicleInquiryButton vehicleName={vehicleName} />
           </div>
         </div>

@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 interface FilterBarProps {
   makes: string[];
@@ -17,6 +18,7 @@ interface FilterBarProps {
 }
 
 export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
+  const t = useTranslations("filters");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
@@ -74,7 +76,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
         aria-expanded={open}
       >
         <span className="font-accent text-[11px] uppercase tracking-[0.25em] text-tj-cream/60">
-          Filters{activeCount > 0 ? ` (${activeCount})` : ""}
+          {t("filters")}{activeCount > 0 ? ` (${activeCount})` : ""}
         </span>
         <svg
           width="14"
@@ -96,7 +98,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
         {/* Search */}
         <div className="flex-1 min-w-0 md:max-w-[240px]">
           <label className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-            Search
+            {t("search")}
           </label>
           <div className="relative">
             <svg
@@ -115,7 +117,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
               type="text"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
-              placeholder="Make or model..."
+              placeholder={t("searchPlaceholder")}
               className="w-full bg-transparent border-b border-white/10 focus:border-tj-gold/30 text-tj-cream text-sm pl-5 pb-1.5 outline-none placeholder:text-white/15 transition-colors min-h-[44px] md:min-h-0"
             />
           </div>
@@ -124,7 +126,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
         {/* Make */}
         <div className="md:w-[150px]">
           <label className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-            Make
+            {t("make")}
           </label>
           <select
             value={currentFilters.make}
@@ -132,7 +134,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
             className="w-full bg-transparent border-b border-white/10 focus:border-tj-gold/30 text-tj-cream text-sm pb-1.5 outline-none cursor-pointer transition-colors min-h-[44px] md:min-h-0 appearance-none"
           >
             <option value="" className="bg-black">
-              All Makes
+              {t("allMakes")}
             </option>
             {makes.map((m) => (
               <option key={m} value={m} className="bg-black">
@@ -146,7 +148,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
         <div className="flex gap-2 items-end">
           <div className="flex-1 md:w-[100px]">
             <label className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-              Min Price
+              {t("minPrice")}
             </label>
             <input
               type="number"
@@ -161,7 +163,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
           <span className="text-white/15 text-xs pb-2">–</span>
           <div className="flex-1 md:w-[100px]">
             <label className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-              Max Price
+              {t("maxPrice")}
             </label>
             <input
               type="number"
@@ -179,7 +181,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
         <div className="flex gap-2 items-end">
           <div className="flex-1 md:w-[80px]">
             <label className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-              Min Year
+              {t("minYear")}
             </label>
             <input
               type="number"
@@ -194,7 +196,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
           <span className="text-white/15 text-xs pb-2">–</span>
           <div className="flex-1 md:w-[80px]">
             <label className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-              Max Year
+              {t("maxYear")}
             </label>
             <input
               type="number"
@@ -214,7 +216,7 @@ export default function FilterBar({ makes, currentFilters }: FilterBarProps) {
             href="/inventory"
             className="font-accent text-[10px] uppercase tracking-[0.2em] text-tj-gold/50 hover:text-tj-gold transition-colors pb-1.5 whitespace-nowrap min-h-[44px] md:min-h-0 flex items-end"
           >
-            Clear All
+            {t("clearAll")}
           </Link>
         )}
       </div>

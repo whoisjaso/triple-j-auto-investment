@@ -1,7 +1,9 @@
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import type { Vehicle } from "@/types/database";
 
 export default function VehicleGallery({ vehicle }: { vehicle: Vehicle }) {
+  const t = useTranslations("inventory");
   const hasImages = vehicle.imageUrl || vehicle.gallery.length > 0;
 
   if (!hasImages) {
@@ -29,7 +31,7 @@ export default function VehicleGallery({ vehicle }: { vehicle: Vehicle }) {
             <path d="M9 17h6" />
           </svg>
           <span className="font-accent text-[10px] uppercase tracking-[0.3em] text-white/[0.1]">
-            Photos Coming Soon
+            {t("photosComingSoon")}
           </span>
         </div>
       </div>

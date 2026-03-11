@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 interface DecodedVehicle {
   make: string;
@@ -35,6 +36,8 @@ function SpecItem({ label, value }: { label: string; value: string }) {
 }
 
 export default function VinDecoder({ alwaysOpen = false }: { alwaysOpen?: boolean }) {
+  const t = useTranslations("vinDecoder");
+  const tVehicle = useTranslations("vehicle");
   const [vin, setVin] = useState("");
   const [result, setResult] = useState<DecodedVehicle | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,13 +59,13 @@ export default function VinDecoder({ alwaysOpen = false }: { alwaysOpen?: boolea
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Failed to decode VIN");
+        setError(data.error || t("failedDecode"));
         return;
       }
 
       setResult(data);
     } catch {
-      setError("Network error. Please try again.");
+      setError(t("networkError"));
     } finally {
       setLoading(false);
     }
@@ -98,7 +101,7 @@ export default function VinDecoder({ alwaysOpen = false }: { alwaysOpen?: boolea
               <path d="M6 10h2M10 10h4M16 10h2M6 14h12" />
             </svg>
             <span className="font-accent text-[11px] uppercase tracking-[0.25em] text-tj-cream/60">
-              VIN Decoder
+              {t("vinDecoderToggle")}
             </span>
           </div>
           <svg
@@ -122,7 +125,7 @@ export default function VinDecoder({ alwaysOpen = false }: { alwaysOpen?: boolea
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1">
               <label className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-                Vehicle Identification Number
+                {t("label")}
               </label>
               <input
                 type="text"
@@ -134,13 +137,13 @@ export default function VinDecoder({ alwaysOpen = false }: { alwaysOpen?: boolea
                   setVin(v.toUpperCase());
                 }}
                 onKeyDown={handleKeyDown}
-                placeholder="Enter 17-character VIN"
+                placeholder={t("placeholder")}
                 maxLength={17}
                 className="w-full bg-transparent border-b border-white/10 focus:border-tj-gold/30 text-tj-cream text-sm font-mono tracking-wider pb-1.5 outline-none placeholder:text-white/15 transition-colors min-h-[44px]"
               />
               {vin.length > 0 && vin.length < 17 && (
                 <p className="mt-1 font-accent text-[9px] text-white/20">
-                  {17 - vin.length} characters remaining
+                  {t("charsRemaining", { count: 17 - vin.length })}
                 </p>
               )}
             </div>
@@ -167,10 +170,10 @@ export default function VinDecoder({ alwaysOpen = false }: { alwaysOpen?: boolea
                       strokeDashoffset="10"
                     />
                   </svg>
-                  Decoding
+                  {t("decoding")}
                 </span>
               ) : (
-                "Decode"
+                t("decode")
               )}
             </button>
           </div>
@@ -194,14 +197,14 @@ export default function VinDecoder({ alwaysOpen = false }: { alwaysOpen?: boolea
                 </h3>
                 {result.manufacturer && (
                   <p className="mt-1 font-accent text-[10px] uppercase tracking-[0.2em] text-white/30">
-                    by {result.manufacturer}
+                    {t("by", { manufacturer: result.manufacturer })}
                   </p>
                 )}
                 {result.errorCode &&
                   result.errorCode !== "0" &&
                   !result.errorCode.startsWith("0") && (
                     <p className="mt-2 font-accent text-[9px] text-tj-gold/50">
-                      Note: Some data may be incomplete for this VIN
+                      {t("incompleteData")}
                     </p>
                   )}
               </div>
@@ -209,35 +212,35 @@ export default function VinDecoder({ alwaysOpen = false }: { alwaysOpen?: boolea
               {/* Specs grid */}
               <dl className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6">
                 {result.bodyStyle && (
-                  <SpecItem label="Body Style" value={result.bodyStyle} />
+                  <SpecItem label={tVehicle("bodyStyle")} value={result.bodyStyle} />
                 )}
                 {result.engine && (
-                  <SpecItem label="Engine" value={result.engine} />
+                  <SpecItem label={tVehicle("engine")} value={result.engine} />
                 )}
                 {result.engineHP && (
                   <SpecItem
-                    label="Horsepower"
+                    label={t("horsepower")}
                     value={`${result.engineHP} HP`}
                   />
                 )}
                 {result.transmission && (
                   <SpecItem
-                    label="Transmission"
+                    label={tVehicle("transmission")}
                     value={result.transmission}
                   />
                 )}
                 {result.drivetrain && (
-                  <SpecItem label="Drivetrain" value={result.drivetrain} />
+                  <SpecItem label={tVehicle("drivetrain")} value={result.drivetrain} />
                 )}
                 {result.fuelType && (
-                  <SpecItem label="Fuel Type" value={result.fuelType} />
+                  <SpecItem label={tVehicle("fuelType")} value={result.fuelType} />
                 )}
                 {result.doors && (
-                  <SpecItem label="Doors" value={result.doors.toString()} />
+                  <SpecItem label={t("doors")} value={result.doors.toString()} />
                 )}
-                {result.turbo && <SpecItem label="Turbo" value="Yes" />}
+                {result.turbo && <SpecItem label={t("turbo")} value={t("turboYes")} />}
                 {result.plantCountry && (
-                  <SpecItem label="Made In" value={result.plantCountry} />
+                  <SpecItem label={t("madeIn")} value={result.plantCountry} />
                 )}
               </dl>
             </div>

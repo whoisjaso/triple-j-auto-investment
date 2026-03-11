@@ -1,13 +1,19 @@
+"use client";
+
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 const NAV_LINKS = [
-  { label: "Inventory", href: "/inventory" },
-  { label: "Financing", href: "/financing" },
-  { label: "Contact", href: "/contact" },
+  { labelKey: "inventory" as const, href: "/inventory" as const },
+  { labelKey: "financing" as const, href: "/financing" as const },
+  { labelKey: "contact" as const, href: "/contact" as const },
 ];
 
 export default function Footer() {
+  const t = useTranslations("footer");
+  const tNav = useTranslations("nav");
+
   return (
     <footer className="bg-black border-t border-tj-gold/10">
       <div className="mx-auto max-w-7xl px-4 md:px-8 py-12 md:py-16">
@@ -22,17 +28,17 @@ export default function Footer() {
               className="w-8 h-8 object-contain"
             />
             <p className="mt-3 font-serif text-sm text-tj-cream/80">
-              Triple J Auto Investment
+              {t("brand")}
             </p>
             <p className="mt-1 text-[11px] text-white/30 tracking-wide">
-              Houston&rsquo;s Premier Dealership
+              {t("tagline")}
             </p>
           </div>
 
           {/* Navigation */}
           <div className="flex flex-col items-center md:items-start gap-3">
             <h4 className="font-accent text-[10px] uppercase tracking-[0.3em] text-tj-gold/60 mb-1">
-              Navigate
+              {t("navigate")}
             </h4>
             {NAV_LINKS.map((link) => (
               <Link
@@ -40,7 +46,7 @@ export default function Footer() {
                 href={link.href}
                 className="font-accent text-[11px] uppercase tracking-[0.2em] text-white/40 hover:text-tj-gold transition-colors"
               >
-                {link.label}
+                {tNav(link.labelKey)}
               </Link>
             ))}
           </div>
@@ -48,7 +54,7 @@ export default function Footer() {
           {/* Contact */}
           <div className="flex flex-col items-center md:items-start gap-2">
             <h4 className="font-accent text-[10px] uppercase tracking-[0.3em] text-tj-gold/60 mb-1">
-              Contact
+              {t("contactHeading")}
             </h4>
             <a
               href="tel:+18324009760"
@@ -57,11 +63,11 @@ export default function Footer() {
               (832) 400-9760
             </a>
             <address className="not-italic text-[11px] text-white/30 leading-relaxed">
-              8774 Almeda Genoa Rd
+              {t("address")}
               <br />
-              Houston, TX 77075
+              {t("addressCity")}
             </address>
-            <p className="text-[11px] text-white/20">Mon–Sat 9AM–7PM</p>
+            <p className="text-[11px] text-white/20">{t("hours")}</p>
           </div>
         </div>
       </div>
@@ -70,16 +76,16 @@ export default function Footer() {
       <div className="border-t border-white/5 py-6">
         <div className="mx-auto max-w-7xl px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-2">
           <p className="text-white/20 text-[10px] tracking-wide">
-            &copy; 2025 Triple J Auto Investment LLC. All rights reserved.
+            {t("allRights")}
           </p>
-          <Link
+          <a
             href="/admin/login"
             className="text-white/20 text-[10px] tracking-wide hover:text-tj-gold/40 transition-colors"
           >
-            Dealer Login
-          </Link>
+            {t("dealerLogin")}
+          </a>
           <p className="text-white/20 text-[10px] tracking-wide">
-            Dealer License P171632
+            {t("dealerLicense")}
           </p>
         </div>
       </div>

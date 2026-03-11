@@ -22,7 +22,7 @@ Phases: 6 of 8 complete
 | 4 | Inventory System | 2/2 | Complete | 2026-03-07 |
 | 5 | Lead Capture & Contact | 1/1 | Complete | 2026-03-07 |
 | 6 | Admin Core | 2/2 | Complete | 2026-03-10 |
-| 7 | Bilingual (i18n) | TBD | Not started | - |
+| 7 | Bilingual (i18n) | 2/2 | Planning | - |
 | 8 | SEO & Launch | TBD | Not started | - |
 
 ## Phase Details

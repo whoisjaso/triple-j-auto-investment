@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import type { VehicleFilters } from "@/types/database";
 import type { VehicleSortOption } from "@/lib/supabase/queries/vehicles";
 import { getMockVehicles, getMockMakes } from "@/lib/mock-vehicles";
@@ -6,6 +6,7 @@ import VehicleCard from "@/components/inventory/VehicleCard";
 import FilterBar from "@/components/inventory/FilterBar";
 import SortSelect from "@/components/inventory/SortSelect";
 import VinDecoder from "@/components/inventory/VinDecoder";
+import { Link } from "@/i18n/navigation";
 
 const VALID_SORTS: VehicleSortOption[] = [
   "newest",
@@ -34,6 +35,7 @@ export default async function InventoryPage({
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const t = await getTranslations("inventory");
   const params = await searchParams;
 
   const make = typeof params.make === "string" ? params.make : undefined;
@@ -64,7 +66,6 @@ export default async function InventoryPage({
     search,
   };
 
-  // Fetch vehicles — Supabase when connected, mock data otherwise
   let vehicles;
   let makes: string[];
 
@@ -75,7 +76,6 @@ export default async function InventoryPage({
     );
     const supabase = await createClient();
     vehicles = await getVehicles(supabase, filters, sort);
-    // Get all makes for filter dropdown (unfiltered query)
     const allVehicles = await getVehicles(supabase);
     makes = [...new Set(allVehicles.map((v) => v.make))].sort();
   } else {
@@ -89,21 +89,18 @@ export default async function InventoryPage({
   return (
     <div className="min-h-screen pt-24 md:pt-28 pb-16 md:pb-24">
       <div className="mx-auto max-w-7xl px-4 md:px-8">
-        {/* Page header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 md:mb-10">
           <div>
             <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-tj-cream font-light">
-              Our Collection
+              {t("title")}
             </h1>
             <p className="mt-2 font-accent text-[11px] uppercase tracking-[0.25em] text-white/30">
-              {vehicles.length} vehicle{vehicles.length !== 1 ? "s" : ""}{" "}
-              available
+              {t("vehicleCount", { count: vehicles.length })}
             </p>
           </div>
           <SortSelect currentSort={sort} />
         </div>
 
-        {/* Filter bar */}
         <FilterBar
           makes={makes}
           currentFilters={{
@@ -116,12 +113,10 @@ export default async function InventoryPage({
           }}
         />
 
-        {/* VIN Decoder */}
         <div className="mt-4">
           <VinDecoder />
         </div>
 
-        {/* Vehicle grid */}
         {vehicles.length > 0 ? (
           <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
             {vehicles.map((vehicle) => (
@@ -131,14 +126,14 @@ export default async function InventoryPage({
         ) : (
           <div className="mt-16 md:mt-24 flex flex-col items-center text-center">
             <p className="font-serif text-lg text-tj-cream/60">
-              No vehicles match your filters
+              {t("noVehicles")}
             </p>
             {hasFilters && (
               <Link
                 href="/inventory"
                 className="mt-4 font-accent text-[11px] uppercase tracking-[0.25em] text-tj-gold/70 hover:text-tj-gold transition-colors border-b border-tj-gold/20 hover:border-tj-gold/50 pb-1"
               >
-                Browse All Vehicles
+                {t("browseAll")}
               </Link>
             )}
           </div>

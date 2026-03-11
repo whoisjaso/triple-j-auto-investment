@@ -1,24 +1,26 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import type { VehicleSortOption } from "@/lib/supabase/queries/vehicles";
-
-const SORT_OPTIONS: { value: VehicleSortOption; label: string }[] = [
-  { value: "newest", label: "Recently Added" },
-  { value: "price_asc", label: "Price: Low to High" },
-  { value: "price_desc", label: "Price: High to Low" },
-  { value: "year_desc", label: "Year: Newest" },
-  { value: "year_asc", label: "Year: Oldest" },
-  { value: "mileage_asc", label: "Mileage: Lowest" },
-];
 
 export default function SortSelect({
   currentSort,
 }: {
   currentSort: VehicleSortOption;
 }) {
+  const t = useTranslations("filters");
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const SORT_OPTIONS: { value: VehicleSortOption; labelKey: string }[] = [
+    { value: "newest", labelKey: "recentlyAdded" },
+    { value: "price_asc", labelKey: "priceLowHigh" },
+    { value: "price_desc", labelKey: "priceHighLow" },
+    { value: "year_desc", labelKey: "yearNewest" },
+    { value: "year_asc", labelKey: "yearOldest" },
+    { value: "mileage_asc", labelKey: "mileageLowest" },
+  ];
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -37,7 +39,7 @@ export default function SortSelect({
         htmlFor="sort-select"
         className="font-accent text-[10px] uppercase tracking-[0.2em] text-white/30 hidden md:block"
       >
-        Sort by
+        {t("sortBy")}
       </label>
       <select
         id="sort-select"
@@ -52,7 +54,7 @@ export default function SortSelect({
       >
         {SORT_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value} className="bg-black">
-            {opt.label}
+            {t(opt.labelKey)}
           </option>
         ))}
       </select>

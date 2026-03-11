@@ -1,17 +1,19 @@
+import { getTranslations } from "next-intl/server";
 import VinDecoder from "@/components/inventory/VinDecoder";
 
-export default function VinDecoderPage() {
+export default async function VinDecoderPage() {
+  const t = await getTranslations("vinDecoder");
+
   return (
     <div className="min-h-screen pt-24 md:pt-28 pb-16 md:pb-24">
       <div className="mx-auto max-w-3xl px-4 md:px-8">
         {/* Page header */}
         <div className="mb-10 md:mb-14 text-center">
           <h1 className="font-serif text-3xl md:text-4xl lg:text-5xl text-tj-cream font-light">
-            VIN Decoder
+            {t("title")}
           </h1>
           <p className="mt-4 text-sm md:text-base text-white/35 max-w-lg mx-auto leading-relaxed">
-            Enter any 17-character Vehicle Identification Number to instantly
-            look up factory specifications from the NHTSA database.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -39,11 +41,10 @@ export default function VinDecoderPage() {
               </svg>
             </div>
             <p className="font-accent text-[10px] uppercase tracking-[0.25em] text-tj-gold/40 mb-1.5">
-              Free &amp; Instant
+              {t("freeInstant")}
             </p>
             <p className="text-xs text-white/25 leading-relaxed">
-              No registration required. Powered by the official NHTSA vehicle
-              database.
+              {t("freeInstantDesc")}
             </p>
           </div>
 
@@ -66,11 +67,10 @@ export default function VinDecoderPage() {
               </svg>
             </div>
             <p className="font-accent text-[10px] uppercase tracking-[0.25em] text-tj-gold/40 mb-1.5">
-              Factory Specs
+              {t("factorySpecs")}
             </p>
             <p className="text-xs text-white/25 leading-relaxed">
-              Decode engine, transmission, drivetrain, body style, and
-              manufacturing origin.
+              {t("factorySpecsDesc")}
             </p>
           </div>
 
@@ -91,11 +91,10 @@ export default function VinDecoderPage() {
               </svg>
             </div>
             <p className="font-accent text-[10px] uppercase tracking-[0.25em] text-tj-gold/40 mb-1.5">
-              Where to Find
+              {t("whereToFind")}
             </p>
             <p className="text-xs text-white/25 leading-relaxed">
-              Your VIN is on the driver-side dashboard, door jamb sticker, or
-              vehicle title.
+              {t("whereToFindDesc")}
             </p>
           </div>
         </div>

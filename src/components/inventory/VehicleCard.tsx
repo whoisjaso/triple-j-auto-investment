@@ -1,5 +1,6 @@
-import Link from "next/link";
 import Image from "next/image";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import type { Vehicle } from "@/types/database";
 
 const formatPrice = (price: number) =>
@@ -13,6 +14,8 @@ const formatMileage = (mileage: number) =>
   new Intl.NumberFormat("en-US").format(mileage);
 
 export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
+  const t = useTranslations("inventory");
+
   return (
     <Link
       href={`/inventory/${vehicle.slug}`}
@@ -45,7 +48,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
               <path d="M9 17h6" />
             </svg>
             <span className="font-accent text-[9px] uppercase tracking-[0.3em] text-white/[0.1]">
-              Photo Coming Soon
+              {t("photoComingSoon")}
             </span>
           </div>
         )}
@@ -69,7 +72,7 @@ export default function VehicleCard({ vehicle }: { vehicle: Vehicle }) {
 
         <div className="mt-3 flex items-center gap-3 text-white/30">
           <span className="font-accent text-[10px] uppercase tracking-[0.15em]">
-            {formatMileage(vehicle.mileage)} mi
+            {formatMileage(vehicle.mileage)} {t("mi")}
           </span>
           {vehicle.transmission && (
             <>

@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Playfair_Display, Plus_Jakarta_Sans, Cormorant_Garamond } from "next/font/google";
-import PublicShell from "@/components/layout/PublicShell";
+import {
+  Playfair_Display,
+  Plus_Jakarta_Sans,
+  Cormorant_Garamond,
+} from "next/font/google";
 import "./globals.css";
 
 const playfairDisplay = Playfair_Display({
@@ -47,9 +50,7 @@ export default function RootLayout({
       <body
         className={`${playfairDisplay.variable} ${plusJakartaSans.variable} ${cormorantGaramond.variable} antialiased`}
       >
-        <PublicShell>
-          {children}
-        </PublicShell>
+        {children}
       </body>
     </html>
   );

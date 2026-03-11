@@ -1,24 +1,26 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import LanguageToggle from "./LanguageToggle";
 
 const LEFT_LINKS = [
-  { label: "Inventory", href: "/inventory" },
-  { label: "Financing", href: "/financing" },
-  { label: "VIN Lookup", href: "/vin-decoder" },
+  { labelKey: "inventory" as const, href: "/inventory" as const },
+  { labelKey: "financing" as const, href: "/financing" as const },
+  { labelKey: "vinLookup" as const, href: "/vin-decoder" as const },
 ];
 
 const RIGHT_LINKS = [
-  { label: "Contact", href: "/contact" },
+  { labelKey: "contact" as const, href: "/contact" as const },
 ];
 
 function NavLink({
   href,
   children,
 }: {
-  href: string;
+  href: "/inventory" | "/financing" | "/vin-decoder" | "/contact";
   children: React.ReactNode;
 }) {
   return (
@@ -33,10 +35,12 @@ function NavLink({
 }
 
 export default function Navbar() {
+  const t = useTranslations("nav");
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   // Scroll detection — transparent at top, solid after 50px
   useEffect(() => {
@@ -76,10 +80,7 @@ export default function Navbar() {
     if (!menuEl) return;
 
     requestAnimationFrame(() => {
-      const closeBtn = menuEl.querySelector<HTMLElement>(
-        '[aria-label="Close menu"]'
-      );
-      closeBtn?.focus();
+      closeBtnRef.current?.focus();
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -116,6 +117,8 @@ export default function Navbar() {
     hamburgerRef.current?.focus();
   };
 
+  const ALL_LINKS = [...LEFT_LINKS, ...RIGHT_LINKS];
+
   return (
     <>
       <nav
@@ -124,14 +127,14 @@ export default function Navbar() {
             ? "bg-black/90 backdrop-blur-lg border-b border-white/[0.04]"
             : "bg-transparent"
         }`}
-        aria-label="Main navigation"
+        aria-label={t("mainNav")}
       >
         <div className="relative mx-auto max-w-7xl px-4 md:px-8 flex items-center h-16 md:h-[72px]">
           {/* LEFT: Desktop nav links */}
           <div className="hidden md:flex flex-1 items-center gap-10">
             {LEFT_LINKS.map((link) => (
               <NavLink key={link.href} href={link.href}>
-                {link.label}
+                {t(link.labelKey)}
               </NavLink>
             ))}
           </div>
@@ -143,7 +146,7 @@ export default function Navbar() {
               type="button"
               className="flex items-center justify-center min-h-[44px] min-w-[44px] -ml-2 text-tj-cream/60 hover:text-tj-cream transition-colors"
               onClick={() => setMenuOpen(true)}
-              aria-label="Open menu"
+              aria-label={t("openMenu")}
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
             >
@@ -167,7 +170,7 @@ export default function Navbar() {
           <Link
             href="/"
             className="absolute left-1/2 -translate-x-1/2 flex-shrink-0"
-            aria-label="Triple J Auto Investment — Home"
+            aria-label={t("homeLink")}
           >
             <Image
               src="/GoldTripleJLogo.png"
@@ -179,13 +182,14 @@ export default function Navbar() {
             />
           </Link>
 
-          {/* RIGHT: Desktop nav links + phone */}
+          {/* RIGHT: Desktop nav links + language toggle + phone */}
           <div className="hidden md:flex flex-1 items-center justify-end gap-10">
             {RIGHT_LINKS.map((link) => (
               <NavLink key={link.href} href={link.href}>
-                {link.label}
+                {t(link.labelKey)}
               </NavLink>
             ))}
+            <LanguageToggle />
             <span className="w-px h-3 bg-white/10" />
             <a
               href="tel:+18324009760"
@@ -200,7 +204,7 @@ export default function Navbar() {
             <a
               href="tel:+18324009760"
               className="flex items-center justify-center min-h-[44px] min-w-[44px] -mr-2 text-tj-gold/70 hover:text-tj-gold transition-colors"
-              aria-label="Call (832) 400-9760"
+              aria-label={t("callPhone")}
             >
               <svg
                 width="20"
@@ -230,15 +234,16 @@ export default function Navbar() {
         }`}
         role="dialog"
         aria-modal={menuOpen || undefined}
-        aria-label="Navigation menu"
+        aria-label={t("navMenu")}
         aria-hidden={!menuOpen}
       >
         {/* Close button */}
         <button
+          ref={closeBtnRef}
           type="button"
           className="absolute top-4 right-4 min-h-[44px] min-w-[44px] flex items-center justify-center text-tj-cream/50 hover:text-tj-cream transition-colors"
           onClick={closeMenu}
-          aria-label="Close menu"
+          aria-label={t("closeMenu")}
         >
           <svg
             width="22"
@@ -268,9 +273,9 @@ export default function Navbar() {
         {/* Menu nav links */}
         <nav
           className="flex flex-col items-center gap-7"
-          aria-label="Mobile navigation"
+          aria-label={t("mobileNav")}
         >
-          {[...LEFT_LINKS, ...RIGHT_LINKS].map((link, idx) => (
+          {ALL_LINKS.map((link, idx) => (
             <Link
               key={link.href}
               href={link.href}
@@ -282,23 +287,41 @@ export default function Navbar() {
               }}
               onClick={() => setMenuOpen(false)}
             >
-              {link.label}
+              {t(link.labelKey)}
             </Link>
           ))}
 
           <span
             className="w-8 h-px bg-tj-gold/20 my-2 transition-all duration-500"
             style={{
-              transitionDelay: menuOpen ? `${100 + ([...LEFT_LINKS, ...RIGHT_LINKS].length) * 60}ms` : "0ms",
+              transitionDelay: menuOpen
+                ? `${100 + ALL_LINKS.length * 60}ms`
+                : "0ms",
               opacity: menuOpen ? 1 : 0,
             }}
           />
+
+          {/* Language toggle in mobile menu */}
+          <div
+            className="transition-all duration-500"
+            style={{
+              transitionDelay: menuOpen
+                ? `${130 + ALL_LINKS.length * 60}ms`
+                : "0ms",
+              opacity: menuOpen ? 1 : 0,
+              transform: menuOpen ? "translateY(0)" : "translateY(12px)",
+            }}
+          >
+            <LanguageToggle />
+          </div>
 
           <a
             href="tel:+18324009760"
             className="font-serif text-lg text-tj-gold/80 hover:text-tj-gold transition-all duration-500 min-h-[44px] flex items-center tracking-wide"
             style={{
-              transitionDelay: menuOpen ? `${160 + ([...LEFT_LINKS, ...RIGHT_LINKS].length) * 60}ms` : "0ms",
+              transitionDelay: menuOpen
+                ? `${190 + ALL_LINKS.length * 60}ms`
+                : "0ms",
               opacity: menuOpen ? 1 : 0,
               transform: menuOpen ? "translateY(0)" : "translateY(12px)",
             }}

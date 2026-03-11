@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 import { submitLead, type LeadFormState } from "@/lib/actions/leads";
 import type { LeadSource } from "@/types/database";
 
@@ -19,6 +20,7 @@ export default function ContactForm({
   showVehicleField,
   showDownPayment,
 }: ContactFormProps) {
+  const t = useTranslations("form");
   const [state, formAction, isPending] = useActionState(
     submitLead,
     initialState
@@ -43,10 +45,10 @@ export default function ContactForm({
           <polyline points="22 4 12 14.01 9 11.01" />
         </svg>
         <h3 className="font-serif text-xl text-tj-cream mb-2">
-          Thank you!
+          {t("thankYou")}
         </h3>
         <p className="text-sm text-white/50 mb-6">
-          We&rsquo;ll be in touch soon. Expect a call within 24 hours.
+          {t("successMessage")}
         </p>
         <a
           href="tel:+18324009760"
@@ -65,7 +67,7 @@ export default function ContactForm({
           >
             <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
           </svg>
-          Or call now — (832) 400-9760
+          {t("orCallNow")}
         </a>
       </div>
     );
@@ -90,7 +92,7 @@ export default function ContactForm({
           htmlFor="lead-name"
           className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5"
         >
-          Name <span className="text-tj-gold/50">*</span>
+          {t("name")} <span className="text-tj-gold/50">{t("required")}</span>
         </label>
         <input
           id="lead-name"
@@ -109,7 +111,7 @@ export default function ContactForm({
           htmlFor="lead-phone"
           className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5"
         >
-          Phone <span className="text-tj-gold/50">*</span>
+          {t("phone")} <span className="text-tj-gold/50">{t("required")}</span>
         </label>
         <input
           id="lead-phone"
@@ -127,7 +129,7 @@ export default function ContactForm({
           htmlFor="lead-email"
           className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5"
         >
-          Email
+          {t("email")}
         </label>
         <input
           id="lead-email"
@@ -145,7 +147,7 @@ export default function ContactForm({
             htmlFor="lead-vehicle"
             className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5"
           >
-            Vehicle of Interest
+            {t("vehicleOfInterest")}
           </label>
           <input
             id="lead-vehicle"
@@ -164,13 +166,13 @@ export default function ContactForm({
             htmlFor="lead-downpayment"
             className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5"
           >
-            Down Payment Budget
+            {t("downPaymentBudget")}
           </label>
           <input
             id="lead-downpayment"
             name="downPayment"
             type="text"
-            placeholder="e.g., $500"
+            placeholder={t("downPaymentPlaceholder")}
             className="w-full bg-transparent border-b border-white/10 focus:border-tj-gold/30 text-tj-cream text-sm pb-2 outline-none transition-colors min-h-[44px] placeholder:text-white/10"
           />
         </div>
@@ -182,7 +184,7 @@ export default function ContactForm({
           htmlFor="lead-message"
           className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5"
         >
-          Message
+          {t("message")}
         </label>
         <textarea
           id="lead-message"
@@ -213,10 +215,10 @@ export default function ContactForm({
               <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
               <path d="M12 2a10 10 0 0 1 10 10" strokeOpacity="0.75" />
             </svg>
-            Sending...
+            {t("sending")}
           </>
         ) : (
-          "Send Message"
+          t("sendMessage")
         )}
       </button>
     </form>

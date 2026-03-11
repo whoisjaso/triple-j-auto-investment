@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
+import { routing } from "./i18n/routing";
 
 const ADMIN_SECRET = process.env.ADMIN_SECRET || "dev-secret-triple-j";
 const SESSION_MAX_AGE = 86400 * 1000; // 24 hours in ms
+
+const intlMiddleware = createIntlMiddleware(routing);
 
 async function verifyToken(token: string): Promise<boolean> {
   const dotIndex = token.indexOf(".");
@@ -34,19 +38,27 @@ async function verifyToken(token: string): Promise<boolean> {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Don't protect the login page
-  if (pathname === "/admin/login") {
+  // Admin routes: apply auth only, skip i18n
+  if (pathname.startsWith("/admin")) {
+    if (pathname === "/admin/login") {
+      return NextResponse.next();
+    }
+
+    const token = request.cookies.get("admin-session")?.value;
+    if (!token || !(await verifyToken(token))) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+
     return NextResponse.next();
   }
 
-  const token = request.cookies.get("admin-session")?.value;
-  if (!token || !(await verifyToken(token))) {
-    return NextResponse.redirect(new URL("/admin/login", request.url));
-  }
-
-  return NextResponse.next();
+  // All other matched routes: apply i18n locale routing
+  return intlMiddleware(request);
 }
 
 export const config = {
-  matcher: "/admin/:path*",
+  // Match all pathnames except:
+  // - /api, /_next, /_vercel
+  // - files with dots (e.g. favicon.ico, images)
+  matcher: "/((?!api|_next|_vercel|.*\\..*).*)",
 };

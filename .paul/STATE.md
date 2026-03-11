@@ -5,32 +5,33 @@
 See: .paul/PROJECT.md (updated 2026-03-10)
 
 **Core value:** Every digital touchpoint engineers the neurological conditions under which buying becomes the only comfortable option -- a FATE-triggered, PCP-sequenced behavioral funnel from stranger to buyer to evangelist.
-**Current focus:** Phase 7 -- Bilingual (i18n)
+**Current focus:** Phase 8 -- SEO & Launch
 
 ## Current Position
 
 Milestone: v0.1 Initial Release
-Phase: 7 of 8 (Bilingual / i18n) -- Not started
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-03-10 -- Phase 6 complete, transitioned to Phase 7
+Phase: 7 of 8 (Bilingual / i18n) -- COMPLETE
+Plan: 07-02 UNIFIED
+Status: Phase 7 complete. Ready for Phase 8 (SEO & Launch).
+Last activity: 2026-03-11 -- Plan 07-02 UNIFY complete, Phase 7 closed
 
 Progress:
-- Milestone: [########░░] 75%
+- Milestone: [#########░] 87%
 - Phase 1: [##########] 100% (complete)
 - Phase 2: [##########] 100% (complete)
 - Phase 3: [##########] 100% (complete)
 - Phase 4: [##########] 100% (complete)
 - Phase 5: [##########] 100% (complete)
 - Phase 6: [##########] 100% (complete)
-- Phase 7: [░░░░░░░░░░] 0%
+- Phase 7: [##########] 100% (complete)
+- Phase 8: [░░░░░░░░░░] 0%
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [06-02 loop closed, Phase 6 complete]
+  ✓        ✓        ✓     [07-02 loop closed]
 ```
 
 ## Accumulated Context
@@ -56,7 +57,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Mobile: frame skipping (every 2nd), canvas buffer scaling (50%), IntersectionObserver rAF pausing
 - Crest section: no text overlay on animation — crest IS the brand identity
 - CSS custom properties for responsive canvas sizing (mobile-first breakpoints)
-- Footer as server component with subtle "Dealer Login" link in compliance bar
+- Footer as client component (imported by "use client" PublicShell — can't use server-only getTranslations)
 - Card hover uses translate-y (not scale) to avoid grid layout shifts
 - NHTSA VIN decoder proxied through /api/vin-decode route (avoids CORS, adds normalization)
 - VinDecoder component supports alwaysOpen prop for embedded vs standalone usage
@@ -70,6 +71,9 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Admin layout: separate from public (PublicShell conditionally hides Navbar/Footer/Lenis)
 - VIN auto-decode in admin vehicle form (reuses /api/vin-decode endpoint)
 - Lead status cycling via form button (server component, no client JS on leads page)
+- i18n: next-intl with prefix-based routing (/en/..., /es/...), localePrefix 'always'
+- i18n split into 2 plans: infrastructure (07-01) then component integration (07-02)
+- Scroll component CTAs use locale-aware Link from i18n/navigation
 
 ### Deferred Issues
 - No Supabase project connected yet -- user needs to create project and run schema.sql
@@ -81,16 +85,19 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Photo upload to Supabase Storage (future)
 - Next.js 16 "middleware" → "proxy" deprecation (monitor)
 - Mock lead status changes not persisted (page refresh resets in mock mode)
+- Vercel Root Directory needs manual fix in dashboard (currently points to nested Vite codebase)
+- html lang attribute static "en" — needs dynamic lang in Phase 8
 
 ### Blockers/Concerns
 - No Supabase project connected yet -- user needs to create project and run schema.sql
+- Vercel deployment blocked: Root Directory setting points to old Vite codebase — must be cleared in Vercel dashboard
 
 ## Session Continuity
 
-Last session: 2026-03-10
-Stopped at: Phase 6 complete, ready to plan Phase 7
-Next action: /paul:plan for Phase 7 (Bilingual / i18n)
-Resume file: .paul/ROADMAP.md
+Last session: 2026-03-11
+Stopped at: Phase 7 complete (both plans unified)
+Next action: Begin Phase 8 (SEO & Launch) — run /paul:plan for Phase 8
+Resume file: N/A (phase boundary)
 
 ---
 *STATE.md -- Updated after every significant action*

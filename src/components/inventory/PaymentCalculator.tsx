@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 const TERM_OPTIONS = [12, 18, 24, 30, 36];
 
@@ -12,6 +13,7 @@ const formatCurrency = (amount: number) =>
   }).format(amount);
 
 export default function PaymentCalculator({ price }: { price: number }) {
+  const t = useTranslations("payment");
   const [downPayment, setDownPayment] = useState(500);
   const [termMonths, setTermMonths] = useState(24);
 
@@ -21,7 +23,7 @@ export default function PaymentCalculator({ price }: { price: number }) {
   return (
     <div className="border border-white/[0.06] rounded-sm bg-white/[0.02] p-4 md:p-5">
       <h2 className="font-accent text-[10px] uppercase tracking-[0.25em] text-white/30 mb-4">
-        Estimated Payment
+        {t("title")}
       </h2>
 
       {/* Monthly payment display */}
@@ -29,7 +31,7 @@ export default function PaymentCalculator({ price }: { price: number }) {
         <span className="font-serif text-3xl text-tj-gold">
           {formatCurrency(monthly)}
         </span>
-        <span className="text-sm text-white/30 ml-1">/month</span>
+        <span className="text-sm text-white/30 ml-1">{t("perMonth")}</span>
       </div>
 
       {/* Controls */}
@@ -37,7 +39,7 @@ export default function PaymentCalculator({ price }: { price: number }) {
         {/* Down payment */}
         <div>
           <label htmlFor="calc-down-payment" className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-            Down Payment
+            {t("downPayment")}
           </label>
           <div className="relative">
             <span className="absolute left-0 top-1/2 -translate-y-1/2 text-white/20 text-sm" aria-hidden="true">
@@ -62,7 +64,7 @@ export default function PaymentCalculator({ price }: { price: number }) {
         {/* Term */}
         <div>
           <label htmlFor="calc-term" className="block font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1.5">
-            Term (Months)
+            {t("termMonths")}
           </label>
           <select
             id="calc-term"
@@ -70,9 +72,9 @@ export default function PaymentCalculator({ price }: { price: number }) {
             onChange={(e) => setTermMonths(Number(e.target.value))}
             className="w-full bg-transparent border-b border-white/10 focus:border-tj-gold/30 text-tj-cream text-sm pb-1.5 outline-none cursor-pointer transition-colors min-h-[44px] appearance-none"
           >
-            {TERM_OPTIONS.map((t) => (
-              <option key={t} value={t} className="bg-black">
-                {t} months
+            {TERM_OPTIONS.map((m) => (
+              <option key={m} value={m} className="bg-black">
+                {t("months", { count: m })}
               </option>
             ))}
           </select>
@@ -81,8 +83,7 @@ export default function PaymentCalculator({ price }: { price: number }) {
 
       {/* Disclaimer */}
       <p className="mt-4 font-accent text-[9px] leading-relaxed text-white/20">
-        Estimate only. Final terms determined at dealership. Subject to credit
-        approval.
+        {t("disclaimer")}
       </p>
     </div>
   );

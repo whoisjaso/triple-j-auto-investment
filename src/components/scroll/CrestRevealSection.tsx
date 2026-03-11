@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 
 const TOTAL_FRAMES = 121;
 const BATCH_SIZE = 20;
@@ -25,6 +26,8 @@ interface CrestRevealSectionProps {
 export default function CrestRevealSection({
   onProgress,
 }: CrestRevealSectionProps) {
+  const t = useTranslations("home");
+  const tFooter = useTranslations("footer");
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const overlayRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -212,7 +215,7 @@ export default function CrestRevealSection({
           style={{ visibility: "hidden", opacity: 0 }}
         >
           <h3 className="font-serif text-lg md:text-2xl lg:text-3xl text-tj-cream/80 leading-[1.2] font-light tracking-wide">
-            Houston&rsquo;s Premier Dealership
+            {t("crestTagline")}
           </h3>
         </div>
 
@@ -229,10 +232,10 @@ export default function CrestRevealSection({
             (832) 400-9760
           </a>
           <address className="not-italic mt-2 text-white/30 text-[11px] tracking-wide">
-            8774 Almeda Genoa Rd, Houston, TX 77075
+            {tFooter("address")}, {tFooter("addressCity")}
           </address>
           <p className="mt-1 text-white/20 text-[10px] tracking-widest uppercase">
-            Dealer License P171632
+            {tFooter("dealerLicense")}
           </p>
         </div>
       </div>

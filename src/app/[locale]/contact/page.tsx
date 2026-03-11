@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import ContactForm from "@/components/leads/ContactForm";
 
 export default async function ContactPage({
@@ -5,6 +6,7 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<{ vehicle?: string }>;
 }) {
+  const t = await getTranslations("contact");
   const { vehicle } = await searchParams;
   const hasVehicle = !!vehicle;
   const source = hasVehicle ? "vehicle_inquiry" : "contact_form";
@@ -16,12 +18,12 @@ export default async function ContactPage({
           {/* LEFT: Form */}
           <div className="lg:col-span-7">
             <h1 className="font-serif text-2xl md:text-3xl text-tj-cream font-light mb-2">
-              Get In Touch
+              {t("title")}
             </h1>
             <p className="text-sm text-white/40 leading-relaxed mb-8">
               {hasVehicle
-                ? `Interested in the ${vehicle}? Fill out the form below and we'll get back to you within 24 hours.`
-                : "Have a question or ready to visit? We're here to help. Fill out the form below or give us a call."}
+                ? t("subtitleWithVehicle", { vehicle })
+                : t("subtitle")}
             </p>
 
             <ContactForm
@@ -36,7 +38,7 @@ export default async function ContactPage({
             {/* Contact details card */}
             <div className="border border-white/[0.06] rounded-sm bg-white/[0.02] p-6 space-y-5">
               <h2 className="font-accent text-[10px] uppercase tracking-[0.25em] text-white/30 mb-4">
-                Contact Information
+                {t("contactInfo")}
               </h2>
 
               {/* Phone */}
@@ -57,7 +59,7 @@ export default async function ContactPage({
                 </svg>
                 <div>
                   <p className="font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1">
-                    Phone
+                    {t("phone")}
                   </p>
                   <a
                     href="tel:+18324009760"
@@ -87,7 +89,7 @@ export default async function ContactPage({
                 </svg>
                 <div>
                   <p className="font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1">
-                    Address
+                    {t("address")}
                   </p>
                   <address className="not-italic text-sm text-tj-cream/70 leading-relaxed">
                     8774 Almeda Genoa Rd
@@ -116,10 +118,10 @@ export default async function ContactPage({
                 </svg>
                 <div>
                   <p className="font-accent text-[9px] uppercase tracking-[0.2em] text-white/25 mb-1">
-                    Hours
+                    {t("hours")}
                   </p>
-                  <p className="text-sm text-tj-cream/70">Mon–Sat 9AM–7PM</p>
-                  <p className="text-sm text-white/30">Sun Closed</p>
+                  <p className="text-sm text-tj-cream/70">{t("hoursWeekday")}</p>
+                  <p className="text-sm text-white/30">{t("hoursSunday")}</p>
                 </div>
               </div>
             </div>
@@ -127,7 +129,7 @@ export default async function ContactPage({
             {/* Direct call CTA */}
             <div className="border border-white/[0.06] rounded-sm bg-white/[0.02] p-6 text-center">
               <p className="font-accent text-[10px] uppercase tracking-[0.25em] text-white/30 mb-3">
-                Prefer to call?
+                {t("preferToCall")}
               </p>
               <a
                 href="tel:+18324009760"
@@ -146,7 +148,7 @@ export default async function ContactPage({
                 >
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
-                Call Now — (832) 400-9760
+                {t("callNowCta")}
               </a>
             </div>
           </div>
