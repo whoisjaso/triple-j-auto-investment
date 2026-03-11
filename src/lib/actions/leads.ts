@@ -1,6 +1,7 @@
 "use server";
 
-import type { LeadSource } from "@/types/database";
+import { revalidatePath } from "next/cache";
+import type { LeadSource, LeadStatus } from "@/types/database";
 
 export type LeadFormState = {
   success: boolean;
@@ -57,4 +58,40 @@ export async function submitLead(
       error: "Something went wrong. Please call us directly at (832) 400-9760.",
     };
   }
+}
+
+// ============================================================
+// Admin: update lead status
+// ============================================================
+
+const NEXT_STATUS: Record<LeadStatus, LeadStatus> = {
+  New: "Contacted",
+  Contacted: "Closed",
+  Closed: "New",
+};
+
+export async function updateLeadStatusAction(
+  formData: FormData
+): Promise<void> {
+  const id = formData.get("id") as string;
+  const current = formData.get("status") as LeadStatus;
+  const next = NEXT_STATUS[current] ?? "New";
+
+  try {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      const { createClient } = await import("@/lib/supabase/server");
+      const { updateLeadStatus } = await import(
+        "@/lib/supabase/queries/leads"
+      );
+      const supabase = await createClient();
+      await updateLeadStatus(supabase, id, next);
+    } else {
+      console.log(`[Mock] Lead ${id} status: ${current} → ${next}`);
+    }
+  } catch (err) {
+    console.error("Lead status update error:", err);
+  }
+
+  revalidatePath("/admin/leads");
+  revalidatePath("/admin");
 }

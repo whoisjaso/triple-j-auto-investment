@@ -72,6 +72,12 @@ export default function Footer() {
           <p className="text-white/20 text-[10px] tracking-wide">
             &copy; 2025 Triple J Auto Investment LLC. All rights reserved.
           </p>
+          <Link
+            href="/admin/login"
+            className="text-white/20 text-[10px] tracking-wide hover:text-tj-gold/40 transition-colors"
+          >
+            Dealer Login
+          </Link>
           <p className="text-white/20 text-[10px] tracking-wide">
             Dealer License P171632
           </p>

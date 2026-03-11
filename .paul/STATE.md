@@ -5,30 +5,31 @@
 See: .paul/PROJECT.md (updated 2026-03-07)
 
 **Core value:** Every digital touchpoint engineers the neurological conditions under which buying becomes the only comfortable option -- a FATE-triggered, PCP-sequenced behavioral funnel from stranger to buyer to evangelist.
-**Current focus:** Phase 5 -- Lead Capture & Contact
+**Current focus:** Phase 6 -- Admin Core (Plan 06-02 next: Lead Management)
 
 ## Current Position
 
 Milestone: v0.1 Initial Release
-Phase: 5 of 8 (Lead Capture & Contact) -- Planning
-Plan: 05-01 created (Contact + Financing pages)
-Status: PLAN created, ready for APPLY
-Last activity: 2026-03-07 -- Created Plan 05-01
+Phase: 6 of 8 (Admin Core) -- In progress
+Plan: 06-02 APPLY complete (Lead Management + Dashboard Stats + Admin Access)
+Status: APPLY complete, ready for UNIFY
+Last activity: 2026-03-10 -- Plan 06-02 APPLY complete
 
 Progress:
-- Milestone: [######░░░░] 60%
+- Milestone: [########░░] 75%
 - Phase 1: [##########] 100% (complete)
 - Phase 2: [##########] 100% (complete)
 - Phase 3: [##########] 100% (complete)
 - Phase 4: [##########] 100% (complete)
-- Phase 5: [░░░░░░░░░░] 0% (planning)
+- Phase 5: [##########] 100% (complete)
+- Phase 6: [#####░░░░░] 50% (plan 06-01 complete, 06-02 planned)
 
 ## Loop Position
 
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ○        ○     [Plan created, awaiting approval]
+  ✓        ✓        ○     [Plan 06-02 applied, ready for UNIFY]
 ```
 
 ## Accumulated Context
@@ -62,22 +63,33 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - BHPH payment calculator: simple division (no interest — built into vehicle price)
 - Server components by default, client components only for interactivity (PaymentCalculator only)
 - Accessibility: aria-hidden on decorative SVGs, htmlFor/id on form labels, 44px+ tap targets
+- useActionState (React 19) for form handling, not deprecated useFormStatus
+- Scroll animation performance: direct DOM manipulation via refs, cached canvas ctx, translate3d GPU compositing
+- Lenis tuned: 1.2s duration, cubic easing, 1.0 wheelMultiplier
+- Mobile menu: staggered entrance animation with computed CSS transition delays
+- Admin auth: simple password-based with HMAC-signed cookies (no Supabase Auth for v0.1)
+- Admin layout: separate from public (PublicShell conditionally hides Navbar/Footer/Lenis)
+- VIN auto-decode in admin vehicle form (reuses /api/vin-decode endpoint)
 
 ### Deferred Issues
 - No Supabase project connected yet -- user needs to create project and run schema.sql
 - 363 WebP frames (~40MB) in public/ — consider CDN for production
 - No real vehicle images yet (placeholders)
 - No pagination on inventory (6 vehicles, not needed until inventory grows)
+- Email notifications on lead submission (future enhancement)
+- CAPTCHA / rate limiting on forms (future enhancement)
+- Photo upload to Supabase Storage (future)
+- Next.js 16 "middleware" → "proxy" deprecation (monitor)
 
 ### Blockers/Concerns
 - No Supabase project connected yet -- user needs to create project and run schema.sql
 
 ## Session Continuity
 
-Last session: 2026-03-07
-Stopped at: Plan 05-01 created
-Next action: Review and approve plan, then run /paul:apply
-Resume file: .paul/phases/05-leads/05-01-PLAN.md
+Last session: 2026-03-10
+Stopped at: Plan 06-02 APPLY complete
+Next action: Run /paul:unify .paul/phases/06-admin/06-02-PLAN.md
+Resume file: .paul/phases/06-admin/06-02-PLAN.md
 
 ---
 *STATE.md -- Updated after every significant action*
