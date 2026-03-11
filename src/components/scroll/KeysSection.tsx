@@ -108,11 +108,17 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
     const canvasScale = isMobile ? 0.5 : 1;
     const opacities = new Array(PHASES.length).fill(0);
 
-    loadFrames().then((result) => {
-      bitmaps = result.bitmaps;
-      effectiveFrames = result.frameCount;
+    // Mobile: skip frame loading to prevent GPU memory crash (~1.5GB VRAM)
+    if (isMobile) {
+      onProgressRef.current?.(1, 1);
       setLoaded(true);
-    });
+    } else {
+      loadFrames().then((result) => {
+        bitmaps = result.bitmaps;
+        effectiveFrames = result.frameCount;
+        setLoaded(true);
+      });
+    }
 
     const tick = () => {
       if (!isVisible) {
@@ -120,7 +126,6 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
         return;
       }
 
-      // Read scroll position inside rAF — single read/write cycle
       let rawProgress = 0;
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
@@ -130,36 +135,38 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
         }
       }
 
-      // Direct frame mapping — no lerp, Lenis already smooths scroll
-      const displayFrame = Math.min(
-        Math.round(rawProgress * (effectiveFrames - 1)),
-        effectiveFrames - 1
-      );
+      // Canvas frame animation — desktop only
+      if (!isMobile) {
+        const displayFrame = Math.min(
+          Math.round(rawProgress * (effectiveFrames - 1)),
+          effectiveFrames - 1
+        );
 
-      if (displayFrame !== drawnFrame && canvasRef.current) {
-        const bmp = bitmaps[displayFrame];
-        if (bmp) {
-          if (!ctx) ctx = canvasRef.current.getContext("2d", { alpha: false });
-          if (ctx) {
-            if (!canvasSized) {
-              const cw = Math.round(bmp.width * canvasScale);
-              const ch = Math.round(bmp.height * canvasScale);
-              canvasRef.current.width = cw;
-              canvasRef.current.height = ch;
-              canvasSized = true;
+        if (displayFrame !== drawnFrame && canvasRef.current) {
+          const bmp = bitmaps[displayFrame];
+          if (bmp) {
+            if (!ctx) ctx = canvasRef.current.getContext("2d", { alpha: false });
+            if (ctx) {
+              if (!canvasSized) {
+                const cw = Math.round(bmp.width * canvasScale);
+                const ch = Math.round(bmp.height * canvasScale);
+                canvasRef.current.width = cw;
+                canvasRef.current.height = ch;
+                canvasSized = true;
+              }
+              ctx.drawImage(bmp, 0, 0, canvasRef.current.width, canvasRef.current.height);
+              drawnFrame = displayFrame;
             }
-            ctx.drawImage(bmp, 0, 0, canvasRef.current.width, canvasRef.current.height);
-            drawnFrame = displayFrame;
           }
+        }
+
+        if (canvasRef.current) {
+          const scale = 1 + rawProgress * 0.04;
+          canvasRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
         }
       }
 
-      if (canvasRef.current) {
-        const scale = 1 + rawProgress * 0.04;
-        canvasRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
-      }
-
-      // Direct DOM opacity updates — no React state
+      // Direct DOM opacity updates — both mobile and desktop
       for (let i = 0; i < PHASES.length; i++) {
         const p = PHASES[i];
         const fadeRange = 0.04;
@@ -220,9 +227,17 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
           loaded ? "opacity-100" : "opacity-0"
         }`}
       >
+        {/* Static image for mobile — prevents GPU memory crash */}
+        <img
+          src="/key-frames/frame-0001.webp"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover md:hidden"
+        />
+
+        {/* Canvas for desktop frame animation */}
         <canvas
           ref={canvasRef}
-          className="absolute top-1/2 left-1/2 pointer-events-none"
+          className="absolute top-1/2 left-1/2 pointer-events-none hidden md:block"
           style={{
             transform: "translate3d(-50%, -50%, 0) scale(1)",
             willChange: "transform",
