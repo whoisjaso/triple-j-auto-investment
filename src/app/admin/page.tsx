@@ -18,6 +18,20 @@ async function getStats(): Promise<Stats> {
   return getMockLeadStats();
 }
 
+async function getPipelineCount(): Promise<number> {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    const { createClient } = await import("@/lib/supabase/server");
+    const supabase = await createClient();
+    const { count, error } = await supabase
+      .from("vehicles")
+      .select("*", { count: "exact", head: true })
+      .in("status", ["Bidding", "Purchased", "In_Transit", "Arrived", "Inspection"]);
+    if (error) return 0;
+    return count ?? 0;
+  }
+  return 0;
+}
+
 async function getRecentLeads(): Promise<Lead[]> {
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const { createClient } = await import("@/lib/supabase/server");
@@ -56,9 +70,10 @@ function formatPhone(phone: string): string {
 }
 
 export default async function AdminDashboardPage() {
-  const [stats, recentLeads] = await Promise.all([
+  const [stats, recentLeads, pipelineCount] = await Promise.all([
     getStats(),
     getRecentLeads(),
+    getPipelineCount(),
   ]);
 
   return (
@@ -74,7 +89,7 @@ export default async function AdminDashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-3 md:gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
         <div className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6">
           <div className="absolute top-0 right-0 w-20 h-20 bg-tj-gold/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
           <svg
@@ -102,6 +117,30 @@ export default async function AdminDashboardPage() {
             Vehicles
           </p>
         </div>
+
+        <Link href="/admin/pipeline" className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6 hover:bg-white/[0.03] hover:border-purple-400/10 transition-all duration-300">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-400/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-purple-400/40 mb-3"
+            aria-hidden="true"
+          >
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+          <p className="font-serif text-2xl md:text-4xl text-tj-cream/90">
+            {pipelineCount}
+          </p>
+          <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
+            In Pipeline
+          </p>
+        </Link>
 
         <div className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6">
           <div className="absolute top-0 right-0 w-20 h-20 bg-tj-gold/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -200,7 +239,31 @@ export default async function AdminDashboardPage() {
       )}
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <Link
+          href="/admin/pipeline"
+          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-tj-gold/50 mb-3"
+            aria-hidden="true"
+          >
+            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+          </svg>
+          <p className="text-sm text-tj-cream/80 font-medium">Pipeline</p>
+          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
+            Manage &rarr;
+          </p>
+        </Link>
+
         <Link
           href="/admin/inventory"
           className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"

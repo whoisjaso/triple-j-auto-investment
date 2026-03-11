@@ -12,9 +12,9 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 
 | Attribute | Value |
 |-----------|-------|
-| Version | 0.1.0-dev |
+| Version | 0.2.0-dev |
 | Status | In Development |
-| Last Updated | 2026-03-07 |
+| Last Updated | 2026-03-11 |
 
 ## Requirements
 
@@ -37,6 +37,12 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 - Lead management page with status cycling and filtering -- Phase 6
 - Dashboard statistics (vehicles, leads, new leads) + recent leads preview -- Phase 6
 - Dealer login link in footer for admin discoverability -- Phase 6
+- Pipeline schema (vehicle_events, pipeline statuses, transport fields) -- Phase 9
+- AI email parsers for Manheim/OVE, DealShield, Central Dispatch -- Phase 9
+- Gmail API integration with pipeline sync endpoint -- Phase 9
+- Admin pipeline dashboard with stage-grouped vehicles and status advancement -- Phase 9
+- Gmail sync trigger from admin UI with real-time results -- Phase 9
+- Vehicle lifecycle management (Bidding → Available) replacing Google Sheet workflow -- Phase 9
 
 ### Out of Scope (v0.1)
 - Rental management, plate tracking, registration workflows -- v0.2+
@@ -116,6 +122,10 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 | NHTSA VIN decoder proxied through API route | Avoids CORS, adds normalization, alwaysOpen prop for dual usage | 2026-03-07 | Active |
 | Lead status cycling (New→Contacted→Closed) via form button | No client component needed; server component page stays fast | 2026-03-10 | Active |
 | Subtle "Dealer Login" in footer compliance bar | Discoverable by owner, invisible to customers | 2026-03-10 | Active |
+| AI email parsing over Manheim API | Enterprise API is gated/expensive; email data is free and comprehensive | 2026-03-11 | Active |
+| Gmail MCP for email access | Infrastructure already connected, simplest integration path | 2026-03-11 | Active |
+| Vehicle lifecycle: Bidding→Purchased→In_Transit→Arrived→Inspection→Available | Maps to real Manheim-to-lot workflow stages | 2026-03-11 | Active |
+| Server actions for pipeline mutations | revalidatePath pattern keeps server components fast | 2026-03-11 | Active |
 
 ## Success Metrics
 
@@ -150,4 +160,4 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 
 ---
 *PROJECT.md -- Updated when requirements or context change*
-*Last updated: 2026-03-10 after Phase 6*
+*Last updated: 2026-03-11 after Phase 9*
