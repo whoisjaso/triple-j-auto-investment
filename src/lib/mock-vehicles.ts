@@ -1,6 +1,25 @@
 import type { Vehicle, VehicleFilters } from "@/types/database";
 import type { VehicleSortOption } from "@/lib/supabase/queries/vehicles";
 
+const PIPELINE_DEFAULTS = {
+  trim: null,
+  purchasePrice: null,
+  buyFee: null,
+  totalCost: null,
+  sellerName: null,
+  auctionLocation: null,
+  workOrderNumber: null,
+  stockNumber: null,
+  guaranteeExpiresAt: null,
+  guaranteePrice: null,
+  transportCarrier: null,
+  transportLoadId: null,
+  transportCost: null,
+  transportPickupEta: null,
+  transportDeliveryEta: null,
+  sourceEmailId: null,
+} as const;
+
 const MOCK_VEHICLES: Vehicle[] = [
   {
     id: "mock-1",
@@ -26,6 +45,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     dateAdded: "2026-03-01T00:00:00Z",
     createdAt: "2026-03-01T00:00:00Z",
     updatedAt: "2026-03-01T00:00:00Z",
+    ...PIPELINE_DEFAULTS,
   },
   {
     id: "mock-2",
@@ -51,6 +71,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     dateAdded: "2026-03-02T00:00:00Z",
     createdAt: "2026-03-02T00:00:00Z",
     updatedAt: "2026-03-02T00:00:00Z",
+    ...PIPELINE_DEFAULTS,
   },
   {
     id: "mock-3",
@@ -76,6 +97,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     dateAdded: "2026-03-03T00:00:00Z",
     createdAt: "2026-03-03T00:00:00Z",
     updatedAt: "2026-03-03T00:00:00Z",
+    ...PIPELINE_DEFAULTS,
   },
   {
     id: "mock-4",
@@ -101,6 +123,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     dateAdded: "2026-03-04T00:00:00Z",
     createdAt: "2026-03-04T00:00:00Z",
     updatedAt: "2026-03-04T00:00:00Z",
+    ...PIPELINE_DEFAULTS,
   },
   {
     id: "mock-5",
@@ -126,6 +149,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     dateAdded: "2026-03-05T00:00:00Z",
     createdAt: "2026-03-05T00:00:00Z",
     updatedAt: "2026-03-05T00:00:00Z",
+    ...PIPELINE_DEFAULTS,
   },
   {
     id: "mock-6",
@@ -151,6 +175,7 @@ const MOCK_VEHICLES: Vehicle[] = [
     dateAdded: "2026-03-06T00:00:00Z",
     createdAt: "2026-03-06T00:00:00Z",
     updatedAt: "2026-03-06T00:00:00Z",
+    ...PIPELINE_DEFAULTS,
   },
 ];
 

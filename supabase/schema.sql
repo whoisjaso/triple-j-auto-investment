@@ -1,4 +1,4 @@
--- Triple J Auto Investment — v0.1 Database Schema
+-- Triple J Auto Investment — Database Schema (v0.1 + v0.2 Pipeline)
 -- Run this in your Supabase SQL Editor to create the tables.
 
 -- ============================================================
@@ -14,7 +14,7 @@ create table if not exists vehicles (
   mileage integer not null,
   vin text not null unique,
   status text not null default 'Available'
-    check (status in ('Available', 'Pending', 'Sold')),
+    check (status in ('Bidding', 'Purchased', 'In_Transit', 'Arrived', 'Inspection', 'Available', 'Pending', 'Sold')),
   description text,
   image_url text,
   gallery text[] default '{}',
@@ -28,7 +28,24 @@ create table if not exists vehicles (
   fuel_type text,
   date_added timestamptz default now(),
   created_at timestamptz default now(),
-  updated_at timestamptz default now()
+  updated_at timestamptz default now(),
+  -- v0.2 Pipeline columns
+  trim text,
+  purchase_price numeric(10, 2),
+  buy_fee numeric(10, 2),
+  total_cost numeric(10, 2),
+  seller_name text,
+  auction_location text,
+  work_order_number text,
+  stock_number text,
+  guarantee_expires_at timestamptz,
+  guarantee_price numeric(10, 2),
+  transport_carrier text,
+  transport_load_id text,
+  transport_cost numeric(10, 2),
+  transport_pickup_eta timestamptz,
+  transport_delivery_eta timestamptz,
+  source_email_id text
 );
 
 create index if not exists idx_vehicles_status on vehicles (status);
@@ -104,3 +121,35 @@ create policy "Admin full access to leads"
   to authenticated
   using (true)
   with check (true);
+
+-- ============================================================
+-- VEHICLE EVENTS (v0.2 Pipeline Audit Trail)
+-- ============================================================
+
+create table if not exists vehicle_events (
+  id uuid primary key default gen_random_uuid(),
+  vehicle_id uuid not null references vehicles(id) on delete cascade,
+  event_type text not null
+    check (event_type in (
+      'high_bid', 'purchased', 'guarantee_confirmed',
+      'transport_accepted', 'transport_picked_up', 'transport_delivered',
+      'arrived', 'inspection_started', 'listed', 'status_changed'
+    )),
+  event_data jsonb default '{}',
+  source_email_id text,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_vehicle_events_vehicle_id
+  on vehicle_events (vehicle_id, created_at desc);
+
+alter table vehicle_events enable row level security;
+
+create policy "Anon can view vehicle events"
+  on vehicle_events for select to anon using (true);
+
+create policy "Anon can insert vehicle events"
+  on vehicle_events for insert to anon with check (true);
+
+create policy "Admin full access to vehicle events"
+  on vehicle_events for all to authenticated using (true) with check (true);

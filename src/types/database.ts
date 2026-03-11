@@ -2,7 +2,15 @@
 // Vehicle
 // ============================================================
 
-export type VehicleStatus = "Available" | "Pending" | "Sold";
+export type VehicleStatus =
+  | "Bidding"
+  | "Purchased"
+  | "In_Transit"
+  | "Arrived"
+  | "Inspection"
+  | "Available"
+  | "Pending"
+  | "Sold";
 
 export interface Vehicle {
   id: string;
@@ -27,6 +35,23 @@ export interface Vehicle {
   dateAdded: string;
   createdAt: string;
   updatedAt: string;
+  // v0.2 Pipeline fields
+  trim: string | null;
+  purchasePrice: number | null;
+  buyFee: number | null;
+  totalCost: number | null;
+  sellerName: string | null;
+  auctionLocation: string | null;
+  workOrderNumber: string | null;
+  stockNumber: string | null;
+  guaranteeExpiresAt: string | null;
+  guaranteePrice: number | null;
+  transportCarrier: string | null;
+  transportLoadId: string | null;
+  transportCost: number | null;
+  transportPickupEta: string | null;
+  transportDeliveryEta: string | null;
+  sourceEmailId: string | null;
 }
 
 /** Row shape returned by Supabase (snake_case) */
@@ -53,12 +78,37 @@ export interface VehicleRow {
   date_added: string;
   created_at: string;
   updated_at: string;
+  // v0.2 Pipeline fields
+  trim: string | null;
+  purchase_price: number | null;
+  buy_fee: number | null;
+  total_cost: number | null;
+  seller_name: string | null;
+  auction_location: string | null;
+  work_order_number: string | null;
+  stock_number: string | null;
+  guarantee_expires_at: string | null;
+  guarantee_price: number | null;
+  transport_carrier: string | null;
+  transport_load_id: string | null;
+  transport_cost: number | null;
+  transport_pickup_eta: string | null;
+  transport_delivery_eta: string | null;
+  source_email_id: string | null;
 }
+
+// Pipeline columns are optional on insert (nullable in DB, no default)
+type PipelineColumns =
+  | "trim" | "purchase_price" | "buy_fee" | "total_cost"
+  | "seller_name" | "auction_location" | "work_order_number" | "stock_number"
+  | "guarantee_expires_at" | "guarantee_price"
+  | "transport_carrier" | "transport_load_id" | "transport_cost"
+  | "transport_pickup_eta" | "transport_delivery_eta" | "source_email_id";
 
 export type VehicleInsert = Omit<
   VehicleRow,
-  "id" | "created_at" | "updated_at" | "date_added"
->;
+  "id" | "created_at" | "updated_at" | "date_added" | PipelineColumns
+> & Partial<Pick<VehicleRow, PipelineColumns>>;
 
 // ============================================================
 // Lead
@@ -141,6 +191,23 @@ export function mapVehicleRow(row: VehicleRow): Vehicle {
     dateAdded: row.date_added,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+    // v0.2 Pipeline fields
+    trim: row.trim,
+    purchasePrice: row.purchase_price != null ? Number(row.purchase_price) : null,
+    buyFee: row.buy_fee != null ? Number(row.buy_fee) : null,
+    totalCost: row.total_cost != null ? Number(row.total_cost) : null,
+    sellerName: row.seller_name,
+    auctionLocation: row.auction_location,
+    workOrderNumber: row.work_order_number,
+    stockNumber: row.stock_number,
+    guaranteeExpiresAt: row.guarantee_expires_at,
+    guaranteePrice: row.guarantee_price != null ? Number(row.guarantee_price) : null,
+    transportCarrier: row.transport_carrier,
+    transportLoadId: row.transport_load_id,
+    transportCost: row.transport_cost != null ? Number(row.transport_cost) : null,
+    transportPickupEta: row.transport_pickup_eta,
+    transportDeliveryEta: row.transport_delivery_eta,
+    sourceEmailId: row.source_email_id,
   };
 }
 
