@@ -47,7 +47,11 @@ async function getRecentLeads(): Promise<Lead[]> {
 const STATUS_COLORS: Record<string, string> = {
   New: "bg-blue-400/10 text-blue-400 border-blue-400/15",
   Contacted: "bg-amber-400/10 text-amber-400 border-amber-400/15",
-  Closed: "bg-emerald-400/10 text-emerald-400 border-emerald-400/15",
+  Qualified: "bg-cyan-400/10 text-cyan-400 border-cyan-400/15",
+  Appointment: "bg-purple-400/10 text-purple-400 border-purple-400/15",
+  Negotiation: "bg-orange-400/10 text-orange-400 border-orange-400/15",
+  Sold: "bg-emerald-400/10 text-emerald-400 border-emerald-400/15",
+  Lost: "bg-red-400/10 text-red-400 border-red-400/15",
 };
 
 function relativeDate(iso: string): string {
@@ -211,7 +215,7 @@ export default async function AdminDashboardPage() {
             {recentLeads.map((lead) => (
               <Link
                 key={lead.id}
-                href="/admin/leads"
+                href={`/admin/leads/${lead.id}`}
                 className="flex items-center justify-between p-4 rounded-xl border border-white/[0.04] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.06] transition-all duration-300 min-h-[56px] group"
               >
                 <div className="min-w-0 flex-1">
