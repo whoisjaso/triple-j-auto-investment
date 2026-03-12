@@ -65,7 +65,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
 
   const loadFrames = useCallback(async () => {
     const isMobile = window.innerWidth < 768;
-    const step = isMobile ? 2 : 1;
+    const step = isMobile ? 4 : 1;
     const frameCount = Math.ceil(TOTAL_FRAMES / step);
     const bitmaps: (ImageBitmap | null)[] = new Array(frameCount).fill(null);
 
@@ -108,17 +108,12 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
     const canvasScale = isMobile ? 0.5 : 1;
     const opacities = new Array(PHASES.length).fill(0);
 
-    // Mobile: skip frame loading to prevent GPU memory crash (~1.5GB VRAM)
-    if (isMobile) {
-      onProgressRef.current?.(1, 1);
+    // Load frames — mobile uses every 4th frame (~30 frames) for memory safety
+    loadFrames().then((result) => {
+      bitmaps = result.bitmaps;
+      effectiveFrames = result.frameCount;
       setLoaded(true);
-    } else {
-      loadFrames().then((result) => {
-        bitmaps = result.bitmaps;
-        effectiveFrames = result.frameCount;
-        setLoaded(true);
-      });
-    }
+    });
 
     // Shared: read scroll progress and update overlays
     const updateOverlays = () => {
@@ -131,35 +126,33 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
         }
       }
 
-      // Canvas frame animation — desktop only
-      if (!isMobile) {
-        const displayFrame = Math.min(
-          Math.round(rawProgress * (effectiveFrames - 1)),
-          effectiveFrames - 1
-        );
+      // Canvas frame animation — all devices
+      const displayFrame = Math.min(
+        Math.round(rawProgress * (effectiveFrames - 1)),
+        effectiveFrames - 1
+      );
 
-        if (displayFrame !== drawnFrame && canvasRef.current) {
-          const bmp = bitmaps[displayFrame];
-          if (bmp) {
-            if (!ctx) ctx = canvasRef.current.getContext("2d", { alpha: false });
-            if (ctx) {
-              if (!canvasSized) {
-                const cw = Math.round(bmp.width * canvasScale);
-                const ch = Math.round(bmp.height * canvasScale);
-                canvasRef.current.width = cw;
-                canvasRef.current.height = ch;
-                canvasSized = true;
-              }
-              ctx.drawImage(bmp, 0, 0, canvasRef.current.width, canvasRef.current.height);
-              drawnFrame = displayFrame;
+      if (displayFrame !== drawnFrame && canvasRef.current) {
+        const bmp = bitmaps[displayFrame];
+        if (bmp) {
+          if (!ctx) ctx = canvasRef.current.getContext("2d", { alpha: false });
+          if (ctx) {
+            if (!canvasSized) {
+              const cw = Math.round(bmp.width * canvasScale);
+              const ch = Math.round(bmp.height * canvasScale);
+              canvasRef.current.width = cw;
+              canvasRef.current.height = ch;
+              canvasSized = true;
             }
+            ctx.drawImage(bmp, 0, 0, canvasRef.current.width, canvasRef.current.height);
+            drawnFrame = displayFrame;
           }
         }
+      }
 
-        if (canvasRef.current) {
-          const scale = 1 + rawProgress * 0.04;
-          canvasRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
-        }
+      if (canvasRef.current) {
+        const scale = 1 + rawProgress * 0.04;
+        canvasRef.current.style.transform = `translate3d(-50%, -50%, 0) scale(${scale})`;
       }
 
       // Direct DOM opacity updates — both mobile and desktop
@@ -235,8 +228,8 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
           loaded ? "opacity-100" : "opacity-0"
         }`}
       >
-        {/* Static image for mobile — prevents GPU memory crash */}
-        <div className="absolute inset-0 flex items-center justify-center overflow-hidden md:hidden">
+        {/* Static image for mobile — loading fallback while frames load */}
+        <div className={`absolute inset-0 flex items-center justify-center overflow-hidden md:hidden ${loaded ? "hidden" : ""}`}>
           <img
             src="/key-frames/frame-0001.webp"
             alt=""
@@ -253,7 +246,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
         {/* Canvas for desktop frame animation */}
         <canvas
           ref={canvasRef}
-          className="absolute top-1/2 left-1/2 pointer-events-none hidden md:block"
+          className="absolute top-1/2 left-1/2 pointer-events-none"
           style={{
             transform: "translate3d(-50%, -50%, 0) scale(1)",
             willChange: "transform",

@@ -10,16 +10,16 @@ See: .paul/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Milestone: v0.2 Dealer Intelligence System
-Phase: 10 of 12 (CRM) — Planning
-Plan: 10-01 created, awaiting approval
-Status: PLAN created, ready for APPLY
-Last activity: 2026-03-11 — Created .paul/phases/10-crm/10-01-PLAN.md
+Phase: 10 of 12 (CRM) — Plan 10-01 Complete
+Plan: 10-01 complete (CRM Foundation)
+Status: Loop closed — ready for Plan 10-02
+Last activity: 2026-03-11 — Committed & pushed CRM + mobile fixes (40a19a6)
 
 Progress:
 - v0.1 Initial Release: [##########] 100% ★
-- v0.2 Dealer Intelligence: [#####░░░░░] 25%
+- v0.2 Dealer Intelligence: [######░░░░] 35%
   - Phase 9 (Pipeline): ✅ Complete (3/3 plans)
-  - Phase 10 (CRM): Planning (10-01 created)
+  - Phase 10 (CRM): In Progress (1/~2 plans done)
   - Phase 11 (BI): Not started
   - Phase 12 (Advanced): Not started
 
@@ -28,7 +28,7 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ○        ○     [Plan 10-01 created, awaiting approval]
+  ✓        ✓        ✓     [Plan 10-01 complete — CRM Foundation]
 ```
 
 ## Accumulated Context
@@ -52,6 +52,9 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - User wants automated hourly Gmail sync (future enhancement)
 - Server actions in src/lib/actions/ for admin mutations with revalidatePath pattern
 - Pipeline dashboard uses server-component-fetch + client-component-interactivity pattern
+- CRM pipeline: 7 stages (New → Contacted → Qualified → Appointment → Negotiation → Sold → Lost)
+- Lead detail page with notes, tasks, and status pipeline stepper
+- Mobile: static images for scroll sections (no GPU frame animation) with radial gradient mask
 
 ### Deferred Issues
 - RLS is permissive for anon (admin auth at middleware level) — needs Supabase Auth in v0.2
@@ -63,9 +66,10 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - stitch MCP needs Google auth, nano-banana-2 needs GEMINI_API_KEY
 - Automated hourly Gmail pipeline sync (Vercel Cron or pg_cron)
 - Vehicle event timeline view in pipeline dashboard (future enhancement)
+- Migrate real inventory from Google Sheets (user deferred this)
 
 ### Git State
-Last commit: 31911b4 feat(09-pipeline): complete Phase 9
+Last commit: 40a19a6 feat(10-crm): CRM foundation + mobile scroll optimization
 Branch: main
 Feature branches merged: none
 
@@ -75,9 +79,9 @@ Feature branches merged: none
 ## Session Continuity
 
 Last session: 2026-03-11
-Stopped at: Plan 10-01 created (CRM Foundation)
-Next action: Review and approve plan, then run /paul:apply
-Resume file: .paul/phases/10-crm/10-01-PLAN.md
+Stopped at: Plan 10-01 closed (CRM Foundation complete, pushed to production)
+Next action: Plan 10-02 (CRM pipeline board + dashboard) or migrate real inventory
+Resume file: .paul/phases/10-crm/10-01-SUMMARY.md
 
 ---
 *STATE.md -- Updated after every significant action*
