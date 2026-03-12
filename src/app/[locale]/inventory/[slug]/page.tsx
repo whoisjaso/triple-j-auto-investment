@@ -10,12 +10,17 @@ import { Link } from "@/i18n/navigation";
 
 async function getVehicle(slug: string) {
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    const { createClient } = await import("@/lib/supabase/server");
-    const { getVehicleBySlug } = await import(
-      "@/lib/supabase/queries/vehicles"
-    );
-    const supabase = await createClient();
-    return getVehicleBySlug(supabase, slug);
+    try {
+      const { createClient } = await import("@/lib/supabase/server");
+      const { getVehicleBySlug } = await import(
+        "@/lib/supabase/queries/vehicles"
+      );
+      const supabase = await createClient();
+      return getVehicleBySlug(supabase, slug);
+    } catch (err) {
+      console.error("Supabase query failed, using mock data:", err);
+      return getMockVehicleBySlug(slug);
+    }
   }
   return getMockVehicleBySlug(slug);
 }

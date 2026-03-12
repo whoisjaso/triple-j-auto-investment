@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import type { VehicleFilters } from "@/types/database";
 import type { VehicleSortOption } from "@/lib/supabase/queries/vehicles";
@@ -88,14 +89,20 @@ export default async function InventoryPage({
   let makes: string[];
 
   if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    const { createClient } = await import("@/lib/supabase/server");
-    const { getVehicles } = await import(
-      "@/lib/supabase/queries/vehicles"
-    );
-    const supabase = await createClient();
-    vehicles = await getVehicles(supabase, filters, sort);
-    const allVehicles = await getVehicles(supabase);
-    makes = [...new Set(allVehicles.map((v) => v.make))].sort();
+    try {
+      const { createClient } = await import("@/lib/supabase/server");
+      const { getVehicles } = await import(
+        "@/lib/supabase/queries/vehicles"
+      );
+      const supabase = await createClient();
+      vehicles = await getVehicles(supabase, filters, sort);
+      const allVehicles = await getVehicles(supabase);
+      makes = [...new Set(allVehicles.map((v) => v.make))].sort();
+    } catch (err) {
+      console.error("Supabase query failed, using mock data:", err);
+      vehicles = getMockVehicles(filters, sort);
+      makes = getMockMakes();
+    }
   } else {
     vehicles = getMockVehicles(filters, sort);
     makes = getMockMakes();
@@ -116,20 +123,24 @@ export default async function InventoryPage({
               {t("vehicleCount", { count: vehicles.length })}
             </p>
           </div>
-          <SortSelect currentSort={sort} />
+          <Suspense fallback={null}>
+            <SortSelect currentSort={sort} />
+          </Suspense>
         </div>
 
-        <FilterBar
-          makes={makes}
-          currentFilters={{
-            make: make || "",
-            minPrice: minPrice?.toString() || "",
-            maxPrice: maxPrice?.toString() || "",
-            minYear: minYear?.toString() || "",
-            maxYear: maxYear?.toString() || "",
-            search: search || "",
-          }}
-        />
+        <Suspense fallback={null}>
+          <FilterBar
+            makes={makes}
+            currentFilters={{
+              make: make || "",
+              minPrice: minPrice?.toString() || "",
+              maxPrice: maxPrice?.toString() || "",
+              minYear: minYear?.toString() || "",
+              maxYear: maxYear?.toString() || "",
+              search: search || "",
+            }}
+          />
+        </Suspense>
 
         <div className="mt-4">
           <VinDecoder />
