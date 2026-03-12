@@ -20,6 +20,10 @@ const statusColors: Record<string, string> = {
   Available: "bg-emerald-400/10 text-emerald-400 border-emerald-400/15",
   Pending: "bg-amber-400/10 text-amber-400 border-amber-400/15",
   Sold: "bg-white/[0.04] text-white/30 border-white/[0.06]",
+  Purchased: "bg-blue-400/10 text-blue-400 border-blue-400/15",
+  In_Transit: "bg-purple-400/10 text-purple-400 border-purple-400/15",
+  Arrived: "bg-cyan-400/10 text-cyan-400 border-cyan-400/15",
+  Inspection: "bg-orange-400/10 text-orange-400 border-orange-400/15",
 };
 
 export default async function AdminInventoryPage() {
@@ -90,6 +94,9 @@ export default async function AdminInventoryPage() {
                   <th className="text-left px-4 py-3 font-accent text-[10px] uppercase tracking-[0.15em] text-white/25 font-medium">
                     Status
                   </th>
+                  <th className="text-left px-4 py-3 font-accent text-[10px] uppercase tracking-[0.15em] text-white/25 font-medium">
+                    Buyer
+                  </th>
                   <th className="text-right px-4 py-3 font-accent text-[10px] uppercase tracking-[0.15em] text-white/25 font-medium">
                     Actions
                   </th>
@@ -125,6 +132,23 @@ export default async function AdminInventoryPage() {
                       >
                         {v.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3.5">
+                      {v.buyerName ? (
+                        <div>
+                          <p className="text-xs text-tj-cream/70">{v.buyerName}</p>
+                          {v.buyerPhone && (
+                            <a
+                              href={`tel:${v.buyerPhone}`}
+                              className="text-[10px] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
+                            >
+                              {v.buyerPhone}
+                            </a>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-white/10">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -167,9 +191,28 @@ export default async function AdminInventoryPage() {
                     {v.status}
                   </span>
                 </div>
-                <p className="font-serif text-lg text-tj-cream/90 mb-3">
+                <p className="font-serif text-lg text-tj-cream/90 mb-2">
                   ${v.price.toLocaleString()}
                 </p>
+                {v.buyerName && (
+                  <div className="flex items-center gap-2 mb-2 px-2.5 py-1.5 rounded-lg bg-white/[0.02] border border-white/[0.04]">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-tj-gold/40 shrink-0" aria-hidden="true">
+                      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" />
+                      <circle cx="12" cy="7" r="4" />
+                    </svg>
+                    <div className="min-w-0">
+                      <p className="text-[11px] text-tj-cream/60 truncate">{v.buyerName}</p>
+                      {v.buyerPhone && (
+                        <a
+                          href={`tel:${v.buyerPhone}`}
+                          className="text-[10px] text-tj-gold/40 hover:text-tj-gold/70 transition-colors"
+                        >
+                          {v.buyerPhone}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className="flex items-center gap-2">
                   <Link
                     href={`/admin/inventory/${v.id}/edit`}
