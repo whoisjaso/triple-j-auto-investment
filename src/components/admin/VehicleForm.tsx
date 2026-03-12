@@ -3,6 +3,7 @@
 import { useActionState, useState, useRef } from "react";
 import type { Vehicle } from "@/types/database";
 import type { VehicleFormState } from "@/lib/actions/vehicles";
+import PhotoCapture from "./PhotoCapture";
 
 interface VehicleFormProps {
   vehicle?: Vehicle;
@@ -98,6 +99,13 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
           <p className="text-red-400/80 text-sm">{state.error}</p>
         </div>
       )}
+
+      {/* Photos — front and center, Instagram-style */}
+      <p className={sectionClass}>Photos</p>
+      <PhotoCapture
+        initialPhotos={vehicle?.gallery}
+        coverPhoto={vehicle?.imageUrl}
+      />
 
       {/* VIN Section */}
       <p className={sectionClass}>VIN Lookup</p>
@@ -332,8 +340,8 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
         </div>
       </div>
 
-      {/* Description & Images */}
-      <p className={sectionClass}>Description & Images</p>
+      {/* Description */}
+      <p className={sectionClass}>Description</p>
       <div>
         <label htmlFor="description" className={labelClass}>
           Description
@@ -345,37 +353,6 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
           rows={4}
           className={`${inputClass} min-h-[100px]`}
           placeholder="Vehicle description..."
-        />
-      </div>
-      <div>
-        <label htmlFor="imageUrl" className={labelClass}>
-          Main Image URL
-        </label>
-        <input
-          type="url"
-          id="imageUrl"
-          name="imageUrl"
-          defaultValue={vehicle?.imageUrl || ""}
-          className={inputClass}
-          placeholder="https://example.com/photo.jpg"
-        />
-      </div>
-      <div>
-        <label htmlFor="gallery" className={labelClass}>
-          Gallery URLs{" "}
-          <span className="text-white/10 font-normal normal-case tracking-normal">
-            (one per line)
-          </span>
-        </label>
-        <textarea
-          id="gallery"
-          name="gallery"
-          defaultValue={vehicle?.gallery?.join("\n") || ""}
-          rows={3}
-          className={`${inputClass} min-h-[80px]`}
-          placeholder={
-            "https://example.com/photo1.jpg\nhttps://example.com/photo2.jpg"
-          }
         />
       </div>
 
