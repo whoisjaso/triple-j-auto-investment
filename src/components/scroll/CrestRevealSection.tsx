@@ -93,12 +93,8 @@ export default function CrestRevealSection({
       });
     }
 
-    const tick = () => {
-      if (!isVisible) {
-        rafId = null;
-        return;
-      }
-
+    // Shared: read scroll progress and update overlays
+    const updateOverlays = () => {
       let rawProgress = 0;
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
@@ -166,9 +162,20 @@ export default function CrestRevealSection({
           }
         }
       }
+    };
 
+    const tick = () => {
+      if (!isVisible) {
+        rafId = null;
+        return;
+      }
+      updateOverlays();
       rafId = requestAnimationFrame(tick);
     };
+
+    // Mobile: scroll event listener ensures updates during iOS momentum scroll
+    const onScroll = isMobile ? () => { if (isVisible) updateOverlays(); } : null;
+    if (onScroll) window.addEventListener("scroll", onScroll, { passive: true });
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -185,6 +192,7 @@ export default function CrestRevealSection({
 
     return () => {
       if (rafId !== null) cancelAnimationFrame(rafId);
+      if (onScroll) window.removeEventListener("scroll", onScroll);
       observer.disconnect();
     };
   }, [loadFrames]);
