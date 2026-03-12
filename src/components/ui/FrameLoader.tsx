@@ -44,7 +44,7 @@ export default function FrameLoader({ progress, loaded }: FrameLoaderProps) {
           }}
         />
         <Image
-          src="/GoldTripleJLogo.png"
+          src="/GoldTripleJLogo.webp"
           alt="Triple J Auto Investment"
           width={120}
           height={120}

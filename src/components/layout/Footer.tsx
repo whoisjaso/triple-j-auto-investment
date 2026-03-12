@@ -21,7 +21,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex flex-col items-center md:items-start">
             <Image
-              src="/GoldTripleJLogo.png"
+              src="/GoldTripleJLogo.webp"
               alt="Triple J Auto Investment"
               width={32}
               height={32}

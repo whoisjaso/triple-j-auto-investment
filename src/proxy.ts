@@ -35,7 +35,7 @@ async function verifyToken(token: string): Promise<boolean> {
   return signature === expected;
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Admin routes: apply auth only, skip i18n

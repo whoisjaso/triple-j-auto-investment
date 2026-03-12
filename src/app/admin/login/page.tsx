@@ -23,7 +23,7 @@ export default function AdminLoginPage() {
           <div className="relative">
             <div className="absolute inset-0 bg-tj-gold/10 rounded-full blur-2xl scale-[2]" />
             <Image
-              src="/GoldTripleJLogo.png"
+              src="/GoldTripleJLogo.webp"
               alt="Triple J Auto Investment"
               width={72}
               height={72}

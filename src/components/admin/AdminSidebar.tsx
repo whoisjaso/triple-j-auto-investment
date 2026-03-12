@@ -122,7 +122,7 @@ export default function AdminSidebar() {
         <div className="h-16 flex items-center px-5 border-b border-white/[0.04]">
           <Link href="/admin" className="flex items-center gap-3">
             <Image
-              src="/GoldTripleJLogo.png"
+              src="/GoldTripleJLogo.webp"
               alt=""
               width={32}
               height={32}

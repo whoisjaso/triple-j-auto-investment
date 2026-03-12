@@ -108,12 +108,23 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
     const canvasScale = isMobile ? 0.5 : 1;
     const opacities = new Array(PHASES.length).fill(0);
 
-    // Load frames — mobile uses every 4th frame (~30 frames) for memory safety
-    loadFrames().then((result) => {
-      bitmaps = result.bitmaps;
-      effectiveFrames = result.frameCount;
-      setLoaded(true);
-    });
+    // Defer frame loading until section is approaching viewport (saves ~6MB network at page load)
+    let loadStarted = false;
+    const loadObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !loadStarted) {
+          loadStarted = true;
+          loadObserver.disconnect();
+          loadFrames().then((result) => {
+            bitmaps = result.bitmaps;
+            effectiveFrames = result.frameCount;
+            setLoaded(true);
+          });
+        }
+      },
+      { rootMargin: "100% 0px" }
+    );
+    if (containerRef.current) loadObserver.observe(containerRef.current);
 
     // Shared: read scroll progress and update overlays
     const updateOverlays = () => {
@@ -214,6 +225,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
       if (rafId !== null) cancelAnimationFrame(rafId);
       if (onScroll) window.removeEventListener("scroll", onScroll);
       observer.disconnect();
+      loadObserver.disconnect();
     };
   }, [loadFrames]);
 

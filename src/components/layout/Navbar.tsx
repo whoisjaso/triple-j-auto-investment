@@ -173,7 +173,7 @@ export default function Navbar() {
             aria-label={t("homeLink")}
           >
             <Image
-              src="/GoldTripleJLogo.png"
+              src="/GoldTripleJLogo.webp"
               alt=""
               width={48}
               height={48}
@@ -289,7 +289,7 @@ export default function Navbar() {
         {/* Logo in menu */}
         <div className="mb-12">
           <Image
-            src="/GoldTripleJLogo.png"
+            src="/GoldTripleJLogo.webp"
             alt="Triple J Auto Investment"
             width={64}
             height={64}
