@@ -52,6 +52,25 @@ export interface Vehicle {
   transportPickupEta: string | null;
   transportDeliveryEta: string | null;
   sourceEmailId: string | null;
+  // Business / inventory fields
+  conditionNotes: string | null;
+  titleType: string | null;
+  mechanicalCost: number | null;
+  cosmeticCost: number | null;
+  otherCosts: number | null;
+  dateListed: string | null;
+  dateSold: string | null;
+  salePrice: number | null;
+  sellingFees: number | null;
+  netProfit: number | null;
+  weightLbs: number | null;
+  licensePlate: string | null;
+  buyerName: string | null;
+  buyerPhone: string | null;
+  leadSourceName: string | null;
+  daysInStock: number | null;
+  targetListPrice: number | null;
+  floorPrice: number | null;
 }
 
 /** Row shape returned by Supabase (snake_case) */
@@ -95,6 +114,25 @@ export interface VehicleRow {
   transport_pickup_eta: string | null;
   transport_delivery_eta: string | null;
   source_email_id: string | null;
+  // Business / inventory fields
+  condition_notes: string | null;
+  title_type: string | null;
+  mechanical_cost: number | null;
+  cosmetic_cost: number | null;
+  other_costs: number | null;
+  date_listed: string | null;
+  date_sold: string | null;
+  sale_price: number | null;
+  selling_fees: number | null;
+  net_profit: number | null;
+  weight_lbs: number | null;
+  license_plate: string | null;
+  buyer_name: string | null;
+  buyer_phone: string | null;
+  lead_source_name: string | null;
+  days_in_stock: number | null;
+  target_list_price: number | null;
+  floor_price: number | null;
 }
 
 // Pipeline columns are optional on insert (nullable in DB, no default)
@@ -103,7 +141,11 @@ type PipelineColumns =
   | "seller_name" | "auction_location" | "work_order_number" | "stock_number"
   | "guarantee_expires_at" | "guarantee_price"
   | "transport_carrier" | "transport_load_id" | "transport_cost"
-  | "transport_pickup_eta" | "transport_delivery_eta" | "source_email_id";
+  | "transport_pickup_eta" | "transport_delivery_eta" | "source_email_id"
+  | "condition_notes" | "title_type" | "mechanical_cost" | "cosmetic_cost" | "other_costs"
+  | "date_listed" | "date_sold" | "sale_price" | "selling_fees" | "net_profit"
+  | "weight_lbs" | "license_plate" | "buyer_name" | "buyer_phone" | "lead_source_name"
+  | "days_in_stock" | "target_list_price" | "floor_price";
 
 export type VehicleInsert = Omit<
   VehicleRow,
@@ -283,6 +325,25 @@ export function mapVehicleRow(row: VehicleRow): Vehicle {
     transportPickupEta: row.transport_pickup_eta,
     transportDeliveryEta: row.transport_delivery_eta,
     sourceEmailId: row.source_email_id,
+    // Business / inventory fields
+    conditionNotes: row.condition_notes,
+    titleType: row.title_type,
+    mechanicalCost: row.mechanical_cost != null ? Number(row.mechanical_cost) : null,
+    cosmeticCost: row.cosmetic_cost != null ? Number(row.cosmetic_cost) : null,
+    otherCosts: row.other_costs != null ? Number(row.other_costs) : null,
+    dateListed: row.date_listed,
+    dateSold: row.date_sold,
+    salePrice: row.sale_price != null ? Number(row.sale_price) : null,
+    sellingFees: row.selling_fees != null ? Number(row.selling_fees) : null,
+    netProfit: row.net_profit != null ? Number(row.net_profit) : null,
+    weightLbs: row.weight_lbs,
+    licensePlate: row.license_plate,
+    buyerName: row.buyer_name,
+    buyerPhone: row.buyer_phone,
+    leadSourceName: row.lead_source_name,
+    daysInStock: row.days_in_stock,
+    targetListPrice: row.target_list_price != null ? Number(row.target_list_price) : null,
+    floorPrice: row.floor_price != null ? Number(row.floor_price) : null,
   };
 }
 
