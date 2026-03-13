@@ -9,7 +9,7 @@ import {
 
 export async function createLead(
   client: SupabaseClient,
-  lead: Omit<Lead, "id" | "createdAt" | "status">
+  lead: Omit<Lead, "id" | "createdAt" | "status" | "buyerName" | "buyerPhone"> & { buyerName?: string | null; buyerPhone?: string | null }
 ): Promise<Lead> {
   const row = toLeadRow(lead);
 

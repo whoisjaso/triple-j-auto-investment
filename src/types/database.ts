@@ -180,6 +180,8 @@ export interface Lead {
   vehicleId: string | null;
   source: LeadSource;
   status: LeadStatus;
+  buyerName: string | null;
+  buyerPhone: string | null;
   createdAt: string;
 }
 
@@ -193,10 +195,15 @@ export interface LeadRow {
   vehicle_id: string | null;
   source: LeadSource;
   status: LeadStatus;
+  buyer_name: string | null;
+  buyer_phone: string | null;
   created_at: string;
 }
 
-export type LeadInsert = Omit<LeadRow, "id" | "created_at">;
+export type LeadInsert = Omit<LeadRow, "id" | "created_at" | "buyer_name" | "buyer_phone"> & {
+  buyer_name?: string | null;
+  buyer_phone?: string | null;
+};
 
 // ============================================================
 // Lead Notes (CRM Communication Log)
@@ -357,13 +364,15 @@ export function mapLeadRow(row: LeadRow): Lead {
     vehicleId: row.vehicle_id,
     source: row.source,
     status: row.status,
+    buyerName: row.buyer_name,
+    buyerPhone: row.buyer_phone,
     createdAt: row.created_at,
   };
 }
 
 /** Convert camelCase LeadInsert to snake_case for Supabase */
 export function toLeadRow(
-  lead: Omit<Lead, "id" | "createdAt" | "status">
+  lead: Omit<Lead, "id" | "createdAt" | "status" | "buyerName" | "buyerPhone"> & { buyerName?: string | null; buyerPhone?: string | null }
 ): LeadInsert {
   return {
     name: lead.name,

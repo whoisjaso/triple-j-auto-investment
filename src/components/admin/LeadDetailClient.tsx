@@ -8,6 +8,7 @@ import {
   addTaskAction,
   completeTaskAction,
   changeLeadStatusAction,
+  saveBuyerInfoAction,
 } from "@/lib/actions/crm";
 
 // ============================================================
@@ -86,13 +87,40 @@ export default function LeadDetailClient({ lead, notes, tasks }: Props) {
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDueDate, setTaskDueDate] = useState("");
 
+  // Buyer info modal (shown when marking as Sold)
+  const [showBuyerModal, setShowBuyerModal] = useState(false);
+  const [buyerName, setBuyerName] = useState("");
+  const [buyerPhone, setBuyerPhone] = useState("");
+
   function handleStatusChange(newStatus: LeadStatus) {
     if (newStatus === lead.status) return;
+
+    // Intercept "Sold" — show buyer info modal first
+    if (newStatus === "Sold") {
+      setBuyerName(lead.buyerName || lead.name);
+      setBuyerPhone(lead.buyerPhone || lead.phone);
+      setShowBuyerModal(true);
+      return;
+    }
+
     const fd = new FormData();
     fd.set("leadId", lead.id);
     fd.set("newStatus", newStatus);
     startTransition(async () => {
       await changeLeadStatusAction(fd);
+      router.refresh();
+    });
+  }
+
+  function handleConfirmSold() {
+    if (!buyerName.trim() || !buyerPhone.trim()) return;
+    const fd = new FormData();
+    fd.set("leadId", lead.id);
+    fd.set("buyerName", buyerName.trim());
+    fd.set("buyerPhone", buyerPhone.trim());
+    startTransition(async () => {
+      await saveBuyerInfoAction(fd);
+      setShowBuyerModal(false);
       router.refresh();
     });
   }
@@ -170,6 +198,46 @@ export default function LeadDetailClient({ lead, notes, tasks }: Props) {
           </div>
         </div>
       </div>
+
+      {/* ══════════ BUYER INFO (shown when sold) ══════════ */}
+      {lead.status === "Sold" && lead.buyerName && (
+        <div className="rounded-xl border border-emerald-400/10 bg-emerald-400/[0.03] p-5">
+          <h2 className="font-accent text-[10px] uppercase tracking-[0.2em] text-emerald-400/50 mb-3">
+            Buyer Information
+          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+            <div className="flex items-center gap-2">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400/60" aria-hidden="true">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+              <span className="text-sm text-tj-cream/80 font-medium">{lead.buyerName}</span>
+            </div>
+            <a
+              href={`tel:${lead.buyerPhone}`}
+              className="inline-flex items-center gap-2 text-emerald-400/80 hover:text-emerald-400 transition-colors text-sm"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2A19.79 19.79 0 0 1 3.09 5.18 2 2 0 0 1 5.11 3h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 11.91a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+              </svg>
+              {(lead.buyerPhone ?? "").replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3")}
+            </a>
+            <button
+              onClick={() => {
+                setBuyerName(lead.buyerName || "");
+                setBuyerPhone(lead.buyerPhone || "");
+                setShowBuyerModal(true);
+              }}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-accent uppercase tracking-[0.1em] text-white/20 border border-white/[0.04] hover:text-white/40 hover:border-white/[0.08] transition-all ml-auto"
+            >
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 20h9 M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
+              Edit
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ══════════ STATUS PIPELINE ══════════ */}
       <div className="rounded-xl border border-white/[0.04] bg-white/[0.015] p-5">
@@ -388,6 +456,78 @@ export default function LeadDetailClient({ lead, notes, tasks }: Props) {
           </div>
         )}
       </div>
+
+      {/* ══════════ BUYER INFO MODAL ══════════ */}
+      {showBuyerModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setShowBuyerModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative w-full max-w-md rounded-2xl border border-emerald-400/10 bg-[#0a0a0a] p-6 shadow-2xl">
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-8 h-8 rounded-full bg-emerald-400/10 flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400" aria-hidden="true">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-medium text-tj-cream">Mark as Sold</h3>
+                <p className="text-[11px] text-white/30">Enter the buyer&apos;s information</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[10px] font-accent uppercase tracking-[0.2em] text-white/30 mb-1.5">
+                  Buyer Name
+                </label>
+                <input
+                  type="text"
+                  value={buyerName}
+                  onChange={(e) => setBuyerName(e.target.value)}
+                  placeholder="Full name"
+                  autoFocus
+                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-tj-cream/80 placeholder:text-white/15 focus:outline-none focus:border-emerald-400/30 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-accent uppercase tracking-[0.2em] text-white/30 mb-1.5">
+                  Buyer Phone
+                </label>
+                <input
+                  type="tel"
+                  value={buyerPhone}
+                  onChange={(e) => setBuyerPhone(e.target.value)}
+                  placeholder="(555) 555-5555"
+                  className="w-full bg-white/[0.03] border border-white/[0.08] rounded-lg px-3 py-2.5 text-sm text-tj-cream/80 placeholder:text-white/15 focus:outline-none focus:border-emerald-400/30 transition-colors"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2 mt-5">
+              <button
+                onClick={() => setShowBuyerModal(false)}
+                className="flex-1 px-4 py-2 rounded-lg text-[11px] font-accent uppercase tracking-[0.1em] text-white/30 border border-white/[0.06] hover:text-white/50 hover:border-white/[0.1] transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmSold}
+                disabled={isPending || !buyerName.trim() || !buyerPhone.trim()}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-500/90 to-emerald-600/80 text-white text-[11px] font-medium hover:from-emerald-500 hover:to-emerald-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {isPending ? "Saving..." : "Confirm Sale"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

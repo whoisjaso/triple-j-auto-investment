@@ -112,3 +112,34 @@ export async function changeLeadStatusAction(
   revalidatePath("/admin");
   return { success: true };
 }
+
+export async function saveBuyerInfoAction(
+  formData: FormData
+): Promise<{ success: boolean; error?: string }> {
+  const leadId = formData.get("leadId") as string;
+  const buyerName = (formData.get("buyerName") as string)?.trim();
+  const buyerPhone = (formData.get("buyerPhone") as string)?.trim();
+
+  if (!leadId || !buyerName || !buyerPhone) {
+    return { success: false, error: "Buyer name and phone are required." };
+  }
+
+  try {
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      const { createClient } = await import("@/lib/supabase/server");
+      const { updateLeadBuyerInfo } = await import(
+        "@/lib/supabase/queries/crm"
+      );
+      const supabase = await createClient();
+      await updateLeadBuyerInfo(supabase, leadId, buyerName, buyerPhone);
+    }
+  } catch (err) {
+    console.error("Save buyer info error:", err);
+    return { success: false, error: "Failed to save buyer info." };
+  }
+
+  revalidatePath(`/admin/leads/${leadId}`);
+  revalidatePath("/admin/leads");
+  revalidatePath("/admin");
+  return { success: true };
+}

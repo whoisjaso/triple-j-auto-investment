@@ -66,6 +66,8 @@ create table if not exists leads (
     check (source in ('contact_form', 'financing_inquiry', 'vehicle_inquiry', 'schedule_visit')),
   status text not null default 'New'
     check (status in ('New', 'Contacted', 'Qualified', 'Appointment', 'Negotiation', 'Sold', 'Lost')),
+  buyer_name text,
+  buyer_phone text,
   created_at timestamptz default now()
 );
 

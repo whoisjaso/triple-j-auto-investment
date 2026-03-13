@@ -42,6 +42,8 @@ function parseFormData(formData: FormData) {
   const fuelType = (formData.get("fuelType") as string)?.trim() || null;
   const exteriorColor = (formData.get("exteriorColor") as string)?.trim() || null;
   const interiorColor = (formData.get("interiorColor") as string)?.trim() || null;
+  const buyerName = (formData.get("buyerName") as string)?.trim() || null;
+  const buyerPhone = (formData.get("buyerPhone") as string)?.trim() || null;
 
   const year = parseInt(yearStr, 10);
   const price = parseFloat(priceStr);
@@ -52,6 +54,7 @@ function parseFormData(formData: FormData) {
     description, imageUrl, gallery,
     engine, transmission, drivetrain, bodyStyle, fuelType,
     exteriorColor, interiorColor,
+    buyerName, buyerPhone,
   };
 }
 
@@ -92,6 +95,8 @@ export async function createVehicle(
     drivetrain: data.drivetrain,
     engine: data.engine,
     fuel_type: data.fuelType,
+    buyer_name: data.buyerName,
+    buyer_phone: data.buyerPhone,
   };
 
   try {
@@ -142,6 +147,8 @@ export async function updateVehicle(
     drivetrain: data.drivetrain,
     engine: data.engine,
     fuel_type: data.fuelType,
+    buyer_name: data.buyerName,
+    buyer_phone: data.buyerPhone,
   };
 
   try {

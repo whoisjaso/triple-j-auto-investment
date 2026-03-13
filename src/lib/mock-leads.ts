@@ -14,6 +14,8 @@ const MOCK_LEADS: Lead[] = [
     vehicleId: "mock-1",
     source: "vehicle_inquiry",
     status: "New",
+    buyerName: null,
+    buyerPhone: null,
     createdAt: new Date(now - DAY * 0.5).toISOString(),
   },
   {
@@ -25,6 +27,8 @@ const MOCK_LEADS: Lead[] = [
     vehicleId: null,
     source: "contact_form",
     status: "New",
+    buyerName: null,
+    buyerPhone: null,
     createdAt: new Date(now - DAY * 1).toISOString(),
   },
   {
@@ -36,6 +40,8 @@ const MOCK_LEADS: Lead[] = [
     vehicleId: "mock-2",
     source: "financing_inquiry",
     status: "Contacted",
+    buyerName: null,
+    buyerPhone: null,
     createdAt: new Date(now - DAY * 2).toISOString(),
   },
   {
@@ -47,6 +53,8 @@ const MOCK_LEADS: Lead[] = [
     vehicleId: null,
     source: "contact_form",
     status: "Contacted",
+    buyerName: null,
+    buyerPhone: null,
     createdAt: new Date(now - DAY * 3).toISOString(),
   },
   {
@@ -58,6 +66,8 @@ const MOCK_LEADS: Lead[] = [
     vehicleId: "mock-4",
     source: "schedule_visit",
     status: "Sold",
+    buyerName: "Miguel Lopez",
+    buyerPhone: "7135552345",
     createdAt: new Date(now - DAY * 5).toISOString(),
   },
   {
@@ -69,6 +79,8 @@ const MOCK_LEADS: Lead[] = [
     vehicleId: null,
     source: "financing_inquiry",
     status: "Sold",
+    buyerName: "Rosa Sanchez",
+    buyerPhone: "8325556789",
     createdAt: new Date(now - DAY * 6).toISOString(),
   },
   {
@@ -80,6 +92,8 @@ const MOCK_LEADS: Lead[] = [
     vehicleId: "mock-5",
     source: "vehicle_inquiry",
     status: "New",
+    buyerName: null,
+    buyerPhone: null,
     createdAt: new Date(now - DAY * 0.2).toISOString(),
   },
 ];

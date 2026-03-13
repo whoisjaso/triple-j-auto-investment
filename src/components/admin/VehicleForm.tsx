@@ -340,6 +340,37 @@ export default function VehicleForm({ vehicle, action }: VehicleFormProps) {
         </div>
       </div>
 
+      {/* Buyer Information */}
+      <p className={sectionClass}>Buyer Information</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="buyerName" className={labelClass}>
+            Buyer Name
+          </label>
+          <input
+            type="text"
+            id="buyerName"
+            name="buyerName"
+            defaultValue={vehicle?.buyerName || ""}
+            className={inputClass}
+            placeholder="Full name"
+          />
+        </div>
+        <div>
+          <label htmlFor="buyerPhone" className={labelClass}>
+            Buyer Phone
+          </label>
+          <input
+            type="tel"
+            id="buyerPhone"
+            name="buyerPhone"
+            defaultValue={vehicle?.buyerPhone || ""}
+            className={inputClass}
+            placeholder="(555) 555-5555"
+          />
+        </div>
+      </div>
+
       {/* Description */}
       <p className={sectionClass}>Description</p>
       <div>

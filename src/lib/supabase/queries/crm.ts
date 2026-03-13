@@ -46,6 +46,20 @@ export async function updateLeadStatusCrm(
   if (error) throw error;
 }
 
+export async function updateLeadBuyerInfo(
+  client: SupabaseClient,
+  leadId: string,
+  buyerName: string,
+  buyerPhone: string
+): Promise<void> {
+  const { error } = await client
+    .from("leads")
+    .update({ buyer_name: buyerName, buyer_phone: buyerPhone, status: "Sold" })
+    .eq("id", leadId);
+
+  if (error) throw error;
+}
+
 // ============================================================
 // Lead Notes
 // ============================================================
