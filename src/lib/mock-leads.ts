@@ -110,6 +110,17 @@ export function getMockLeads(status?: LeadStatus): Lead[] {
   return results;
 }
 
+export function getMockLeadCountsByStatus(): Record<LeadStatus, number> {
+  const counts: Record<LeadStatus, number> = {
+    New: 0, Contacted: 0, Qualified: 0, Appointment: 0,
+    Negotiation: 0, Sold: 0, Lost: 0,
+  };
+  for (const lead of MOCK_LEADS) {
+    counts[lead.status]++;
+  }
+  return counts;
+}
+
 export function getMockLeadStats(): {
   totalVehicles: number;
   totalLeads: number;

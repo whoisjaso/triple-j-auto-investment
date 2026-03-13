@@ -10,16 +10,16 @@ See: .paul/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Milestone: v0.2 Dealer Intelligence System
-Phase: 10 of 12 (CRM) — Plan 10-01 Complete
-Plan: 10-01 complete (CRM Foundation)
-Status: Loop closed — ready for Plan 10-02
-Last activity: 2026-03-11 — Committed & pushed CRM + mobile fixes (40a19a6)
+Phase: 10 of 12 (CRM) — Plan 10-02 Created
+Plan: 10-02 created (CRM Pipeline Board + Dashboard Stats), awaiting approval
+Status: PLAN created, ready for APPLY
+Last activity: 2026-03-12 — Created .paul/phases/10-crm/10-02-PLAN.md
 
 Progress:
 - v0.1 Initial Release: [##########] 100% ★
-- v0.2 Dealer Intelligence: [######░░░░] 35%
+- v0.2 Dealer Intelligence: [######░░░░] 38%
   - Phase 9 (Pipeline): ✅ Complete (3/3 plans)
-  - Phase 10 (CRM): In Progress (1/~2 plans done)
+  - Phase 10 (CRM): In Progress (1/~2 plans done, plan 2 created)
   - Phase 11 (BI): Not started
   - Phase 12 (Advanced): Not started
 
@@ -28,7 +28,7 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ✓     [Plan 10-01 complete — CRM Foundation]
+  ✓        ○        ○     [Plan 10-02 created, awaiting approval]
 ```
 
 ## Accumulated Context
@@ -55,6 +55,8 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - CRM pipeline: 7 stages (New → Contacted → Qualified → Appointment → Negotiation → Sold → Lost)
 - Lead detail page with notes, tasks, and status pipeline stepper
 - Mobile: static images for scroll sections (no GPU frame animation) with radial gradient mask
+- Buyer info (name, phone) captured on lead "Sold" status + editable on vehicle edit form
+- Future document generation: bill of sale, 130-U, rental agreements, as-is guides, vehicle registration
 
 ### Deferred Issues
 - RLS is permissive for anon (admin auth at middleware level) — needs Supabase Auth in v0.2
@@ -69,7 +71,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Migrate real inventory from Google Sheets (user deferred this)
 
 ### Git State
-Last commit: 40a19a6 feat(10-crm): CRM foundation + mobile scroll optimization
+Last commit: b4b8457 feat(10-crm): add buyer info capture on lead sale + editable vehicle buyer fields
 Branch: main
 Feature branches merged: none
 
@@ -78,10 +80,10 @@ Feature branches merged: none
 
 ## Session Continuity
 
-Last session: 2026-03-11
-Stopped at: Plan 10-01 closed (CRM Foundation complete, pushed to production)
-Next action: Plan 10-02 (CRM pipeline board + dashboard) or migrate real inventory
-Resume file: .paul/phases/10-crm/10-01-SUMMARY.md
+Last session: 2026-03-12
+Stopped at: Plan 10-02 created (CRM Pipeline Board + Dashboard Stats)
+Next action: Review and approve plan, then run /paul:apply
+Resume file: .paul/phases/10-crm/10-02-PLAN.md
 
 ---
 *STATE.md -- Updated after every significant action*

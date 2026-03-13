@@ -79,6 +79,17 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
             {statusFilter ? ` \u00B7 ${statusFilter}` : ""}
           </p>
         </div>
+        <div className="flex items-center gap-1 bg-white/[0.02] rounded-lg border border-white/[0.04] p-0.5">
+          <span className="px-3 py-1.5 rounded-md text-[10px] font-accent uppercase tracking-[0.12em] text-tj-gold bg-white/[0.04]">
+            List
+          </span>
+          <Link
+            href="/admin/leads/board"
+            className="px-3 py-1.5 rounded-md text-[10px] font-accent uppercase tracking-[0.12em] text-white/30 hover:text-white/50 hover:bg-white/[0.03] transition-all"
+          >
+            Board
+          </Link>
+        </div>
       </div>
 
       {/* Status filter tabs — scrollable on mobile */}

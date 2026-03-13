@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { Lead } from "@/types/database";
+import type { Lead, LeadStatus } from "@/types/database";
 
 interface Stats {
   totalVehicles: number;
@@ -30,6 +30,17 @@ async function getPipelineCount(): Promise<number> {
     return count ?? 0;
   }
   return 0;
+}
+
+async function getLeadPipelineCounts(): Promise<Record<LeadStatus, number>> {
+  if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    const { createClient } = await import("@/lib/supabase/server");
+    const { getLeadCountsByStatus } = await import("@/lib/supabase/queries/leads");
+    const supabase = await createClient();
+    return getLeadCountsByStatus(supabase);
+  }
+  const { getMockLeadCountsByStatus } = await import("@/lib/mock-leads");
+  return getMockLeadCountsByStatus();
 }
 
 async function getRecentLeads(): Promise<Lead[]> {
@@ -74,10 +85,11 @@ function formatPhone(phone: string): string {
 }
 
 export default async function AdminDashboardPage() {
-  const [stats, recentLeads, pipelineCount] = await Promise.all([
+  const [stats, recentLeads, pipelineCount, leadCounts] = await Promise.all([
     getStats(),
     getRecentLeads(),
     getPipelineCount(),
+    getLeadPipelineCounts(),
   ]);
 
   return (
@@ -194,6 +206,45 @@ export default async function AdminDashboardPage() {
           <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
             New Leads
           </p>
+        </div>
+      </div>
+
+      {/* Lead Pipeline Breakdown */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-accent text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/30">
+            Lead Pipeline
+          </h2>
+          <Link
+            href="/admin/leads/board"
+            className="font-accent text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
+          >
+            View Board &rarr;
+          </Link>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {([
+            { status: "New" as LeadStatus, color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/15" },
+            { status: "Contacted" as LeadStatus, color: "text-amber-400", bg: "bg-amber-400/10 border-amber-400/15" },
+            { status: "Qualified" as LeadStatus, color: "text-cyan-400", bg: "bg-cyan-400/10 border-cyan-400/15" },
+            { status: "Appointment" as LeadStatus, color: "text-purple-400", bg: "bg-purple-400/10 border-purple-400/15" },
+            { status: "Negotiation" as LeadStatus, color: "text-orange-400", bg: "bg-orange-400/10 border-orange-400/15" },
+            { status: "Sold" as LeadStatus, color: "text-emerald-400", bg: "bg-emerald-400/10 border-emerald-400/15" },
+            { status: "Lost" as LeadStatus, color: "text-red-400", bg: "bg-red-400/10 border-red-400/15" },
+          ]).map(({ status, color, bg }) => (
+            <Link
+              key={status}
+              href={`/admin/leads?status=${status}`}
+              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${bg} hover:opacity-80 transition-opacity`}
+            >
+              <span className={`text-lg font-serif ${color}`}>
+                {leadCounts[status]}
+              </span>
+              <span className={`text-[10px] font-accent uppercase tracking-[0.1em] ${color} opacity-70`}>
+                {status}
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
 

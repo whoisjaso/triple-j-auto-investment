@@ -66,6 +66,33 @@ export async function getLeadStats(
   };
 }
 
+const ALL_STATUSES: LeadStatus[] = [
+  "New", "Contacted", "Qualified", "Appointment", "Negotiation", "Sold", "Lost",
+];
+
+export async function getLeadCountsByStatus(
+  client: SupabaseClient
+): Promise<Record<LeadStatus, number>> {
+  const counts = Object.fromEntries(
+    ALL_STATUSES.map((s) => [s, 0])
+  ) as Record<LeadStatus, number>;
+
+  const results = await Promise.all(
+    ALL_STATUSES.map((status) =>
+      client
+        .from("leads")
+        .select("id", { count: "exact", head: true })
+        .eq("status", status)
+    )
+  );
+
+  ALL_STATUSES.forEach((status, i) => {
+    counts[status] = results[i].count ?? 0;
+  });
+
+  return counts;
+}
+
 export async function updateLeadStatus(
   client: SupabaseClient,
   id: string,
