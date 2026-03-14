@@ -161,7 +161,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* ══════════ DESKTOP SIDEBAR ══════════ */}
-      <aside className="hidden md:flex fixed top-0 left-0 bottom-0 z-50 w-60 bg-black border-r border-white/[0.04] flex-col">
+      <aside className="hidden md:flex fixed top-0 left-0 bottom-0 z-50 w-60 bg-black border-r border-white/[0.04] flex-col print:!hidden">
         <div className="h-16 flex items-center px-5 border-b border-white/[0.04]">
           <Link href="/admin" className="flex items-center gap-3">
             <Image
@@ -260,7 +260,7 @@ export default function AdminSidebar() {
 
       {/* ══════════ MOBILE BOTTOM TAB BAR ══════════ */}
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 print:!hidden"
         aria-label="Admin navigation"
       >
         <div className="bg-black/90 backdrop-blur-xl border-t border-white/[0.06] px-2 pb-[env(safe-area-inset-bottom)]">

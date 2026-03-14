@@ -103,3 +103,30 @@ select option:hover {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ══════════ PRINT STYLES ══════════ */
+@media print {
+  @page {
+    size: letter;
+    margin: 0.4in;
+  }
+
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Reset all overflow locks for printing */
+  * {
+    overflow: visible !important;
+  }
+
+  /* Page break helpers */
+  .print-page-break {
+    page-break-before: always;
+  }
+}

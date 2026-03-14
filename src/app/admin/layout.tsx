@@ -20,9 +20,9 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-[#050505] md:min-h-screen max-md:h-[100dvh] max-md:overflow-hidden max-md:flex max-md:flex-col">
+    <div className="min-h-screen bg-[#050505] md:min-h-screen max-md:h-[100dvh] max-md:overflow-hidden max-md:flex max-md:flex-col print:!h-auto print:!overflow-visible print:!block print:!bg-white">
       <AdminSidebar />
-      <main className="md:ml-60 min-h-screen md:pb-0 max-md:flex-1 max-md:overflow-y-auto max-md:pb-16 max-md:min-h-0">{children}</main>
+      <main className="md:ml-60 min-h-screen md:pb-0 max-md:flex-1 max-md:overflow-y-auto max-md:pb-16 max-md:min-h-0 print:!ml-0 print:!p-0 print:!overflow-visible print:!h-auto">{children}</main>
     </div>
   );
 }

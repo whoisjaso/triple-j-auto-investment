@@ -91,7 +91,6 @@ interface Props {
 export default function DocumentEditor({ initialSection = 'billOfSale', vehiclePrefill, buyerPrefill }: Props) {
   const [section, setSection] = useState<Section>(initialSection);
   const [view, setView] = useState<'edit' | 'preview'>('edit');
-  const [downloading, setDownloading] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareLink, setShareLink] = useState('');
   const [copied, setCopied] = useState(false);
@@ -152,40 +151,16 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
   });
   const [signatures, setSignatures] = useState<SignatureData>(emptySignatures);
 
-  const getClientName = () => {
-    if (section === 'financing') return contractData.buyerName || 'Document';
-    if (section === 'rental') return rentalData.renterName || 'Document';
-    if (section === 'billOfSale') return billOfSaleData.buyerName || 'Document';
-    const n = form130UData.applicantType === 'Individual'
-      ? [form130UData.applicantFirstName, form130UData.applicantLastName].filter(Boolean).join('_')
-      : form130UData.applicantEntityName;
-    return n || 'Document';
-  };
-
-  const handleDownloadPDF = async () => {
-    setDownloading(true);
+  const handlePrint = useCallback(() => {
     const prevView = view;
     setView('preview');
-    await new Promise((r) => setTimeout(r, 400));
-    const element = previewRef.current;
-    if (!element) { setDownloading(false); return; }
-    const name = getClientName();
-    const filename = `Triple_J_${sectionLabels[section]}_${name.replace(/\s+/g, '_')}.pdf`;
-    try {
-      const html2pdf = (await import('html2pdf.js')).default;
-      const opt = {
-        margin: 0, filename,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] },
-      };
-      await html2pdf().set(opt).from(element).save();
-    } finally {
+    // Wait for React to render the preview, then print
+    setTimeout(() => {
+      window.print();
+      // Restore view after print dialog closes
       setView(prevView);
-      setDownloading(false);
-    }
-  };
+    }, 300);
+  }, [view]);
 
   const handlePrefill130U = () => {
     const prefilled = prefillFromBillOfSale(billOfSaleData);
@@ -227,7 +202,7 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 mb-6">
+      <div className="flex flex-wrap items-center gap-2 mb-6 print:hidden">
         {/* Section Tabs */}
         <div className="bg-white/[0.03] p-1 rounded-full border border-white/[0.06] flex flex-wrap gap-1">
           {sectionButtons.map((btn) => (
@@ -250,12 +225,12 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
         {/* Actions */}
         <div className="flex gap-2 ml-auto">
           <button onClick={handleSendToCustomer} className="px-3 py-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-emerald-700 transition-all flex items-center space-x-1">
-            <Send size={12} /><span>Send to Customer</span>
+            <Send size={12} /><span className="hidden sm:inline">Send to Customer</span><span className="sm:hidden">Send</span>
           </button>
-          <button onClick={handleDownloadPDF} disabled={downloading} className="px-3 py-1.5 bg-white/10 text-tj-gold rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-white/15 transition-all flex items-center space-x-1 border border-tj-gold/20 disabled:opacity-50">
-            <Download size={12} /><span>{downloading ? '...' : 'PDF'}</span>
+          <button onClick={handlePrint} className="px-3 py-1.5 bg-white/10 text-tj-gold rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-white/15 transition-all flex items-center space-x-1 border border-tj-gold/20">
+            <Download size={12} /><span>PDF</span>
           </button>
-          <button onClick={() => window.print()} className="px-3 py-1.5 bg-tj-gold text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-tj-gold/90 transition-all flex items-center space-x-1">
+          <button onClick={handlePrint} className="px-3 py-1.5 bg-tj-gold text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-tj-gold/90 transition-all flex items-center space-x-1">
             <Printer size={12} /><span>Print</span>
           </button>
         </div>
@@ -271,7 +246,7 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
           <SignatureBlock signatures={signatures} onChange={setSignatures} mode="dealer" />
         </div>
       ) : (
-        <div ref={previewRef} className="bg-white shadow-2xl border border-white/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
+        <div ref={previewRef} className="bg-white shadow-2xl border border-white/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none print:m-0">
           {section === 'financing' && <ContractPreview data={contractData} signatures={signatures} />}
           {section === 'rental' && <RentalPreview data={rentalData} signatures={signatures} />}
           {section === 'billOfSale' && <BillOfSalePreview data={billOfSaleData} signatures={signatures} />}
