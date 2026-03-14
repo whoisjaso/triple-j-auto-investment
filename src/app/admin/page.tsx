@@ -93,31 +93,30 @@ export default async function AdminDashboardPage() {
   ]);
 
   return (
-    <div className="px-4 py-6 md:p-8 max-w-5xl">
+    <div className="px-3 py-3 md:p-8 max-w-5xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-serif text-2xl md:text-3xl text-tj-cream/90 tracking-wide">
+      <div className="mb-4 md:mb-8">
+        <h1 className="font-serif text-xl md:text-3xl text-tj-cream/90 tracking-wide">
           Dashboard
         </h1>
-        <p className="text-xs text-white/25 mt-1 font-accent uppercase tracking-[0.15em]">
+        <p className="text-[9px] md:text-xs text-white/25 mt-0.5 md:mt-1 font-accent uppercase tracking-[0.15em]">
           Triple J Auto Investment
         </p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-8">
-        <div className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-tj-gold/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
+      <div className="grid grid-cols-4 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8">
+        <div className="relative overflow-hidden rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5 md:p-6">
           <svg
-            width="18"
-            height="18"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-tj-gold/40 mb-3"
+            className="text-tj-gold/40 mb-1 md:mb-3 md:w-[18px] md:h-[18px]"
             aria-hidden="true"
           >
             <rect x="1" y="3" width="15" height="13" rx="2" />
@@ -126,103 +125,100 @@ export default async function AdminDashboardPage() {
             <circle cx="18.5" cy="18.5" r="2.5" />
             <path d="M8 18.5h8" />
           </svg>
-          <p className="font-serif text-2xl md:text-4xl text-tj-cream/90">
+          <p className="font-serif text-lg md:text-4xl text-tj-cream/90">
             {stats.totalVehicles}
           </p>
-          <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
+          <p className="text-[8px] md:text-xs text-white/25 uppercase tracking-[0.1em] md:tracking-[0.15em] font-accent mt-0.5 md:mt-1">
             Vehicles
           </p>
         </div>
 
-        <Link href="/admin/pipeline" className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6 hover:bg-white/[0.03] hover:border-purple-400/10 transition-all duration-300">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-purple-400/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
+        <Link href="/admin/pipeline" className="relative overflow-hidden rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5 md:p-6 hover:bg-white/[0.03] hover:border-purple-400/10 transition-all duration-300">
           <svg
-            width="18"
-            height="18"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-purple-400/40 mb-3"
+            className="text-purple-400/40 mb-1 md:mb-3 md:w-[18px] md:h-[18px]"
             aria-hidden="true"
           >
             <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
           </svg>
-          <p className="font-serif text-2xl md:text-4xl text-tj-cream/90">
+          <p className="font-serif text-lg md:text-4xl text-tj-cream/90">
             {pipelineCount}
           </p>
-          <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
-            In Pipeline
+          <p className="text-[8px] md:text-xs text-white/25 uppercase tracking-[0.1em] md:tracking-[0.15em] font-accent mt-0.5 md:mt-1">
+            Pipeline
           </p>
         </Link>
 
-        <div className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-tj-gold/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="relative overflow-hidden rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5 md:p-6">
           <svg
-            width="18"
-            height="18"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-tj-gold/40 mb-3"
+            className="text-tj-gold/40 mb-1 md:mb-3 md:w-[18px] md:h-[18px]"
             aria-hidden="true"
           >
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
           </svg>
-          <p className="font-serif text-2xl md:text-4xl text-tj-cream/90">
+          <p className="font-serif text-lg md:text-4xl text-tj-cream/90">
             {stats.totalLeads}
           </p>
-          <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
-            Total Leads
+          <p className="text-[8px] md:text-xs text-white/25 uppercase tracking-[0.1em] md:tracking-[0.15em] font-accent mt-0.5 md:mt-1">
+            Leads
           </p>
         </div>
 
-        <div className="relative overflow-hidden rounded-xl border border-white/[0.04] bg-white/[0.02] p-4 md:p-6">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-blue-400/[0.03] rounded-full -translate-y-1/2 translate-x-1/2" />
+        <div className="relative overflow-hidden rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5 md:p-6">
           <svg
-            width="18"
-            height="18"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-blue-400/40 mb-3"
+            className="text-blue-400/40 mb-1 md:mb-3 md:w-[18px] md:h-[18px]"
             aria-hidden="true"
           >
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
             <path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
-          <p className="font-serif text-2xl md:text-4xl text-tj-cream/90">
+          <p className="font-serif text-lg md:text-4xl text-tj-cream/90">
             {stats.newLeads}
           </p>
-          <p className="text-[10px] md:text-xs text-white/25 uppercase tracking-[0.15em] font-accent mt-1">
-            New Leads
+          <p className="text-[8px] md:text-xs text-white/25 uppercase tracking-[0.1em] md:tracking-[0.15em] font-accent mt-0.5 md:mt-1">
+            New
           </p>
         </div>
       </div>
 
       {/* Lead Pipeline Breakdown */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-accent text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/30">
+      <div className="mb-4 md:mb-8">
+        <div className="flex items-center justify-between mb-2 md:mb-4">
+          <h2 className="font-accent text-[9px] md:text-xs uppercase tracking-[0.2em] text-white/30">
             Lead Pipeline
           </h2>
           <Link
             href="/admin/leads/board"
-            className="font-accent text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
+            className="font-accent text-[9px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
           >
             View Board &rarr;
           </Link>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5 md:gap-2">
           {([
             { status: "New" as LeadStatus, color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/15" },
             { status: "Contacted" as LeadStatus, color: "text-amber-400", bg: "bg-amber-400/10 border-amber-400/15" },
@@ -235,12 +231,12 @@ export default async function AdminDashboardPage() {
             <Link
               key={status}
               href={`/admin/leads?status=${status}`}
-              className={`inline-flex items-center gap-2 px-3 py-2 rounded-lg border ${bg} hover:opacity-80 transition-opacity`}
+              className={`inline-flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-2 rounded-md md:rounded-lg border ${bg} hover:opacity-80 transition-opacity`}
             >
-              <span className={`text-lg font-serif ${color}`}>
+              <span className={`text-sm md:text-lg font-serif ${color}`}>
                 {leadCounts[status]}
               </span>
-              <span className={`text-[10px] font-accent uppercase tracking-[0.1em] ${color} opacity-70`}>
+              <span className={`text-[8px] md:text-[10px] font-accent uppercase tracking-[0.1em] ${color} opacity-70`}>
                 {status}
               </span>
             </Link>
@@ -250,41 +246,38 @@ export default async function AdminDashboardPage() {
 
       {/* Recent Leads */}
       {recentLeads.length > 0 && (
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-accent text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/30">
+        <div className="mb-4 md:mb-8">
+          <div className="flex items-center justify-between mb-2 md:mb-4">
+            <h2 className="font-accent text-[9px] md:text-xs uppercase tracking-[0.2em] text-white/30">
               Recent Leads
             </h2>
             <Link
               href="/admin/leads"
-              className="font-accent text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
+              className="font-accent text-[9px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
             >
               View All &rarr;
             </Link>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-1.5 md:space-y-2">
             {recentLeads.map((lead) => (
               <Link
                 key={lead.id}
                 href={`/admin/leads/${lead.id}`}
-                className="flex items-center justify-between p-4 rounded-xl border border-white/[0.04] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.06] transition-all duration-300 min-h-[56px] group"
+                className="flex items-center justify-between px-3 py-2.5 md:p-4 rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.06] transition-all duration-300 group"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-tj-cream/80 font-medium truncate">
+                  <p className="text-xs md:text-sm text-tj-cream/80 font-medium truncate">
                     {lead.name}
                   </p>
-                  <p className="text-xs text-white/25 mt-0.5">
+                  <p className="text-[10px] md:text-xs text-white/25 mt-0.5">
                     {formatPhone(lead.phone)}
                   </p>
                 </div>
-                <div className="flex items-center gap-3 shrink-0 ml-3">
+                <div className="flex items-center gap-2 md:gap-3 shrink-0 ml-3">
                   <span
-                    className={`inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-medium border ${STATUS_COLORS[lead.status] ?? ""}`}
+                    className={`inline-flex items-center px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[9px] md:text-[10px] font-medium border ${STATUS_COLORS[lead.status] ?? ""}`}
                   >
                     {lead.status}
-                  </span>
-                  <span className="text-[10px] text-white/15 hidden sm:inline font-accent tracking-wide">
-                    {relativeDate(lead.createdAt)}
                   </span>
                 </div>
               </Link>
@@ -294,10 +287,10 @@ export default async function AdminDashboardPage() {
       )}
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
         <Link
           href="/admin/pipeline"
-          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
+          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
         >
           <svg
             width="20"
@@ -308,7 +301,7 @@ export default async function AdminDashboardPage() {
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-tj-gold/50 mb-3"
+            className="text-tj-gold/50 mb-1.5 md:mb-3"
             aria-hidden="true"
           >
             <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
@@ -321,7 +314,7 @@ export default async function AdminDashboardPage() {
 
         <Link
           href="/admin/inventory"
-          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
+          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
         >
           <svg
             width="20"
@@ -332,7 +325,7 @@ export default async function AdminDashboardPage() {
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-tj-gold/50 mb-3"
+            className="text-tj-gold/50 mb-1.5 md:mb-3"
             aria-hidden="true"
           >
             <rect x="1" y="3" width="15" height="13" rx="2" />
@@ -349,7 +342,7 @@ export default async function AdminDashboardPage() {
 
         <Link
           href="/admin/leads"
-          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
+          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
         >
           <svg
             width="20"
@@ -360,7 +353,7 @@ export default async function AdminDashboardPage() {
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-tj-gold/50 mb-3"
+            className="text-tj-gold/50 mb-1.5 md:mb-3"
             aria-hidden="true"
           >
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
@@ -376,7 +369,7 @@ export default async function AdminDashboardPage() {
 
         <Link
           href="/admin/analytics"
-          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
+          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
         >
           <svg
             width="20"
@@ -387,7 +380,7 @@ export default async function AdminDashboardPage() {
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-tj-gold/50 mb-3"
+            className="text-tj-gold/50 mb-1.5 md:mb-3"
             aria-hidden="true"
           >
             <path d="M18 20V10" />
@@ -404,7 +397,7 @@ export default async function AdminDashboardPage() {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
+          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
         >
           <svg
             width="20"
@@ -415,7 +408,7 @@ export default async function AdminDashboardPage() {
             strokeWidth="1.5"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-tj-gold/50 mb-3"
+            className="text-tj-gold/50 mb-1.5 md:mb-3"
             aria-hidden="true"
           >
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
