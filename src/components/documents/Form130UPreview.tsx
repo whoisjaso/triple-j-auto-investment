@@ -42,7 +42,7 @@ export default function Form130UPreview({ data, signatures }: Props) {
   const sectionHeaderClass = "bg-gray-800 text-white text-[8px] font-bold uppercase tracking-wider px-2 py-1";
 
   return (
-    <div className="bg-white text-black max-w-[8.5in] mx-auto relative print:m-0"
+    <div className="bg-white text-black max-w-[8.5in] mx-auto relative print:m-0 print-doc"
       style={{ fontFamily: 'Arial, Helvetica, sans-serif', fontSize: '10px', padding: '0.3in 0.4in' }}>
 
       {/* === HEADER === */}
@@ -459,7 +459,7 @@ export default function Form130UPreview({ data, signatures }: Props) {
       )}
 
       {/* === CERTIFICATION & SIGNATURES === */}
-      <div className="border-2 border-black mb-2 mt-3">
+      <div className="border-2 border-black mb-2 mt-3 print-section">
         <div className="bg-black text-white text-[8px] font-bold uppercase tracking-wider px-2 py-1.5 text-center">
           Certification
         </div>

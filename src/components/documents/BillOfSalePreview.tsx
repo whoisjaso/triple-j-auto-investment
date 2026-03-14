@@ -27,15 +27,15 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
     'IS NOT the actual mileage. ODOMETER DISCREPANCY.';
 
   return (
-    <div className="bg-white p-10 md:p-16 text-[#1a1a1a] font-sans max-w-5xl mx-auto relative">
+    <div className="bg-white p-10 md:p-16 text-[#1a1a1a] font-sans max-w-5xl mx-auto relative print-doc">
       {/* Watermark */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none overflow-hidden print-no-watermark">
         <div className="font-serif font-bold text-[400px] leading-none">JJJ</div>
       </div>
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex justify-between items-end border-b-2 border-[#1a1a1a] pb-8 mb-10">
+        <div className="flex justify-between items-end border-b-2 border-[#1a1a1a] pb-8 mb-10 print-section">
           <div className="flex items-center space-x-6">
             <div className="w-24 h-24 border-2 border-[#b89b5e] p-1 rounded-full overflow-hidden flex items-center justify-center bg-white">
               <img src="/GoldTripleJLogo.webp" alt="Triple J Logo" className="w-full h-full object-contain" />
@@ -65,7 +65,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         </div>
 
         {/* Seller / Dealer */}
-        <div className="mb-10 border border-[#b89b5e]/30 p-6 rounded-sm bg-[#b89b5e]/5">
+        <div className="mb-10 border border-[#b89b5e]/30 p-6 rounded-sm bg-[#b89b5e]/5 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#b89b5e] mb-3">Seller (Dealer)</h3>
           <div className="grid grid-cols-3 gap-6 text-sm">
             <div>
@@ -85,7 +85,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         </div>
 
         {/* Buyer / Co-Buyer */}
-        <div className="grid grid-cols-2 gap-12 mb-10">
+        <div className="grid grid-cols-2 gap-12 mb-10 print-section">
           <div className="border border-[#1a1a1a]/10 p-6 rounded-sm bg-[#f5f2ed]/30">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Buyer Information</h3>
             <p className="font-serif text-xl mb-1 min-h-[1.75rem]">{data.buyerName}</p>
@@ -111,7 +111,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         </div>
 
         {/* Vehicle Description */}
-        <div className="mb-10">
+        <div className="mb-10 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Vehicle Description</h3>
           <table className="w-full text-sm border-collapse">
             <thead>
@@ -152,7 +152,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         </div>
 
         {/* Sale Summary Boxes (mirrors Truth in Lending) */}
-        <div className="mb-10">
+        <div className="mb-10 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Sale Summary</h3>
           <div className="grid grid-cols-4 border-2 border-[#1a1a1a] divide-x-2 divide-[#1a1a1a]">
             <div className="p-4 flex flex-col justify-between">
@@ -187,7 +187,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         </div>
 
         {/* Itemization & Condition */}
-        <div className="grid grid-cols-2 gap-12 mb-12">
+        <div className="grid grid-cols-2 gap-12 mb-12 print-section">
           {/* Itemization */}
           <div>
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Itemization of Sale Price</h3>
@@ -310,7 +310,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         )}
 
         {/* Odometer Disclosure Statement */}
-        <div className="mb-10 border-2 border-[#1a1a1a] p-6">
+        <div className="mb-10 border-2 border-[#1a1a1a] p-6 print-section">
           <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-4 text-center">Federal Odometer Disclosure Statement</h3>
           <p className="text-xs text-justify leading-relaxed mb-4">
             In accordance with federal law (49 U.S.C. § 32705) and applicable state law, the seller hereby discloses that the odometer of the vehicle described herein reads <strong className="font-mono text-sm">{data.odometerReading || '___________'}</strong> miles, and to the best of the seller&apos;s knowledge, said odometer reading <strong>{odometerLabel}</strong>.
@@ -334,7 +334,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         </div>
 
         {/* Terms */}
-        <div className="mb-16 text-[11px] text-justify space-y-3 text-[#1a1a1a]/70 columns-2 gap-8">
+        <div className="mb-16 text-[11px] text-justify space-y-3 text-[#1a1a1a]/70 columns-2 gap-8 print-section">
           <p>
             <strong>TRANSFER OF TITLE:</strong> The Seller agrees to transfer title and all rights of ownership of the above-described vehicle to the Buyer upon receipt of full payment. The Seller warrants that they hold clear title to the vehicle, free of all liens and encumbrances, except as otherwise noted herein.
           </p>
@@ -365,7 +365,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         )}
 
         {/* Signatures */}
-        <div className="space-y-12 bg-[#f5f2ed]/30 p-8 border border-[#1a1a1a]/10">
+        <div className="space-y-12 bg-[#f5f2ed]/30 p-8 border border-[#1a1a1a]/10 print-signatures">
           <div className="text-sm font-bold mb-8 text-center font-serif text-lg">
             By signing below, all parties acknowledge and agree to the terms set forth in this Bill of Sale. Each party confirms they have read and understood this document in its entirety.
           </div>
@@ -382,7 +382,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
         </div>
 
         {/* Buyer Acknowledgment Page (print page break) */}
-        <div className="mt-20 pt-12 border-t-2 border-[#1a1a1a] print:break-before-page">
+        <div className="mt-20 pt-12 border-t-2 border-[#1a1a1a] print-page-break print-section">
           <div className="text-center mb-10">
             <h3 className="text-2xl font-serif font-bold uppercase tracking-widest">Buyer Acknowledgment</h3>
             <p className="text-xs text-[#1a1a1a]/60 mt-2 tracking-wider uppercase">Retain this copy for your records</p>

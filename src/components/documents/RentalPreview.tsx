@@ -23,15 +23,15 @@ export default function RentalPreview({ data, signatures }: Props) {
   };
 
   return (
-    <div className="bg-white p-10 md:p-16 text-[#1a1a1a] font-sans max-w-5xl mx-auto relative">
+    <div className="bg-white p-10 md:p-16 text-[#1a1a1a] font-sans max-w-5xl mx-auto relative print-doc">
       {/* Watermark / Background Logo */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none overflow-hidden print-no-watermark">
         <div className="font-serif font-bold text-[400px] leading-none">JJJ</div>
       </div>
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex justify-between items-end border-b-2 border-[#1a1a1a] pb-8 mb-10">
+        <div className="flex justify-between items-end border-b-2 border-[#1a1a1a] pb-8 mb-10 print-section">
           <div className="flex items-center space-x-6">
             <div className="w-24 h-24 border-2 border-[#b89b5e] p-1 rounded-full overflow-hidden flex items-center justify-center bg-white">
               <img
@@ -300,7 +300,7 @@ export default function RentalPreview({ data, signatures }: Props) {
         )}
 
         {/* Signatures */}
-        <div className="space-y-12 bg-[#f5f2ed]/30 p-8 border border-[#1a1a1a]/10 print-section">
+        <div className="space-y-12 bg-[#f5f2ed]/30 p-8 border border-[#1a1a1a]/10 print-signatures">
           <div className="text-sm font-bold mb-8 text-center font-serif text-lg">
             By signing below, you agree to the terms of this rental agreement. You acknowledge that you have read it completely before signing.
           </div>
@@ -317,7 +317,7 @@ export default function RentalPreview({ data, signatures }: Props) {
 
         {/* Full Payment Tracking Schedule (Page Break for Print) */}
         {schedule.length > 0 && (
-          <div className="mt-20 pt-12 border-t-2 border-[#1a1a1a] print:break-before-page">
+          <div className="mt-20 pt-12 border-t-2 border-[#1a1a1a] print-page-break">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-serif font-bold uppercase tracking-widest">Payment Tracking Schedule</h3>
               <p className="text-xs text-[#1a1a1a]/60 mt-2 tracking-wider uppercase">
