@@ -213,7 +213,7 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
                     return (
                       <div key={field}>
                         <label className="block text-[10px] font-semibold tracking-widest uppercase text-[#1a1a1a]/70 mb-2">{label}</label>
-                        <select name={field} value={customerData[field] || 'Individual'} onChange={handleChange} className="w-full px-4 py-3 bg-white border border-[#1a1a1a]/10 rounded-lg focus:outline-none focus:border-[#b89b5e] text-sm">
+                        <select name={field} value={customerData[field] || 'Individual'} onChange={handleChange} className="w-full px-4 py-3 bg-black text-tj-cream border border-white/[0.06] rounded-lg focus:outline-none focus:border-[#b89b5e] text-sm">
                           <option value="Individual">Individual</option>
                           <option value="Business">Business</option>
                           <option value="Government">Government</option>

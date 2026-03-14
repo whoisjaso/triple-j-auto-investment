@@ -19,8 +19,18 @@ interface Phase {
 }
 
 const PHASES: Phase[] = [
+  // Intro: "Claim Your Keys" visible immediately when section enters view
   {
-    start: 0.05,
+    start: -0.1,
+    end: 0.04,
+    side: "center",
+    labelKey: "keysPhase3",
+    headingKey: "keysHeading3",
+    ctaKey: "keysCta",
+    ctaHref: "/inventory",
+  },
+  {
+    start: 0.08,
     end: 0.35,
     side: "right",
     labelKey: "keysPhase1",
@@ -35,6 +45,7 @@ const PHASES: Phase[] = [
     headingKey: "keysHeading2",
     heading2Key: "keysSub2",
   },
+  // Reappears at the end
   {
     start: 0.75,
     end: 1.0,
@@ -107,6 +118,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
     const isMobile = window.innerWidth < 768;
     const canvasScale = isMobile ? 0.5 : 1;
     const opacities = new Array(PHASES.length).fill(0);
+    opacities[0] = 1; // Intro phase starts visible
 
     // Defer frame loading until section is approaching viewport (saves ~6MB network at page load)
     let loadStarted = false;
@@ -284,7 +296,7 @@ export default function KeysSection({ onProgress }: KeysSectionProps) {
               key={i}
               ref={(el) => { overlayRefs.current[i] = el; }}
               className={`absolute z-10 max-w-full md:max-w-[340px] flex flex-col items-center text-center ${positionClasses}`}
-              style={{ visibility: "hidden", opacity: 0 }}
+              style={i === 0 ? { visibility: "visible", opacity: 1 } : { visibility: "hidden", opacity: 0 }}
             >
               <span className="font-accent text-[10px] md:text-[9px] uppercase tracking-[0.4em] text-tj-gold-light mb-2 md:mb-4">
                 {t(phase.labelKey)}

@@ -20,8 +20,18 @@ interface Phase {
 }
 
 const PHASES: Phase[] = [
+  // Intro: "Your Journey Begins" visible immediately before scrolling
   {
-    start: 0.05,
+    start: -0.1,
+    end: 0.05,
+    side: "center",
+    labelKey: "maybachPhase3",
+    headingKey: "maybachHeading3",
+    ctaKey: "maybachCta",
+    ctaHref: "/inventory",
+  },
+  {
+    start: 0.08,
     end: 0.28,
     side: "right",
     labelKey: "maybachPhase1",
@@ -36,6 +46,7 @@ const PHASES: Phase[] = [
     headingKey: "maybachHeading2",
     heading2Key: "maybachSub2",
   },
+  // Reappears at the end
   {
     start: 0.60,
     end: 0.92,
@@ -108,6 +119,7 @@ export default function MaybachSection({ onProgress }: MaybachSectionProps) {
     const isMobile = window.innerWidth < 768;
     const canvasScale = isMobile ? 0.5 : 1;
     const opacities = new Array(PHASES.length).fill(0);
+    opacities[0] = 1; // Intro phase starts visible
 
     // Load frames — mobile uses every 4th frame (~30 frames) for memory safety
     loadFrames().then((result) => {
@@ -275,7 +287,7 @@ export default function MaybachSection({ onProgress }: MaybachSectionProps) {
               key={i}
               ref={(el) => { overlayRefs.current[i] = el; }}
               className={`absolute z-10 max-w-full md:max-w-[340px] flex flex-col items-center text-center ${positionClasses}`}
-              style={{ visibility: "hidden", opacity: 0 }}
+              style={i === 0 ? { visibility: "visible", opacity: 1 } : { visibility: "hidden", opacity: 0 }}
             >
               <span className="font-accent text-[10px] md:text-[9px] uppercase tracking-[0.4em] text-tj-gold mb-2 md:mb-4">
                 {t(phase.labelKey)}

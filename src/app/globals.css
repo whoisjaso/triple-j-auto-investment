@@ -71,3 +71,26 @@ body {
 .mobile-ken-burns {
   animation: ken-burns 20s ease-in-out infinite alternate;
 }
+
+/* Global dropdown styling — black menu, gold highlight */
+select {
+  accent-color: #d4af37;
+}
+
+select option {
+  background-color: #000000;
+  color: #F5F0E8;
+  padding: 8px 12px;
+}
+
+select option:checked {
+  background: #d4af37 linear-gradient(0deg, #d4af37 0%, #d4af37 100%) !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000;
+  font-weight: 600;
+}
+
+select option:hover {
+  background-color: #d4af37 !important;
+  color: #000000 !important;
+}
