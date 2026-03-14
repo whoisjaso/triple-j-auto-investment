@@ -43,6 +43,12 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 - Admin pipeline dashboard with stage-grouped vehicles and status advancement -- Phase 9
 - Gmail sync trigger from admin UI with real-time results -- Phase 9
 - Vehicle lifecycle management (Bidding → Available) replacing Google Sheet workflow -- Phase 9
+- 7-stage CRM pipeline (New → Contacted → Qualified → Appointment → Negotiation → Sold → Lost) -- Phase 10
+- Lead detail page with notes, tasks, and status pipeline stepper -- Phase 10
+- Buyer info capture on lead "Sold" status + editable vehicle buyer fields -- Phase 10
+- CRM pipeline board (kanban) at /admin/leads/board with 7 status columns -- Phase 10
+- Dashboard lead pipeline breakdown with per-stage count pills -- Phase 10
+- List/Board toggle navigation between lead views -- Phase 10
 
 ### Out of Scope (v0.1)
 - Rental management, plate tracking, registration workflows -- v0.2+
@@ -126,6 +132,9 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 | Gmail MCP for email access | Infrastructure already connected, simplest integration path | 2026-03-11 | Active |
 | Vehicle lifecycle: Bidding→Purchased→In_Transit→Arrived→Inspection→Available | Maps to real Manheim-to-lot workflow stages | 2026-03-11 | Active |
 | Server actions for pipeline mutations | revalidatePath pattern keeps server components fast | 2026-03-11 | Active |
+| 7-stage CRM pipeline | Matches real sales funnel; "Appointment" stage added for test drives | 2026-03-12 | Active |
+| No drag-and-drop on kanban board | Status changes on lead detail page; keeps board simple | 2026-03-12 | Active |
+| Buyer info capture on Sold | Auto-captures lead name/phone as buyer; editable on vehicle edit | 2026-03-12 | Active |
 
 ## Success Metrics
 
@@ -160,4 +169,4 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 
 ---
 *PROJECT.md -- Updated when requirements or context change*
-*Last updated: 2026-03-11 after Phase 9*
+*Last updated: 2026-03-14 after Phase 10*

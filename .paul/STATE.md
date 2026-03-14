@@ -2,7 +2,7 @@
 
 ## Project Reference
 
-See: .paul/PROJECT.md (updated 2026-03-11)
+See: .paul/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Every digital touchpoint engineers the neurological conditions under which buying becomes the only comfortable option -- a FATE-triggered, PCP-sequenced behavioral funnel from stranger to buyer to evangelist.
 **Current focus:** v0.2 Dealer Intelligence System
@@ -10,16 +10,16 @@ See: .paul/PROJECT.md (updated 2026-03-11)
 ## Current Position
 
 Milestone: v0.2 Dealer Intelligence System
-Phase: 10 of 12 (CRM) — Plan 10-02 Created
-Plan: 10-02 created (CRM Pipeline Board + Dashboard Stats), awaiting approval
-Status: PLAN created, ready for APPLY
-Last activity: 2026-03-12 — Created .paul/phases/10-crm/10-02-PLAN.md
+Phase: 11 of 12 (Business Intelligence)
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-03-14 — Phase 10 complete, transitioned to Phase 11
 
 Progress:
 - v0.1 Initial Release: [##########] 100% ★
-- v0.2 Dealer Intelligence: [######░░░░] 38%
+- v0.2 Dealer Intelligence: [#######░░░] 50%
   - Phase 9 (Pipeline): ✅ Complete (3/3 plans)
-  - Phase 10 (CRM): In Progress (1/~2 plans done, plan 2 created)
+  - Phase 10 (CRM): ✅ Complete (2/2 plans)
   - Phase 11 (BI): Not started
   - Phase 12 (Advanced): Not started
 
@@ -28,7 +28,7 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ○        ○     [Plan 10-02 created, awaiting approval]
+  ○        ○        ○     [New loop — ready to plan Phase 11]
 ```
 
 ## Accumulated Context
@@ -56,6 +56,8 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Lead detail page with notes, tasks, and status pipeline stepper
 - Mobile: static images for scroll sections (no GPU frame animation) with radial gradient mask
 - Buyer info (name, phone) captured on lead "Sold" status + editable on vehicle edit form
+- No drag-and-drop on kanban board — status changes on lead detail page
+- Kanban board + dashboard pipeline stats complete (Phase 10)
 - Future document generation: bill of sale, 130-U, rental agreements, as-is guides, vehicle registration
 
 ### Deferred Issues
@@ -71,7 +73,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Migrate real inventory from Google Sheets (user deferred this)
 
 ### Git State
-Last commit: b4b8457 feat(10-crm): add buyer info capture on lead sale + editable vehicle buyer fields
+Last commit: 53a9c2a feat(10-crm): add CRM pipeline board + dashboard lead stats
 Branch: main
 Feature branches merged: none
 
@@ -80,10 +82,10 @@ Feature branches merged: none
 
 ## Session Continuity
 
-Last session: 2026-03-12
-Stopped at: Plan 10-02 created (CRM Pipeline Board + Dashboard Stats)
-Next action: Review and approve plan, then run /paul:apply
-Resume file: .paul/phases/10-crm/10-02-PLAN.md
+Last session: 2026-03-14
+Stopped at: Phase 10 complete, ready to plan Phase 11
+Next action: /paul:plan for Phase 11 (Business Intelligence)
+Resume file: .paul/ROADMAP.md
 
 ---
 *STATE.md -- Updated after every significant action*
