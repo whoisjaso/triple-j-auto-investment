@@ -65,17 +65,6 @@ const STATUS_COLORS: Record<string, string> = {
   Lost: "bg-red-400/10 text-red-400 border-red-400/15",
 };
 
-function relativeDate(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60_000);
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days === 1) return "1 day ago";
-  return `${days} days ago`;
-}
-
 function formatPhone(phone: string): string {
   const d = phone.replace(/\D/g, "");
   if (d.length === 10) {
@@ -93,132 +82,61 @@ export default async function AdminDashboardPage() {
   ]);
 
   return (
-    <div className="px-3 py-3 md:p-8 max-w-5xl">
+    <div className="px-3 py-2 md:p-8 max-w-5xl max-md:flex max-md:flex-col max-md:gap-2">
       {/* Header */}
-      <div className="mb-4 md:mb-8">
-        <h1 className="font-serif text-xl md:text-3xl text-tj-cream/90 tracking-wide">
+      <div className="mb-1 md:mb-8">
+        <h1 className="font-serif text-lg md:text-3xl text-tj-cream/90 tracking-wide leading-tight">
           Dashboard
         </h1>
-        <p className="text-[9px] md:text-xs text-white/25 mt-0.5 md:mt-1 font-accent uppercase tracking-[0.15em]">
+        <p className="text-[8px] md:text-xs text-white/25 font-accent uppercase tracking-[0.15em]">
           Triple J Auto Investment
         </p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 md:grid-cols-4 gap-2 md:gap-4 mb-4 md:mb-8">
-        <div className="relative overflow-hidden rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5 md:p-6">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-tj-gold/40 mb-1 md:mb-3 md:w-[18px] md:h-[18px]"
-            aria-hidden="true"
-          >
-            <rect x="1" y="3" width="15" height="13" rx="2" />
-            <path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" />
-            <circle cx="5.5" cy="18.5" r="2.5" />
-            <circle cx="18.5" cy="18.5" r="2.5" />
-            <path d="M8 18.5h8" />
+      {/* Stats — single row, ultra-compact on mobile */}
+      <div className="grid grid-cols-4 gap-1.5 md:gap-4 md:mb-8">
+        <div className="rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] px-2 py-1.5 md:p-6">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/40 mb-0.5 md:mb-3 md:w-[18px] md:h-[18px]" aria-hidden="true">
+            <rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /><path d="M8 18.5h8" />
           </svg>
-          <p className="font-serif text-lg md:text-4xl text-tj-cream/90">
-            {stats.totalVehicles}
-          </p>
-          <p className="text-[8px] md:text-xs text-white/25 uppercase tracking-[0.1em] md:tracking-[0.15em] font-accent mt-0.5 md:mt-1">
-            Vehicles
-          </p>
+          <p className="font-serif text-base md:text-4xl text-tj-cream/90 leading-tight">{stats.totalVehicles}</p>
+          <p className="text-[7px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Vehicles</p>
         </div>
 
-        <Link href="/admin/pipeline" className="relative overflow-hidden rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5 md:p-6 hover:bg-white/[0.03] hover:border-purple-400/10 transition-all duration-300">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-purple-400/40 mb-1 md:mb-3 md:w-[18px] md:h-[18px]"
-            aria-hidden="true"
-          >
+        <Link href="/admin/pipeline" className="rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] px-2 py-1.5 md:p-6 hover:bg-white/[0.03] hover:border-purple-400/10 transition-all duration-300">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-purple-400/40 mb-0.5 md:mb-3 md:w-[18px] md:h-[18px]" aria-hidden="true">
             <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
           </svg>
-          <p className="font-serif text-lg md:text-4xl text-tj-cream/90">
-            {pipelineCount}
-          </p>
-          <p className="text-[8px] md:text-xs text-white/25 uppercase tracking-[0.1em] md:tracking-[0.15em] font-accent mt-0.5 md:mt-1">
-            Pipeline
-          </p>
+          <p className="font-serif text-base md:text-4xl text-tj-cream/90 leading-tight">{pipelineCount}</p>
+          <p className="text-[7px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Pipeline</p>
         </Link>
 
-        <div className="relative overflow-hidden rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5 md:p-6">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-tj-gold/40 mb-1 md:mb-3 md:w-[18px] md:h-[18px]"
-            aria-hidden="true"
-          >
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
+        <div className="rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] px-2 py-1.5 md:p-6">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/40 mb-0.5 md:mb-3 md:w-[18px] md:h-[18px]" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
           </svg>
-          <p className="font-serif text-lg md:text-4xl text-tj-cream/90">
-            {stats.totalLeads}
-          </p>
-          <p className="text-[8px] md:text-xs text-white/25 uppercase tracking-[0.1em] md:tracking-[0.15em] font-accent mt-0.5 md:mt-1">
-            Leads
-          </p>
+          <p className="font-serif text-base md:text-4xl text-tj-cream/90 leading-tight">{stats.totalLeads}</p>
+          <p className="text-[7px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Leads</p>
         </div>
 
-        <div className="relative overflow-hidden rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] p-2.5 md:p-6">
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-blue-400/40 mb-1 md:mb-3 md:w-[18px] md:h-[18px]"
-            aria-hidden="true"
-          >
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        <div className="rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] px-2 py-1.5 md:p-6">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400/40 mb-0.5 md:mb-3 md:w-[18px] md:h-[18px]" aria-hidden="true">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
-          <p className="font-serif text-lg md:text-4xl text-tj-cream/90">
-            {stats.newLeads}
-          </p>
-          <p className="text-[8px] md:text-xs text-white/25 uppercase tracking-[0.1em] md:tracking-[0.15em] font-accent mt-0.5 md:mt-1">
-            New
-          </p>
+          <p className="font-serif text-base md:text-4xl text-tj-cream/90 leading-tight">{stats.newLeads}</p>
+          <p className="text-[7px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">New</p>
         </div>
       </div>
 
-      {/* Lead Pipeline Breakdown */}
-      <div className="mb-4 md:mb-8">
-        <div className="flex items-center justify-between mb-2 md:mb-4">
-          <h2 className="font-accent text-[9px] md:text-xs uppercase tracking-[0.2em] text-white/30">
-            Lead Pipeline
-          </h2>
-          <Link
-            href="/admin/leads/board"
-            className="font-accent text-[9px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
-          >
-            View Board &rarr;
+      {/* Lead Pipeline — single scrollable row on mobile */}
+      <div className="md:mb-8">
+        <div className="flex items-center justify-between mb-1 md:mb-4">
+          <h2 className="font-accent text-[8px] md:text-xs uppercase tracking-[0.2em] text-white/30">Lead Pipeline</h2>
+          <Link href="/admin/leads/board" className="font-accent text-[8px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors">
+            Board &rarr;
           </Link>
         </div>
-        <div className="flex flex-wrap gap-1.5 md:gap-2">
+        <div className="flex gap-1 md:gap-2 md:flex-wrap overflow-x-auto no-scrollbar">
           {([
             { status: "New" as LeadStatus, color: "text-blue-400", bg: "bg-blue-400/10 border-blue-400/15" },
             { status: "Contacted" as LeadStatus, color: "text-amber-400", bg: "bg-amber-400/10 border-amber-400/15" },
@@ -231,195 +149,80 @@ export default async function AdminDashboardPage() {
             <Link
               key={status}
               href={`/admin/leads?status=${status}`}
-              className={`inline-flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-2 rounded-md md:rounded-lg border ${bg} hover:opacity-80 transition-opacity`}
+              className={`inline-flex items-center gap-1 md:gap-2 px-1.5 md:px-3 py-0.5 md:py-2 rounded md:rounded-lg border ${bg} hover:opacity-80 transition-opacity shrink-0`}
             >
-              <span className={`text-sm md:text-lg font-serif ${color}`}>
-                {leadCounts[status]}
-              </span>
-              <span className={`text-[8px] md:text-[10px] font-accent uppercase tracking-[0.1em] ${color} opacity-70`}>
-                {status}
-              </span>
+              <span className={`text-xs md:text-lg font-serif ${color}`}>{leadCounts[status]}</span>
+              <span className={`text-[7px] md:text-[10px] font-accent uppercase tracking-[0.08em] ${color} opacity-70`}>{status}</span>
             </Link>
           ))}
         </div>
       </div>
 
-      {/* Recent Leads */}
+      {/* Recent Leads — compact list */}
       {recentLeads.length > 0 && (
-        <div className="mb-4 md:mb-8">
-          <div className="flex items-center justify-between mb-2 md:mb-4">
-            <h2 className="font-accent text-[9px] md:text-xs uppercase tracking-[0.2em] text-white/30">
-              Recent Leads
-            </h2>
-            <Link
-              href="/admin/leads"
-              className="font-accent text-[9px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors"
-            >
-              View All &rarr;
+        <div className="md:mb-8">
+          <div className="flex items-center justify-between mb-1 md:mb-4">
+            <h2 className="font-accent text-[8px] md:text-xs uppercase tracking-[0.2em] text-white/30">Recent Leads</h2>
+            <Link href="/admin/leads" className="font-accent text-[8px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors">
+              All &rarr;
             </Link>
           </div>
-          <div className="space-y-1.5 md:space-y-2">
+          <div className="space-y-1 md:space-y-2">
             {recentLeads.map((lead) => (
               <Link
                 key={lead.id}
                 href={`/admin/leads/${lead.id}`}
-                className="flex items-center justify-between px-3 py-2.5 md:p-4 rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.06] transition-all duration-300 group"
+                className="flex items-center justify-between px-2.5 py-1.5 md:p-4 rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.06] transition-all duration-300 group"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs md:text-sm text-tj-cream/80 font-medium truncate">
-                    {lead.name}
-                  </p>
-                  <p className="text-[10px] md:text-xs text-white/25 mt-0.5">
-                    {formatPhone(lead.phone)}
-                  </p>
+                  <p className="text-[11px] md:text-sm text-tj-cream/80 font-medium truncate leading-tight">{lead.name}</p>
+                  <p className="text-[9px] md:text-xs text-white/25">{formatPhone(lead.phone)}</p>
                 </div>
-                <div className="flex items-center gap-2 md:gap-3 shrink-0 ml-3">
-                  <span
-                    className={`inline-flex items-center px-2 md:px-2.5 py-0.5 md:py-1 rounded-full text-[9px] md:text-[10px] font-medium border ${STATUS_COLORS[lead.status] ?? ""}`}
-                  >
-                    {lead.status}
-                  </span>
-                </div>
+                <span className={`inline-flex items-center px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full text-[8px] md:text-[10px] font-medium border shrink-0 ml-2 ${STATUS_COLORS[lead.status] ?? ""}`}>
+                  {lead.status}
+                </span>
               </Link>
             ))}
           </div>
         </div>
       )}
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
-        <Link
-          href="/admin/pipeline"
-          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-tj-gold/50 mb-1.5 md:mb-3"
-            aria-hidden="true"
-          >
+      {/* Quick Actions — compact grid */}
+      <div className="grid grid-cols-5 md:grid-cols-5 gap-1.5 md:gap-3">
+        <Link href="/admin/pipeline" className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-2 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/50 mb-1 md:mb-3 md:w-5 md:h-5" aria-hidden="true">
             <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
           </svg>
-          <p className="text-sm text-tj-cream/80 font-medium">Pipeline</p>
-          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
-            Manage &rarr;
-          </p>
+          <p className="text-[10px] md:text-sm text-tj-cream/80 font-medium leading-tight">Pipeline</p>
         </Link>
 
-        <Link
-          href="/admin/inventory"
-          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-tj-gold/50 mb-1.5 md:mb-3"
-            aria-hidden="true"
-          >
-            <rect x="1" y="3" width="15" height="13" rx="2" />
-            <path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" />
-            <circle cx="5.5" cy="18.5" r="2.5" />
-            <circle cx="18.5" cy="18.5" r="2.5" />
-            <path d="M8 18.5h8" />
+        <Link href="/admin/inventory" className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-2 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/50 mb-1 md:mb-3 md:w-5 md:h-5" aria-hidden="true">
+            <rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /><path d="M8 18.5h8" />
           </svg>
-          <p className="text-sm text-tj-cream/80 font-medium">Inventory</p>
-          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
-            Manage &rarr;
-          </p>
+          <p className="text-[10px] md:text-sm text-tj-cream/80 font-medium leading-tight">Inventory</p>
         </Link>
 
-        <Link
-          href="/admin/leads"
-          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-tj-gold/50 mb-1.5 md:mb-3"
-            aria-hidden="true"
-          >
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-            <circle cx="9" cy="7" r="4" />
-            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        <Link href="/admin/leads" className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-2 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/50 mb-1 md:mb-3 md:w-5 md:h-5" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
           </svg>
-          <p className="text-sm text-tj-cream/80 font-medium">Leads</p>
-          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
-            Manage &rarr;
-          </p>
+          <p className="text-[10px] md:text-sm text-tj-cream/80 font-medium leading-tight">Leads</p>
         </Link>
 
-        <Link
-          href="/admin/analytics"
-          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-tj-gold/50 mb-1.5 md:mb-3"
-            aria-hidden="true"
-          >
-            <path d="M18 20V10" />
-            <path d="M12 20V4" />
-            <path d="M6 20v-6" />
+        <Link href="/admin/analytics" className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-2 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/50 mb-1 md:mb-3 md:w-5 md:h-5" aria-hidden="true">
+            <path d="M18 20V10" /><path d="M12 20V4" /><path d="M6 20v-6" />
           </svg>
-          <p className="text-sm text-tj-cream/80 font-medium">Analytics</p>
-          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
-            Insights &rarr;
-          </p>
+          <p className="text-[10px] md:text-sm text-tj-cream/80 font-medium leading-tight">Analytics</p>
         </Link>
 
-        <a
-          href="/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-3 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-tj-gold/50 mb-1.5 md:mb-3"
-            aria-hidden="true"
-          >
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-            <polyline points="15 3 21 3 21 9" />
-            <line x1="10" y1="14" x2="21" y2="3" />
+        <Link href="/admin/documents" className="group rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.015] p-2 md:p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-tj-gold/50 mb-1 md:mb-3 md:w-5 md:h-5" aria-hidden="true">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" />
           </svg>
-          <p className="text-sm text-tj-cream/80 font-medium">View Site</p>
-          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
-            Open &rarr;
-          </p>
-        </a>
+          <p className="text-[10px] md:text-sm text-tj-cream/80 font-medium leading-tight">Docs</p>
+        </Link>
       </div>
     </div>
   );
