@@ -93,6 +93,49 @@ const NAV_ITEMS = [
       </svg>
     ),
   },
+  {
+    label: "Documents",
+    href: "/admin/documents",
+    icon: (
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+        <polyline points="14 2 14 8 20 8" />
+        <line x1="16" y1="13" x2="8" y2="13" />
+        <line x1="16" y1="17" x2="8" y2="17" />
+      </svg>
+    ),
+  },
+  {
+    label: "Analytics",
+    href: "/admin/analytics",
+    icon: (
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M18 20V10" />
+        <path d="M12 20V4" />
+        <path d="M6 20v-6" />
+      </svg>
+    ),
+  },
 ];
 
 export default function AdminSidebar() {
@@ -222,13 +265,13 @@ export default function AdminSidebar() {
       >
         <div className="bg-black/90 backdrop-blur-xl border-t border-white/[0.06] px-2 pb-[env(safe-area-inset-bottom)]">
           <div className="flex items-center justify-around h-16">
-            {NAV_ITEMS.map((item) => {
+            {NAV_ITEMS.slice(0, 5).map((item) => {
               const active = isActive(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative flex flex-col items-center justify-center gap-1 min-w-[64px] min-h-[44px] transition-colors duration-300 ${
+                  className={`relative flex flex-col items-center justify-center gap-1 min-w-[52px] min-h-[44px] transition-colors duration-300 ${
                     active ? "text-tj-gold" : "text-white/30"
                   }`}
                 >
@@ -289,6 +332,26 @@ export default function AdminSidebar() {
       >
         <div className="bg-[#0A0A0A] border-t border-white/[0.06] rounded-t-2xl px-4 pt-3 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
           <div className="w-10 h-1 bg-white/10 rounded-full mx-auto mb-6" />
+
+          {NAV_ITEMS.slice(5).map((item) => {
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all min-h-[52px] ${
+                  active
+                    ? "text-tj-gold bg-tj-gold/[0.08]"
+                    : "text-white/50 hover:text-white/80 hover:bg-white/[0.03]"
+                }`}
+              >
+                <span className={active ? "text-tj-gold" : "text-white/30"}>
+                  {item.icon}
+                </span>
+                <span className="text-sm">{item.label}</span>
+              </Link>
+            );
+          })}
 
           <a
             href="/"

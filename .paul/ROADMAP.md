@@ -35,7 +35,7 @@ Theme: Automate the Manheim-to-website pipeline, build a real CRM, and add busin
 |-------|------|-------|--------|-----------|
 | 9 | Automated Inventory Pipeline | 3/3 | Complete | 2026-03-11 |
 | 10 | CRM | 2/2 | Complete | 2026-03-12 |
-| 11 | Business Intelligence | TBD | Not started | - |
+| 11 | Business Intelligence | 0/~1 | Planning | - |
 | 12 | Advanced Features | TBD | Not started | - |
 
 ## v0.2 Phase Details

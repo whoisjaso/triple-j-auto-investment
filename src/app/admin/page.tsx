@@ -294,7 +294,7 @@ export default async function AdminDashboardPage() {
       )}
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
         <Link
           href="/admin/pipeline"
           className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
@@ -371,6 +371,32 @@ export default async function AdminDashboardPage() {
           <p className="text-sm text-tj-cream/80 font-medium">Leads</p>
           <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
             Manage &rarr;
+          </p>
+        </Link>
+
+        <Link
+          href="/admin/analytics"
+          className="group rounded-xl border border-white/[0.04] bg-white/[0.015] p-5 hover:bg-white/[0.03] hover:border-tj-gold/10 transition-all duration-300"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="text-tj-gold/50 mb-3"
+            aria-hidden="true"
+          >
+            <path d="M18 20V10" />
+            <path d="M12 20V4" />
+            <path d="M6 20v-6" />
+          </svg>
+          <p className="text-sm text-tj-cream/80 font-medium">Analytics</p>
+          <p className="text-[10px] text-white/20 mt-1 font-accent uppercase tracking-[0.12em] group-hover:text-tj-gold/40 transition-colors">
+            Insights &rarr;
           </p>
         </Link>
 
