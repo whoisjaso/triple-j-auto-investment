@@ -105,85 +105,101 @@ select option:hover {
 }
 
 /* ══════════ PRINT STYLES ══════════ */
+/* Triggered when body has .printing-document class AND print media is active */
 @media print {
   @page {
     size: letter;
     margin: 0.5in 0.5in 0.6in 0.5in;
   }
 
+  /* ── NUCLEAR: Hide ALL admin UI ── */
+  /* Desktop sidebar */
+  aside {
+    display: none !important;
+  }
+
+  /* ALL navigation bars (mobile bottom bar, more sheet) */
+  nav[aria-label="Admin navigation"] {
+    display: none !important;
+  }
+
+  /* Mobile "More" overlay backdrop */
+  body > div > div > div[class*="fixed inset-0"] {
+    display: none !important;
+  }
+
+  /* Mobile "More" bottom sheet */
+  body > div > div > div[class*="fixed bottom-0"] {
+    display: none !important;
+  }
+
+  /* Next.js dev tools */
+  button[class*="Next.js"],
+  [class*="dev-tools"],
+  body > div > button {
+    display: none !important;
+  }
+
+  /* Alert banners */
+  [role="alert"] {
+    display: none !important;
+  }
+
+  /* ── Reset layout for print ── */
   html, body {
     height: auto !important;
     overflow: visible !important;
     background: white !important;
     color: black !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
-    font-size: 11px !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
-  /* Reset all overflow locks for printing */
+  /* Remove sidebar margin from main content */
+  main {
+    margin-left: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  /* Reset the admin layout container */
+  body > div > div {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Reset all overflow locks */
   * {
     overflow: visible !important;
   }
 
-  /* ── Section break control ── */
-
-  /* Each print-section stays together on one page */
-  .print-section {
-    break-inside: avoid;
-    page-break-inside: avoid;
+  /* ── Hide non-document content ── */
+  /* Document page header ("Bill of Sale" title) */
+  [data-print-hide] {
+    display: none !important;
   }
 
-  /* Force a new page before this element */
-  .print-page-break {
-    break-before: page;
-    page-break-before: always;
+  /* Document toolbar (tabs, edit/preview, actions) */
+  .print-toolbar-hide {
+    display: none !important;
   }
 
-  /* Headings should not be orphaned at bottom of page */
-  h1, h2, h3, h4 {
-    break-after: avoid;
-    page-break-after: avoid;
+  /* Edit form (should never print) */
+  .print-form-hide {
+    display: none !important;
   }
 
-  /* Tables should not split across pages */
-  table, thead, tbody, tr {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  /* Signature blocks must stay together */
-  .print-signatures {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-
-  /* ── Document preview proportional sizing ── */
-
-  /* Scale down padding for print (letter paper is 8.5x11) */
+  /* ── Document preview: clean output ── */
   .print-doc {
     padding: 0 !important;
     max-width: 100% !important;
     margin: 0 !important;
-    font-size: 10px !important;
-    line-height: 1.4 !important;
-  }
-
-  .print-doc h1 {
-    font-size: 22px !important;
-  }
-
-  .print-doc h2 {
-    font-size: 14px !important;
-  }
-
-  .print-doc h3 {
-    font-size: 12px !important;
-  }
-
-  /* Reduce spacing between sections for tighter print layout */
-  .print-doc > div > div {
-    margin-bottom: 12px !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
   }
 
   /* Ensure borders and backgrounds print */
@@ -192,12 +208,37 @@ select option:hover {
     print-color-adjust: exact !important;
   }
 
-  /* Hide watermark in print — it wastes ink */
+  /* Hide watermark — saves ink */
   .print-no-watermark {
     display: none !important;
   }
 
-  /* Grids should not split */
+  /* ── Page break control ── */
+  .print-section {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-page-break {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .print-signatures {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  h1, h2, h3, h4 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  table, thead, tbody, tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
   .grid {
     break-inside: avoid;
     page-break-inside: avoid;

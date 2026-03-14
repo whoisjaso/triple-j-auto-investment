@@ -154,12 +154,69 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
   const handlePrint = useCallback(() => {
     const prevView = view;
     setView('preview');
-    // Wait for React to render the preview, then print
+
+    // Wait for React to render the preview
     setTimeout(() => {
+      // Physically hide ALL admin UI with inline styles (beats any CSS)
+      const elementsToHide = [
+        document.querySelector('aside'),                              // desktop sidebar
+        ...document.querySelectorAll('nav[aria-label="Admin navigation"]'), // mobile nav
+        document.querySelector('.print-toolbar-hide'),                // document toolbar
+        document.querySelector('[data-print-hide]'),                  // page header
+      ].filter((el): el is HTMLElement => el instanceof HTMLElement);
+
+      // Hide them all
+      elementsToHide.forEach(el => {
+        el.setAttribute('data-prev-display', el.style.display);
+        el.style.setProperty('display', 'none', 'important');
+      });
+
+      // Reset main content to full width
+      const main = document.querySelector('main') as HTMLElement | null;
+      const layoutDiv = document.querySelector('main')?.parentElement as HTMLElement | null;
+      if (main) {
+        main.setAttribute('data-prev-ml', main.style.marginLeft);
+        main.setAttribute('data-prev-p', main.style.padding);
+        main.setAttribute('data-prev-overflow', main.style.overflow);
+        main.style.setProperty('margin-left', '0', 'important');
+        main.style.setProperty('padding', '0', 'important');
+        main.style.setProperty('overflow', 'visible', 'important');
+        main.style.setProperty('height', 'auto', 'important');
+      }
+      if (layoutDiv) {
+        layoutDiv.setAttribute('data-prev-overflow', layoutDiv.style.overflow);
+        layoutDiv.setAttribute('data-prev-height', layoutDiv.style.height);
+        layoutDiv.style.setProperty('overflow', 'visible', 'important');
+        layoutDiv.style.setProperty('height', 'auto', 'important');
+        layoutDiv.style.setProperty('display', 'block', 'important');
+      }
+      // Set body background to white
+      const prevBg = document.body.style.background;
+      document.body.style.setProperty('background', 'white', 'important');
+
       window.print();
-      // Restore view after print dialog closes
+
+      // Restore everything after print dialog closes (print() is blocking)
+      elementsToHide.forEach(el => {
+        const prev = el.getAttribute('data-prev-display') || '';
+        el.style.display = prev;
+        el.removeAttribute('data-prev-display');
+      });
+      if (main) {
+        main.style.marginLeft = main.getAttribute('data-prev-ml') || '';
+        main.style.padding = main.getAttribute('data-prev-p') || '';
+        main.style.overflow = main.getAttribute('data-prev-overflow') || '';
+        main.style.height = '';
+      }
+      if (layoutDiv) {
+        layoutDiv.style.overflow = layoutDiv.getAttribute('data-prev-overflow') || '';
+        layoutDiv.style.height = layoutDiv.getAttribute('data-prev-height') || '';
+        layoutDiv.style.display = '';
+      }
+      document.body.style.background = prevBg;
+
       setView(prevView);
-    }, 300);
+    }, 400);
   }, [view]);
 
   const handlePrefill130U = () => {
@@ -202,7 +259,7 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
   return (
     <div>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 mb-6 print:hidden">
+      <div className="flex flex-wrap items-center gap-2 mb-6 print-toolbar-hide">
         {/* Section Tabs */}
         <div className="bg-white/[0.03] p-1 rounded-full border border-white/[0.06] flex flex-wrap gap-1">
           {sectionButtons.map((btn) => (
@@ -238,7 +295,7 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
 
       {/* Content */}
       {view === 'edit' ? (
-        <div className="print:hidden">
+        <div className="print-form-hide">
           {section === 'financing' && <ContractForm data={contractData} onChange={setContractData} />}
           {section === 'rental' && <RentalForm data={rentalData} onChange={setRentalData} />}
           {section === 'billOfSale' && <BillOfSaleForm data={billOfSaleData} onChange={setBillOfSaleData} />}
@@ -246,7 +303,7 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
           <SignatureBlock signatures={signatures} onChange={setSignatures} mode="dealer" />
         </div>
       ) : (
-        <div ref={previewRef} className="bg-white shadow-2xl border border-white/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none print:m-0">
+        <div ref={previewRef} className="bg-white shadow-2xl border border-white/10 rounded-2xl overflow-hidden print-doc">
           {section === 'financing' && <ContractPreview data={contractData} signatures={signatures} />}
           {section === 'rental' && <RentalPreview data={rentalData} signatures={signatures} />}
           {section === 'billOfSale' && <BillOfSalePreview data={billOfSaleData} signatures={signatures} />}
