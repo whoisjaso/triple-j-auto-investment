@@ -10,17 +10,17 @@ See: .paul/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Milestone: v0.2 Dealer Intelligence System
-Phase: 11 of 12 (Business Intelligence) — Planning
-Plan: 11-01 (BI Analytics Dashboard) — APPLY complete, ready for UNIFY
-Status: APPLY complete, verified with Playwright
-Last activity: 2026-03-14 — Applied and verified plan 11-01
+Phase: 12 of 12 (Advanced Features) — Not started
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-03-14 — Phase 11 (BI) complete, transitioned to Phase 12
 
 Progress:
 - v0.1 Initial Release: [##########] 100% ★
-- v0.2 Dealer Intelligence: [#######░░░] 50%
+- v0.2 Dealer Intelligence: [########░░] 75%
   - Phase 9 (Pipeline): ✅ Complete (3/3 plans)
   - Phase 10 (CRM): ✅ Complete (2/2 plans)
-  - Phase 11 (BI): Planning (1 plan created)
+  - Phase 11 (BI): ✅ Complete (1/1 plans)
   - Phase 12 (Advanced): Not started
 
 ## Loop Position
@@ -28,7 +28,7 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ○     [Plan 11-01 applied, verified, ready for UNIFY]
+  ○        ○        ○     [Ready for new PLAN in Phase 12]
 ```
 
 ## Accumulated Context
@@ -59,6 +59,9 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - No drag-and-drop on kanban board — status changes on lead detail page
 - Kanban board + dashboard pipeline stats complete (Phase 10)
 - Future document generation: bill of sale, 130-U, rental agreements, as-is guides, vehicle registration
+- Pure CSS analytics visualization — no charting libraries, keeps bundle lean (Phase 11)
+- Active Inventory Investment tracker — shows capital tied up in unsold vehicles (Phase 11)
+- Analytics uses server-component-only rendering — zero client JS (Phase 11)
 
 ### Deferred Issues
 - RLS is permissive for anon (admin auth at middleware level) — needs Supabase Auth in v0.2
@@ -71,9 +74,11 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Automated hourly Gmail pipeline sync (Vercel Cron or pg_cron)
 - Vehicle event timeline view in pipeline dashboard (future enhancement)
 - Migrate real inventory from Google Sheets (user deferred this)
+- Date range filtering for analytics (future enhancement)
+- Charting library integration if advanced visualizations needed (future)
 
 ### Git State
-Last commit: 9a1e324 docs(10-crm): phase 10 complete — CRM pipeline & kanban board
+Last commit: 4cb3fab feat(11-bi): add BI analytics dashboard with active inventory investment
 Branch: main
 Feature branches merged: none
 
@@ -83,9 +88,9 @@ Feature branches merged: none
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Plan 11-01 applied and verified
-Next action: Run /paul:unify to close loop, then deploy
-Resume file: .paul/phases/11-bi/11-01-PLAN.md
+Stopped at: Phase 11 complete, ready to plan Phase 12
+Next action: /paul:plan for Phase 12 (Advanced Features)
+Resume file: .paul/ROADMAP.md
 
 ---
 *STATE.md -- Updated after every significant action*

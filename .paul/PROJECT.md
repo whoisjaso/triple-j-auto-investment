@@ -49,6 +49,10 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 - CRM pipeline board (kanban) at /admin/leads/board with 7 status columns -- Phase 10
 - Dashboard lead pipeline breakdown with per-stage count pills -- Phase 10
 - List/Board toggle navigation between lead views -- Phase 10
+- BI analytics dashboard with KPIs, profitability, lead funnel, source attribution, vehicle performance -- Phase 11
+- Active inventory investment tracker (capital tied up in unsold vehicles) -- Phase 11
+- Analytics query layer with typed Supabase queries + mock fallback -- Phase 11
+- Admin sidebar + dashboard quick action for Analytics navigation -- Phase 11
 
 ### Out of Scope (v0.1)
 - Rental management, plate tracking, registration workflows -- v0.2+
@@ -135,6 +139,8 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 | 7-stage CRM pipeline | Matches real sales funnel; "Appointment" stage added for test drives | 2026-03-12 | Active |
 | No drag-and-drop on kanban board | Status changes on lead detail page; keeps board simple | 2026-03-12 | Active |
 | Buyer info capture on Sold | Auto-captures lead name/phone as buyer; editable on vehicle edit | 2026-03-12 | Active |
+| Pure CSS analytics visualization | No charting libraries; CSS bars and progress indicators keep bundle lean | 2026-03-14 | Active |
+| Active Inventory Investment | Track capital tied up in unsold vehicles with estimated returns | 2026-03-14 | Active |
 
 ## Success Metrics
 
@@ -169,4 +175,4 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 
 ---
 *PROJECT.md -- Updated when requirements or context change*
-*Last updated: 2026-03-14 after Phase 10*
+*Last updated: 2026-03-14 after Phase 11*

@@ -13,7 +13,7 @@ Deployed: thetriplejauto.com + Supabase connected
 
 ### v0.2 Dealer Intelligence System (IN PROGRESS)
 Status: In Progress
-Phases: 2 of 4 complete
+Phases: 3 of 4 complete
 Theme: Automate the Manheim-to-website pipeline, build a real CRM, and add business intelligence — replacing manual Google Sheet workflows with AI-powered automation.
 
 ## v0.1 Phases (Complete)
@@ -35,7 +35,7 @@ Theme: Automate the Manheim-to-website pipeline, build a real CRM, and add busin
 |-------|------|-------|--------|-----------|
 | 9 | Automated Inventory Pipeline | 3/3 | Complete | 2026-03-11 |
 | 10 | CRM | 2/2 | Complete | 2026-03-12 |
-| 11 | Business Intelligence | 0/~1 | Planning | - |
+| 11 | Business Intelligence | 1/1 | Complete | 2026-03-14 |
 | 12 | Advanced Features | TBD | Not started | - |
 
 ## v0.2 Phase Details
@@ -76,4 +76,4 @@ Phase 9 is foundational — automated vehicle data feeds Phase 10's CRM matching
 
 ---
 *Roadmap created: 2026-03-06*
-*Updated: 2026-03-14 -- Phase 10 (CRM) complete, 2/4 v0.2 phases done*
+*Updated: 2026-03-14 -- Phase 11 (BI) complete, 3/4 v0.2 phases done*
