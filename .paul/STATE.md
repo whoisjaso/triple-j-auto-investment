@@ -13,7 +13,7 @@ Milestone: v0.2 Dealer Intelligence System
 Phase: 12 of 12 (Advanced Features) — Not started
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-03-14 — Phase 11 (BI) complete, transitioned to Phase 12
+Last activity: 2026-03-15 — Fixed customer portal 404 + html2pdf crash, committed document system, deployed
 
 Progress:
 - v0.1 Initial Release: [##########] 100% ★
@@ -78,7 +78,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Charting library integration if advanced visualizations needed (future)
 
 ### Git State
-Last commit: 4cb3fab feat(11-bi): add BI analytics dashboard with active inventory investment
+Last commit: c78de5a fix(documents): customer portal 404 + html2pdf crash
 Branch: main
 Feature branches merged: none
 
@@ -87,10 +87,11 @@ Feature branches merged: none
 
 ## Session Continuity
 
-Last session: 2026-03-14
-Stopped at: Phase 11 complete, ready to plan Phase 12
-Next action: /paul:plan for Phase 12 (Advanced Features)
-Resume file: .paul/ROADMAP.md
+Last session: 2026-03-15
+Stopped at: Portal fix deployed, document system fully live. User requested favicon change (not yet done).
+Next action: Change favicon to business logo, then gstack review → /paul:plan for Phase 12
+Resume file: .paul/HANDOFF-2026-03-15-portal-fix-and-deploy.md
+Resume context: User wants favicon changed to Triple J logo. Then Phase 12 planning (Payment & Contract Renewal System). gstack review cycle not yet run — do it before Phase 12.
 
 ---
 *STATE.md -- Updated after every significant action*

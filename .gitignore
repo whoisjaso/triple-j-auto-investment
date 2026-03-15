@@ -50,6 +50,8 @@ next-env.d.ts
 !public/**/*.jpg
 !public/**/*.jpeg
 !public/**/*.pdf
+!src/app/icon.png
+!src/app/apple-icon.png
 
 # claude code / agent tooling
 .claude/
