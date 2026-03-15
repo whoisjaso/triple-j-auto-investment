@@ -1,0 +1,157 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+
+// ============================================================
+// Admin Auth (replicated from middleware — API routes are excluded)
+// ============================================================
+
+const ADMIN_SECRET = process.env.ADMIN_SECRET || "dev-secret-triple-j";
+const SESSION_MAX_AGE = 86400 * 1000; // 24 hours
+
+async function verifyAdminToken(token: string): Promise<boolean> {
+  const dotIndex = token.indexOf(".");
+  if (dotIndex === -1) return false;
+
+  const timestamp = token.slice(0, dotIndex);
+  const signature = token.slice(dotIndex + 1);
+  if (!timestamp || !signature) return false;
+
+  const age = Date.now() - parseInt(timestamp, 10);
+  if (isNaN(age) || age > SESSION_MAX_AGE || age < 0) return false;
+
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(ADMIN_SECRET),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", key, encoder.encode(timestamp));
+  const expected = Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  return signature === expected;
+}
+
+async function requireAdmin(req: NextRequest): Promise<NextResponse | null> {
+  const token = req.cookies.get("admin-session")?.value;
+  if (!token || !(await verifyAdminToken(token))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  return null;
+}
+
+// ============================================================
+// GET — Admin only, excludes completed_link blob for performance
+// ============================================================
+
+const LISTING_COLUMNS = [
+  'id', 'document_type', 'buyer_name', 'buyer_email', 'buyer_phone',
+  'vehicle_description', 'vehicle_vin', 'status', 'sent_at', 'completed_at',
+  'acknowledgments', 'has_buyer_signature', 'has_cobuyer_signature',
+  'has_dealer_signature', 'has_buyer_id',
+].join(', ');
+
+export async function GET(req: NextRequest) {
+  const authError = await requireAdmin(req);
+  if (authError) return authError;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('document_agreements')
+    .select(LISTING_COLUMNS)
+    .order('sent_at', { ascending: false });
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json(data);
+}
+
+// ============================================================
+// POST — Public (customers submit completed agreements)
+// ============================================================
+
+export async function POST(req: NextRequest) {
+  const supabase = await createClient();
+  const body = await req.json();
+
+  if (!body.document_type) {
+    return NextResponse.json({ error: 'Missing document_type' }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from('document_agreements')
+    .insert({
+      document_type: body.document_type,
+      buyer_name: body.buyer_name || null,
+      buyer_email: body.buyer_email || null,
+      buyer_phone: body.buyer_phone || null,
+      vehicle_description: body.vehicle_description || null,
+      vehicle_vin: body.vehicle_vin || null,
+      status: body.status || 'pending',
+      completed_at: body.status === 'completed' ? new Date().toISOString() : null,
+      acknowledgments: body.acknowledgments || {},
+      has_buyer_signature: body.has_buyer_signature || false,
+      has_cobuyer_signature: body.has_cobuyer_signature || false,
+      has_dealer_signature: body.has_dealer_signature || false,
+      has_buyer_id: body.has_buyer_id || false,
+      completed_link: body.completed_link || null,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json(data);
+}
+
+// ============================================================
+// PATCH — Admin only
+// ============================================================
+
+export async function PATCH(req: NextRequest) {
+  const authError = await requireAdmin(req);
+  if (authError) return authError;
+
+  const supabase = await createClient();
+  const body = await req.json();
+
+  if (!body.id) {
+    return NextResponse.json({ error: 'Missing agreement id' }, { status: 400 });
+  }
+
+  const updates: Record<string, unknown> = {};
+  if (body.status) {
+    updates.status = body.status;
+    if (body.status === 'completed') updates.completed_at = new Date().toISOString();
+  }
+  if (body.buyer_name !== undefined) updates.buyer_name = body.buyer_name;
+  if (body.buyer_email !== undefined) updates.buyer_email = body.buyer_email;
+  if (body.buyer_phone !== undefined) updates.buyer_phone = body.buyer_phone;
+  if (body.acknowledgments !== undefined) updates.acknowledgments = body.acknowledgments;
+  if (body.has_buyer_signature !== undefined) updates.has_buyer_signature = body.has_buyer_signature;
+  if (body.has_cobuyer_signature !== undefined) updates.has_cobuyer_signature = body.has_cobuyer_signature;
+  if (body.has_dealer_signature !== undefined) updates.has_dealer_signature = body.has_dealer_signature;
+  if (body.has_buyer_id !== undefined) updates.has_buyer_id = body.has_buyer_id;
+  if (body.completed_link !== undefined) updates.completed_link = body.completed_link;
+
+  if (Object.keys(updates).length === 0) {
+    return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
+  }
+
+  const { data, error } = await supabase
+    .from('document_agreements')
+    .update(updates)
+    .eq('id', body.id)
+    .select()
+    .single();
+
+  if (error) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  return NextResponse.json(data);
+}

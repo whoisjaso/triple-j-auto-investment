@@ -4,12 +4,33 @@ import { format } from 'date-fns';
 import { SignatureData, DEALER_LICENSE } from '@/lib/documents/shared';
 import SignatureLinePreview from '@/components/documents/SignatureLinePreview';
 
+export interface BuyerAcknowledgments {
+  inspected: boolean;
+  asIs: boolean;
+  receivedCopy: boolean;
+  allSalesFinal: boolean;
+  odometerInformed: boolean;
+  responsibility: boolean;
+  financingSeparate: boolean;
+}
+
+export const emptyAcknowledgments: BuyerAcknowledgments = {
+  inspected: false,
+  asIs: false,
+  receivedCopy: false,
+  allSalesFinal: false,
+  odometerInformed: false,
+  responsibility: false,
+  financingSeparate: false,
+};
+
 interface Props {
   data: BillOfSaleData;
   signatures: SignatureData;
+  acknowledgments?: BuyerAcknowledgments;
 }
 
-export default function BillOfSalePreview({ data, signatures }: Props) {
+export default function BillOfSalePreview({ data, signatures, acknowledgments }: Props) {
   const calc = calculateBillOfSale(data);
 
   const formatDate = (dateStr: string) => {
@@ -150,6 +171,9 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
             )}
           </div>
         </div>
+
+        {/* ═══ PRINT PAGE 2: Financial Details & Disclosures ═══ */}
+        <div className="print-page-group">
 
         {/* Sale Summary Boxes (mirrors Truth in Lending) */}
         <div className="mb-10 print-section">
@@ -333,6 +357,11 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
           </div>
         </div>
 
+        </div>{/* end PRINT PAGE 2 */}
+
+        {/* ═══ PRINT PAGE 3: Terms & Signatures ═══ */}
+        <div className="print-page-group">
+
         {/* Terms */}
         <div className="mb-16 text-[11px] text-justify space-y-3 text-[#1a1a1a]/70 columns-2 gap-8 print-section">
           <p>
@@ -381,8 +410,11 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
           </div>
         </div>
 
-        {/* Buyer Acknowledgment Page (print page break) */}
-        <div className="mt-20 pt-12 border-t-2 border-[#1a1a1a] print-page-break print-section">
+        </div>{/* end PRINT PAGE 3 */}
+
+        {/* ═══ PRINT PAGE 4: Buyer Acknowledgment ═══ */}
+        <div className="print-page-group">
+        <div className="mt-20 pt-12 border-t-2 border-[#1a1a1a] print-section">
           <div className="text-center mb-10">
             <h3 className="text-2xl font-serif font-bold uppercase tracking-widest">Buyer Acknowledgment</h3>
             <p className="text-xs text-[#1a1a1a]/60 mt-2 tracking-wider uppercase">Retain this copy for your records</p>
@@ -433,15 +465,36 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
             <p>
               <strong>I, the undersigned Buyer, acknowledge:</strong>
             </p>
-            <div className="space-y-2 ml-4">
-              <p>&#9744; I have inspected the vehicle and accept it in its present condition.</p>
-              <p>&#9744; I understand this vehicle is sold <strong>{data.conditionType === 'as_is' ? '"AS IS" with NO dealer warranty' : 'with a LIMITED WARRANTY as described'}</strong>.</p>
-              <p>&#9744; I have received a copy of this Bill of Sale for my records.</p>
-              <p>&#9744; I understand <strong>ALL SALES ARE FINAL</strong> — no refunds, returns, or exchanges.</p>
-              <p>&#9744; I have been informed of the odometer reading and its accuracy status.</p>
-              <p>&#9744; I accept full responsibility for the vehicle upon delivery, including insurance and registration.</p>
+            <div className="space-y-3 ml-4">
+              <div className="flex items-start space-x-2">
+                <span className="text-base leading-none mt-[-1px]">{acknowledgments?.inspected ? '\u2611' : '\u2610'}</span>
+                <p>I have inspected the vehicle and accept it in its present condition.</p>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-base leading-none mt-[-1px]">{acknowledgments?.asIs ? '\u2611' : '\u2610'}</span>
+                <p>I understand this vehicle is sold <strong>{data.conditionType === 'as_is' ? '"AS IS" with NO dealer warranty' : 'with a LIMITED WARRANTY as described'}</strong>.</p>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-base leading-none mt-[-1px]">{acknowledgments?.receivedCopy ? '\u2611' : '\u2610'}</span>
+                <p>I have received a copy of this Bill of Sale for my records.</p>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-base leading-none mt-[-1px]">{acknowledgments?.allSalesFinal ? '\u2611' : '\u2610'}</span>
+                <p>I understand <strong>ALL SALES ARE FINAL</strong> — no refunds, returns, or exchanges.</p>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-base leading-none mt-[-1px]">{acknowledgments?.odometerInformed ? '\u2611' : '\u2610'}</span>
+                <p>I have been informed of the odometer reading and its accuracy status.</p>
+              </div>
+              <div className="flex items-start space-x-2">
+                <span className="text-base leading-none mt-[-1px]">{acknowledgments?.responsibility ? '\u2611' : '\u2610'}</span>
+                <p>I accept full responsibility for the vehicle upon delivery, including insurance and registration.</p>
+              </div>
               {data.paymentMethod === 'Financing' && (
-                <p>&#9744; I understand this purchase is financed under a separate Retail Installment Contract.</p>
+                <div className="flex items-start space-x-2">
+                  <span className="text-base leading-none mt-[-1px]">{acknowledgments?.financingSeparate ? '\u2611' : '\u2610'}</span>
+                  <p>I understand this purchase is financed under a separate Retail Installment Contract.</p>
+                </div>
               )}
             </div>
           </div>
@@ -457,6 +510,7 @@ export default function BillOfSalePreview({ data, signatures }: Props) {
             </div>
           </div>
         </div>
+        </div>{/* end PRINT PAGE 4 */}
       </div>
     </div>
   );

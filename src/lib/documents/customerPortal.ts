@@ -95,6 +95,7 @@ export interface CompletedLinkData {
   cs?: string;
   csd?: string;
   bi?: string;
+  ack?: Record<string, boolean>;
 }
 
 export function encodeCompletedLink(
@@ -109,12 +110,14 @@ export function encodeCompletedLink(
   coBuyerSignature?: string,
   coBuyerSignatureDate?: string,
   buyerIdPhoto?: string,
+  acknowledgments?: Record<string, boolean>,
 ): string {
   const payload: CompletedLinkData = { s: section, dd: dealerData, cd: customerData };
   if (dealerSignature && dealerSignature.length < 50000) { payload.ds = dealerSignature; payload.dsd = dealerSignatureDate; }
   if (buyerSignature && buyerSignature.length < 50000) { payload.bs = buyerSignature; payload.bsd = buyerSignatureDate; }
   if (coBuyerSignature && coBuyerSignature.length < 50000) { payload.cs = coBuyerSignature; payload.csd = coBuyerSignatureDate; }
   if (buyerIdPhoto && buyerIdPhoto.length < 100000) { payload.bi = buyerIdPhoto; }
+  if (acknowledgments) { payload.ack = acknowledgments; }
   const json = JSON.stringify(payload);
   const compressed = compressToEncodedURIComponent(json);
   return `${baseUrl}/documents/portal#completed/${compressed}`;
@@ -129,4 +132,47 @@ export function decodeCompletedLink(hash: string): CompletedLinkData | null {
     if (!json) return null;
     return JSON.parse(json) as CompletedLinkData;
   } catch { return null; }
+}
+
+// ============================================================
+// Shared agreement save helper (used by both admin and customer)
+// ============================================================
+
+export interface SaveAgreementParams {
+  documentType: CustomerSection;
+  data: Record<string, unknown>;
+  status: 'pending' | 'completed';
+  dealerSignature?: boolean;
+  buyerSignature?: boolean;
+  coBuyerSignature?: boolean;
+  buyerIdPhoto?: boolean;
+  acknowledgments?: Record<string, boolean>;
+  completedLink?: string;
+}
+
+export async function saveAgreement(params: SaveAgreementParams): Promise<void> {
+  const { data, documentType, status } = params;
+  try {
+    await fetch('/api/documents/agreements', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        document_type: documentType,
+        buyer_name: data.buyerName || data.renterName || null,
+        buyer_email: data.buyerEmail || data.renterEmail || null,
+        buyer_phone: data.buyerPhone || data.renterPhone || null,
+        vehicle_description: [data.vehicleYear, data.vehicleMake, data.vehicleModel].filter(Boolean).join(' ') || null,
+        vehicle_vin: (data.vehicleVin || data.vin || '') as string || null,
+        status,
+        acknowledgments: params.acknowledgments || {},
+        has_buyer_signature: params.buyerSignature || false,
+        has_cobuyer_signature: params.coBuyerSignature || false,
+        has_dealer_signature: params.dealerSignature || false,
+        has_buyer_id: params.buyerIdPhoto || false,
+        completed_link: params.completedLink || null,
+      }),
+    });
+  } catch {
+    // Non-blocking — don't fail the send/complete flow
+  }
 }

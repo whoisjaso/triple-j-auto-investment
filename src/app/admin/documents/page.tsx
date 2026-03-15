@@ -103,6 +103,34 @@ export default function DocumentsPage() {
         ))}
       </div>
 
+      {/* Agreement Tracker Link */}
+      <div className="mt-6">
+        <Link
+          href="/admin/documents/agreements"
+          className="group bg-emerald-500/[0.05] border border-emerald-500/10 rounded-2xl p-6 flex items-center justify-between hover:bg-emerald-500/[0.08] hover:border-emerald-500/20 transition-all duration-300"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/20 transition-colors">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                <polyline points="22 4 12 14.01 9 11.01" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="font-serif text-lg text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                Agreement Tracker
+              </h2>
+              <p className="text-xs text-white/40 mt-1">
+                View customer signatures, acknowledgments, and document completion status.
+              </p>
+            </div>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-white/20 group-hover:text-emerald-400/60 transition-colors shrink-0">
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </Link>
+      </div>
+
       {/* Quick Tips */}
       <div className="mt-10 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6">
         <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">How it works</h3>

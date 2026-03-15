@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { Download, Printer, CheckCircle, Send, Copy, Check } from 'lucide-react';
-import { decodeCustomerLink, decodeCompletedLink, customerFields, encodeCompletedLink, type CustomerLinkData, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
+import { Download, Printer, CheckCircle, Send, Copy, Check, AlertCircle } from 'lucide-react';
+import { decodeCustomerLink, decodeCompletedLink, customerFields, encodeCompletedLink, saveAgreement, type CustomerLinkData, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
 import { ContractData } from '@/lib/documents/finance';
 import { RentalData } from '@/lib/documents/rental';
 import { BillOfSaleData } from '@/lib/documents/billOfSale';
@@ -10,7 +10,7 @@ import { Form130UData } from '@/lib/documents/form130U';
 import { SignatureData, emptySignatures, DEALER_NAME, DEALER_ADDRESS, DEALER_PHONE } from '@/lib/documents/shared';
 import ContractPreview from '@/components/documents/ContractPreview';
 import RentalPreview from '@/components/documents/RentalPreview';
-import BillOfSalePreview from '@/components/documents/BillOfSalePreview';
+import BillOfSalePreview, { type BuyerAcknowledgments, emptyAcknowledgments } from '@/components/documents/BillOfSalePreview';
 import Form130UPreview from '@/components/documents/Form130UPreview';
 import AddressAutocomplete, { ParsedAddress } from '@/components/documents/AddressAutocomplete';
 import SignaturePad from '@/components/documents/SignaturePad';
@@ -36,6 +36,15 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
     coBuyerSignature: data.cs || '', coBuyerSignatureDate: data.csd || '',
     dealerSignature: data.ds || '', dealerSignatureDate: data.dsd || '',
   };
+  const acknowledgments: BuyerAcknowledgments = data.ack ? {
+    inspected: !!data.ack.inspected,
+    asIs: !!data.ack.asIs,
+    receivedCopy: !!data.ack.receivedCopy,
+    allSalesFinal: !!data.ack.allSalesFinal,
+    odometerInformed: !!data.ack.odometerInformed,
+    responsibility: !!data.ack.responsibility,
+    financingSeparate: !!data.ack.financingSeparate,
+  } : emptyAcknowledgments;
 
   const handleDownloadPDF = async () => {
     setDownloading(true);
@@ -87,7 +96,7 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
         <div ref={previewRef} className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
           {data.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={signatures} />}
           {data.s === 'rental' && <RentalPreview data={mergedData as unknown as RentalData} signatures={signatures} />}
-          {data.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={signatures} />}
+          {data.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={signatures} acknowledgments={acknowledgments} />}
           {data.s === 'form130U' && <Form130UPreview data={mergedData as unknown as Form130UData} signatures={signatures} />}
         </div>
       </div>
@@ -98,11 +107,13 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
 function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
   const [customerData, setCustomerData] = useState<Record<string, string>>({});
   const [signatures, setSignatures] = useState<SignatureData>(emptySignatures);
+  const [acknowledgments, setAcknowledgments] = useState<BuyerAcknowledgments>(emptyAcknowledgments);
   const [viewMode, setViewMode] = useState<'form' | 'preview'>('form');
   const [showReturnLink, setShowReturnLink] = useState(false);
   const [returnLink, setReturnLink] = useState('');
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [ackError, setAckError] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const fields = customerFields[linkData.s];
@@ -120,7 +131,16 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
     setCustomerData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    // Validate all required acknowledgments are checked
+    const requiredAcks: (keyof BuyerAcknowledgments)[] = ['inspected', 'asIs', 'receivedCopy', 'allSalesFinal', 'odometerInformed', 'responsibility'];
+    const allChecked = requiredAcks.every(key => acknowledgments[key]);
+    if (linkData.s === 'billOfSale' && !allChecked) {
+      setAckError(true);
+      return;
+    }
+    setAckError(false);
+
     const baseUrl = window.location.origin;
     const link = encodeCompletedLink(
       linkData.s, linkData.d, customerData, baseUrl,
@@ -128,9 +148,22 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
       signatures.buyerSignature, signatures.buyerSignatureDate,
       signatures.coBuyerSignature, signatures.coBuyerSignatureDate,
       signatures.buyerIdPhoto,
+      acknowledgments as unknown as Record<string, boolean>,
     );
     setReturnLink(link);
     setShowReturnLink(true);
+
+    await saveAgreement({
+      documentType: linkData.s,
+      data: { ...linkData.d, ...customerData },
+      status: 'completed',
+      acknowledgments: acknowledgments as unknown as Record<string, boolean>,
+      buyerSignature: !!signatures.buyerSignature,
+      coBuyerSignature: !!signatures.coBuyerSignature,
+      dealerSignature: !!dealerSig,
+      buyerIdPhoto: !!signatures.buyerIdPhoto,
+      completedLink: link,
+    });
   };
 
   const handleCopy = async () => {
@@ -238,6 +271,54 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
               </div>
             </div>
 
+            {/* Buyer Acknowledgment Checklist */}
+            {linkData.s === 'billOfSale' && (
+              <div className="bg-white p-8 rounded-2xl shadow-xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/5 space-y-4">
+                <h2 className="text-xl font-serif border-b border-[#1a1a1a]/10 pb-3 mb-4">Buyer Acknowledgment</h2>
+                <p className="text-sm text-[#1a1a1a]/70 font-semibold">I, the undersigned Buyer, acknowledge:</p>
+                {ackError && (
+                  <div className="flex items-center space-x-2 text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+                    <AlertCircle size={16} />
+                    <span className="text-sm font-medium">You must check all acknowledgments before submitting.</span>
+                  </div>
+                )}
+                <div className="space-y-3">
+                  {[
+                    { key: 'inspected' as const, label: 'I have inspected the vehicle and accept it in its present condition.' },
+                    { key: 'asIs' as const, label: `I understand this vehicle is sold ${(linkData.d as Record<string, unknown>).conditionType === 'as_is' ? '"AS IS" with NO dealer warranty' : 'with a LIMITED WARRANTY as described'}.` },
+                    { key: 'receivedCopy' as const, label: 'I have received a copy of this Bill of Sale for my records.' },
+                    { key: 'allSalesFinal' as const, label: 'I understand ALL SALES ARE FINAL — no refunds, returns, or exchanges.' },
+                    { key: 'odometerInformed' as const, label: 'I have been informed of the odometer reading and its accuracy status.' },
+                    { key: 'responsibility' as const, label: 'I accept full responsibility for the vehicle upon delivery, including insurance and registration.' },
+                  ].map(({ key, label }) => (
+                    <label key={key} className="flex items-start space-x-3 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={acknowledgments[key]}
+                        onChange={() => {
+                          setAcknowledgments(prev => ({ ...prev, [key]: !prev[key] }));
+                          setAckError(false);
+                        }}
+                        className="w-5 h-5 mt-0.5 accent-[#b89b5e] shrink-0 rounded border-[#1a1a1a]/20"
+                      />
+                      <span className="text-sm text-[#1a1a1a]/80 group-hover:text-[#1a1a1a] transition-colors">{label}</span>
+                    </label>
+                  ))}
+                  {(linkData.d as Record<string, unknown>).paymentMethod === 'Financing' && (
+                    <label className="flex items-start space-x-3 cursor-pointer group">
+                      <input
+                        type="checkbox"
+                        checked={acknowledgments.financingSeparate}
+                        onChange={() => setAcknowledgments(prev => ({ ...prev, financingSeparate: !prev.financingSeparate }))}
+                        className="w-5 h-5 mt-0.5 accent-[#b89b5e] shrink-0 rounded border-[#1a1a1a]/20"
+                      />
+                      <span className="text-sm text-[#1a1a1a]/80 group-hover:text-[#1a1a1a] transition-colors">I understand this purchase is financed under a separate Retail Installment Contract.</span>
+                    </label>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Submit */}
             <button onClick={handleSubmit} className="w-full py-4 bg-green-700 text-white rounded-full text-sm font-bold tracking-widest uppercase hover:bg-green-800 transition-all flex items-center justify-center space-x-2">
               <Send size={16} /><span>Complete & Send Back to Dealer</span>
@@ -247,7 +328,7 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
           <div ref={previewRef} className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
             {linkData.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={fullSignatures} />}
             {linkData.s === 'rental' && <RentalPreview data={mergedData as unknown as RentalData} signatures={fullSignatures} />}
-            {linkData.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={fullSignatures} />}
+            {linkData.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={fullSignatures} acknowledgments={acknowledgments} />}
             {linkData.s === 'form130U' && <Form130UPreview data={mergedData as unknown as Form130UData} signatures={fullSignatures} />}
           </div>
         )}

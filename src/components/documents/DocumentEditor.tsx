@@ -7,7 +7,7 @@ import { RentalData } from '@/lib/documents/rental';
 import { BillOfSaleData } from '@/lib/documents/billOfSale';
 import { Form130UData, prefillFromBillOfSale } from '@/lib/documents/form130U';
 import { SignatureData, emptySignatures } from '@/lib/documents/shared';
-import { encodeCustomerLink, type CustomerSection } from '@/lib/documents/customerPortal';
+import { encodeCustomerLink, saveAgreement, type CustomerSection } from '@/lib/documents/customerPortal';
 import ContractForm from './ContractForm';
 import ContractPreview from './ContractPreview';
 import RentalForm from './RentalForm';
@@ -155,66 +155,24 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
     const prevView = view;
     setView('preview');
 
-    // Wait for React to render the preview
     setTimeout(() => {
-      // Physically hide ALL admin UI with inline styles (beats any CSS)
-      const elementsToHide = [
-        document.querySelector('aside'),                              // desktop sidebar
-        ...document.querySelectorAll('nav[aria-label="Admin navigation"]'), // mobile nav
-        document.querySelector('.print-toolbar-hide'),                // document toolbar
-        document.querySelector('[data-print-hide]'),                  // page header
-      ].filter((el): el is HTMLElement => el instanceof HTMLElement);
-
-      // Hide them all
-      elementsToHide.forEach(el => {
-        el.setAttribute('data-prev-display', el.style.display);
-        el.style.setProperty('display', 'none', 'important');
+      // Neutralize ALL fixed-position elements (defeats Chrome's fixed-on-every-page print bug)
+      const fixedEls = document.querySelectorAll('aside, nav, [class*="fixed"], [data-print-hide], .print-toolbar-hide');
+      const saved: { el: HTMLElement; pos: string; display: string }[] = [];
+      fixedEls.forEach(el => {
+        const htmlEl = el as HTMLElement;
+        saved.push({ el: htmlEl, pos: htmlEl.style.position, display: htmlEl.style.display });
+        htmlEl.style.setProperty('position', 'static', 'important');
+        htmlEl.style.setProperty('display', 'none', 'important');
       });
-
-      // Reset main content to full width
-      const main = document.querySelector('main') as HTMLElement | null;
-      const layoutDiv = document.querySelector('main')?.parentElement as HTMLElement | null;
-      if (main) {
-        main.setAttribute('data-prev-ml', main.style.marginLeft);
-        main.setAttribute('data-prev-p', main.style.padding);
-        main.setAttribute('data-prev-overflow', main.style.overflow);
-        main.style.setProperty('margin-left', '0', 'important');
-        main.style.setProperty('padding', '0', 'important');
-        main.style.setProperty('overflow', 'visible', 'important');
-        main.style.setProperty('height', 'auto', 'important');
-      }
-      if (layoutDiv) {
-        layoutDiv.setAttribute('data-prev-overflow', layoutDiv.style.overflow);
-        layoutDiv.setAttribute('data-prev-height', layoutDiv.style.height);
-        layoutDiv.style.setProperty('overflow', 'visible', 'important');
-        layoutDiv.style.setProperty('height', 'auto', 'important');
-        layoutDiv.style.setProperty('display', 'block', 'important');
-      }
-      // Set body background to white
-      const prevBg = document.body.style.background;
-      document.body.style.setProperty('background', 'white', 'important');
 
       window.print();
 
-      // Restore everything after print dialog closes (print() is blocking)
-      elementsToHide.forEach(el => {
-        const prev = el.getAttribute('data-prev-display') || '';
-        el.style.display = prev;
-        el.removeAttribute('data-prev-display');
+      // Restore after print dialog closes (window.print() is blocking)
+      saved.forEach(({ el, pos, display }) => {
+        el.style.position = pos;
+        el.style.display = display;
       });
-      if (main) {
-        main.style.marginLeft = main.getAttribute('data-prev-ml') || '';
-        main.style.padding = main.getAttribute('data-prev-p') || '';
-        main.style.overflow = main.getAttribute('data-prev-overflow') || '';
-        main.style.height = '';
-      }
-      if (layoutDiv) {
-        layoutDiv.style.overflow = layoutDiv.getAttribute('data-prev-overflow') || '';
-        layoutDiv.style.height = layoutDiv.getAttribute('data-prev-height') || '';
-        layoutDiv.style.display = '';
-      }
-      document.body.style.background = prevBg;
-
       setView(prevView);
     }, 400);
   }, [view]);
@@ -233,13 +191,20 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
     return form130UData;
   };
 
-  const handleSendToCustomer = () => {
+  const handleSendToCustomer = async () => {
     const data = getCurrentData();
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
     const link = encodeCustomerLink(section as CustomerSection, data, baseUrl, signatures.dealerSignature, signatures.dealerSignatureDate);
     setShareLink(link);
     setShowShareModal(true);
     setCopied(false);
+
+    await saveAgreement({
+      documentType: section as CustomerSection,
+      data: data as unknown as Record<string, unknown>,
+      status: 'pending',
+      dealerSignature: !!signatures.dealerSignature,
+    });
   };
 
   const handleCopyLink = async () => {
