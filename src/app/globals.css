@@ -104,48 +104,52 @@ select option:hover {
   scrollbar-width: none;
 }
 
+/* Print page group — transparent on screen, forces page break in print */
+.print-page-group {
+  display: contents;
+}
+
 /* ══════════ PRINT STYLES ══════════ */
-/* Triggered when body has .printing-document class AND print media is active */
 @media print {
   @page {
     size: letter;
-    margin: 0.5in 0.5in 0.6in 0.5in;
+    margin: 0.6in;
   }
 
-  /* ── NUCLEAR: Hide ALL admin UI ── */
-  /* Desktop sidebar */
-  aside {
+  /* ── NUCLEAR HIDE: sidebar, nav, buttons, UI chrome ── */
+  aside,
+  nav,
+  nav[aria-label="Admin navigation"],
+  [data-print-hide],
+  .print-toolbar-hide,
+  .print-form-hide,
+  .print-no-watermark,
+  [role="alert"],
+  nextjs-portal,
+  body > div > button,
+  [data-nextjs-dialog-left-right] {
     display: none !important;
+    visibility: hidden !important;
+    position: static !important;
+    width: 0 !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
   }
 
-  /* ALL navigation bars (mobile bottom bar, more sheet) */
-  nav[aria-label="Admin navigation"] {
+  /* Kill fixed-position elements (Chrome prints them on every page) */
+  [class*="fixed"] {
+    position: static !important;
     display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
-  /* Mobile "More" overlay backdrop */
-  body > div > div > div[class*="fixed inset-0"] {
-    display: none !important;
-  }
-
-  /* Mobile "More" bottom sheet */
-  body > div > div > div[class*="fixed bottom-0"] {
-    display: none !important;
-  }
-
-  /* Next.js dev tools */
-  button[class*="Next.js"],
-  [class*="dev-tools"],
-  body > div > button {
-    display: none !important;
-  }
-
-  /* Alert banners */
-  [role="alert"] {
-    display: none !important;
-  }
-
-  /* ── Reset layout for print ── */
+  /* ── Reset base colors ── */
   html, body {
     height: auto !important;
     overflow: visible !important;
@@ -155,65 +159,110 @@ select option:hover {
     print-color-adjust: exact !important;
   }
 
-  /* Remove sidebar margin from main content */
-  main {
-    margin-left: 0 !important;
+  /* ── Layout containers: transparent pass-throughs ── */
+  body > div,
+  body > div > div,
+  main,
+  main > div {
+    display: block !important;
+    position: static !important;
+    margin: 0 !important;
     padding: 0 !important;
-    overflow: visible !important;
+    width: auto !important;
+    max-width: none !important;
     height: auto !important;
     min-height: 0 !important;
-  }
-
-  /* Reset the admin layout container */
-  body > div > div {
-    display: block !important;
-    height: auto !important;
     overflow: visible !important;
+    background: white !important;
+    border: none !important;
+    box-shadow: none !important;
   }
 
-  /* Reset all overflow locks */
-  * {
-    overflow: visible !important;
-  }
-
-  /* ── Hide non-document content ── */
-  /* Document page header ("Bill of Sale" title) */
-  [data-print-hide] {
-    display: none !important;
-  }
-
-  /* Document toolbar (tabs, edit/preview, actions) */
-  .print-toolbar-hide {
-    display: none !important;
-  }
-
-  /* Edit form (should never print) */
-  .print-form-hide {
-    display: none !important;
-  }
-
-  /* ── Document preview: clean output ── */
+  /* ── Document preview: full-width, no decorations ── */
   .print-doc {
+    display: block !important;
+    position: static !important;
     padding: 0 !important;
     max-width: 100% !important;
     margin: 0 !important;
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
+    overflow: visible !important;
   }
 
-  /* Ensure borders and backgrounds print */
+  /* Ensure backgrounds/borders print exactly */
+  .print-doc,
   .print-doc * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
-  /* Hide watermark — saves ink */
-  .print-no-watermark {
-    display: none !important;
+  .print-doc,
+  .print-doc > * {
+    overflow: visible !important;
   }
 
-  /* ── Page break control ── */
+  /* ══════ BORDERS: clean 0.5px #ddd lines everywhere ══════ */
+
+  /* Override ALL border colors to #ddd and widths to 0.5px */
+  .print-doc *,
+  .print-doc *::before,
+  .print-doc *::after {
+    border-color: #ddd !important;
+  }
+
+  /* Thin out all heavy (2px) borders to 0.5px */
+  .print-doc .border-2,
+  .print-doc .border-b-2,
+  .print-doc .border-t-2,
+  .print-doc .border-y-2 {
+    border-width: 0.5px !important;
+  }
+
+  /* Thin out standard 1px borders to 0.5px */
+  .print-doc .border,
+  .print-doc .border-b,
+  .print-doc .border-t,
+  .print-doc .border-y {
+    border-width: 0.5px !important;
+  }
+
+  /* Remove dividers between Rental Summary columns */
+  .print-doc .divide-x-2 > * + * {
+    border-left-width: 0 !important;
+  }
+
+  /* Table header/row borders */
+  .print-doc thead tr {
+    border-bottom: 0.5px solid #ddd !important;
+  }
+  .print-doc tbody tr {
+    border-bottom: 0.5px solid #eee !important;
+  }
+
+  /* Signature lines — slightly darker for visibility */
+  .print-doc .h-14.border-b,
+  .print-doc .h-8.border-b {
+    border-bottom-color: #999 !important;
+  }
+
+  /* Dashed write-in fields */
+  .print-doc .border-dashed {
+    border-bottom: 0.5px dashed #ccc !important;
+  }
+
+  /* ── Rental Summary boxes — light fill, no outlines ── */
+  .print-doc .grid.grid-cols-4 {
+    border: none !important;
+  }
+  .print-doc .grid.grid-cols-4 > div {
+    background: #f5f5f5 !important;
+    border: 0.5px solid #eee !important;
+  }
+
+  /* ══════ PAGE BREAKS — keep sections together ══════ */
+
   .print-section {
     break-inside: avoid;
     page-break-inside: avoid;
@@ -234,7 +283,7 @@ select option:hover {
     page-break-after: avoid;
   }
 
-  table, thead, tbody, tr {
+  table {
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -243,4 +292,37 @@ select option:hover {
     break-inside: avoid;
     page-break-inside: avoid;
   }
+
+  /* Print page group — forces page break */
+  .print-page-group {
+    display: block;
+    break-before: page;
+    page-break-before: always;
+  }
+
+  /* GPS Disclosure — keep together */
+  .print-doc .border-2.border-red-900\/40 {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Each term paragraph — avoid breaking mid-clause */
+  .print-doc .columns-2 > p,
+  .print-doc .columns-1 > p {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* ══════ TERMS: single-column for print ══════ */
+  .print-doc .columns-2 {
+    columns: 1 !important;
+    column-count: 1 !important;
+  }
+
+  /* ══════ NO SIZE/SPACING COMPRESSION ══════ */
+  /* Everything stays exactly as the screen shows. */
+  /* The only CSS below is for things that NEED print-specific handling. */
+
+  /* Remove min-heights on empty info fields so they collapse naturally */
+  .print-doc [class*="min-h-"] { min-height: 0 !important; }
 }
