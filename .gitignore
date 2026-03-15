@@ -43,9 +43,13 @@ next-env.d.ts
 # playwright / testing artifacts
 .playwright-mcp/
 *.png
+*.jpg
 *.jpeg
+*.pdf
 !public/**/*.png
+!public/**/*.jpg
 !public/**/*.jpeg
+!public/**/*.pdf
 
 # claude code / agent tooling
 .claude/
