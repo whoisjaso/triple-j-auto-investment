@@ -52,6 +52,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Document portal: public, no i18n — skip locale routing
+  if (pathname.startsWith("/documents")) {
+    return NextResponse.next();
+  }
+
   // All other matched routes: apply i18n locale routing
   return intlMiddleware(request);
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Download, Printer, CheckCircle, Send, Copy, Check, AlertCircle } from 'lucide-react';
 import { decodeCustomerLink, decodeCompletedLink, customerFields, encodeCompletedLink, saveAgreement, type CustomerLinkData, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
 import { ContractData } from '@/lib/documents/finance';
@@ -28,8 +28,6 @@ const InputField = ({ label, name, type = "text", uppercase = false, value, onCh
 );
 
 function CompletedView({ data }: { data: CompletedLinkData }) {
-  const [downloading, setDownloading] = useState(false);
-  const previewRef = useRef<HTMLDivElement>(null);
   const mergedData = { ...data.dd, ...data.cd };
   const signatures: SignatureData = {
     buyerIdPhoto: data.bi || '', buyerSignature: data.bs || '', buyerSignatureDate: data.bsd || '',
@@ -46,21 +44,8 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
     financingSeparate: !!data.ack.financingSeparate,
   } : emptyAcknowledgments;
 
-  const handleDownloadPDF = async () => {
-    setDownloading(true);
-    await new Promise(r => setTimeout(r, 300));
-    const el = previewRef.current;
-    if (!el) { setDownloading(false); return; }
-    try {
-      const html2pdf = (await import('html2pdf.js')).default;
-      await html2pdf().set({
-        margin: 0, filename: `Triple_J_${data.s}_COMPLETED.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] },
-      }).from(el).save();
-    } finally { setDownloading(false); }
+  const handleDownloadPDF = () => {
+    window.print();
   };
 
   return (
@@ -72,8 +57,8 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
             <span className="text-[10px] font-bold tracking-widest uppercase">Completed Document</span>
           </div>
           <div className="flex items-center space-x-3">
-            <button onClick={handleDownloadPDF} disabled={downloading} className="px-4 py-2 bg-[#1a1a1a] text-[#b89b5e] rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-[#1a1a1a]/90 flex items-center space-x-1 border border-[#b89b5e]/30 disabled:opacity-50">
-              <Download size={12} /><span>{downloading ? '...' : 'PDF'}</span>
+            <button onClick={handleDownloadPDF} className="px-4 py-2 bg-[#1a1a1a] text-[#b89b5e] rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-[#1a1a1a]/90 flex items-center space-x-1 border border-[#b89b5e]/30">
+              <Download size={12} /><span>PDF</span>
             </button>
             <button onClick={() => window.print()} className="px-4 py-2 bg-[#b89b5e] text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-[#b89b5e]/90 flex items-center space-x-1">
               <Printer size={12} /><span>Print</span>
@@ -93,7 +78,7 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 py-8 print:p-0 print:m-0 print:max-w-none">
-        <div ref={previewRef} className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
+        <div className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
           {data.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={signatures} />}
           {data.s === 'rental' && <RentalPreview data={mergedData as unknown as RentalData} signatures={signatures} />}
           {data.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={signatures} acknowledgments={acknowledgments} />}
@@ -112,9 +97,7 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
   const [showReturnLink, setShowReturnLink] = useState(false);
   const [returnLink, setReturnLink] = useState('');
   const [copied, setCopied] = useState(false);
-  const [downloading, setDownloading] = useState(false);
   const [ackError, setAckError] = useState(false);
-  const previewRef = useRef<HTMLDivElement>(null);
 
   const fields = customerFields[linkData.s];
   const dealerSig = linkData.ds || '';
@@ -172,22 +155,9 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
     setTimeout(() => setCopied(false), 3000);
   };
 
-  const handleDownloadPDF = async () => {
-    setDownloading(true);
+  const handleDownloadPDF = () => {
     setViewMode('preview');
-    await new Promise(r => setTimeout(r, 400));
-    const el = previewRef.current;
-    if (!el) { setDownloading(false); return; }
-    try {
-      const html2pdf = (await import('html2pdf.js')).default;
-      await html2pdf().set({
-        margin: 0, filename: `Triple_J_${linkData.s}_Customer_Copy.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-        pagebreak: { mode: ['css', 'legacy'] },
-      }).from(el).save();
-    } finally { setDownloading(false); }
+    setTimeout(() => window.print(), 400);
   };
 
   return (
@@ -203,8 +173,8 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
             <button onClick={() => setViewMode(viewMode === 'form' ? 'preview' : 'form')} className="px-3 py-1.5 bg-[#1a1a1a] text-[#b89b5e] rounded-full text-[10px] font-semibold tracking-wider uppercase">
               {viewMode === 'form' ? 'Preview' : 'Edit'}
             </button>
-            <button onClick={handleDownloadPDF} disabled={downloading} className="px-3 py-1.5 bg-[#b89b5e] text-white rounded-full text-[10px] font-semibold tracking-wider uppercase disabled:opacity-50">
-              {downloading ? '...' : 'PDF'}
+            <button onClick={handleDownloadPDF} className="px-3 py-1.5 bg-[#b89b5e] text-white rounded-full text-[10px] font-semibold tracking-wider uppercase">
+              PDF
             </button>
           </div>
         </div>
@@ -325,7 +295,7 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
             </button>
           </div>
         ) : (
-          <div ref={previewRef} className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
+          <div className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
             {linkData.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={fullSignatures} />}
             {linkData.s === 'rental' && <RentalPreview data={mergedData as unknown as RentalData} signatures={fullSignatures} />}
             {linkData.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={fullSignatures} acknowledgments={acknowledgments} />}
