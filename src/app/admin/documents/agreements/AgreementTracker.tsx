@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileText, CheckCircle, Clock, AlertCircle, ExternalLink, RefreshCw } from "lucide-react";
+import { FileText, CheckCircle, Clock, AlertCircle, ExternalLink, RefreshCw, Eye, X } from "lucide-react";
 
 interface Agreement {
   id: string;
@@ -55,6 +55,26 @@ export default function AgreementTracker() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "completed">("all");
+  const [idPhotoModal, setIdPhotoModal] = useState<{ photo: string; name: string } | null>(null);
+  const [loadingPhoto, setLoadingPhoto] = useState<string | null>(null);
+
+  const fetchIdPhoto = async (agreementId: string, buyerName: string) => {
+    setLoadingPhoto(agreementId);
+    try {
+      const res = await fetch(`/api/documents/agreements/${agreementId}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      if (data.buyer_id_photo) {
+        setIdPhotoModal({ photo: data.buyer_id_photo, name: buyerName || "Customer" });
+      } else {
+        alert("No ID photo available for this agreement.");
+      }
+    } catch {
+      alert("Failed to load ID photo.");
+    } finally {
+      setLoadingPhoto(null);
+    }
+  };
 
   const fetchAgreements = async () => {
     setLoading(true);
@@ -286,15 +306,23 @@ export default function AgreementTracker() {
                 >
                   Dealer Sig {agreement.has_dealer_signature ? "✓" : "—"}
                 </span>
-                <span
-                  className={`text-[9px] font-semibold tracking-wider uppercase px-2 py-1 rounded-full border ${
-                    agreement.has_buyer_id
-                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                      : "bg-white/[0.02] border-white/[0.06] text-white/30"
-                  }`}
-                >
-                  ID Photo {agreement.has_buyer_id ? "✓" : "—"}
-                </span>
+                {agreement.has_buyer_id ? (
+                  <button
+                    onClick={() => fetchIdPhoto(agreement.id, agreement.buyer_name || "Customer")}
+                    className="text-[9px] font-semibold tracking-wider uppercase px-2 py-1 rounded-full border bg-emerald-500/10 border-emerald-500/20 text-emerald-400 hover:bg-emerald-500/20 transition-all cursor-pointer flex items-center space-x-1"
+                  >
+                    {loadingPhoto === agreement.id ? (
+                      <div className="w-3 h-3 border border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+                    ) : (
+                      <Eye size={10} />
+                    )}
+                    <span>View ID</span>
+                  </button>
+                ) : (
+                  <span className="text-[9px] font-semibold tracking-wider uppercase px-2 py-1 rounded-full border bg-white/[0.02] border-white/[0.06] text-white/30">
+                    ID Photo —
+                  </span>
+                )}
                 {agreement.acknowledgments &&
                   Object.entries(agreement.acknowledgments).map(
                     ([key, val]) => (
@@ -313,6 +341,25 @@ export default function AgreementTracker() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+      {/* ID Photo Modal */}
+      {idPhotoModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setIdPhotoModal(null)}>
+          <div onClick={(e) => e.stopPropagation()} className="bg-[#111] border border-white/10 rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-serif text-tj-cream">Customer ID</h3>
+                <p className="text-xs text-white/40">{idPhotoModal.name}</p>
+              </div>
+              <button onClick={() => setIdPhotoModal(null)} className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/20 transition-all">
+                <X size={16} />
+              </button>
+            </div>
+            <div className="border border-white/10 rounded-xl overflow-hidden bg-white/5">
+              <img src={idPhotoModal.photo} alt={`${idPhotoModal.name} ID`} className="w-full object-contain max-h-[500px]" />
+            </div>
+          </div>
         </div>
       )}
     </div>

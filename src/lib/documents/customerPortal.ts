@@ -11,6 +11,8 @@ export interface CustomerLinkData {
   d: Record<string, unknown>;
   ds?: string;
   dd?: string;
+  aid?: string;  // agreement ID for linking admin→customer records
+  abn?: string;  // admin buyer name (takes priority over customer-entered name)
 }
 
 const dealerFields: Record<CustomerSection, string[]> = {
@@ -57,6 +59,8 @@ export function encodeCustomerLink(
   baseUrl: string,
   dealerSignature?: string,
   dealerSignatureDate?: string,
+  agreementId?: string,
+  adminBuyerName?: string,
 ): string {
   const fields = dealerFields[section];
   const dealerData: Record<string, unknown> = {};
@@ -68,6 +72,8 @@ export function encodeCustomerLink(
     payload.ds = dealerSignature;
     payload.dd = dealerSignatureDate;
   }
+  if (agreementId) payload.aid = agreementId;
+  if (adminBuyerName) payload.abn = adminBuyerName;
   const json = JSON.stringify(payload);
   const compressed = compressToEncodedURIComponent(json);
   return `${baseUrl}/documents/portal#customer/${compressed}`;
@@ -146,14 +152,40 @@ export interface SaveAgreementParams {
   buyerSignature?: boolean;
   coBuyerSignature?: boolean;
   buyerIdPhoto?: boolean;
+  buyerIdPhotoData?: string;
   acknowledgments?: Record<string, boolean>;
   completedLink?: string;
+  agreementId?: string;  // for updating existing record
 }
 
-export async function saveAgreement(params: SaveAgreementParams): Promise<void> {
+export async function saveAgreement(params: SaveAgreementParams): Promise<string | null> {
   const { data, documentType, status } = params;
   try {
-    await fetch('/api/documents/agreements', {
+    // If we have an agreement ID, complete the existing record
+    if (params.agreementId && status === 'completed') {
+      const res = await fetch('/api/documents/agreements/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: params.agreementId,
+          buyer_name: data.buyerName || data.renterName || null,
+          buyer_email: data.buyerEmail || data.renterEmail || null,
+          buyer_phone: data.buyerPhone || data.renterPhone || null,
+          acknowledgments: params.acknowledgments || {},
+          has_buyer_signature: params.buyerSignature || false,
+          has_cobuyer_signature: params.coBuyerSignature || false,
+          has_dealer_signature: params.dealerSignature || false,
+          has_buyer_id: params.buyerIdPhoto || false,
+          buyer_id_photo: params.buyerIdPhotoData || null,
+          completed_link: params.completedLink || null,
+        }),
+      });
+      const result = await res.json();
+      return result?.id || params.agreementId;
+    }
+
+    // Otherwise create a new record (admin sending)
+    const res = await fetch('/api/documents/agreements', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -172,7 +204,31 @@ export async function saveAgreement(params: SaveAgreementParams): Promise<void> 
         completed_link: params.completedLink || null,
       }),
     });
+    const result = await res.json();
+    return result?.id || null;
   } catch {
-    // Non-blocking — don't fail the send/complete flow
+    return null;
   }
+}
+
+// Compress image client-side before storing in DB
+export async function compressIdPhoto(dataUrl: string, maxWidth = 1200, quality = 0.8): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      let { width, height } = img;
+      if (width > maxWidth) {
+        height = (height * maxWidth) / width;
+        width = maxWidth;
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, width, height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.onerror = () => resolve(dataUrl); // fallback to original
+    img.src = dataUrl;
+  });
 }

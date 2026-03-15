@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Download, Printer, CheckCircle, Send, Copy, Check, AlertCircle } from 'lucide-react';
-import { decodeCustomerLink, decodeCompletedLink, customerFields, encodeCompletedLink, saveAgreement, type CustomerLinkData, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
+import { decodeCustomerLink, decodeCompletedLink, customerFields, encodeCompletedLink, saveAgreement, compressIdPhoto, type CustomerLinkData, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
 import { ContractData } from '@/lib/documents/finance';
 import { RentalData } from '@/lib/documents/rental';
 import { BillOfSaleData } from '@/lib/documents/billOfSale';
@@ -90,7 +90,17 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
 }
 
 function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
-  const [customerData, setCustomerData] = useState<Record<string, string>>({});
+  const adminBuyerName = linkData.abn || '';
+  const [customerData, setCustomerData] = useState<Record<string, string>>(() => {
+    // Pre-fill buyer name from admin if provided
+    const initial: Record<string, string> = {};
+    if (adminBuyerName) {
+      // Determine the name field based on document type
+      const nameField = linkData.s === 'rental' ? 'renterName' : 'buyerName';
+      initial[nameField] = adminBuyerName;
+    }
+    return initial;
+  });
   const [signatures, setSignatures] = useState<SignatureData>(emptySignatures);
   const [acknowledgments, setAcknowledgments] = useState<BuyerAcknowledgments>(emptyAcknowledgments);
   const [viewMode, setViewMode] = useState<'form' | 'preview'>('form');
@@ -98,11 +108,13 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
   const [returnLink, setReturnLink] = useState('');
   const [copied, setCopied] = useState(false);
   const [ackError, setAckError] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const fields = customerFields[linkData.s];
   const dealerSig = linkData.ds || '';
   const dealerSigDate = linkData.dd || '';
   const mergedData = { ...linkData.d, ...customerData };
+  const nameField = linkData.s === 'rental' ? 'renterName' : 'buyerName';
 
   const fullSignatures: SignatureData = {
     ...signatures,
@@ -123,10 +135,23 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
       return;
     }
     setAckError(false);
+    setSubmitting(true);
+
+    // Compress ID photo for DB storage
+    let compressedPhoto = '';
+    if (signatures.buyerIdPhoto) {
+      compressedPhoto = await compressIdPhoto(signatures.buyerIdPhoto);
+    }
+
+    // Build final customer data with name priority
+    const finalCustomerData = { ...customerData };
+    if (adminBuyerName) {
+      finalCustomerData[nameField] = adminBuyerName;
+    }
 
     const baseUrl = window.location.origin;
     const link = encodeCompletedLink(
-      linkData.s, linkData.d, customerData, baseUrl,
+      linkData.s, linkData.d, finalCustomerData, baseUrl,
       dealerSig, dealerSigDate,
       signatures.buyerSignature, signatures.buyerSignatureDate,
       signatures.coBuyerSignature, signatures.coBuyerSignatureDate,
@@ -138,15 +163,18 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
 
     await saveAgreement({
       documentType: linkData.s,
-      data: { ...linkData.d, ...customerData },
+      data: { ...linkData.d, ...finalCustomerData },
       status: 'completed',
       acknowledgments: acknowledgments as unknown as Record<string, boolean>,
       buyerSignature: !!signatures.buyerSignature,
       coBuyerSignature: !!signatures.coBuyerSignature,
       dealerSignature: !!dealerSig,
       buyerIdPhoto: !!signatures.buyerIdPhoto,
+      buyerIdPhotoData: compressedPhoto || undefined,
       completedLink: link,
+      agreementId: linkData.aid,
     });
+    setSubmitting(false);
   };
 
   const handleCopy = async () => {
@@ -226,7 +254,9 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
                       </div>
                     );
                   }
-                  return <InputField key={field} label={label} name={field} value={customerData[field] || ''} onChange={handleChange} type={field.includes('Email') || field.includes('email') ? 'email' : field.includes('Dob') ? 'date' : 'text'} uppercase={field.includes('License') || field.includes('State') || field.includes('Vin')} />;
+                  // If admin set the buyer name, make it read-only
+                  const isAdminNameField = adminBuyerName && (field === 'buyerName' || field === 'renterName');
+                  return <InputField key={field} label={isAdminNameField ? `${label} (set by dealer)` : label} name={field} value={customerData[field] || ''} onChange={handleChange} type={field.includes('Email') || field.includes('email') ? 'email' : field.includes('Dob') ? 'date' : 'text'} uppercase={field.includes('License') || field.includes('State') || field.includes('Vin')} disabled={!!isAdminNameField} />;
                 })}
               </div>
             </div>
@@ -290,8 +320,12 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
             )}
 
             {/* Submit */}
-            <button onClick={handleSubmit} className="w-full py-4 bg-green-700 text-white rounded-full text-sm font-bold tracking-widest uppercase hover:bg-green-800 transition-all flex items-center justify-center space-x-2">
-              <Send size={16} /><span>Complete & Send Back to Dealer</span>
+            <button onClick={handleSubmit} disabled={submitting} className="w-full py-4 bg-green-700 text-white rounded-full text-sm font-bold tracking-widest uppercase hover:bg-green-800 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
+              {submitting ? (
+                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Submitting...</span></>
+              ) : (
+                <><Send size={16} /><span>Complete & Send Back to Dealer</span></>
+              )}
             </button>
           </div>
         ) : (

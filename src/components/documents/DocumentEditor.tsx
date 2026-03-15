@@ -193,18 +193,29 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
 
   const handleSendToCustomer = async () => {
     const data = getCurrentData();
+    const dataRecord = data as unknown as Record<string, unknown>;
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
-    const link = encodeCustomerLink(section as CustomerSection, data, baseUrl, signatures.dealerSignature, signatures.dealerSignatureDate);
-    setShareLink(link);
-    setShowShareModal(true);
-    setCopied(false);
 
-    await saveAgreement({
+    // Save pending agreement first to get the ID
+    const agreementId = await saveAgreement({
       documentType: section as CustomerSection,
-      data: data as unknown as Record<string, unknown>,
+      data: dataRecord,
       status: 'pending',
       dealerSignature: !!signatures.dealerSignature,
     });
+
+    // Extract admin buyer name (if admin filled it in)
+    const adminBuyerName = (dataRecord.buyerName || dataRecord.renterName || '') as string;
+
+    const link = encodeCustomerLink(
+      section as CustomerSection, data, baseUrl,
+      signatures.dealerSignature, signatures.dealerSignatureDate,
+      agreementId || undefined,
+      adminBuyerName || undefined,
+    );
+    setShareLink(link);
+    setShowShareModal(true);
+    setCopied(false);
   };
 
   const handleCopyLink = async () => {

@@ -47,6 +47,7 @@ async function requireAdmin(req: NextRequest): Promise<NextResponse | null> {
 // GET — Admin only, excludes completed_link blob for performance
 // ============================================================
 
+// Excludes completed_link and buyer_id_photo blobs for performance
 const LISTING_COLUMNS = [
   'id', 'document_type', 'buyer_name', 'buyer_email', 'buyer_phone',
   'vehicle_description', 'vehicle_vin', 'status', 'sent_at', 'completed_at',
