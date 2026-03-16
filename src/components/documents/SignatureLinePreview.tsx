@@ -14,7 +14,7 @@ export default function SignatureLinePreview({ label, dateLabel = 'Date', signat
           <img
             src={signatureImage}
             alt={label}
-            className="signature-img h-12 max-w-[200px] object-contain absolute bottom-0 left-2"
+            className="signature-img h-12 max-w-[300px] object-contain absolute bottom-0 left-2"
           />
         )}
         {signatureDate && (
