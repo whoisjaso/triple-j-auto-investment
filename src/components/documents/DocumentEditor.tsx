@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback } from 'react';
-import { FileText, Edit3, Download, Send, Copy, Check, Printer } from 'lucide-react';
+import { FileText, Edit3, Send, Copy, Check } from 'lucide-react';
+import PrintButton from './PrintButton';
 import { ContractData } from '@/lib/documents/finance';
 import { RentalData } from '@/lib/documents/rental';
 import { BillOfSaleData } from '@/lib/documents/billOfSale';
@@ -197,7 +198,7 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
     // Save pending agreement first to get the ID
-    const agreementId = await saveAgreement({
+    const result = await saveAgreement({
       documentType: section as CustomerSection,
       data: dataRecord,
       status: 'pending',
@@ -210,7 +211,7 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
     const link = encodeCustomerLink(
       section as CustomerSection, data, baseUrl,
       signatures.dealerSignature, signatures.dealerSignatureDate,
-      agreementId || undefined,
+      result.id || undefined,
       adminBuyerName || undefined,
     );
     setShareLink(link);
@@ -260,12 +261,8 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
           <button onClick={handleSendToCustomer} className="px-3 py-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-emerald-700 transition-all flex items-center space-x-1">
             <Send size={12} /><span className="hidden sm:inline">Send to Customer</span><span className="sm:hidden">Send</span>
           </button>
-          <button onClick={handlePrint} className="px-3 py-1.5 bg-white/10 text-tj-gold rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-white/15 transition-all flex items-center space-x-1 border border-tj-gold/20">
-            <Download size={12} /><span>PDF</span>
-          </button>
-          <button onClick={handlePrint} className="px-3 py-1.5 bg-tj-gold text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-tj-gold/90 transition-all flex items-center space-x-1">
-            <Printer size={12} /><span>Print</span>
-          </button>
+          <PrintButton variant="pdf" size="sm" onClick={handlePrint} />
+          <PrintButton variant="print" size="sm" onClick={handlePrint} />
         </div>
       </div>
 

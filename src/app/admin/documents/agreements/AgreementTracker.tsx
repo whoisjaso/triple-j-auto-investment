@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileText, CheckCircle, Clock, AlertCircle, ExternalLink, RefreshCw, Eye, X, ChevronDown, ChevronUp, Printer, Download } from "lucide-react";
+import { FileText, CheckCircle, Clock, AlertCircle, ExternalLink, RefreshCw, Eye, X, ChevronDown, ChevronUp } from "lucide-react";
+import PrintButton from "@/components/documents/PrintButton";
 import { decodeCompletedLinkFromUrl, type CompletedLinkData } from "@/lib/documents/customerPortal";
 import { ContractData } from "@/lib/documents/finance";
 import { RentalData } from "@/lib/documents/rental";
@@ -119,12 +120,8 @@ function DocumentViewerModal({ data, onClose }: { data: CompletedLinkData; onClo
           </span>
         </div>
         <div className="flex items-center space-x-2">
-          <button onClick={() => window.print()} className="px-3 py-1.5 bg-white/10 text-tj-gold rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-white/15 transition-all flex items-center space-x-1 border border-tj-gold/20">
-            <Download size={12} /><span>PDF</span>
-          </button>
-          <button onClick={() => window.print()} className="px-3 py-1.5 bg-tj-gold text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-tj-gold/90 transition-all flex items-center space-x-1">
-            <Printer size={12} /><span>Print</span>
-          </button>
+          <PrintButton variant="pdf" size="sm" />
+          <PrintButton variant="print" size="sm" />
           <button onClick={onClose} className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/20 transition-all">
             <X size={16} />
           </button>

@@ -170,7 +170,13 @@ export interface SaveAgreementParams {
   agreementId?: string;  // for updating existing record
 }
 
-export async function saveAgreement(params: SaveAgreementParams): Promise<string | null> {
+export interface SaveAgreementResult {
+  success: boolean;
+  error?: string;
+  id?: string;
+}
+
+export async function saveAgreement(params: SaveAgreementParams): Promise<SaveAgreementResult> {
   const { data, documentType, status } = params;
   try {
     // If we have an agreement ID, complete the existing record
@@ -194,8 +200,9 @@ export async function saveAgreement(params: SaveAgreementParams): Promise<string
           completed_link: params.completedLink || null,
         }),
       });
+      if (!res.ok) return { success: false, error: `Server error: ${res.status}` };
       const result = await res.json();
-      return result?.id || params.agreementId;
+      return { success: true, id: result?.id || params.agreementId };
     }
 
     // Otherwise create a new record (admin sending)
@@ -218,10 +225,11 @@ export async function saveAgreement(params: SaveAgreementParams): Promise<string
         completed_link: params.completedLink || null,
       }),
     });
+    if (!res.ok) return { success: false, error: `Server error: ${res.status}` };
     const result = await res.json();
-    return result?.id || null;
-  } catch {
-    return null;
+    return { success: true, id: result?.id || undefined };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
   }
 }
 
@@ -238,7 +246,8 @@ export async function compressIdPhoto(dataUrl: string, maxWidth = 1200, quality 
       }
       canvas.width = width;
       canvas.height = height;
-      const ctx = canvas.getContext('2d')!;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) { resolve(dataUrl); return; }
       ctx.drawImage(img, 0, 0, width, height);
       resolve(canvas.toDataURL('image/jpeg', quality));
     };

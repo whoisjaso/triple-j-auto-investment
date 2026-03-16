@@ -1,85 +1,25 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Download, Printer, CheckCircle, Send, Copy, Check, AlertCircle, DollarSign, Banknote, Smartphone, MapPin } from 'lucide-react';
-import { decodeCustomerLink, decodeCompletedLink, customerFields, encodeCompletedLink, saveAgreement, compressIdPhoto, compressIdPhotoForUrl, type CustomerLinkData, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
+import { CheckCircle } from 'lucide-react';
+import { decodeCustomerLink, decodeCompletedLink, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
 import { ContractData } from '@/lib/documents/finance';
 import { RentalData } from '@/lib/documents/rental';
 import { BillOfSaleData } from '@/lib/documents/billOfSale';
 import { Form130UData } from '@/lib/documents/form130U';
-import { SignatureData, emptySignatures, DEALER_NAME, DEALER_ADDRESS, DEALER_PHONE } from '@/lib/documents/shared';
+import { SignatureData, DEALER_ADDRESS, DEALER_PHONE } from '@/lib/documents/shared';
+import { type BuyerAcknowledgments, emptyAcknowledgments } from '@/components/documents/BillOfSalePreview';
 import ContractPreview from '@/components/documents/ContractPreview';
 import RentalPreview from '@/components/documents/RentalPreview';
-import BillOfSalePreview, { type BuyerAcknowledgments, emptyAcknowledgments } from '@/components/documents/BillOfSalePreview';
+import BillOfSalePreview from '@/components/documents/BillOfSalePreview';
 import Form130UPreview from '@/components/documents/Form130UPreview';
-import AddressAutocomplete, { ParsedAddress } from '@/components/documents/AddressAutocomplete';
-import SignaturePad from '@/components/documents/SignaturePad';
-import IdUpload from '@/components/documents/IdUpload';
-
-const ZELLE_PHONE = '+1 (281) 253-3602';
-const CASHAPP_TAG = '$JasonObawemimo';
-const CASHAPP_URL = 'https://cash.app/$JasonObawemimo';
+import PaymentMethodSection from '@/components/documents/PaymentMethodSection';
+import PrintButton from '@/components/documents/PrintButton';
+import CustomerWizard, { WizardErrorBoundary } from '@/components/documents/CustomerWizard';
 
 const sectionTitles: Record<CustomerSection, string> = {
   financing: 'Financing Contract', rental: 'Rental Agreement', billOfSale: 'Bill of Sale', form130U: 'Form 130-U',
 };
-
-const InputField = ({ label, name, type = "text", uppercase = false, value, onChange, disabled, placeholder }: { label: string; name: string; type?: string; uppercase?: boolean; value: string | number; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; disabled?: boolean; placeholder?: string }) => (
-  <div>
-    <label className="block text-[10px] font-semibold tracking-widest uppercase text-[#1a1a1a]/70 mb-2">{label}</label>
-    <input type={type} name={name} value={value ?? ''} onChange={onChange} disabled={disabled} placeholder={placeholder} className={`w-full px-4 py-3 bg-white border border-[#1a1a1a]/10 rounded-lg focus:outline-none focus:border-[#b89b5e] focus:ring-1 focus:ring-[#b89b5e] transition-all text-sm ${uppercase ? 'uppercase' : ''} ${disabled ? 'bg-[#f5f2ed]/50 text-[#1a1a1a]/50 cursor-not-allowed' : ''}`} />
-  </div>
-);
-
-function PaymentMethodSection() {
-  return (
-    <div className="bg-white p-8 rounded-2xl shadow-xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/5 space-y-4 print:hidden">
-      <div className="flex items-center space-x-2 mb-2">
-        <DollarSign size={20} className="text-[#b89b5e]" />
-        <h2 className="text-xl font-serif">Payment Methods</h2>
-      </div>
-      <p className="text-sm text-[#1a1a1a]/60">Choose your preferred payment method below.</p>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {/* Zelle */}
-        <a
-          href={`https://enroll.zellepay.com/qr-codes?data=eyJuYW1lIjoiVFJJUExFIEogQVVUTyIsInRva2VuIjoiMjgxMjUzMzYwMiIsImFjdGlvbiI6InBheW1lbnQifQ==`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-col items-center p-6 bg-[#6d1ed4]/5 border-2 border-[#6d1ed4]/20 rounded-2xl hover:bg-[#6d1ed4]/10 hover:border-[#6d1ed4]/40 transition-all group"
-        >
-          <div className="w-14 h-14 bg-[#6d1ed4] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-            <Banknote size={24} className="text-white" />
-          </div>
-          <span className="text-sm font-bold text-[#6d1ed4]">Zelle</span>
-          <span className="text-[10px] text-[#1a1a1a]/50 mt-1">{ZELLE_PHONE}</span>
-        </a>
-
-        {/* CashApp */}
-        <a
-          href={CASHAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex flex-col items-center p-6 bg-[#00d632]/5 border-2 border-[#00d632]/20 rounded-2xl hover:bg-[#00d632]/10 hover:border-[#00d632]/40 transition-all group"
-        >
-          <div className="w-14 h-14 bg-[#00d632] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-            <Smartphone size={24} className="text-white" />
-          </div>
-          <span className="text-sm font-bold text-[#00d632]">CashApp</span>
-          <span className="text-[10px] text-[#1a1a1a]/50 mt-1">{CASHAPP_TAG}</span>
-        </a>
-
-        {/* Cash */}
-        <div className="flex flex-col items-center p-6 bg-[#b89b5e]/5 border-2 border-[#b89b5e]/20 rounded-2xl">
-          <div className="w-14 h-14 bg-[#b89b5e] rounded-full flex items-center justify-center mb-3">
-            <MapPin size={24} className="text-white" />
-          </div>
-          <span className="text-sm font-bold text-[#b89b5e]">Pay in Cash</span>
-          <span className="text-[10px] text-[#1a1a1a]/50 mt-1 text-center leading-relaxed">{DEALER_ADDRESS}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function CompletedView({ data }: { data: CompletedLinkData }) {
   const mergedData = { ...data.dd, ...data.cd };
@@ -89,18 +29,10 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
     dealerSignature: data.ds || '', dealerSignatureDate: data.dsd || '',
   };
   const acknowledgments: BuyerAcknowledgments = data.ack ? {
-    inspected: !!data.ack.inspected,
-    asIs: !!data.ack.asIs,
-    receivedCopy: !!data.ack.receivedCopy,
-    allSalesFinal: !!data.ack.allSalesFinal,
-    odometerInformed: !!data.ack.odometerInformed,
-    responsibility: !!data.ack.responsibility,
-    financingSeparate: !!data.ack.financingSeparate,
+    inspected: !!data.ack.inspected, asIs: !!data.ack.asIs, receivedCopy: !!data.ack.receivedCopy,
+    allSalesFinal: !!data.ack.allSalesFinal, odometerInformed: !!data.ack.odometerInformed,
+    responsibility: !!data.ack.responsibility, financingSeparate: !!data.ack.financingSeparate,
   } : emptyAcknowledgments;
-
-  const handleDownloadPDF = () => {
-    window.print();
-  };
 
   return (
     <div className="min-h-screen bg-[#f5f2ed]">
@@ -111,12 +43,8 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
             <span className="text-[10px] font-bold tracking-widest uppercase">Completed Document</span>
           </div>
           <div className="flex items-center space-x-3">
-            <button onClick={handleDownloadPDF} className="px-4 py-2 bg-[#1a1a1a] text-[#b89b5e] rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-[#1a1a1a]/90 flex items-center space-x-1 border border-[#b89b5e]/30">
-              <Download size={12} /><span>PDF</span>
-            </button>
-            <button onClick={() => window.print()} className="px-4 py-2 bg-[#b89b5e] text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-[#b89b5e]/90 flex items-center space-x-1">
-              <Printer size={12} /><span>Print</span>
-            </button>
+            <PrintButton variant="pdf" light />
+            <PrintButton variant="print" light />
           </div>
         </div>
       </div>
@@ -131,12 +59,9 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
           </div>
         </div>
       </div>
-
-      {/* Payment Methods */}
       <div className="max-w-5xl mx-auto px-4 pt-6">
         <PaymentMethodSection />
       </div>
-
       <div className="max-w-7xl mx-auto px-4 py-8 print:p-0 print:m-0 print:max-w-none">
         <div className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
           {data.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={signatures} />}
@@ -149,306 +74,9 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
   );
 }
 
-function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
-  const adminBuyerName = linkData.abn || '';
-  const [customerData, setCustomerData] = useState<Record<string, string>>(() => {
-    // Pre-fill buyer name from admin if provided
-    const initial: Record<string, string> = {};
-    if (adminBuyerName) {
-      // Determine the name field based on document type
-      const nameField = linkData.s === 'rental' ? 'renterName' : 'buyerName';
-      initial[nameField] = adminBuyerName;
-    }
-    return initial;
-  });
-  const [signatures, setSignatures] = useState<SignatureData>(emptySignatures);
-  const [acknowledgments, setAcknowledgments] = useState<BuyerAcknowledgments>(emptyAcknowledgments);
-  const [viewMode, setViewMode] = useState<'form' | 'preview'>('form');
-  const [showReturnLink, setShowReturnLink] = useState(false);
-  const [returnLink, setReturnLink] = useState('');
-  const [copied, setCopied] = useState(false);
-  const [ackError, setAckError] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  const fields = customerFields[linkData.s];
-  const dealerSig = linkData.ds || '';
-  const dealerSigDate = linkData.dd || '';
-  const mergedData = { ...linkData.d, ...customerData };
-  const nameField = linkData.s === 'rental' ? 'renterName' : 'buyerName';
-
-  const fullSignatures: SignatureData = {
-    ...signatures,
-    dealerSignature: dealerSig,
-    dealerSignatureDate: dealerSigDate,
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setCustomerData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = async () => {
-    // Validate all required acknowledgments are checked
-    const requiredAcks: (keyof BuyerAcknowledgments)[] = ['inspected', 'asIs', 'receivedCopy', 'allSalesFinal', 'odometerInformed', 'responsibility'];
-    const allChecked = requiredAcks.every(key => acknowledgments[key]);
-    if (linkData.s === 'billOfSale' && !allChecked) {
-      setAckError(true);
-      return;
-    }
-    setAckError(false);
-    setSubmitting(true);
-
-    // Compress ID photo for DB storage (full resolution)
-    let compressedPhoto = '';
-    if (signatures.buyerIdPhoto) {
-      compressedPhoto = await compressIdPhoto(signatures.buyerIdPhoto);
-    }
-
-    // Compress ID photo for URL embedding (small thumbnail)
-    // Safety: if compression fails/produces huge output, skip URL embed (full-res is in DB)
-    let urlPhoto = '';
-    if (signatures.buyerIdPhoto) {
-      const compressed = await compressIdPhotoForUrl(signatures.buyerIdPhoto);
-      if (compressed.length < 150000) urlPhoto = compressed;
-    }
-
-    // Build final customer data with name priority
-    const finalCustomerData = { ...customerData };
-    if (adminBuyerName) {
-      finalCustomerData[nameField] = adminBuyerName;
-    }
-
-    const baseUrl = window.location.origin;
-    const link = encodeCompletedLink(
-      linkData.s, linkData.d, finalCustomerData, baseUrl,
-      dealerSig, dealerSigDate,
-      signatures.buyerSignature, signatures.buyerSignatureDate,
-      signatures.coBuyerSignature, signatures.coBuyerSignatureDate,
-      urlPhoto || signatures.buyerIdPhoto,
-      acknowledgments as unknown as Record<string, boolean>,
-    );
-    setReturnLink(link);
-    setShowReturnLink(true);
-
-    await saveAgreement({
-      documentType: linkData.s,
-      data: { ...linkData.d, ...finalCustomerData },
-      status: 'completed',
-      acknowledgments: acknowledgments as unknown as Record<string, boolean>,
-      buyerSignature: !!signatures.buyerSignature,
-      coBuyerSignature: !!signatures.coBuyerSignature,
-      dealerSignature: !!dealerSig,
-      buyerIdPhoto: !!signatures.buyerIdPhoto,
-      buyerIdPhotoData: compressedPhoto || undefined,
-      completedLink: link,
-      agreementId: linkData.aid,
-    });
-    setSubmitting(false);
-  };
-
-  const handleCopy = async () => {
-    try { await navigator.clipboard.writeText(returnLink); } catch { /* fallback */ }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
-  };
-
-  const handleDownloadPDF = () => {
-    setViewMode('preview');
-    setTimeout(() => window.print(), 400);
-  };
-
-  return (
-    <div className="min-h-screen bg-[#f5f2ed] text-[#1a1a1a]" style={{ fontFamily: 'system-ui, sans-serif' }}>
-      {/* Header */}
-      <header className="bg-[#f5f2ed]/80 backdrop-blur-md border-b border-[#1a1a1a]/10 sticky top-0 z-10 print:hidden">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div>
-            <h1 className="text-lg font-serif font-semibold">{DEALER_NAME}</h1>
-            <p className="text-[10px] text-[#1a1a1a]/50">{sectionTitles[linkData.s]}</p>
-          </div>
-          <div className="flex items-center space-x-2">
-            <button onClick={() => setViewMode(viewMode === 'form' ? 'preview' : 'form')} className="px-3 py-1.5 bg-[#1a1a1a] text-[#b89b5e] rounded-full text-[10px] font-semibold tracking-wider uppercase">
-              {viewMode === 'form' ? 'Preview' : 'Edit'}
-            </button>
-            <button onClick={handleDownloadPDF} className="px-3 py-1.5 bg-[#b89b5e] text-white rounded-full text-[10px] font-semibold tracking-wider uppercase">
-              PDF
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 py-8 print:p-0">
-        {viewMode === 'form' ? (
-          <div className="space-y-8 print:hidden">
-            {/* Dealer Info Banner */}
-            <div className="bg-[#b89b5e]/10 border border-[#b89b5e]/30 p-6 rounded-2xl">
-              <p className="text-xs text-[#1a1a1a]/60">
-                <strong>{DEALER_NAME}</strong> has prepared a {sectionTitles[linkData.s].toLowerCase()} for you. Please fill in your information below, upload your ID, and sign to complete the document.
-              </p>
-              <p className="text-xs text-[#1a1a1a]/40 mt-1">{DEALER_ADDRESS} | {DEALER_PHONE}</p>
-            </div>
-
-            {/* Customer Fields */}
-            <div className="bg-white p-8 rounded-2xl shadow-xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/5 space-y-4">
-              <h2 className="text-xl font-serif border-b border-[#1a1a1a]/10 pb-3 mb-4">Your Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {fields.map(field => {
-                  const label = field.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase()).replace(/co /i, 'Co-');
-                  if (field.includes('Address') && !field.includes('City') && !field.includes('State') && !field.includes('Zip') && !field.includes('County')) {
-                    return (
-                      <AddressAutocomplete key={field} label={label} name={field} value={customerData[field] || ''} onChange={handleChange} onAddressSelect={(addr: ParsedAddress) => {
-                        setCustomerData(prev => ({ ...prev, [field]: addr.street, [field.replace('Address', 'City')]: addr.city, [field.replace('Address', 'State')]: addr.state, [field.replace('Address', 'Zip')]: addr.zip }));
-                      }} dark={false} />
-                    );
-                  }
-                  if (field.includes('SameAsMailing')) {
-                    return (
-                      <label key={field} className="flex items-center space-x-2 md:col-span-2">
-                        <input type="checkbox" name={field} checked={customerData[field] === 'true'} onChange={(e) => setCustomerData(prev => ({ ...prev, [field]: String(e.target.checked) }))} className="w-4 h-4 accent-[#b89b5e]" />
-                        <span className="text-sm">Same as mailing address</span>
-                      </label>
-                    );
-                  }
-                  if (field === 'applicantType') {
-                    return (
-                      <div key={field}>
-                        <label className="block text-[10px] font-semibold tracking-widest uppercase text-[#1a1a1a]/70 mb-2">{label}</label>
-                        <select name={field} value={customerData[field] || 'Individual'} onChange={handleChange} className="w-full px-4 py-3 bg-black text-tj-cream border border-white/[0.06] rounded-lg focus:outline-none focus:border-[#b89b5e] text-sm">
-                          <option value="Individual">Individual</option>
-                          <option value="Business">Business</option>
-                          <option value="Government">Government</option>
-                          <option value="Trust">Trust</option>
-                          <option value="Non-Profit">Non-Profit</option>
-                        </select>
-                      </div>
-                    );
-                  }
-                  // If admin set the buyer name, make it read-only
-                  const isAdminNameField = adminBuyerName && (field === 'buyerName' || field === 'renterName');
-                  return <InputField key={field} label={isAdminNameField ? `${label} (set by dealer)` : label} name={field} value={customerData[field] || ''} onChange={handleChange} type={field.includes('Email') || field.includes('email') ? 'email' : field.includes('Dob') ? 'date' : 'text'} uppercase={field.includes('License') || field.includes('State') || field.includes('Vin')} disabled={!!isAdminNameField} />;
-                })}
-              </div>
-            </div>
-
-            {/* Signature & ID */}
-            <div className="bg-white p-8 rounded-2xl shadow-xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/5 space-y-6">
-              <h2 className="text-xl font-serif border-b border-[#1a1a1a]/10 pb-3 mb-4">Signature & ID Verification</h2>
-              <IdUpload label="Your Photo ID (Driver&apos;s License / State ID)" value={signatures.buyerIdPhoto} onChange={(v) => setSignatures(prev => ({ ...prev, buyerIdPhoto: v }))} />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <SignaturePad label="Your Signature" value={signatures.buyerSignature} dateValue={signatures.buyerSignatureDate} onChange={(v) => setSignatures(prev => ({ ...prev, buyerSignature: v }))} onDateChange={(v) => setSignatures(prev => ({ ...prev, buyerSignatureDate: v }))} />
-                <SignaturePad label="Co-Buyer / Co-Signer" value={signatures.coBuyerSignature} dateValue={signatures.coBuyerSignatureDate} onChange={(v) => setSignatures(prev => ({ ...prev, coBuyerSignature: v }))} onDateChange={(v) => setSignatures(prev => ({ ...prev, coBuyerSignatureDate: v }))} />
-              </div>
-            </div>
-
-            {/* Buyer Acknowledgment Checklist */}
-            {linkData.s === 'billOfSale' && (
-              <div className="bg-white p-8 rounded-2xl shadow-xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/5 space-y-4">
-                <h2 className="text-xl font-serif border-b border-[#1a1a1a]/10 pb-3 mb-4">Buyer Acknowledgment</h2>
-                <p className="text-sm text-[#1a1a1a]/70 font-semibold">I, the undersigned Buyer, acknowledge:</p>
-                {ackError && (
-                  <div className="flex items-center space-x-2 text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
-                    <AlertCircle size={16} />
-                    <span className="text-sm font-medium">You must check all acknowledgments before submitting.</span>
-                  </div>
-                )}
-                <div className="space-y-3">
-                  {[
-                    { key: 'inspected' as const, label: 'I have inspected the vehicle and accept it in its present condition.' },
-                    { key: 'asIs' as const, label: `I understand this vehicle is sold ${(linkData.d as Record<string, unknown>).conditionType === 'as_is' ? '"AS IS" with NO dealer warranty' : 'with a LIMITED WARRANTY as described'}.` },
-                    { key: 'receivedCopy' as const, label: 'I have received a copy of this Bill of Sale for my records.' },
-                    { key: 'allSalesFinal' as const, label: 'I understand ALL SALES ARE FINAL — no refunds, returns, or exchanges.' },
-                    { key: 'odometerInformed' as const, label: 'I have been informed of the odometer reading and its accuracy status.' },
-                    { key: 'responsibility' as const, label: 'I accept full responsibility for the vehicle upon delivery, including insurance and registration.' },
-                  ].map(({ key, label }) => (
-                    <label key={key} className="flex items-start space-x-3 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={acknowledgments[key]}
-                        onChange={() => {
-                          setAcknowledgments(prev => ({ ...prev, [key]: !prev[key] }));
-                          setAckError(false);
-                        }}
-                        className="w-5 h-5 mt-0.5 accent-[#b89b5e] shrink-0 rounded border-[#1a1a1a]/20"
-                      />
-                      <span className="text-sm text-[#1a1a1a]/80 group-hover:text-[#1a1a1a] transition-colors">{label}</span>
-                    </label>
-                  ))}
-                  {(linkData.d as Record<string, unknown>).paymentMethod === 'Financing' && (
-                    <label className="flex items-start space-x-3 cursor-pointer group">
-                      <input
-                        type="checkbox"
-                        checked={acknowledgments.financingSeparate}
-                        onChange={() => setAcknowledgments(prev => ({ ...prev, financingSeparate: !prev.financingSeparate }))}
-                        className="w-5 h-5 mt-0.5 accent-[#b89b5e] shrink-0 rounded border-[#1a1a1a]/20"
-                      />
-                      <span className="text-sm text-[#1a1a1a]/80 group-hover:text-[#1a1a1a] transition-colors">I understand this purchase is financed under a separate Retail Installment Contract.</span>
-                    </label>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Submit */}
-            <button onClick={handleSubmit} disabled={submitting} className="w-full py-4 bg-green-700 text-white rounded-full text-sm font-bold tracking-widest uppercase hover:bg-green-800 transition-all flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed">
-              {submitting ? (
-                <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /><span>Submitting...</span></>
-              ) : (
-                <><Send size={16} /><span>Complete & Send Back to Dealer</span></>
-              )}
-            </button>
-          </div>
-        ) : (
-          <div className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
-            {linkData.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={fullSignatures} />}
-            {linkData.s === 'rental' && <RentalPreview data={mergedData as unknown as RentalData} signatures={fullSignatures} />}
-            {linkData.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={fullSignatures} acknowledgments={acknowledgments} />}
-            {linkData.s === 'form130U' && <Form130UPreview data={mergedData as unknown as Form130UData} signatures={fullSignatures} />}
-          </div>
-        )}
-      </main>
-
-      {/* Return Link Modal */}
-      {showReturnLink && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 space-y-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle size={24} className="text-green-700" />
-              </div>
-              <h3 className="text-2xl font-serif font-bold">Document Completed!</h3>
-              <p className="text-sm text-[#1a1a1a]/60 mt-2">Send this link back to {DEALER_NAME} so they can view the completed document with your information and signatures.</p>
-            </div>
-            <div className="bg-[#f5f2ed] rounded-xl p-4 space-y-3">
-              <label className="text-[10px] font-semibold tracking-widest uppercase text-[#1a1a1a]/50">Return Link for Dealer</label>
-              <div className="flex items-center space-x-2">
-                <input type="text" readOnly value={returnLink} className="flex-1 px-3 py-2 bg-white border border-[#1a1a1a]/10 rounded-lg text-xs font-mono text-[#1a1a1a]/70 truncate" />
-                <button onClick={handleCopy} className={`px-4 py-2 rounded-lg text-[10px] font-bold tracking-widest uppercase flex items-center space-x-1 transition-all ${copied ? 'bg-green-600 text-white' : 'bg-[#1a1a1a] text-[#b89b5e] border border-[#b89b5e]/30'}`}>
-                  {copied ? <Check size={12} /> : <Copy size={12} />}
-                  <span>{copied ? 'Copied!' : 'Copy'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Payment Methods in Modal */}
-            <PaymentMethodSection />
-
-            <div className="flex gap-3">
-              <button onClick={handleDownloadPDF} className="flex-1 py-3 bg-[#1a1a1a] text-[#b89b5e] rounded-full text-sm font-bold tracking-widest uppercase border border-[#b89b5e]/30">
-                Download Your Copy
-              </button>
-              <button onClick={() => window.print()} className="flex-1 py-3 bg-[#b89b5e] text-white rounded-full text-sm font-bold tracking-widest uppercase">
-                Print Your Copy
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export default function CustomerPortalClient() {
   const [mode, setMode] = useState<'loading' | 'customer' | 'completed' | 'error'>('loading');
-  const [customerData, setCustomerData] = useState<CustomerLinkData | null>(null);
+  const [customerData, setCustomerData] = useState<ReturnType<typeof decodeCustomerLink>>(null);
   const [completedData, setCompletedData] = useState<CompletedLinkData | null>(null);
 
   useEffect(() => {
@@ -474,7 +102,14 @@ export default function CustomerPortalClient() {
     );
   }
 
-  if (mode === 'customer' && customerData) return <CustomerView linkData={customerData} />;
+  if (mode === 'customer' && customerData) {
+    return (
+      <WizardErrorBoundary>
+        <CustomerWizard linkData={customerData} />
+      </WizardErrorBoundary>
+    );
+  }
+
   if (mode === 'completed' && completedData) return <CompletedView data={completedData} />;
 
   return (
