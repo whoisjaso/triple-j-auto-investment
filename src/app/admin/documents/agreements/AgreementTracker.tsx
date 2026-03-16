@@ -310,10 +310,14 @@ export default function AgreementTracker() {
     setError(null);
     try {
       const res = await fetch("/api/documents/agreements");
-      if (!res.ok) throw new Error("Failed to fetch");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || `Server error ${res.status}`);
+      }
       const data = await res.json();
-      setAgreements(data);
+      setAgreements(Array.isArray(data) ? data : []);
     } catch (e) {
+      console.error("[AgreementTracker] fetch error:", e);
       setError(e instanceof Error ? e.message : "Failed to load agreements");
     } finally {
       setLoading(false);

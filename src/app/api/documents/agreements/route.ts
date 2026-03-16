@@ -29,9 +29,22 @@ export async function GET(req: NextRequest) {
     .order('sent_at', { ascending: false });
 
   if (error) {
+    console.error('[agreements GET] Supabase error:', error.message, error.code, error.details);
+    // Fallback: try minimal query if column-related error
+    if (error.message?.includes('column') || error.code === '42703') {
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('document_agreements')
+        .select('*')
+        .order('sent_at', { ascending: false });
+      if (!fallbackError && fallbackData) {
+        // Strip large blobs from response
+        const clean = fallbackData.map(({ completed_link, buyer_id_photo, ...rest }: Record<string, unknown>) => rest);
+        return NextResponse.json(clean);
+      }
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json(data);
+  return NextResponse.json(data ?? []);
 }
 
 // ============================================================
