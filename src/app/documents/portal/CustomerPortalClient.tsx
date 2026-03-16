@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Download, Printer, CheckCircle, Send, Copy, Check, AlertCircle } from 'lucide-react';
-import { decodeCustomerLink, decodeCompletedLink, customerFields, encodeCompletedLink, saveAgreement, compressIdPhoto, type CustomerLinkData, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
+import { Download, Printer, CheckCircle, Send, Copy, Check, AlertCircle, DollarSign, Banknote, Smartphone, MapPin } from 'lucide-react';
+import { decodeCustomerLink, decodeCompletedLink, customerFields, encodeCompletedLink, saveAgreement, compressIdPhoto, compressIdPhotoForUrl, type CustomerLinkData, type CompletedLinkData, type CustomerSection } from '@/lib/documents/customerPortal';
 import { ContractData } from '@/lib/documents/finance';
 import { RentalData } from '@/lib/documents/rental';
 import { BillOfSaleData } from '@/lib/documents/billOfSale';
@@ -16,6 +16,10 @@ import AddressAutocomplete, { ParsedAddress } from '@/components/documents/Addre
 import SignaturePad from '@/components/documents/SignaturePad';
 import IdUpload from '@/components/documents/IdUpload';
 
+const ZELLE_PHONE = '+1 (281) 253-3602';
+const CASHAPP_TAG = '$JasonObawemimo';
+const CASHAPP_URL = 'https://cash.app/$JasonObawemimo';
+
 const sectionTitles: Record<CustomerSection, string> = {
   financing: 'Financing Contract', rental: 'Rental Agreement', billOfSale: 'Bill of Sale', form130U: 'Form 130-U',
 };
@@ -26,6 +30,56 @@ const InputField = ({ label, name, type = "text", uppercase = false, value, onCh
     <input type={type} name={name} value={value ?? ''} onChange={onChange} disabled={disabled} placeholder={placeholder} className={`w-full px-4 py-3 bg-white border border-[#1a1a1a]/10 rounded-lg focus:outline-none focus:border-[#b89b5e] focus:ring-1 focus:ring-[#b89b5e] transition-all text-sm ${uppercase ? 'uppercase' : ''} ${disabled ? 'bg-[#f5f2ed]/50 text-[#1a1a1a]/50 cursor-not-allowed' : ''}`} />
   </div>
 );
+
+function PaymentMethodSection() {
+  return (
+    <div className="bg-white p-8 rounded-2xl shadow-xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/5 space-y-4 print:hidden">
+      <div className="flex items-center space-x-2 mb-2">
+        <DollarSign size={20} className="text-[#b89b5e]" />
+        <h2 className="text-xl font-serif">Payment Methods</h2>
+      </div>
+      <p className="text-sm text-[#1a1a1a]/60">Choose your preferred payment method below.</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* Zelle */}
+        <a
+          href={`https://enroll.zellepay.com/qr-codes?data=eyJuYW1lIjoiVFJJUExFIEogQVVUTyIsInRva2VuIjoiMjgxMjUzMzYwMiIsImFjdGlvbiI6InBheW1lbnQifQ==`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center p-6 bg-[#6d1ed4]/5 border-2 border-[#6d1ed4]/20 rounded-2xl hover:bg-[#6d1ed4]/10 hover:border-[#6d1ed4]/40 transition-all group"
+        >
+          <div className="w-14 h-14 bg-[#6d1ed4] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <Banknote size={24} className="text-white" />
+          </div>
+          <span className="text-sm font-bold text-[#6d1ed4]">Zelle</span>
+          <span className="text-[10px] text-[#1a1a1a]/50 mt-1">{ZELLE_PHONE}</span>
+        </a>
+
+        {/* CashApp */}
+        <a
+          href={CASHAPP_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex flex-col items-center p-6 bg-[#00d632]/5 border-2 border-[#00d632]/20 rounded-2xl hover:bg-[#00d632]/10 hover:border-[#00d632]/40 transition-all group"
+        >
+          <div className="w-14 h-14 bg-[#00d632] rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <Smartphone size={24} className="text-white" />
+          </div>
+          <span className="text-sm font-bold text-[#00d632]">CashApp</span>
+          <span className="text-[10px] text-[#1a1a1a]/50 mt-1">{CASHAPP_TAG}</span>
+        </a>
+
+        {/* Cash */}
+        <div className="flex flex-col items-center p-6 bg-[#b89b5e]/5 border-2 border-[#b89b5e]/20 rounded-2xl">
+          <div className="w-14 h-14 bg-[#b89b5e] rounded-full flex items-center justify-center mb-3">
+            <MapPin size={24} className="text-white" />
+          </div>
+          <span className="text-sm font-bold text-[#b89b5e]">Pay in Cash</span>
+          <span className="text-[10px] text-[#1a1a1a]/50 mt-1 text-center leading-relaxed">{DEALER_ADDRESS}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function CompletedView({ data }: { data: CompletedLinkData }) {
   const mergedData = { ...data.dd, ...data.cd };
@@ -77,6 +131,12 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
           </div>
         </div>
       </div>
+
+      {/* Payment Methods */}
+      <div className="max-w-5xl mx-auto px-4 pt-6">
+        <PaymentMethodSection />
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 py-8 print:p-0 print:m-0 print:max-w-none">
         <div className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
           {data.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={signatures} />}
@@ -137,10 +197,18 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
     setAckError(false);
     setSubmitting(true);
 
-    // Compress ID photo for DB storage
+    // Compress ID photo for DB storage (full resolution)
     let compressedPhoto = '';
     if (signatures.buyerIdPhoto) {
       compressedPhoto = await compressIdPhoto(signatures.buyerIdPhoto);
+    }
+
+    // Compress ID photo for URL embedding (small thumbnail)
+    // Safety: if compression fails/produces huge output, skip URL embed (full-res is in DB)
+    let urlPhoto = '';
+    if (signatures.buyerIdPhoto) {
+      const compressed = await compressIdPhotoForUrl(signatures.buyerIdPhoto);
+      if (compressed.length < 150000) urlPhoto = compressed;
     }
 
     // Build final customer data with name priority
@@ -155,7 +223,7 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
       dealerSig, dealerSigDate,
       signatures.buyerSignature, signatures.buyerSignatureDate,
       signatures.coBuyerSignature, signatures.coBuyerSignatureDate,
-      signatures.buyerIdPhoto,
+      urlPhoto || signatures.buyerIdPhoto,
       acknowledgments as unknown as Record<string, boolean>,
     );
     setReturnLink(link);
@@ -359,6 +427,10 @@ function CustomerView({ linkData }: { linkData: CustomerLinkData }) {
                 </button>
               </div>
             </div>
+
+            {/* Payment Methods in Modal */}
+            <PaymentMethodSection />
+
             <div className="flex gap-3">
               <button onClick={handleDownloadPDF} className="flex-1 py-3 bg-[#1a1a1a] text-[#b89b5e] rounded-full text-sm font-bold tracking-widest uppercase border border-[#b89b5e]/30">
                 Download Your Copy

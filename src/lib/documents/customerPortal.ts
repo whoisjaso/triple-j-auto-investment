@@ -122,7 +122,8 @@ export function encodeCompletedLink(
   if (dealerSignature && dealerSignature.length < 50000) { payload.ds = dealerSignature; payload.dsd = dealerSignatureDate; }
   if (buyerSignature && buyerSignature.length < 50000) { payload.bs = buyerSignature; payload.bsd = buyerSignatureDate; }
   if (coBuyerSignature && coBuyerSignature.length < 50000) { payload.cs = coBuyerSignature; payload.csd = coBuyerSignatureDate; }
-  if (buyerIdPhoto && buyerIdPhoto.length < 100000) { payload.bi = buyerIdPhoto; }
+  // Embed a smaller thumbnail in the URL; full-res photo is stored in DB separately
+  if (buyerIdPhoto) { payload.bi = buyerIdPhoto; }
   if (acknowledgments) { payload.ack = acknowledgments; }
   const json = JSON.stringify(payload);
   const compressed = compressToEncodedURIComponent(json);
@@ -137,6 +138,17 @@ export function decodeCompletedLink(hash: string): CompletedLinkData | null {
     const json = decompressFromEncodedURIComponent(compressed);
     if (!json) return null;
     return JSON.parse(json) as CompletedLinkData;
+  } catch { return null; }
+}
+
+// ============================================================
+// Decode a completed_link URL string (used by admin to view docs)
+// ============================================================
+export function decodeCompletedLinkFromUrl(url: string): CompletedLinkData | null {
+  try {
+    const hashIndex = url.indexOf('#completed/');
+    if (hashIndex === -1) return null;
+    return decodeCompletedLink(url.slice(hashIndex));
   } catch { return null; }
 }
 
@@ -169,8 +181,10 @@ export async function saveAgreement(params: SaveAgreementParams): Promise<string
         body: JSON.stringify({
           id: params.agreementId,
           buyer_name: data.buyerName || data.renterName || null,
-          buyer_email: data.buyerEmail || data.renterEmail || null,
-          buyer_phone: data.buyerPhone || data.renterPhone || null,
+          buyer_email: data.buyerEmail || data.renterEmail || data.applicantEmail || null,
+          buyer_phone: data.buyerPhone || data.renterPhone || data.applicantPhone || null,
+          // Pass all customer data fields for extraction into individual columns
+          ...data,
           acknowledgments: params.acknowledgments || {},
           has_buyer_signature: params.buyerSignature || false,
           has_cobuyer_signature: params.coBuyerSignature || false,
@@ -211,7 +225,7 @@ export async function saveAgreement(params: SaveAgreementParams): Promise<string
   }
 }
 
-// Compress image client-side before storing in DB
+// Compress image client-side before storing in DB (full resolution)
 export async function compressIdPhoto(dataUrl: string, maxWidth = 1200, quality = 0.8): Promise<string> {
   return new Promise((resolve) => {
     const img = new Image();
@@ -231,4 +245,9 @@ export async function compressIdPhoto(dataUrl: string, maxWidth = 1200, quality 
     img.onerror = () => resolve(dataUrl); // fallback to original
     img.src = dataUrl;
   });
+}
+
+// Compress image to smaller size for URL embedding (thumbnail)
+export async function compressIdPhotoForUrl(dataUrl: string): Promise<string> {
+  return compressIdPhoto(dataUrl, 400, 0.6);
 }
