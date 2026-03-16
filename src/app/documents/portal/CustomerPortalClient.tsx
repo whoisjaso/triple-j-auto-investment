@@ -64,9 +64,10 @@ function CompletedView({ data }: { data: CompletedLinkData }) {
       </div>
       <div className="max-w-7xl mx-auto px-4 py-8 print:p-0 print:m-0 print:max-w-none">
         <div className="bg-white shadow-2xl shadow-[#1a1a1a]/5 border border-[#1a1a1a]/10 rounded-2xl overflow-hidden print:shadow-none print:border-none print:rounded-none">
-          {data.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={signatures} />}
-          {data.s === 'rental' && <RentalPreview data={mergedData as unknown as RentalData} signatures={signatures} />}
-          {data.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={signatures} acknowledgments={acknowledgments} />}
+          {/* BUYER COPY — customer portal only shows buyer's copy, no dealer copy */}
+          {data.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={signatures} copyLabel="BUYER COPY" />}
+          {data.s === 'rental' && <RentalPreview data={mergedData as unknown as RentalData} signatures={signatures} copyLabel="RENTER'S COPY" />}
+          {data.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={signatures} acknowledgments={acknowledgments} copyLabel="BUYER COPY" />}
           {data.s === 'form130U' && <Form130UPreview data={mergedData as unknown as Form130UData} signatures={signatures} />}
         </div>
       </div>

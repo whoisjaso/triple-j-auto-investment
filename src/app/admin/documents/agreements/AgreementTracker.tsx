@@ -37,8 +37,8 @@ interface Agreement {
   status: "pending" | "completed" | "finalized";
   sent_at: string;
   completed_at: string | null;
-  finalized_at: string | null;
-  last_emailed_at: string | null;
+  finalized_at?: string | null;    // requires migration-14
+  last_emailed_at?: string | null; // requires migration-14
   acknowledgments: Record<string, boolean>;
   has_buyer_signature: boolean;
   has_cobuyer_signature: boolean;

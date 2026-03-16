@@ -8,10 +8,12 @@ import { requireAdmin } from '@/lib/admin-auth';
 
 // Core columns (always present). New customer data columns (migration-13)
 // are fetched on-demand via the individual agreement endpoint using select('*').
+// NOTE: finalized_at, last_emailed_at, pdf_buyer_path, pdf_dealer_path
+// are fetched on-demand via the individual agreement endpoint (select('*')).
+// They require migration-14 — do NOT add them here until migration is confirmed.
 const LISTING_COLUMNS = [
   'id', 'document_type', 'buyer_name', 'buyer_email', 'buyer_phone',
   'vehicle_description', 'vehicle_vin', 'status', 'sent_at', 'completed_at',
-  'finalized_at', 'last_emailed_at',
   'acknowledgments', 'has_buyer_signature', 'has_cobuyer_signature',
   'has_dealer_signature', 'has_buyer_id',
 ].join(', ');
