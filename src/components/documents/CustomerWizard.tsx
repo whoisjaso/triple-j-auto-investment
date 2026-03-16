@@ -228,6 +228,8 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
   const [copied, setCopied] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [showDocPreview, setShowDocPreview] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<string[]>([]);
 
   const step = steps[currentStep];
   const mergedData = { ...linkData.d, ...customerData };
@@ -243,11 +245,35 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
     setCustomerData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // Required fields per document type for the first (non-optional) fields step
+  const requiredFields: Record<CustomerSection, string[]> = {
+    financing: ['buyerName', 'buyerPhone'],
+    rental: ['renterName', 'renterPhone'],
+    billOfSale: ['buyerName', 'buyerPhone'],
+    form130U: ['applicantFirstName', 'applicantLastName', 'applicantPhone'],
+  };
+
   const handleNext = () => {
+    // Validate required fields on non-optional field steps
+    if (step.type === 'fields' && !step.group?.optional) {
+      const required = requiredFields[linkData.s] || [];
+      const missing = required.filter(f => !customerData[f]?.trim());
+      if (missing.length > 0) {
+        setFieldErrors(missing);
+        return;
+      }
+    }
+    setFieldErrors([]);
     if (currentStep < steps.length - 1) {
       setCurrentStep(prev => prev + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  };
+
+  const handlePrintDocument = () => {
+    setShowDocPreview(true);
+    setTimeout(() => window.print(), 400);
+    setTimeout(() => setShowDocPreview(false), 1000);
   };
 
   const handleBack = () => {
@@ -390,6 +416,12 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
               <h2 className="text-2xl font-serif font-bold text-[#1a1a1a]">{step.group.label}</h2>
               {step.group.optional && (
                 <p className="text-sm text-[#1a1a1a]/60 mt-1">This section is optional. You can skip it if not applicable.</p>
+              )}
+              {fieldErrors.length > 0 && !step.group.optional && (
+                <div className="flex items-center space-x-2 text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3 mt-2">
+                  <AlertCircle size={16} />
+                  <span className="text-sm font-medium">Please fill in the required fields before continuing.</span>
+                </div>
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -624,10 +656,14 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
             {/* Payment */}
             <PaymentMethodSection />
 
-            {/* Print/PDF */}
+            {/* Print/PDF — prints the actual document, not completion page */}
             <div className="flex gap-3">
-              <PrintButton variant="pdf" size="lg" label="Download Your Copy" light />
-              <PrintButton variant="print" size="lg" label="Print Your Copy" light />
+              <button onClick={handlePrintDocument} className="flex-1 py-3 bg-[#1a1a1a] text-[#b89b5e] rounded-full text-[10px] font-semibold tracking-wider uppercase flex items-center justify-center space-x-1 border border-[#b89b5e]/30 hover:bg-[#1a1a1a]/90 transition-all">
+                <span>Download Copy</span>
+              </button>
+              <button onClick={handlePrintDocument} className="flex-1 py-3 bg-[#b89b5e] text-white rounded-full text-[10px] font-semibold tracking-wider uppercase flex items-center justify-center space-x-1 hover:bg-[#b89b5e]/90 transition-all">
+                <span>Print Copy</span>
+              </button>
             </div>
           </div>
         );
@@ -650,8 +686,18 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
         </div>
       </header>
 
+      {/* Document preview for printing (hidden on screen, visible in print) */}
+      {showDocPreview && (
+        <div className="hidden print:block print:p-0 print:m-0">
+          {linkData.s === 'financing' && <ContractPreview data={mergedData as unknown as ContractData} signatures={fullSignatures} />}
+          {linkData.s === 'rental' && <RentalPreview data={mergedData as unknown as RentalData} signatures={fullSignatures} />}
+          {linkData.s === 'billOfSale' && <BillOfSalePreview data={mergedData as unknown as BillOfSaleData} signatures={fullSignatures} acknowledgments={acknowledgments} />}
+          {linkData.s === 'form130U' && <Form130UPreview data={mergedData as unknown as Form130UData} signatures={fullSignatures} />}
+        </div>
+      )}
+
       {/* Content */}
-      <main className="max-w-2xl mx-auto px-4 py-8 print:p-0">
+      <main className={`max-w-2xl mx-auto px-4 py-8 print:p-0 ${showDocPreview ? 'print:hidden' : ''}`}>
         {step.type !== 'complete' && (
           <ProgressDots current={currentStep} total={steps.length} />
         )}

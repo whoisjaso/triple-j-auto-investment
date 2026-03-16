@@ -14,7 +14,7 @@ interface Props {
 const sizeClasses = {
   sm: 'px-3 py-1.5 text-[10px]',
   md: 'px-4 py-2 text-[10px]',
-  lg: 'flex-1 py-3 text-sm font-bold',
+  lg: 'flex-1 py-3 text-[10px]',
 };
 
 export default function PrintButton({ variant, onClick, className, label, size = 'md', light = false }: Props) {
