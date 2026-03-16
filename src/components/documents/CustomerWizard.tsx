@@ -196,7 +196,7 @@ function WizardInput({ label, name, type = 'text', uppercase = false, value, onC
       <input
         type={type} name={name} value={value ?? ''} onChange={onChange}
         disabled={disabled} placeholder={placeholder}
-        className={`w-full px-4 py-3 bg-white border border-[#1a1a1a]/10 rounded-lg focus:outline-none focus:border-[#b89b5e] focus:ring-1 focus:ring-[#b89b5e] transition-all text-sm min-h-[48px] ${uppercase ? 'uppercase' : ''} ${disabled ? 'bg-[#f5f2ed]/50 text-[#1a1a1a]/50 cursor-not-allowed' : ''}`}
+        className={`w-full px-4 py-3 bg-white border border-[#1a1a1a]/10 rounded-lg focus:outline-none focus:border-[#b89b5e] focus:ring-1 focus:ring-[#b89b5e] transition-all text-base min-h-[48px] ${uppercase ? 'uppercase' : ''} ${disabled ? 'bg-[#f5f2ed]/50 text-[#1a1a1a]/50 cursor-not-allowed' : ''}`}
       />
     </div>
   );
@@ -470,7 +470,7 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
                       <select
                         name={field} value={customerData[field] || 'Individual'}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-white border border-[#1a1a1a]/10 rounded-lg focus:outline-none focus:border-[#b89b5e] text-sm min-h-[48px]"
+                        className="w-full px-4 py-3 bg-white border border-[#1a1a1a]/10 rounded-lg focus:outline-none focus:border-[#b89b5e] text-base min-h-[48px]"
                       >
                         <option value="Individual">Individual</option>
                         <option value="Business">Business</option>

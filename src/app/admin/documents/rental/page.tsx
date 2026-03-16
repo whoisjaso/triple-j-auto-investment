@@ -6,7 +6,8 @@ export const metadata: Metadata = {
   robots: "noindex, nofollow",
 };
 
-export default function RentalPage() {
+export default async function RentalPage({ searchParams }: { searchParams: Promise<{ renew?: string }> }) {
+  const params = await searchParams;
   return (
     <div className="px-4 md:px-8 py-6 md:py-10 max-w-7xl mx-auto">
       <div className="mb-6" data-print-hide>
@@ -14,10 +15,12 @@ export default function RentalPage() {
           Rental Agreement
         </h1>
         <p className="text-white/40 text-sm mt-1">
-          Vehicle rental contract with insurance, mileage allowance, and payment schedule.
+          {params.renew
+            ? "Renewing from a previous rental agreement. Dates have been reset."
+            : "Vehicle rental contract with insurance, mileage allowance, and payment schedule."}
         </p>
       </div>
-      <DocumentEditor initialSection="rental" />
+      <DocumentEditor initialSection="rental" renewAgreementId={params.renew} />
     </div>
   );
 }

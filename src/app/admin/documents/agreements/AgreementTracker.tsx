@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FileText, CheckCircle, Clock, AlertCircle, ExternalLink, RefreshCw, Eye, X, ChevronDown, ChevronUp } from "lucide-react";
+import { FileText, CheckCircle, Clock, AlertCircle, ExternalLink, RefreshCw, Eye, X, ChevronDown, ChevronUp, RotateCcw } from "lucide-react";
+import { useRouter } from "next/navigation";
 import PrintButton from "@/components/documents/PrintButton";
 import { decodeCompletedLinkFromUrl, type CompletedLinkData } from "@/lib/documents/customerPortal";
 import { ContractData } from "@/lib/documents/finance";
@@ -140,6 +141,7 @@ function DocumentViewerModal({ data, onClose }: { data: CompletedLinkData; onClo
 }
 
 export default function AgreementTracker() {
+  const router = useRouter();
   const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -394,6 +396,15 @@ export default function AgreementTracker() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-1">
+                      {agreement.status === "completed" && agreement.document_type === "rental" && (
+                        <button
+                          onClick={() => router.push(`/admin/documents/rental?renew=${agreement.id}`)}
+                          className="p-2 rounded-lg text-emerald-400/70 hover:text-emerald-400 hover:bg-white/[0.03] transition-all"
+                          title="Renew rental agreement"
+                        >
+                          <RotateCcw size={14} />
+                        </button>
+                      )}
                       {agreement.status === "completed" && (
                         <button
                           onClick={() => fetchAndViewDocument(agreement.id)}

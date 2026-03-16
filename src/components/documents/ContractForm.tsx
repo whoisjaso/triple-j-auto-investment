@@ -34,7 +34,7 @@ export default function ContractForm({ data, onChange }: Props) {
     onChange({ ...data, [name]: parsedValue });
   };
 
-  const selectClasses = "w-full px-4 py-3 bg-white/[0.04] border border-white/[0.06] rounded-lg focus:outline-none focus:border-tj-gold/50 focus:ring-1 focus:ring-tj-gold/30 transition-all text-sm text-white";
+  const selectClasses = "w-full px-4 py-3 bg-white/[0.04] border border-white/[0.06] rounded-lg focus:outline-none focus:border-tj-gold/50 focus:ring-1 focus:ring-tj-gold/30 transition-all text-base text-white";
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

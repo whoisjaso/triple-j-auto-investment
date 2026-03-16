@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, useRef, useCallback } from 'react';
-import { FileText, Edit3, Send, Copy, Check } from 'lucide-react';
+import { useState, useRef, useCallback, useEffect } from 'react';
+import { FileText, Edit3, Send, Copy, Check, Loader2, AlertCircle } from 'lucide-react';
 import PrintButton from './PrintButton';
 import { ContractData } from '@/lib/documents/finance';
 import { RentalData } from '@/lib/documents/rental';
 import { BillOfSaleData } from '@/lib/documents/billOfSale';
 import { Form130UData, prefillFromBillOfSale } from '@/lib/documents/form130U';
 import { SignatureData, emptySignatures } from '@/lib/documents/shared';
-import { encodeCustomerLink, saveAgreement, type CustomerSection } from '@/lib/documents/customerPortal';
+import { encodeCustomerLink, saveAgreement, decodeCompletedLinkFromUrl, type CustomerSection } from '@/lib/documents/customerPortal';
 import ContractForm from './ContractForm';
 import ContractPreview from './ContractPreview';
 import RentalForm from './RentalForm';
@@ -87,9 +87,10 @@ interface Props {
     price?: number; stockNumber?: string;
   };
   buyerPrefill?: { name?: string; phone?: string; email?: string; };
+  renewAgreementId?: string;
 }
 
-export default function DocumentEditor({ initialSection = 'billOfSale', vehiclePrefill, buyerPrefill }: Props) {
+export default function DocumentEditor({ initialSection = 'billOfSale', vehiclePrefill, buyerPrefill, renewAgreementId }: Props) {
   const [section, setSection] = useState<Section>(initialSection);
   const [view, setView] = useState<'edit' | 'preview'>('edit');
   const [showShareModal, setShowShareModal] = useState(false);
@@ -151,6 +152,92 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
     return d;
   });
   const [signatures, setSignatures] = useState<SignatureData>(emptySignatures);
+  const [renewLoading, setRenewLoading] = useState(!!renewAgreementId);
+  const [renewError, setRenewError] = useState<string | null>(null);
+
+  // Rental renewal: fetch previous agreement and pre-fill
+  useEffect(() => {
+    if (!renewAgreementId) return;
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/documents/agreements/${renewAgreementId}`);
+        if (!res.ok) throw new Error('Failed to fetch agreement');
+        const agreement = await res.json();
+
+        if (!agreement.completed_link) {
+          throw new Error('No completed document found for this agreement');
+        }
+
+        const decoded = decodeCompletedLinkFromUrl(agreement.completed_link);
+        if (!decoded || decoded.s !== 'rental') {
+          throw new Error('Could not decode rental agreement data');
+        }
+
+        if (cancelled) return;
+
+        // Merge dealer data (dd) + customer data (cd) for full picture
+        const merged = { ...decoded.dd, ...decoded.cd } as Record<string, unknown>;
+
+        // Pre-fill rental data, resetting dates and mileage for the new rental
+        setRentalData(prev => ({
+          ...prev,
+          // Customer info (from customer data)
+          renterName: (merged.renterName as string) || prev.renterName,
+          renterAddress: (merged.renterAddress as string) || prev.renterAddress,
+          renterPhone: (merged.renterPhone as string) || prev.renterPhone,
+          renterEmail: (merged.renterEmail as string) || prev.renterEmail,
+          renterLicense: (merged.renterLicense as string) || prev.renterLicense,
+          coRenterName: (merged.coRenterName as string) || prev.coRenterName,
+          coRenterAddress: (merged.coRenterAddress as string) || prev.coRenterAddress,
+          coRenterPhone: (merged.coRenterPhone as string) || prev.coRenterPhone,
+          coRenterEmail: (merged.coRenterEmail as string) || prev.coRenterEmail,
+          coRenterLicense: (merged.coRenterLicense as string) || prev.coRenterLicense,
+          // Vehicle info (from dealer data)
+          vehicleYear: (merged.vehicleYear as string) || prev.vehicleYear,
+          vehicleMake: (merged.vehicleMake as string) || prev.vehicleMake,
+          vehicleModel: (merged.vehicleModel as string) || prev.vehicleModel,
+          vehicleVin: (merged.vehicleVin as string) || prev.vehicleVin,
+          vehiclePlate: (merged.vehiclePlate as string) || prev.vehiclePlate,
+          // Rates (from dealer data)
+          rentalRate: (merged.rentalRate as number) || prev.rentalRate,
+          rentalPeriod: (merged.rentalPeriod as RentalData['rentalPeriod']) || prev.rentalPeriod,
+          securityDeposit: (merged.securityDeposit as number) || prev.securityDeposit,
+          insuranceFee: (merged.insuranceFee as number) || prev.insuranceFee,
+          additionalDriverFee: (merged.additionalDriverFee as number) || prev.additionalDriverFee,
+          tax: (merged.tax as number) || prev.tax,
+          mileageAllowance: (merged.mileageAllowance as number) || prev.mileageAllowance,
+          excessMileageCharge: (merged.excessMileageCharge as number) || prev.excessMileageCharge,
+          // Reset for new rental period
+          rentalStartDate: new Date().toISOString().split('T')[0],
+          rentalEndDate: '',
+          mileageOut: '',
+          mileageIn: '',
+          fuelLevelOut: 'Full',
+          fuelLevelIn: 'Full',
+          dueAtSigning: 0,
+        }));
+
+        // Pre-fill dealer signature if it existed
+        if (decoded.ds) {
+          setSignatures(prev => ({
+            ...prev,
+            dealerSignature: decoded.ds || '',
+            dealerSignatureDate: new Date().toISOString().split('T')[0],
+          }));
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setRenewError(err instanceof Error ? err.message : 'Failed to load renewal data');
+        }
+      } finally {
+        if (!cancelled) setRenewLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [renewAgreementId]);
 
   const handlePrint = useCallback(() => {
     const prevView = view;
@@ -233,8 +320,26 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
     { key: 'form130U', label: '130-U' },
   ];
 
+  // Show loading state while fetching renewal data
+  if (renewLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <Loader2 size={32} className="text-tj-gold animate-spin" />
+        <p className="text-white/50 text-sm">Loading previous rental agreement...</p>
+      </div>
+    );
+  }
+
   return (
     <div>
+      {/* Renewal error banner */}
+      {renewError && (
+        <div className="mb-4 px-4 py-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm flex items-center space-x-2">
+          <AlertCircle size={16} className="shrink-0" />
+          <span>Renewal failed: {renewError}. You can still create a new rental manually.</span>
+        </div>
+      )}
+
       {/* Toolbar */}
       <div className="flex flex-wrap items-center gap-2 mb-6 print-toolbar-hide">
         {/* Section Tabs */}
