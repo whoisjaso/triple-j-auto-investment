@@ -14,7 +14,7 @@ export default function Form130UForm({ data, onChange, onPrefill }: Props) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     let parsedValue: string | number | boolean = value;
-    if (type === 'number') { parsedValue = value === '' ? 0 : parseFloat(value); if (typeof parsedValue === 'number' && parsedValue < 0) parsedValue = 0; }
+    if (type === 'number') { if (value === '') { parsedValue = ''; } else { parsedValue = parseFloat(value); if (typeof parsedValue === 'number' && parsedValue < 0) parsedValue = 0; } }
     else if (type === 'checkbox') parsedValue = (e.target as HTMLInputElement).checked;
     onChange({ ...data, [name]: parsedValue });
   };

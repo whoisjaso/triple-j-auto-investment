@@ -30,7 +30,7 @@ export default function ContractForm({ data, onChange }: Props) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     let parsedValue: string | number = value;
-    if (type === 'number') { parsedValue = value === '' ? 0 : parseFloat(value); if (name === 'numberOfPayments' && (parsedValue as number) < 1) parsedValue = 1; else if ((parsedValue as number) < 0) parsedValue = 0; }
+    if (type === 'number') { if (value === '') { parsedValue = ''; } else { parsedValue = parseFloat(value); if (name === 'numberOfPayments' && (parsedValue as number) < 1) parsedValue = 1; else if ((parsedValue as number) < 0) parsedValue = 0; } }
     onChange({ ...data, [name]: parsedValue });
   };
 
