@@ -7,9 +7,10 @@ import SignatureLinePreview from '@/components/documents/SignatureLinePreview';
 interface Props {
   data: ContractData;
   signatures: SignatureData;
+  copyLabel?: string;
 }
 
-export default function ContractPreview({ data, signatures }: Props) {
+export default function ContractPreview({ data, signatures, copyLabel }: Props) {
   const totalCashPrice = data.cashPrice + data.tax + data.titleFee + data.docFee;
   const amountFinanced = Math.max(0, totalCashPrice - data.downPayment);
   const paymentAmount = calculatePayment(amountFinanced, data.apr, data.numberOfPayments, data.paymentFrequency);
@@ -46,6 +47,13 @@ export default function ContractPreview({ data, signatures }: Props) {
 
   return (
     <div className="bg-white p-10 md:p-16 text-[#1a1a1a] font-sans max-w-5xl mx-auto relative print-doc">
+      {/* Print copy label — hidden on screen, shown in print */}
+      {copyLabel && (
+        <div className="print-copy-label text-center text-[10px] font-bold tracking-[0.3em] uppercase text-[#1a1a1a]/40 pb-2 border-b border-dashed border-[#1a1a1a]/20 mb-4">
+          — {copyLabel} —
+        </div>
+      )}
+
       {/* Watermark / Background Logo */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none overflow-hidden print-no-watermark">
         <div className="font-serif font-bold text-[400px] leading-none">JJJ</div>
@@ -53,7 +61,7 @@ export default function ContractPreview({ data, signatures }: Props) {
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex justify-between items-end border-b-2 border-[#1a1a1a] pb-8 mb-10 print-section">
+        <div className="flex justify-between items-end border-b border-[#e5e5e5] pb-8 mb-10 print-section">
           <div className="flex items-center space-x-6">
             <div className="w-24 h-24 border-2 border-[#b89b5e] p-1 rounded-full overflow-hidden flex items-center justify-center bg-white">
               <img
@@ -76,14 +84,14 @@ export default function ContractPreview({ data, signatures }: Props) {
 
         {/* Parties */}
         <div className="grid grid-cols-2 gap-12 mb-10 print-section">
-          <div className="border border-[#1a1a1a]/10 p-6 rounded-sm bg-[#f5f2ed]/30">
+          <div className="p-6">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Buyer Information</h3>
             <p className="font-serif text-xl mb-1 min-h-[1.75rem]">{data.buyerName}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{data.buyerAddress}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{data.buyerPhone}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{data.buyerEmail}</p>
           </div>
-          <div className="border border-[#1a1a1a]/10 p-6 rounded-sm bg-[#f5f2ed]/30">
+          <div className="p-6">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Co-Buyer Information</h3>
             <p className="font-serif text-xl mb-1 min-h-[1.75rem]">{data.coBuyerName}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{data.coBuyerAddress}</p>
@@ -97,7 +105,7 @@ export default function ContractPreview({ data, signatures }: Props) {
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Vehicle Description</h3>
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-y border-[#1a1a1a]/20 bg-[#f5f2ed]/50">
+              <tr className="border-b border-[#ddd]">
                 <th className="p-3 text-left font-semibold">Year</th>
                 <th className="p-3 text-left font-semibold">Make</th>
                 <th className="p-3 text-left font-semibold">Model</th>
@@ -122,29 +130,29 @@ export default function ContractPreview({ data, signatures }: Props) {
         {/* Truth in Lending */}
         <div className="mb-10 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Truth In Lending Disclosures</h3>
-          <div className="grid grid-cols-4 border-2 border-[#1a1a1a] divide-x-2 divide-[#1a1a1a]">
-            <div className="p-4 flex flex-col justify-between">
+          <div className="grid grid-cols-4 gap-3">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Annual Percentage Rate</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">The cost of your credit as a yearly rate.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{data.apr.toFixed(2)}%</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Finance Charge</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">The dollar amount the credit will cost you.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{formatCurrency(financeCharge)}</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Amount Financed</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">The amount of credit provided to you or on your behalf.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{formatCurrency(amountFinanced)}</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Total of Payments</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">The amount you will have paid after you have made all payments as scheduled.</div>
@@ -157,9 +165,9 @@ export default function ContractPreview({ data, signatures }: Props) {
         {/* Payment Schedule Summary */}
         <div className="mb-10 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Payment Schedule</h3>
-          <table className="w-full text-sm border-collapse border border-[#1a1a1a]/20">
+          <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-[#f5f2ed]/50 border-b border-[#1a1a1a]/20">
+              <tr className="bg-[#f5f5f5] border-b border-[#ddd]">
                 <th className="p-3 text-left font-semibold">Number of Payments</th>
                 <th className="p-3 text-left font-semibold">Amount of Payments</th>
                 <th className="p-3 text-left font-semibold">When Payments Are Due</th>
@@ -176,6 +184,9 @@ export default function ContractPreview({ data, signatures }: Props) {
             </tbody>
           </table>
         </div>
+
+        {/* ═══ PRINT PAGE 2: Itemization, Policies & Disclosures ═══ */}
+        <div className="print-page-group">
 
         {/* Itemization & Important Clauses */}
         <div className="grid grid-cols-2 gap-12 mb-12 print-section">
@@ -214,13 +225,13 @@ export default function ContractPreview({ data, signatures }: Props) {
           </div>
 
           <div className="space-y-6">
-            <div className="border-2 border-[#1a1a1a] p-5 bg-[#f5f2ed]/20">
+            <div className="p-5 bg-[#f8f8f8] rounded-sm">
               <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-2 text-center">As Is - No Dealer Warranty</h3>
               <p className="text-xs text-justify leading-relaxed">
                 <strong>THE VEHICLE IS SOLD AS IS.</strong> The dealer assumes no responsibility for any repairs regardless of any oral statements about the vehicle. All implied warranties, including any implied warranties of merchantability and fitness for a particular purpose, are expressly disclaimed.
               </p>
             </div>
-            <div className="border border-red-900/20 p-5 bg-red-50/50">
+            <div className="p-5 bg-red-50/30 rounded-sm">
               <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-2 text-center text-red-900">No Refund Policy</h3>
               <p className="text-xs text-justify leading-relaxed text-red-900/80">
                 <strong>ALL SALES ARE FINAL.</strong> The Buyer acknowledges that no refunds, returns, or exchanges will be accepted under any circumstances. The down payment and any subsequent payments are strictly non-refundable.
@@ -232,7 +243,7 @@ export default function ContractPreview({ data, signatures }: Props) {
         {/* Total Due at Signing */}
         {data.dueAtSigning > 0 && (
           <div className="mb-10 print-section">
-            <div className="border-2 border-[#b89b5e] bg-[#f5f2ed]/40 p-6 text-center">
+            <div className="bg-[#f5f2ed]/40 p-6 text-center rounded-sm">
               <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Total Due at Signing</h3>
               <p className="text-4xl font-serif font-bold text-[#b89b5e]">{formatCurrency(data.dueAtSigning)}</p>
               <p className="text-xs text-[#1a1a1a]/60 mt-2">Amount due before vehicle delivery (includes down payment, fees, and any other charges due at time of sale)</p>
@@ -241,14 +252,14 @@ export default function ContractPreview({ data, signatures }: Props) {
         )}
 
         {/* Texas Mandatory Buyer Notice */}
-        <div className="mb-8 border-2 border-[#1a1a1a] p-5 bg-yellow-50/50 print-section">
+        <div className="mb-8 p-5 bg-yellow-50/50 rounded-sm print-section">
           <p className="text-xs font-bold text-center uppercase tracking-wider leading-relaxed">
             NOTICE TO THE BUYER — DO NOT SIGN THIS CONTRACT BEFORE YOU READ IT OR IF IT CONTAINS ANY BLANK SPACES. YOU ARE ENTITLED TO A COPY OF THE CONTRACT YOU SIGN. UNDER THE LAW YOU HAVE THE RIGHT TO PAY OFF IN ADVANCE THE FULL AMOUNT DUE AND UNDER CERTAIN CONDITIONS MAY OBTAIN A PARTIAL REFUND OF THE FINANCE CHARGE. KEEP THIS CONTRACT TO PROTECT YOUR LEGAL RIGHTS.
           </p>
         </div>
 
         {/* GPS Tracking Device Disclosure & Consent */}
-        <div className="mb-8 border-2 border-red-900/40 p-5 bg-red-50/30 print-section">
+        <div className="mb-8 p-5 bg-red-50/30 rounded-sm print-section">
           <h3 className="font-serif font-bold text-sm uppercase tracking-widest mb-3 text-center text-red-900">GPS Tracking &amp; Starter Interrupt Device — Disclosure, Consent &amp; Agreement</h3>
           <div className="text-[10px] text-justify leading-relaxed space-y-2 text-red-900/80">
             <p><strong>DISCLOSURE:</strong> Buyer acknowledges that a Global Positioning System (GPS) electronic tracking device and/or starter interrupt device has been or will be installed in the Vehicle described above. This device is capable of: (a) identifying, monitoring, and recording the geographic location of the Vehicle; and (b) remotely disabling the Vehicle&apos;s ignition/starter system.</p>
@@ -260,6 +271,11 @@ export default function ContractPreview({ data, signatures }: Props) {
             <p><strong>NO ADDITIONAL CHARGE:</strong> There is no separate charge to Buyer for the GPS device. The cost of the device is not included in the Amount Financed, Finance Charge, or any other charge disclosed in this Contract.</p>
           </div>
         </div>
+
+        </div>{/* end PRINT PAGE 2 */}
+
+        {/* ═══ PRINT PAGE 3: Comprehensive Terms ═══ */}
+        <div className="print-page-group">
 
         {/* Comprehensive Terms */}
         <div className="mb-10 text-[10.5px] text-justify space-y-2.5 text-[#1a1a1a]/70 columns-2 gap-8">
@@ -312,14 +328,19 @@ export default function ContractPreview({ data, signatures }: Props) {
           <p><strong>24. WAIVER:</strong> Holder&apos;s failure to enforce any term of this Contract shall not constitute a waiver of Holder&apos;s right to enforce that term or any other term at any time. Acceptance of late payments or partial payments shall not constitute a waiver of Holder&apos;s right to demand timely payment in full.</p>
         </div>
 
+        </div>{/* end PRINT PAGE 3 */}
+
+        {/* ═══ PRINT PAGE 4: ECOA, ID & Signatures ═══ */}
+        <div className="print-page-group">
+
         {/* ECOA Notice */}
-        <div className="mb-8 border border-[#1a1a1a]/20 p-4 text-[9px] text-[#1a1a1a]/50 text-justify leading-relaxed print-section">
+        <div className="mb-8 p-4 bg-[#f8f8f8] rounded-sm text-[9px] text-[#1a1a1a]/50 text-justify leading-relaxed print-section">
           <strong>EQUAL CREDIT OPPORTUNITY ACT NOTICE:</strong> The Federal Equal Credit Opportunity Act prohibits creditors from discriminating against credit applicants on the basis of race, color, religion, national origin, sex, marital status, age (provided the applicant has the capacity to enter into a binding contract), because all or part of the applicant&apos;s income derives from any public assistance program, or because the applicant has in good faith exercised any right under the Consumer Credit Protection Act. The federal agency that administers compliance with this law is: Consumer Financial Protection Bureau, 1700 G Street NW, Washington, DC 20552, (855) 411-2372.
         </div>
 
         {/* Customer ID Photo */}
         {signatures.buyerIdPhoto && (
-          <div className="mb-10 border border-[#1a1a1a]/10 p-4 rounded-sm bg-[#f5f2ed]/20 flex items-center space-x-6">
+          <div className="mb-10 p-4 flex items-center space-x-6">
             <img src={signatures.buyerIdPhoto} alt="Customer ID" className="h-28 object-contain rounded border border-[#1a1a1a]/10" />
             <div>
               <p className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50">Customer ID on File</p>
@@ -329,7 +350,7 @@ export default function ContractPreview({ data, signatures }: Props) {
         )}
 
         {/* Signatures */}
-        <div className="space-y-12 bg-[#f5f2ed]/30 p-8 border border-[#1a1a1a]/10 print-signatures">
+        <div className="space-y-12 p-8 print-signatures">
           <div className="text-sm font-bold mb-8 text-center font-serif text-lg">
             By signing below, you agree to the terms of this contract. You acknowledge that you have read it completely before signing.
           </div>
@@ -343,6 +364,8 @@ export default function ContractPreview({ data, signatures }: Props) {
             <SignatureLinePreview label={`Triple J Auto Representative — DL# ${DEALER_LICENSE}`} signatureImage={signatures.dealerSignature} signatureDate={signatures.dealerSignatureDate} />
           </div>
         </div>
+
+        </div>{/* end PRINT PAGE 4 */}
 
         {/* Full Payment Schedule (Page Break for Print) */}
         {schedule.length > 0 && (

@@ -7,9 +7,10 @@ import SignatureLinePreview from '@/components/documents/SignatureLinePreview';
 interface Props {
   data: RentalData;
   signatures: SignatureData;
+  copyLabel?: string; // When provided, renders single copy with this label (for PDF generation)
 }
 
-export default function RentalPreview({ data, signatures }: Props) {
+export default function RentalPreview({ data, signatures, copyLabel }: Props) {
   const totals = calculateRentalTotal(data);
   const duration = calculateRentalDuration(data.rentalStartDate, data.rentalEndDate, data.rentalPeriod);
   const schedule = generateRentalSchedule(data);
@@ -36,7 +37,7 @@ export default function RentalPreview({ data, signatures }: Props) {
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex justify-between items-end border-b-2 border-[#1a1a1a] pb-8 mb-10 print-section">
+        <div className="flex justify-between items-end border-b border-[#e5e5e5] pb-8 mb-10 print-section">
           <div className="flex items-center space-x-6">
             <div className="w-24 h-24 border-2 border-[#b89b5e] p-1 rounded-full overflow-hidden flex items-center justify-center bg-white">
               <img
@@ -59,7 +60,7 @@ export default function RentalPreview({ data, signatures }: Props) {
 
         {/* Parties */}
         <div className="grid grid-cols-2 gap-12 mb-10 print-section">
-          <div className="border border-[#1a1a1a]/10 p-6 rounded-sm bg-[#f5f2ed]/30">
+          <div className="p-6">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Renter Information</h3>
             <p className="font-serif text-xl mb-1 min-h-[1.75rem]">{data.renterName}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{data.renterAddress}</p>
@@ -67,7 +68,7 @@ export default function RentalPreview({ data, signatures }: Props) {
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{data.renterEmail}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem] mt-2 font-mono uppercase">DL# {data.renterLicense}</p>
           </div>
-          <div className="border border-[#1a1a1a]/10 p-6 rounded-sm bg-[#f5f2ed]/30">
+          <div className="p-6">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Additional Driver</h3>
             <p className="font-serif text-xl mb-1 min-h-[1.75rem]">{data.coRenterName}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{data.coRenterAddress}</p>
@@ -82,7 +83,7 @@ export default function RentalPreview({ data, signatures }: Props) {
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Vehicle Description</h3>
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-y border-[#1a1a1a]/20 bg-[#f5f2ed]/50">
+              <tr className="border-b border-[#ddd]">
                 <th className="p-3 text-left font-semibold">Year</th>
                 <th className="p-3 text-left font-semibold">Make</th>
                 <th className="p-3 text-left font-semibold">Model</th>
@@ -119,29 +120,29 @@ export default function RentalPreview({ data, signatures }: Props) {
         {/* Rental Summary Boxes (mirrors Truth in Lending) */}
         <div className="mb-10 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Rental Summary</h3>
-          <div className="grid grid-cols-4 border-2 border-[#1a1a1a] divide-x-2 divide-[#1a1a1a]">
-            <div className="p-4 flex flex-col justify-between">
+          <div className="grid grid-cols-4 gap-3">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Rental Period</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">Duration of the rental agreement.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{duration} {periodLabel}</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Base Rental</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">Total rental charges before fees and tax.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{formatCurrency(totals.baseRental)}</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Security Deposit</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">Refundable deposit held for the rental term.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{formatCurrency(data.securityDeposit)}</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Total Due at Signing</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">Amount due before vehicle pickup.</div>
@@ -154,9 +155,9 @@ export default function RentalPreview({ data, signatures }: Props) {
         {/* Payment Schedule Summary (mirrors Payment Schedule in Financing) */}
         <div className="mb-10 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Payment Schedule</h3>
-          <table className="w-full text-sm border-collapse border border-[#1a1a1a]/20">
+          <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-[#f5f2ed]/50 border-b border-[#1a1a1a]/20">
+              <tr className="bg-[#f5f5f5] border-b border-[#ddd]">
                 <th className="p-3 text-left font-semibold">Number of Payments</th>
                 <th className="p-3 text-left font-semibold">Amount per {periodSingular}</th>
                 <th className="p-3 text-left font-semibold">When Payments Are Due</th>
@@ -175,6 +176,9 @@ export default function RentalPreview({ data, signatures }: Props) {
             </tbody>
           </table>
         </div>
+
+        {/* ═══ PRINT PAGE 2: Itemization, Policies & Disclosures ═══ */}
+        <div className="print-page-group">
 
         {/* Itemization & Policies (mirrors Itemization & Important Clauses) */}
         <div className="grid grid-cols-2 gap-12 mb-12 print-section">
@@ -217,13 +221,13 @@ export default function RentalPreview({ data, signatures }: Props) {
           </div>
 
           <div className="space-y-6">
-            <div className="border-2 border-[#1a1a1a] p-5 bg-[#f5f2ed]/20">
+            <div className="p-5 bg-[#f8f8f8] rounded-sm">
               <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-2 text-center">Vehicle Condition</h3>
               <p className="text-xs text-justify leading-relaxed">
                 <strong>THE VEHICLE IS PROVIDED IN ITS CURRENT CONDITION.</strong> The renter acknowledges inspecting the vehicle prior to rental and accepts its current condition. Any pre-existing damage has been documented on a separate vehicle condition report signed by both parties at the time of pickup.
               </p>
             </div>
-            <div className="border border-red-900/20 p-5 bg-red-50/50">
+            <div className="p-5 bg-red-50/30 rounded-sm">
               <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-2 text-center text-red-900">Mileage Policy</h3>
               <p className="text-xs text-justify leading-relaxed text-red-900/80">
                 <strong>MILEAGE ALLOWANCE:</strong> {data.mileageAllowance > 0 ? `${data.mileageAllowance} miles per ${data.rentalPeriod === 'Daily' ? 'day' : data.rentalPeriod === 'Weekly' ? 'week' : 'month'}` : 'Unlimited'}. {data.excessMileageCharge > 0 ? `Excess mileage will be charged at ${formatCurrency(data.excessMileageCharge)} per mile.` : ''} The renter is responsible for all fuel consumed during the rental period. Vehicle must be returned with the same fuel level as at pickup.
@@ -233,7 +237,7 @@ export default function RentalPreview({ data, signatures }: Props) {
         </div>
 
         {/* GPS Tracking Device Disclosure & Consent */}
-        <div className="mb-8 border-2 border-red-900/40 p-5 bg-red-50/30 print-section">
+        <div className="mb-8 p-5 bg-red-50/30 rounded-sm print-section">
           <h3 className="font-serif font-bold text-sm uppercase tracking-widest mb-3 text-center text-red-900">GPS Tracking Device — Disclosure &amp; Consent</h3>
           <div className="text-[10px] text-justify leading-relaxed space-y-2 text-red-900/80">
             <p><strong>DISCLOSURE:</strong> Renter acknowledges and consents that the Vehicle is equipped with a Global Positioning System (GPS) electronic tracking device capable of identifying, monitoring, and recording the location of the Vehicle. This device is installed for the purposes of vehicle security, theft recovery, and enforcement of the terms of this Rental Agreement.</p>
@@ -241,6 +245,11 @@ export default function RentalPreview({ data, signatures }: Props) {
             <p><strong>TAMPERING PROHIBITED:</strong> Renter agrees not to tamper with, disable, remove, or damage the GPS device. Any tampering with or removal of the GPS device shall constitute a material breach of this Agreement and Renter shall be liable for the cost of replacement plus any resulting damages.</p>
           </div>
         </div>
+
+        </div>{/* end PRINT PAGE 2 */}
+
+        {/* ═══ PRINT PAGE 3: Comprehensive Terms ═══ */}
+        <div className="print-page-group">
 
         {/* Comprehensive Terms */}
         <div className="mb-10 text-[10.5px] text-justify space-y-2.5 text-[#1a1a1a]/70 columns-2 gap-8">
@@ -293,9 +302,14 @@ export default function RentalPreview({ data, signatures }: Props) {
           <p><strong>24. SECURITY DEPOSIT:</strong> The security deposit of {formatCurrency(data.securityDeposit)} shall be held by Owner for the duration of the rental period. The deposit will be refunded within fourteen (14) days of Vehicle return, less any deductions for: (a) unpaid rental charges or fees; (b) damage to the Vehicle beyond normal wear and tear; (c) excessive cleaning required; (d) missing keys, accessories, or equipment; (e) fuel replacement to restore tank to delivery level; (f) toll violations or traffic citations received after return. Owner will provide an itemized statement of any deductions.</p>
         </div>
 
+        </div>{/* end PRINT PAGE 3 */}
+
+        {/* ═══ PRINT PAGE 4: ID & Signatures ═══ */}
+        <div className="print-page-group">
+
         {/* Customer ID Photo */}
         {signatures.buyerIdPhoto && (
-          <div className="mb-10 border border-[#1a1a1a]/10 p-4 rounded-sm bg-[#f5f2ed]/20 flex items-center space-x-6">
+          <div className="mb-10 p-4 flex items-center space-x-6">
             <img src={signatures.buyerIdPhoto} alt="Customer ID" className="h-28 object-contain rounded border border-[#1a1a1a]/10" />
             <div>
               <p className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50">Customer ID on File</p>
@@ -305,7 +319,7 @@ export default function RentalPreview({ data, signatures }: Props) {
         )}
 
         {/* Signatures */}
-        <div className="space-y-12 bg-[#f5f2ed]/30 p-8 border border-[#1a1a1a]/10 print-signatures">
+        <div className="space-y-12 p-8 print-signatures">
           <div className="text-sm font-bold mb-8 text-center font-serif text-lg">
             By signing below, you agree to the terms of this rental agreement. You acknowledge that you have read it completely before signing.
           </div>
@@ -319,6 +333,8 @@ export default function RentalPreview({ data, signatures }: Props) {
             <SignatureLinePreview label={`Triple J Auto Representative — DL# ${DEALER_LICENSE}`} signatureImage={signatures.dealerSignature} signatureDate={signatures.dealerSignatureDate} />
           </div>
         </div>
+
+        </div>{/* end PRINT PAGE 4 */}
 
         {/* Full Payment Tracking Schedule (Page Break for Print) */}
         {schedule.length > 0 && (
@@ -336,7 +352,7 @@ export default function RentalPreview({ data, signatures }: Props) {
               </p>
             </div>
 
-            <table className="w-full text-sm border-collapse border-2 border-[#1a1a1a]">
+            <table className="w-full text-sm border-collapse">
               <thead>
                 <tr className="bg-[#1a1a1a] text-white">
                   <th className="p-3 text-left font-semibold text-[10px] tracking-wider uppercase w-10">#</th>
@@ -405,7 +421,7 @@ export default function RentalPreview({ data, signatures }: Props) {
 
             {/* Owner & Renter copy acknowledgment */}
             <div className="mt-10 grid grid-cols-2 gap-16">
-              <div className="border border-[#1a1a1a]/10 p-6 bg-[#f5f2ed]/20">
+              <div className="p-6">
                 <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Owner Copy</h4>
                 <div className="border-b border-[#1a1a1a] h-8 mb-2"></div>
                 <div className="flex justify-between text-[10px] uppercase tracking-widest font-semibold">
@@ -413,7 +429,7 @@ export default function RentalPreview({ data, signatures }: Props) {
                   <span>Date</span>
                 </div>
               </div>
-              <div className="border border-[#1a1a1a]/10 p-6 bg-[#f5f2ed]/20">
+              <div className="p-6">
                 <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Renter Copy</h4>
                 <div className="border-b border-[#1a1a1a] h-8 mb-2"></div>
                 <div className="flex justify-between text-[10px] uppercase tracking-widest font-semibold">
@@ -428,6 +444,12 @@ export default function RentalPreview({ data, signatures }: Props) {
     </div>
   );
 
+  // Single-copy mode for PDF generation
+  if (copyLabel) {
+    return renderContract(copyLabel);
+  }
+
+  // Default: dual-copy for screen + print
   return (
     <>
       {/* ═══ RENTER'S COPY (visible on screen + print) ═══ */}

@@ -28,9 +28,10 @@ interface Props {
   data: BillOfSaleData;
   signatures: SignatureData;
   acknowledgments?: BuyerAcknowledgments;
+  copyLabel?: string;
 }
 
-export default function BillOfSalePreview({ data, signatures, acknowledgments }: Props) {
+export default function BillOfSalePreview({ data, signatures, acknowledgments, copyLabel }: Props) {
   const calc = calculateBillOfSale(data);
 
   const formatDate = (dateStr: string) => {
@@ -49,6 +50,13 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
 
   return (
     <div className="bg-white p-10 md:p-16 text-[#1a1a1a] font-sans max-w-5xl mx-auto relative print-doc">
+      {/* Print copy label — hidden on screen, shown in print */}
+      {copyLabel && (
+        <div className="print-copy-label text-center text-[10px] font-bold tracking-[0.3em] uppercase text-[#1a1a1a]/40 pb-2 border-b border-dashed border-[#1a1a1a]/20 mb-4">
+          — {copyLabel} —
+        </div>
+      )}
+
       {/* Watermark */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none overflow-hidden print-no-watermark">
         <div className="font-serif font-bold text-[400px] leading-none">JJJ</div>
@@ -56,7 +64,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
 
       <div className="relative z-10">
         {/* Header */}
-        <div className="flex justify-between items-end border-b-2 border-[#1a1a1a] pb-8 mb-10 print-section">
+        <div className="flex justify-between items-end border-b border-[#e5e5e5] pb-8 mb-10 print-section">
           <div className="flex items-center space-x-6">
             <div className="w-24 h-24 border-2 border-[#b89b5e] p-1 rounded-full overflow-hidden flex items-center justify-center bg-white">
               <img src="/GoldTripleJLogo.webp" alt="Triple J Logo" className="w-full h-full object-contain" />
@@ -86,7 +94,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
         </div>
 
         {/* Seller / Dealer */}
-        <div className="mb-10 border border-[#b89b5e]/30 p-6 rounded-sm bg-[#b89b5e]/5 print-section">
+        <div className="mb-10 p-6 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#b89b5e] mb-3">Seller (Dealer)</h3>
           <div className="grid grid-cols-3 gap-6 text-sm">
             <div>
@@ -107,7 +115,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
 
         {/* Buyer / Co-Buyer */}
         <div className="grid grid-cols-2 gap-12 mb-10 print-section">
-          <div className="border border-[#1a1a1a]/10 p-6 rounded-sm bg-[#f5f2ed]/30">
+          <div className="p-6">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Buyer Information</h3>
             <p className="font-serif text-xl mb-1 min-h-[1.75rem]">{data.buyerName}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{buyerFullAddress}</p>
@@ -118,7 +126,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
               {data.buyerLicenseState && <span className="text-[#1a1a1a]/50">State: {data.buyerLicenseState}</span>}
             </div>
           </div>
-          <div className="border border-[#1a1a1a]/10 p-6 rounded-sm bg-[#f5f2ed]/30">
+          <div className="p-6">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Co-Buyer Information</h3>
             <p className="font-serif text-xl mb-1 min-h-[1.75rem]">{data.coBuyerName}</p>
             <p className="text-sm text-[#1a1a1a]/80 min-h-[1.25rem]">{coBuyerFullAddress}</p>
@@ -136,7 +144,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Vehicle Description</h3>
           <table className="w-full text-sm border-collapse">
             <thead>
-              <tr className="border-y border-[#1a1a1a]/20 bg-[#f5f2ed]/50">
+              <tr className="border-b border-[#ddd]">
                 <th className="p-3 text-left font-semibold">Year</th>
                 <th className="p-3 text-left font-semibold">Make</th>
                 <th className="p-3 text-left font-semibold">Model</th>
@@ -178,29 +186,29 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
         {/* Sale Summary Boxes (mirrors Truth in Lending) */}
         <div className="mb-10 print-section">
           <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-2">Sale Summary</h3>
-          <div className="grid grid-cols-4 border-2 border-[#1a1a1a] divide-x-2 divide-[#1a1a1a]">
-            <div className="p-4 flex flex-col justify-between">
+          <div className="grid grid-cols-4 gap-3">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Vehicle Price</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">Agreed purchase price of the vehicle.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{formatCurrency(data.salePrice)}</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Net Trade-In</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">Trade-in credit after payoff deduction.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{formatCurrency(calc.netTradeIn)}</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Fees &amp; Tax</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">Total taxes, title, registration, and fees.</div>
               </div>
               <div className="text-2xl font-serif font-bold mt-6">{formatCurrency(calc.feesSubtotal)}</div>
             </div>
-            <div className="p-4 flex flex-col justify-between">
+            <div className="p-4 flex flex-col justify-between bg-[#f8f8f8] rounded-sm">
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider mb-1">Total Due</div>
                 <div className="text-[10px] text-[#1a1a1a]/60 leading-tight">Total amount due from buyer at time of sale.</div>
@@ -277,13 +285,13 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
           <div className="space-y-6">
             {data.conditionType === 'as_is' ? (
               <>
-                <div className="border-2 border-[#1a1a1a] p-5 bg-[#f5f2ed]/20">
+                <div className="p-5 bg-[#f8f8f8] rounded-sm">
                   <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-2 text-center">As Is — No Dealer Warranty</h3>
                   <p className="text-xs text-justify leading-relaxed">
                     <strong>THE VEHICLE IS SOLD &ldquo;AS IS.&rdquo;</strong> The seller, Triple J Auto Investment LLC, hereby disclaims all warranties, either express or implied, including any implied warranties of merchantability and fitness for a particular purpose. The buyer has inspected the vehicle and accepts it in its present condition. The seller assumes no responsibility for any repairs regardless of any oral statements about the vehicle.
                   </p>
                 </div>
-                <div className="border border-red-900/20 p-5 bg-red-50/50">
+                <div className="p-5 bg-red-50/30 rounded-sm">
                   <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-2 text-center text-red-900">No Refund Policy</h3>
                   <p className="text-xs text-justify leading-relaxed text-red-900/80">
                     <strong>ALL SALES ARE FINAL.</strong> The Buyer acknowledges that no refunds, returns, or exchanges will be accepted under any circumstances. All payments made are strictly non-refundable. The Buyer waives any right to rescind this transaction after signing.
@@ -292,7 +300,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
               </>
             ) : (
               <>
-                <div className="border-2 border-[#b89b5e] p-5 bg-[#b89b5e]/5">
+                <div className="p-5 bg-[#b89b5e]/5 rounded-sm">
                   <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-2 text-center text-[#b89b5e]">Limited Warranty</h3>
                   <p className="text-xs text-justify leading-relaxed">
                     <strong>WARRANTY PERIOD:</strong> {data.warrantyDuration || '_______________'}
@@ -301,7 +309,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
                     <strong>COVERAGE:</strong> {data.warrantyDescription || 'As described in separate warranty document.'}
                   </p>
                 </div>
-                <div className="border border-red-900/20 p-5 bg-red-50/50">
+                <div className="p-5 bg-red-50/30 rounded-sm">
                   <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-2 text-center text-red-900">No Refund Policy</h3>
                   <p className="text-xs text-justify leading-relaxed text-red-900/80">
                     <strong>ALL SALES ARE FINAL.</strong> The Buyer acknowledges that no refunds, returns, or exchanges will be accepted under any circumstances. All payments made are strictly non-refundable.
@@ -314,7 +322,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
 
         {/* Trade-In Details (if applicable) */}
         {(data.tradeInDescription || data.tradeInVin) && (
-          <div className="mb-10 border border-[#1a1a1a]/10 p-6 rounded-sm bg-[#f5f2ed]/20">
+          <div className="mb-10 p-6">
             <h3 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-3">Trade-In Vehicle</h3>
             <div className="grid grid-cols-3 gap-6 text-sm">
               <div>
@@ -334,7 +342,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
         )}
 
         {/* Odometer Disclosure Statement */}
-        <div className="mb-10 border-2 border-[#1a1a1a] p-6 print-section">
+        <div className="mb-10 p-6 bg-[#f8f8f8] rounded-sm print-section">
           <h3 className="font-serif font-bold text-lg uppercase tracking-widest mb-4 text-center">Federal Odometer Disclosure Statement</h3>
           <p className="text-xs text-justify leading-relaxed mb-4">
             In accordance with federal law (49 U.S.C. § 32705) and applicable state law, the seller hereby discloses that the odometer of the vehicle described herein reads <strong className="font-mono text-sm">{data.odometerReading || '___________'}</strong> miles, and to the best of the seller&apos;s knowledge, said odometer reading <strong>{odometerLabel}</strong>.
@@ -383,7 +391,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
 
         {/* Customer ID Photo */}
         {signatures.buyerIdPhoto && (
-          <div className="mb-10 border border-[#1a1a1a]/10 p-4 rounded-sm bg-[#f5f2ed]/20 flex items-center space-x-6">
+          <div className="mb-10 p-4 flex items-center space-x-6">
             <img src={signatures.buyerIdPhoto} alt="Customer ID" className="h-28 object-contain rounded border border-[#1a1a1a]/10" />
             <div>
               <p className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50">Customer ID on File</p>
@@ -394,7 +402,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
         )}
 
         {/* Signatures */}
-        <div className="space-y-12 bg-[#f5f2ed]/30 p-8 border border-[#1a1a1a]/10 print-signatures">
+        <div className="space-y-12 p-8 print-signatures">
           <div className="text-sm font-bold mb-8 text-center font-serif text-lg">
             By signing below, all parties acknowledge and agree to the terms set forth in this Bill of Sale. Each party confirms they have read and understood this document in its entirety.
           </div>
@@ -420,7 +428,7 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
             <p className="text-xs text-[#1a1a1a]/60 mt-2 tracking-wider uppercase">Retain this copy for your records</p>
           </div>
 
-          <div className="border-2 border-[#1a1a1a] p-8 mb-8">
+          <div className="p-8 mb-8 bg-[#f8f8f8] rounded-sm">
             <div className="grid grid-cols-2 gap-8 text-sm mb-6">
               <div>
                 <span className="text-[10px] text-[#1a1a1a]/50 uppercase tracking-wider font-semibold">Buyer</span>
@@ -500,11 +508,11 @@ export default function BillOfSalePreview({ data, signatures, acknowledgments }:
           </div>
 
           <div className="grid grid-cols-2 gap-16 mt-12">
-            <div className="border border-[#1a1a1a]/10 p-6 bg-[#f5f2ed]/20">
+            <div className="p-6">
               <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Buyer Acknowledgment</h4>
               <SignatureLinePreview label="Buyer Signature" signatureImage={signatures.buyerSignature} signatureDate={signatures.buyerSignatureDate} />
             </div>
-            <div className="border border-[#1a1a1a]/10 p-6 bg-[#f5f2ed]/20">
+            <div className="p-6">
               <h4 className="text-[10px] font-bold tracking-widest uppercase text-[#1a1a1a]/50 mb-4">Dealer Copy</h4>
               <SignatureLinePreview label="Triple J Representative" signatureImage={signatures.dealerSignature} signatureDate={signatures.dealerSignatureDate} />
             </div>

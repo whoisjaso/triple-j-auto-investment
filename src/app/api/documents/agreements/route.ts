@@ -11,6 +11,7 @@ import { requireAdmin } from '@/lib/admin-auth';
 const LISTING_COLUMNS = [
   'id', 'document_type', 'buyer_name', 'buyer_email', 'buyer_phone',
   'vehicle_description', 'vehicle_vin', 'status', 'sent_at', 'completed_at',
+  'finalized_at', 'last_emailed_at',
   'acknowledgments', 'has_buyer_signature', 'has_cobuyer_signature',
   'has_dealer_signature', 'has_buyer_id',
 ].join(', ');
