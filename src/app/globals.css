@@ -104,6 +104,12 @@ select option:hover {
   scrollbar-width: none;
 }
 
+/* Print-only elements — hidden on screen */
+.print-copy-label,
+.print-only-copy {
+  display: none;
+}
+
 /* Print page group — transparent on screen, forces page break in print */
 .print-page-group {
   display: contents;
@@ -113,10 +119,10 @@ select option:hover {
 @media print {
   @page {
     size: letter;
-    margin: 0.6in;
+    margin: 0.35in;
   }
 
-  /* ── NUCLEAR HIDE: sidebar, nav, buttons, UI chrome ── */
+  /* ── HIDE: sidebar, nav, buttons, UI chrome ── */
   aside,
   nav,
   nav[aria-label="Admin navigation"],
@@ -159,7 +165,7 @@ select option:hover {
     print-color-adjust: exact !important;
   }
 
-  /* ── Layout containers: transparent pass-throughs ── */
+  /* ── Layout wrappers: transparent pass-throughs ── */
   body > div,
   body > div > div,
   main,
@@ -178,17 +184,18 @@ select option:hover {
     box-shadow: none !important;
   }
 
-  /* ── Document preview: full-width, no decorations ── */
+  /* ── Document preview: KEEP screen font sizes & spacing ── */
+  /* Only strip decorations (shadow, border-radius). Padding preserved. */
   .print-doc {
     display: block !important;
     position: static !important;
-    padding: 0 !important;
     max-width: 100% !important;
     margin: 0 !important;
     box-shadow: none !important;
     border: none !important;
     border-radius: 0 !important;
     overflow: visible !important;
+    /* NOTE: padding is intentionally NOT zeroed — screen spacing is preserved */
   }
 
   /* Ensure backgrounds/borders print exactly */
@@ -203,16 +210,26 @@ select option:hover {
     overflow: visible !important;
   }
 
+  /* ── Print-only elements: reveal in print ── */
+  .print-copy-label {
+    display: block !important;
+  }
+  .print-only-copy {
+    display: block !important;
+    break-before: page;
+    page-break-before: always;
+  }
+
   /* ══════ BORDERS: clean 0.5px #ddd lines everywhere ══════ */
 
-  /* Override ALL border colors to #ddd and widths to 0.5px */
+  /* Override ALL border colors to #ddd */
   .print-doc *,
   .print-doc *::before,
   .print-doc *::after {
     border-color: #ddd !important;
   }
 
-  /* Thin out all heavy (2px) borders to 0.5px */
+  /* Thin out heavy (2px) borders to 0.5px */
   .print-doc .border-2,
   .print-doc .border-b-2,
   .print-doc .border-t-2,
@@ -248,7 +265,6 @@ select option:hover {
   }
 
   /* ══════ SIGNATURE IMAGES: force visibility in print ══════ */
-  /* Base64 data URL images in signatures must render in print */
   .print-doc .signature-line-container {
     position: relative !important;
     display: block !important;
@@ -348,11 +364,4 @@ select option:hover {
     columns: 1 !important;
     column-count: 1 !important;
   }
-
-  /* ══════ NO SIZE/SPACING COMPRESSION ══════ */
-  /* Everything stays exactly as the screen shows. */
-  /* The only CSS below is for things that NEED print-specific handling. */
-
-  /* Remove min-heights on empty info fields so they collapse naturally */
-  .print-doc [class*="min-h-"] { min-height: 0 !important; }
 }

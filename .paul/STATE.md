@@ -28,7 +28,7 @@ Progress:
 Current loop state:
 ```
 PLAN ──▶ APPLY ──▶ UNIFY
-  ✓        ✓        ○     [Plan 12-01 applied, ready for UNIFY]
+  ✓        ✓        ✓     [Loop 12-01 complete — ready for next PLAN]
 ```
 
 ## Accumulated Context
@@ -78,7 +78,7 @@ PLAN ──▶ APPLY ──▶ UNIFY
 - Charting library integration if advanced visualizations needed (future)
 
 ### Git State
-Last commit: d19c293 fix(documents): allow clearing number input fields to empty
+Last commit: c441fe2 feat(documents): step-by-step customer wizard, component extractions, DRY fixes
 Branch: main
 Feature branches merged: none
 
@@ -88,10 +88,10 @@ Feature branches merged: none
 ## Session Continuity
 
 Last session: 2026-03-16
-Stopped at: Plan 12-01 Foundation COMPLETE — wizard, component extractions, saveAgreement fix, tests, Playwright verified.
-Next action: Run /paul:unify for 12-01, then /paul:apply Plan 12-02 (Enhanced Interactions).
-Resume file: .paul/handoffs/HANDOFF-2026-03-16-phase12-ux-overhaul.md
-Resume context: 12-01 done. Next: 12-02 (full-screen signature modal, camera overlay, dealer sig fix, tests).
+Stopped at: Plan 12-01 loop closed. SUMMARY at .paul/phases/12-advanced/12-01-SUMMARY.md. Deployed to production.
+Next action: /paul:apply Plan 12-02 (Enhanced Interactions — full-screen signature modal, camera ID overlay, dealer sig fix).
+Resume file: .paul/phases/12-advanced/12-01-SUMMARY.md
+Resume context: 12-01 complete. 12-02 scope in handoff: signature modal (DPR cap 2x, haptic, orientation), camera overlay (getUserMedia, ID guide, flip toggle), dealer sig fix, tests.
 
 ---
 *STATE.md -- Updated after every significant action*

@@ -22,8 +22,13 @@ export default function RentalPreview({ data, signatures }: Props) {
     return format(new Date(dateStr + 'T12:00:00'), 'MM/dd/yyyy');
   };
 
-  return (
+  const renderContract = (copyLabel: string) => (
     <div className="bg-white p-10 md:p-16 text-[#1a1a1a] font-sans max-w-5xl mx-auto relative print-doc">
+      {/* Print copy label — hidden on screen, shown in print */}
+      <div className="print-copy-label text-center text-[10px] font-bold tracking-[0.3em] uppercase text-[#1a1a1a]/40 pb-2 border-b border-dashed border-[#1a1a1a]/20 mb-4">
+        — {copyLabel} —
+      </div>
+
       {/* Watermark / Background Logo */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none overflow-hidden print-no-watermark">
         <div className="font-serif font-bold text-[400px] leading-none">JJJ</div>
@@ -421,5 +426,17 @@ export default function RentalPreview({ data, signatures }: Props) {
         )}
       </div>
     </div>
+  );
+
+  return (
+    <>
+      {/* ═══ RENTER'S COPY (visible on screen + print) ═══ */}
+      {renderContract("RENTER'S COPY")}
+
+      {/* ═══ DEALER'S COPY (print-only — hidden on screen) ═══ */}
+      <div className="print-only-copy">
+        {renderContract("DEALER'S COPY")}
+      </div>
+    </>
   );
 }
