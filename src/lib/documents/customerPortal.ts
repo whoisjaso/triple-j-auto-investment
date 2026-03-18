@@ -4,6 +4,11 @@ import { RentalData } from './rental';
 import { BillOfSaleData } from './billOfSale';
 import { Form130UData } from './form130U';
 
+// Max character length for a single signature data URL embedded in the hash fragment.
+// PNG data URLs from a fullscreen 2x-DPR canvas can be 40-70K+ characters.
+// Browser fragment limits are ~2MB, so 200K per signature is safe with lz-string compression.
+const SIG_URL_LIMIT = 200_000;
+
 export type CustomerSection = 'financing' | 'rental' | 'billOfSale' | 'form130U';
 
 export interface CustomerLinkData {
@@ -68,9 +73,13 @@ export function encodeCustomerLink(
     dealerData[key] = (data as unknown as Record<string, unknown>)[key];
   }
   const payload: CustomerLinkData = { s: section, d: dealerData };
-  if (dealerSignature && dealerSignature.length < 50000) {
-    payload.ds = dealerSignature;
-    payload.dd = dealerSignatureDate;
+  if (dealerSignature) {
+    if (dealerSignature.length < SIG_URL_LIMIT) {
+      payload.ds = dealerSignature;
+      payload.dd = dealerSignatureDate;
+    } else {
+      console.warn(`[customerPortal] Dealer signature too large for URL (${dealerSignature.length} chars > ${SIG_URL_LIMIT}). Signature omitted from link.`);
+    }
   }
   if (agreementId) payload.aid = agreementId;
   if (adminBuyerName) payload.abn = adminBuyerName;
@@ -119,9 +128,18 @@ export function encodeCompletedLink(
   acknowledgments?: Record<string, boolean>,
 ): string {
   const payload: CompletedLinkData = { s: section, dd: dealerData, cd: customerData };
-  if (dealerSignature && dealerSignature.length < 50000) { payload.ds = dealerSignature; payload.dsd = dealerSignatureDate; }
-  if (buyerSignature && buyerSignature.length < 50000) { payload.bs = buyerSignature; payload.bsd = buyerSignatureDate; }
-  if (coBuyerSignature && coBuyerSignature.length < 50000) { payload.cs = coBuyerSignature; payload.csd = coBuyerSignatureDate; }
+  if (dealerSignature) {
+    if (dealerSignature.length < SIG_URL_LIMIT) { payload.ds = dealerSignature; payload.dsd = dealerSignatureDate; }
+    else console.warn(`[customerPortal] Dealer signature too large for URL (${dealerSignature.length} chars). Omitted.`);
+  }
+  if (buyerSignature) {
+    if (buyerSignature.length < SIG_URL_LIMIT) { payload.bs = buyerSignature; payload.bsd = buyerSignatureDate; }
+    else console.warn(`[customerPortal] Buyer signature too large for URL (${buyerSignature.length} chars). Omitted.`);
+  }
+  if (coBuyerSignature) {
+    if (coBuyerSignature.length < SIG_URL_LIMIT) { payload.cs = coBuyerSignature; payload.csd = coBuyerSignatureDate; }
+    else console.warn(`[customerPortal] Co-buyer signature too large for URL (${coBuyerSignature.length} chars). Omitted.`);
+  }
   // Embed a smaller thumbnail in the URL; full-res photo is stored in DB separately
   if (buyerIdPhoto) { payload.bi = buyerIdPhoto; }
   if (acknowledgments) { payload.ack = acknowledgments; }
