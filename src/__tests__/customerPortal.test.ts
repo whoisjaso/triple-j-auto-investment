@@ -141,7 +141,8 @@ describe('encodeCompletedLink / decodeCompletedLink', () => {
   });
 
   it('omits signatures that exceed size limits', () => {
-    const hugeSig = 'x'.repeat(60000);
+    // SIG_URL_LIMIT is 200_000 — signatures above that are omitted
+    const hugeSig = 'x'.repeat(200_001);
     const link = encodeCompletedLink(
       'billOfSale', {}, {}, 'https://test.com',
       hugeSig, '2026-03-15',
@@ -149,6 +150,18 @@ describe('encodeCompletedLink / decodeCompletedLink', () => {
     const hash = '#completed/' + link.split('#completed/')[1];
     const decoded = decodeCompletedLink(hash);
     expect(decoded!.ds).toBeUndefined();
+  });
+
+  it('includes signatures under the size limit', () => {
+    // 60K sig should be included now (was dropped at old 50K limit)
+    const sig = 'x'.repeat(60_000);
+    const link = encodeCompletedLink(
+      'billOfSale', {}, {}, 'https://test.com',
+      sig, '2026-03-15',
+    );
+    const hash = '#completed/' + link.split('#completed/')[1];
+    const decoded = decodeCompletedLink(hash);
+    expect(decoded!.ds).toBe(sig);
   });
 
   it('works for all document types', () => {

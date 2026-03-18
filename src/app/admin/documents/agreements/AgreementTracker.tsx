@@ -4,12 +4,16 @@ import { useState, useEffect, useMemo } from "react";
 import {
   FileText, CheckCircle, Clock, AlertCircle, RefreshCw, Eye, X,
   ChevronDown, ChevronUp, RotateCcw, Search, Printer, Send, MailCheck,
+  PenLine, Download,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import PrintButton from "@/components/documents/PrintButton";
+import SignaturePad from "@/components/documents/SignaturePad";
 import {
   decodeCompletedLinkFromUrl,
+  encodeCompletedLink,
   type CompletedLinkData,
+  type CustomerSection,
 } from "@/lib/documents/customerPortal";
 import { ContractData } from "@/lib/documents/finance";
 import { RentalData } from "@/lib/documents/rental";
@@ -302,6 +306,11 @@ export default function AgreementTracker() {
   const [loadingDoc, setLoadingDoc] = useState<string | null>(null);
   const [finalizingId, setFinalizingId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  // Re-sign state
+  const [resignId, setResignId] = useState<string | null>(null);
+  const [resignSig, setResignSig] = useState("");
+  const [resignDate, setResignDate] = useState("");
+  const [resignSaving, setResignSaving] = useState(false);
 
   /* ── Data Fetching ── */
 
@@ -466,6 +475,65 @@ export default function AgreementTracker() {
       alert("Resend failed: " + (e instanceof Error ? e.message : "Unknown error"));
     } finally {
       setResendingId(null);
+    }
+  };
+
+  const handleStartResign = async (agreementId: string) => {
+    await fetchDetail(agreementId);
+    setResignSig("");
+    setResignDate("");
+    setResignId(agreementId);
+  };
+
+  const handleResignSubmit = async () => {
+    if (!resignId || !resignSig) return;
+    setResignSaving(true);
+    try {
+      const detail = detailCache[resignId];
+      if (!detail?.completed_link) throw new Error("No completed document data");
+      const decoded = decodeCompletedLinkFromUrl(detail.completed_link);
+      if (!decoded) throw new Error("Could not decode document");
+
+      const newLink = encodeCompletedLink(
+        decoded.s as CustomerSection,
+        decoded.dd,
+        decoded.cd,
+        window.location.origin,
+        resignSig,
+        resignDate,
+        decoded.bs,
+        decoded.bsd,
+        decoded.cs,
+        decoded.csd,
+        decoded.bi,
+        decoded.ack,
+      );
+
+      const res = await fetch("/api/documents/agreements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: resignId,
+          completed_link: newLink,
+          has_dealer_signature: true,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update agreement");
+
+      // Clear cache so next fetch gets fresh data
+      setDetailCache((prev) => {
+        const next = { ...prev };
+        delete next[resignId];
+        return next;
+      });
+      setResignId(null);
+      fetchAgreements();
+      alert("Dealer signature added successfully!");
+    } catch (e) {
+      alert("Failed: " + (e instanceof Error ? e.message : "Unknown error"));
+    } finally {
+      setResignSaving(false);
     }
   };
 
@@ -787,6 +855,17 @@ export default function AgreementTracker() {
                                       <RotateCcw size={13} />
                                     </button>
                                   )}
+                                {/* Re-sign: show for completed/finalized without dealer sig */}
+                                {(agreement.status === "completed" || agreement.status === "finalized") &&
+                                  !agreement.has_dealer_signature && (
+                                    <button
+                                      onClick={() => handleStartResign(agreement.id)}
+                                      className="p-1.5 rounded-md text-orange-400/60 hover:text-orange-400 hover:bg-white/[0.04] transition-all"
+                                      title="Add dealer signature"
+                                    >
+                                      <PenLine size={13} />
+                                    </button>
+                                  )}
                                 {(agreement.status === "completed" || agreement.status === "finalized") && (
                                   <button
                                     onClick={() =>
@@ -801,6 +880,18 @@ export default function AgreementTracker() {
                                       <FileText size={13} />
                                     )}
                                   </button>
+                                )}
+                                {/* Download PDF */}
+                                {(agreement.status === "completed" || agreement.status === "finalized") && (
+                                  <a
+                                    href={`/api/documents/agreements/${agreement.id}/pdf?copy=${encodeURIComponent("BUYER COPY")}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="p-1.5 rounded-md text-white/30 hover:text-white/60 hover:bg-white/[0.04] transition-all"
+                                    title="Download PDF"
+                                  >
+                                    <Download size={13} />
+                                  </a>
                                 )}
                                 {agreement.status === "completed" && agreement.buyer_email && (
                                   <button
@@ -1147,6 +1238,68 @@ export default function AgreementTracker() {
           data={docViewerData}
           onClose={() => setDocViewerData(null)}
         />
+      )}
+
+      {/* Re-sign Dealer Signature Modal */}
+      {resignId && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => !resignSaving && setResignId(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#111] border border-white/10 rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-5"
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-serif text-tj-cream">
+                  Add Dealer Signature
+                </h3>
+                <p className="text-xs text-white/40 mt-0.5">
+                  Sign below to add the dealer signature to this completed agreement.
+                </p>
+              </div>
+              <button
+                onClick={() => !resignSaving && setResignId(null)}
+                className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/20 transition-all"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <SignaturePad
+              label="Dealer Signature"
+              value={resignSig}
+              dateValue={resignDate}
+              onChange={setResignSig}
+              onDateChange={setResignDate}
+            />
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setResignId(null)}
+                disabled={resignSaving}
+                className="px-5 py-2 text-xs font-semibold tracking-wider uppercase text-white/40 hover:text-white/70 transition-colors disabled:opacity-30"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleResignSubmit}
+                disabled={!resignSig || resignSaving}
+                className="px-6 py-2.5 bg-tj-gold text-white rounded-full text-xs font-bold tracking-widest uppercase hover:bg-tj-gold/90 transition-all disabled:opacity-30 disabled:cursor-not-allowed flex items-center gap-2"
+              >
+                {resignSaving ? (
+                  <>
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  "Save Signature"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
