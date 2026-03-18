@@ -4,8 +4,8 @@ import { requireAdmin } from '@/lib/admin-auth';
 import { generatePdf } from '@/lib/documents/pdf-generator';
 import { Resend } from 'resend';
 
-// Allow up to 60s for PDF generation (Puppeteer cold start + render)
-export const maxDuration = 60;
+// Allow up to 30s for PDF generation (pdf-lib + Supabase fetch + storage upload)
+export const maxDuration = 30;
 
 // ============================================================
 // POST /api/documents/finalize
