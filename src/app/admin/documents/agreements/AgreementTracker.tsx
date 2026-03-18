@@ -7,26 +7,12 @@ import {
   PenLine, Download,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import PrintButton from "@/components/documents/PrintButton";
 import SignaturePad from "@/components/documents/SignaturePad";
 import {
   decodeCompletedLinkFromUrl,
   encodeCompletedLink,
-  type CompletedLinkData,
   type CustomerSection,
 } from "@/lib/documents/customerPortal";
-import { ContractData } from "@/lib/documents/finance";
-import { RentalData } from "@/lib/documents/rental";
-import { BillOfSaleData } from "@/lib/documents/billOfSale";
-import { Form130UData } from "@/lib/documents/form130U";
-import { SignatureData } from "@/lib/documents/shared";
-import ContractPreview from "@/components/documents/ContractPreview";
-import RentalPreview from "@/components/documents/RentalPreview";
-import BillOfSalePreview, {
-  type BuyerAcknowledgments,
-  emptyAcknowledgments,
-} from "@/components/documents/BillOfSalePreview";
-import Form130UPreview from "@/components/documents/Form130UPreview";
 
 /* ═══════════════ TYPES ═══════════════ */
 
@@ -183,99 +169,6 @@ function formatAddress(
   return parts.join(", ");
 }
 
-/* ═══════════════ DOCUMENT VIEWER MODAL ═══════════════ */
-
-function DocumentViewerModal({
-  data,
-  onClose,
-}: {
-  data: CompletedLinkData;
-  onClose: () => void;
-}) {
-  const mergedData = { ...data.dd, ...data.cd };
-  const signatures: SignatureData = {
-    buyerIdPhoto: data.bi || "",
-    buyerSignature: data.bs || "",
-    buyerSignatureDate: data.bsd || "",
-    coBuyerSignature: data.cs || "",
-    coBuyerSignatureDate: data.csd || "",
-    dealerSignature: data.ds || "",
-    dealerSignatureDate: data.dsd || "",
-  };
-  const acknowledgments: BuyerAcknowledgments = data.ack
-    ? {
-        inspected: !!data.ack.inspected,
-        asIs: !!data.ack.asIs,
-        receivedCopy: !!data.ack.receivedCopy,
-        allSalesFinal: !!data.ack.allSalesFinal,
-        odometerInformed: !!data.ack.odometerInformed,
-        responsibility: !!data.ack.responsibility,
-        financingSeparate: !!data.ack.financingSeparate,
-      }
-    : emptyAcknowledgments;
-
-  return (
-    <div
-      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex flex-col"
-      onClick={onClose}
-    >
-      <div
-        className="bg-[#111] border-b border-white/10 px-4 py-3 flex items-center justify-between shrink-0"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-center space-x-3">
-          <FileText size={16} className="text-tj-gold" />
-          <span className="text-sm font-semibold text-tj-cream">
-            {docTypeLabels[data.s] || data.s} — Full Document
-          </span>
-        </div>
-        <div className="flex items-center space-x-2">
-          <PrintButton variant="pdf" size="sm" />
-          <PrintButton variant="print" size="sm" />
-          <button
-            onClick={onClose}
-            className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/20 transition-all"
-          >
-            <X size={16} />
-          </button>
-        </div>
-      </div>
-      <div
-        className="flex-1 overflow-auto p-4 md:p-8"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="max-w-5xl mx-auto bg-white rounded-2xl overflow-hidden shadow-2xl print:shadow-none print:border-none print:rounded-none print-doc">
-          {data.s === "financing" && (
-            <ContractPreview
-              data={mergedData as unknown as ContractData}
-              signatures={signatures}
-            />
-          )}
-          {data.s === "rental" && (
-            <RentalPreview
-              data={mergedData as unknown as RentalData}
-              signatures={signatures}
-            />
-          )}
-          {data.s === "billOfSale" && (
-            <BillOfSalePreview
-              data={mergedData as unknown as BillOfSaleData}
-              signatures={signatures}
-              acknowledgments={acknowledgments}
-            />
-          )}
-          {data.s === "form130U" && (
-            <Form130UPreview
-              data={mergedData as unknown as Form130UData}
-              signatures={signatures}
-            />
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ═══════════════ MAIN COMPONENT ═══════════════ */
 
 export default function AgreementTracker() {
@@ -300,10 +193,6 @@ export default function AgreementTracker() {
     name: string;
   } | null>(null);
   const [loadingPhoto, setLoadingPhoto] = useState<string | null>(null);
-  const [docViewerData, setDocViewerData] = useState<CompletedLinkData | null>(
-    null
-  );
-  const [loadingDoc, setLoadingDoc] = useState<string | null>(null);
   const [finalizingId, setFinalizingId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
   // Re-sign state
@@ -399,31 +288,6 @@ export default function AgreementTracker() {
       alert("Failed to load ID photo.");
     } finally {
       setLoadingPhoto(null);
-    }
-  };
-
-  const fetchAndViewDocument = async (agreementId: string) => {
-    setLoadingDoc(agreementId);
-    try {
-      const detail = await fetchDetail(agreementId);
-      if (detail?.completed_link) {
-        const decoded = decodeCompletedLinkFromUrl(detail.completed_link);
-        if (decoded) {
-          setDocViewerData(decoded);
-        } else {
-          alert(
-            "Could not decode the completed document. The link may be corrupted."
-          );
-        }
-      } else {
-        alert(
-          "No completed document available. The customer hasn't submitted yet."
-        );
-      }
-    } catch {
-      alert("Failed to load document.");
-    } finally {
-      setLoadingDoc(null);
     }
   };
 
@@ -1226,14 +1090,6 @@ export default function AgreementTracker() {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Document Viewer Modal */}
-      {docViewerData && (
-        <DocumentViewerModal
-          data={docViewerData}
-          onClose={() => setDocViewerData(null)}
-        />
       )}
 
       {/* Re-sign Dealer Signature Modal */}
