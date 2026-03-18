@@ -14,12 +14,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const url = new URL(req.url);
   const copy = url.searchParams.get('copy') || 'BUYER COPY';
+  const inline = url.searchParams.get('inline') === 'true';
 
   // Verify agreement exists and has completed data
   const supabase = await createClient();
   const { data: agreement, error } = await supabase
     .from('document_agreements')
-    .select('id, status, vehicle_description, completed_link')
+    .select('id, status, vehicle_description, buyer_name, document_type, completed_link')
     .eq('id', id)
     .single();
 
@@ -33,15 +34,25 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
   try {
     const pdfBuffer = await generatePdf({ agreementId: id, copyLabel: copy });
-    const safeVehicle = (agreement.vehicle_description || 'document')
-      .replace(/[^a-zA-Z0-9 -]/g, '')
-      .replace(/\s+/g, '-');
-    const filename = `${safeVehicle}-${copy.replace(/\s+/g, '-')}.pdf`;
 
+    const docTypeLabels: Record<string, string> = {
+      billOfSale: 'BillOfSale',
+      financing: 'Financing',
+      rental: 'Rental',
+      form130U: 'Form130U',
+    };
+    const docLabel = docTypeLabels[agreement.document_type] || 'Document';
+    const safeName = (agreement.buyer_name || 'Customer')
+      .replace(/[^a-zA-Z0-9 ]/g, '')
+      .replace(/\s+/g, '_');
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const filename = `TripleJ_${docLabel}_${safeName}_${dateStr}.pdf`;
+
+    const disposition = inline ? 'inline' : 'attachment';
     return new NextResponse(new Uint8Array(pdfBuffer), {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="${filename}"`,
+        'Content-Disposition': `${disposition}; filename="${filename}"`,
       },
     });
   } catch (e) {

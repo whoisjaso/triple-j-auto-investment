@@ -867,19 +867,15 @@ export default function AgreementTracker() {
                                     </button>
                                   )}
                                 {(agreement.status === "completed" || agreement.status === "finalized") && (
-                                  <button
-                                    onClick={() =>
-                                      fetchAndViewDocument(agreement.id)
-                                    }
+                                  <a
+                                    href={`/api/documents/agreements/${agreement.id}/pdf?copy=${encodeURIComponent("BUYER COPY")}&inline=true`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     className="p-1.5 rounded-md text-tj-gold/60 hover:text-tj-gold hover:bg-white/[0.04] transition-all"
-                                    title="View full document"
+                                    title="View PDF in new tab"
                                   >
-                                    {loadingDoc === agreement.id ? (
-                                      <div className="w-3.5 h-3.5 border border-tj-gold/30 border-t-tj-gold rounded-full animate-spin" />
-                                    ) : (
-                                      <FileText size={13} />
-                                    )}
-                                  </button>
+                                    <FileText size={13} />
+                                  </a>
                                 )}
                                 {/* Download PDF */}
                                 {(agreement.status === "completed" || agreement.status === "finalized") && (
