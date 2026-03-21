@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { RentalData } from '@/lib/documents/rental';
 import InputField from './InputField';
 import AddressAutocomplete, { ParsedAddress } from './AddressAutocomplete';
+import VehicleSelect, { VehicleOption } from './VehicleSelect';
 
 interface Props {
   data: RentalData;
@@ -30,6 +31,18 @@ export default function RentalForm({ data, onChange }: Props) {
     let parsedValue: string | number = value;
     if (type === 'number') { if (value === '') { parsedValue = ''; } else { parsedValue = parseFloat(value); if ((parsedValue as number) < 0) parsedValue = 0; } }
     onChange({ ...data, [name]: parsedValue });
+  };
+
+  const handleVehicleSelect = (v: VehicleOption) => {
+    onChange({
+      ...data,
+      vehicleVin: v.vin,
+      vehiclePlate: v.licensePlate,
+      vehicleYear: String(v.year),
+      vehicleMake: v.make,
+      vehicleModel: v.model,
+      mileageOut: String(v.mileage),
+    });
   };
 
   const selectClasses = "w-full px-4 py-3 bg-white/[0.04] border border-white/[0.06] rounded-lg focus:outline-none focus:border-tj-gold/50 focus:ring-1 focus:ring-tj-gold/30 transition-all text-base text-white";
@@ -65,6 +78,7 @@ export default function RentalForm({ data, onChange }: Props) {
             {isDecoding ? 'Decoding...' : 'VIN Decode'}
           </button>
         </div>
+        <VehicleSelect onSelect={handleVehicleSelect} />
         <div className="grid grid-cols-2 gap-3">
           <InputField label="VIN" name="vehicleVin" uppercase value={data.vehicleVin} onChange={handleChange} />
           <InputField label="License Plate" name="vehiclePlate" uppercase value={data.vehiclePlate} onChange={handleChange} />

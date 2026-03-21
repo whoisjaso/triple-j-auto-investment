@@ -1,3 +1,39 @@
+// ============================================================
+// Texas Tax & Fee Constants
+// ============================================================
+
+export const TEXAS_TAX_RATE = 0.0625; // 6.25%
+export const TEXAS_TITLE_FEE = 33;
+export const DEFAULT_DOC_FEE = 150;
+export const DEFAULT_REG_FEE = 75;
+
+/** Calculate Texas sales tax (6.25%) rounded to cents */
+export function calcTexasTax(price: number): number {
+  if (!price || isNaN(price) || price <= 0) return 0;
+  return Math.round(price * TEXAS_TAX_RATE * 100) / 100;
+}
+
+/** Reverse-calculate sale price from out-the-door total */
+export function reverseTTL(
+  outTheDoor: number,
+  titleFee = TEXAS_TITLE_FEE,
+  docFee = DEFAULT_DOC_FEE,
+  regFee = DEFAULT_REG_FEE
+): { salePrice: number; tax: number } {
+  if (!outTheDoor || isNaN(outTheDoor) || outTheDoor <= 0) {
+    return { salePrice: 0, tax: 0 };
+  }
+  const afterFees = outTheDoor - titleFee - docFee - regFee;
+  if (afterFees <= 0) return { salePrice: 0, tax: 0 };
+  const salePrice = Math.round((afterFees / (1 + TEXAS_TAX_RATE)) * 100) / 100;
+  const tax = Math.round(salePrice * TEXAS_TAX_RATE * 100) / 100;
+  return { salePrice, tax };
+}
+
+// ============================================================
+// Bill of Sale Data
+// ============================================================
+
 export interface BillOfSaleData {
   saleDate: string;
   stockNumber: string;

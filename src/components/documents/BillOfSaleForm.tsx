@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from 'react';
-import { BillOfSaleData } from '@/lib/documents/billOfSale';
+import { BillOfSaleData, calcTexasTax, reverseTTL, TEXAS_TITLE_FEE, DEFAULT_DOC_FEE, DEFAULT_REG_FEE } from '@/lib/documents/billOfSale';
 import InputField from './InputField';
 import AddressAutocomplete, { ParsedAddress } from './AddressAutocomplete';
+import VehicleSelect, { VehicleOption } from './VehicleSelect';
+import BuyerSelect, { BuyerOption } from './BuyerSelect';
 
 interface Props {
   data: BillOfSaleData;
@@ -12,6 +14,9 @@ interface Props {
 
 export default function BillOfSaleForm({ data, onChange }: Props) {
   const [isDecoding, setIsDecoding] = useState(false);
+  const [taxManualOverride, setTaxManualOverride] = useState(false);
+  const [ttlMode, setTtlMode] = useState(false);
+  const [selectedVehiclePrice, setSelectedVehiclePrice] = useState<number | null>(null);
 
   const decodeVin = async () => {
     if (!data.vehicleVin || data.vehicleVin.length < 11) return;
@@ -30,8 +35,114 @@ export default function BillOfSaleForm({ data, onChange }: Props) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     let parsedValue: string | number = value;
-    if (type === 'number') { if (value === '') { parsedValue = ''; } else { parsedValue = parseFloat(value); if ((parsedValue as number) < 0) parsedValue = 0; } }
-    onChange({ ...data, [name]: parsedValue });
+    if (type === 'number') {
+      if (value === '') { parsedValue = ''; }
+      else { parsedValue = parseFloat(value); if ((parsedValue as number) < 0) parsedValue = 0; }
+    }
+
+    // Tax override detection: if user edits tax directly, enable manual override
+    if (name === 'tax') {
+      setTaxManualOverride(true);
+      onChange({ ...data, tax: parsedValue as number });
+      return;
+    }
+
+    // Auto-calc tax when sale price changes (unless manually overridden)
+    if (name === 'salePrice' && !taxManualOverride) {
+      const price = typeof parsedValue === 'number' ? parsedValue : 0;
+      onChange({ ...data, salePrice: parsedValue as number, tax: calcTexasTax(price) });
+      return;
+    }
+
+    onChange({ ...data, [name]: parsedValue } as BillOfSaleData);
+  };
+
+  const handleVehicleSelect = (v: VehicleOption) => {
+    setSelectedVehiclePrice(v.price);
+    setTaxManualOverride(false);
+
+    if (ttlMode) {
+      // TTL mode: vehicle price IS the out-the-door price
+      const { salePrice, tax } = reverseTTL(v.price);
+      onChange({
+        ...data,
+        vehicleVin: v.vin,
+        vehiclePlate: v.licensePlate,
+        vehicleYear: String(v.year),
+        vehicleMake: v.make,
+        vehicleModel: v.model,
+        vehicleTrim: v.trim,
+        vehicleColor: v.exteriorColor,
+        vehicleBodyStyle: v.bodyStyle,
+        vehicleMileage: String(v.mileage),
+        odometerReading: String(v.mileage),
+        stockNumber: v.stockNumber,
+        salePrice,
+        tax,
+        titleFee: TEXAS_TITLE_FEE,
+        docFee: DEFAULT_DOC_FEE,
+        registrationFee: DEFAULT_REG_FEE,
+      });
+    } else {
+      // Normal mode: vehicle price IS the sale price
+      onChange({
+        ...data,
+        vehicleVin: v.vin,
+        vehiclePlate: v.licensePlate,
+        vehicleYear: String(v.year),
+        vehicleMake: v.make,
+        vehicleModel: v.model,
+        vehicleTrim: v.trim,
+        vehicleColor: v.exteriorColor,
+        vehicleBodyStyle: v.bodyStyle,
+        vehicleMileage: String(v.mileage),
+        odometerReading: String(v.mileage),
+        stockNumber: v.stockNumber,
+        salePrice: v.price,
+        tax: calcTexasTax(v.price),
+      });
+    }
+  };
+
+  const handleBuyerSelect = (b: BuyerOption) => {
+    onChange({
+      ...data,
+      buyerName: b.name,
+      buyerPhone: b.phone,
+      buyerEmail: b.email,
+    });
+  };
+
+  const handleTtlToggle = () => {
+    const next = !ttlMode;
+    setTtlMode(next);
+    setTaxManualOverride(false);
+
+    if (next && selectedVehiclePrice) {
+      // Switching TTL ON with a vehicle selected → reverse-calc
+      const { salePrice, tax } = reverseTTL(selectedVehiclePrice);
+      onChange({
+        ...data,
+        salePrice,
+        tax,
+        titleFee: TEXAS_TITLE_FEE,
+        docFee: DEFAULT_DOC_FEE,
+        registrationFee: DEFAULT_REG_FEE,
+      });
+    } else if (!next && selectedVehiclePrice) {
+      // Switching TTL OFF → vehicle price is the sale price
+      onChange({
+        ...data,
+        salePrice: selectedVehiclePrice,
+        tax: calcTexasTax(selectedVehiclePrice),
+      });
+    }
+  };
+
+  const resetTaxOverride = () => {
+    setTaxManualOverride(false);
+    const price = data.salePrice || 0;
+    onChange({ ...data, tax: calcTexasTax(price) });
   };
 
   const selectClasses = "w-full px-4 py-3 bg-white/[0.04] border border-white/[0.06] rounded-lg focus:outline-none focus:border-tj-gold/50 focus:ring-1 focus:ring-tj-gold/30 transition-all text-base text-white";
@@ -41,6 +152,7 @@ export default function BillOfSaleForm({ data, onChange }: Props) {
       {/* Buyer */}
       <div className="bg-white/[0.02] border border-white/[0.06] p-6 rounded-2xl space-y-4">
         <h2 className="text-lg font-serif text-tj-cream border-b border-white/[0.06] pb-3 mb-4">Buyer Details</h2>
+        <BuyerSelect onSelect={handleBuyerSelect} />
         <InputField label="Full Name" name="buyerName" value={data.buyerName} onChange={handleChange} />
         <AddressAutocomplete label="Street Address" name="buyerAddress" value={data.buyerAddress} onChange={handleChange} onAddressSelect={(addr: ParsedAddress) => onChange({ ...data, buyerAddress: addr.street, buyerCity: addr.city, buyerState: addr.state, buyerZip: addr.zip })} />
         <div className="grid grid-cols-3 gap-3">
@@ -86,6 +198,7 @@ export default function BillOfSaleForm({ data, onChange }: Props) {
             {isDecoding ? 'Decoding...' : 'VIN Decode'}
           </button>
         </div>
+        <VehicleSelect onSelect={handleVehicleSelect} />
         <div className="grid grid-cols-2 gap-3">
           <InputField label="VIN" name="vehicleVin" uppercase value={data.vehicleVin} onChange={handleChange} />
           <InputField label="License Plate" name="vehiclePlate" uppercase value={data.vehiclePlate} onChange={handleChange} />
@@ -118,13 +231,57 @@ export default function BillOfSaleForm({ data, onChange }: Props) {
       {/* Pricing & Fees */}
       <div className="bg-white/[0.02] border border-white/[0.06] p-6 rounded-2xl space-y-4">
         <h2 className="text-lg font-serif text-tj-cream border-b border-white/[0.06] pb-3 mb-4">Sale Details</h2>
+
+        {/* TTL Toggle */}
+        <label className="flex items-center gap-3 px-4 py-3 bg-tj-gold/[0.06] border border-tj-gold/20 rounded-lg cursor-pointer hover:bg-tj-gold/10 transition-colors">
+          <input
+            type="checkbox"
+            checked={ttlMode}
+            onChange={handleTtlToggle}
+            disabled={!selectedVehiclePrice}
+            className="w-4 h-4 rounded border-white/20 text-tj-gold focus:ring-tj-gold/50 bg-white/[0.04] disabled:opacity-30"
+          />
+          <div>
+            <span className="text-sm text-white font-medium">Price includes TTL</span>
+            {!selectedVehiclePrice && (
+              <span className="text-[10px] text-white/30 ml-2">(select a vehicle first)</span>
+            )}
+          </div>
+        </label>
+
         <div className="grid grid-cols-2 gap-3">
           <InputField label="Sale Date" name="saleDate" type="date" value={data.saleDate} onChange={handleChange} />
           <InputField label="Stock #" name="stockNumber" value={data.stockNumber} onChange={handleChange} />
         </div>
         <InputField label="Sale Price ($)" name="salePrice" type="number" min="0" value={data.salePrice} onChange={handleChange} />
+
+        {/* Tax with auto-calc indicator */}
         <div className="grid grid-cols-2 gap-3">
-          <InputField label="Sales Tax ($)" name="tax" type="number" min="0" value={data.tax} onChange={handleChange} />
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[11px] font-semibold tracking-widest uppercase text-white/50">Sales Tax ($)</label>
+              {!taxManualOverride ? (
+                <span className="text-[9px] font-bold tracking-widest uppercase text-tj-gold/60 bg-tj-gold/10 px-2 py-0.5 rounded-full">AUTO 6.25%</span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={resetTaxOverride}
+                  className="text-[9px] font-bold tracking-widest uppercase text-white/40 hover:text-tj-gold transition-colors flex items-center gap-1"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                  RESET AUTO
+                </button>
+              )}
+            </div>
+            <input
+              type="number"
+              name="tax"
+              value={data.tax ?? ''}
+              onChange={handleChange}
+              min="0"
+              className="w-full px-4 py-3 bg-white/[0.04] border border-white/[0.06] rounded-lg focus:outline-none focus:border-tj-gold/50 focus:ring-1 focus:ring-tj-gold/30 transition-all text-base text-white placeholder:text-white/30"
+            />
+          </div>
           <InputField label="Title Fee ($)" name="titleFee" type="number" min="0" value={data.titleFee} onChange={handleChange} />
         </div>
         <div className="grid grid-cols-3 gap-3">
