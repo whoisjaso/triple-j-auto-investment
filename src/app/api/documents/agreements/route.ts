@@ -15,7 +15,7 @@ const LISTING_COLUMNS = [
   'id', 'document_type', 'buyer_name', 'buyer_email', 'buyer_phone',
   'vehicle_description', 'vehicle_vin', 'status', 'sent_at', 'completed_at',
   'acknowledgments', 'has_buyer_signature', 'has_cobuyer_signature',
-  'has_dealer_signature', 'has_buyer_id',
+  'has_dealer_signature', 'has_buyer_id', 'deleted_at',
 ].join(', ');
 
 export async function GET(req: NextRequest) {
@@ -99,6 +99,29 @@ export async function PATCH(req: NextRequest) {
 
   if (!body.id) {
     return NextResponse.json({ error: 'Missing agreement id' }, { status: 400 });
+  }
+
+  // Trash / Restore actions
+  if (body.action === 'trash') {
+    const { data, error } = await supabase
+      .from('document_agreements')
+      .update({ deleted_at: new Date().toISOString() })
+      .eq('id', body.id)
+      .select()
+      .single();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(data);
+  }
+
+  if (body.action === 'restore') {
+    const { data, error } = await supabase
+      .from('document_agreements')
+      .update({ deleted_at: null })
+      .eq('id', body.id)
+      .select()
+      .single();
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(data);
   }
 
   const updates: Record<string, unknown> = {};

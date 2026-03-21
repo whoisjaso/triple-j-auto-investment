@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import {
   FileText, CheckCircle, Clock, AlertCircle, RefreshCw, Eye, X,
   ChevronDown, ChevronUp, RotateCcw, Search, Printer, Send, MailCheck,
-  PenLine, Download,
+  PenLine, Download, Trash2, Undo2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import SignaturePad from "@/components/documents/SignaturePad";
@@ -29,6 +29,7 @@ interface Agreement {
   completed_at: string | null;
   finalized_at?: string | null;    // requires migration-14
   last_emailed_at?: string | null; // requires migration-14
+  deleted_at?: string | null;
   acknowledgments: Record<string, boolean>;
   has_buyer_signature: boolean;
   has_cobuyer_signature: boolean;
@@ -178,7 +179,8 @@ export default function AgreementTracker() {
   const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | "pending" | "completed" | "finalized">("all");
+  const [filter, setFilter] = useState<"all" | "pending" | "completed" | "finalized" | "trash">("all");
+  const [trashingId, setTrashingId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [sort, setSort] = useState<"newest" | "oldest" | "name">("newest");
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
@@ -401,15 +403,71 @@ export default function AgreementTracker() {
     }
   };
 
+  const handleTrash = async (agreementId: string, buyerName: string | null) => {
+    if (!confirm(`Move ${buyerName || "this agreement"} to trash?`)) return;
+    setTrashingId(agreementId);
+    try {
+      const res = await fetch("/api/documents/agreements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: agreementId, action: "trash" }),
+      });
+      if (!res.ok) throw new Error("Failed to trash agreement");
+      fetchAgreements();
+    } catch (e) {
+      alert("Failed: " + (e instanceof Error ? e.message : "Unknown error"));
+    } finally {
+      setTrashingId(null);
+    }
+  };
+
+  const handleRestore = async (agreementId: string) => {
+    setTrashingId(agreementId);
+    try {
+      const res = await fetch("/api/documents/agreements", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: agreementId, action: "restore" }),
+      });
+      if (!res.ok) throw new Error("Failed to restore agreement");
+      fetchAgreements();
+    } catch (e) {
+      alert("Failed: " + (e instanceof Error ? e.message : "Unknown error"));
+    } finally {
+      setTrashingId(null);
+    }
+  };
+
   useEffect(() => {
     fetchAgreements();
   }, []);
 
   /* ── Computed ── */
 
-  const allDeals = useMemo(() => groupByCustomer(agreements), [agreements]);
+  // Separate active vs trashed agreements
+  const activeAgreements = useMemo(
+    () => agreements.filter((a) => !a.deleted_at),
+    [agreements],
+  );
+  const trashedAgreements = useMemo(
+    () => agreements.filter((a) => !!a.deleted_at),
+    [agreements],
+  );
+
+  const allDeals = useMemo(() => groupByCustomer(activeAgreements), [activeAgreements]);
+  const trashedDeals = useMemo(() => groupByCustomer(trashedAgreements), [trashedAgreements]);
 
   const customerDeals = useMemo(() => {
+    // Trash tab shows trashed deals
+    if (filter === "trash") {
+      let deals = [...trashedDeals];
+      if (search.trim()) {
+        const q = search.trim().toLowerCase();
+        deals = deals.filter((d) => d.customerName.toLowerCase().includes(q));
+      }
+      return deals;
+    }
+
     let deals = [...allDeals];
 
     if (filter !== "all") {
@@ -440,12 +498,13 @@ export default function AgreementTracker() {
     });
 
     return deals;
-  }, [allDeals, filter, search, sort]);
+  }, [allDeals, trashedDeals, filter, search, sort]);
 
   const pendingCount = allDeals.filter((d) => d.status === "pending").length;
   const completedCount = allDeals.filter(
     (d) => d.status === "completed"
   ).length;
+  const trashCount = trashedAgreements.length;
 
   /* ═══════════════ RENDER ═══════════════ */
 
@@ -471,19 +530,36 @@ export default function AgreementTracker() {
               {completedCount}
             </div>
           </div>
+          {trashCount > 0 && (
+            <div
+              onClick={() => setFilter("trash")}
+              className="flex-1 bg-white/[0.03] border-l-[3px] border-l-red-500/50 rounded-lg px-4 py-3 cursor-pointer hover:bg-white/[0.05] transition-colors"
+            >
+              <div className="text-[10px] font-semibold tracking-widest uppercase text-white/40">
+                Trash
+              </div>
+              <div className="text-2xl font-serif text-red-400/60 mt-0.5">
+                {trashCount}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Filter Bar ── */}
         <div className="flex items-center justify-between gap-3 flex-wrap">
           {/* Segmented tabs */}
           <div className="bg-white/[0.03] p-1 rounded-lg border border-white/[0.06] flex gap-0.5">
-            {(["all", "pending", "completed", "finalized"] as const).map((f) => (
+            {(["all", "pending", "completed", "finalized", "trash"] as const).map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-4 py-1.5 rounded-md text-[11px] font-semibold tracking-wider uppercase transition-all duration-200 ${
                   filter === f
-                    ? "bg-tj-green text-white shadow-sm"
+                    ? f === "trash"
+                      ? "bg-red-500/20 text-red-400 shadow-sm"
+                      : "bg-tj-green text-white shadow-sm"
+                    : f === "trash"
+                    ? "text-red-400/40 hover:text-red-400/70"
                     : "text-white/40 hover:text-white/70"
                 }`}
               >
@@ -556,12 +632,16 @@ export default function AgreementTracker() {
           <div className="text-center py-16 bg-white/[0.02] rounded-2xl border border-white/[0.04]">
             <FileText size={40} className="mx-auto text-white/15 mb-4" />
             <p className="text-white/40 text-sm font-medium">
-              {filter === "all" && !search
+              {filter === "trash"
+                ? "Trash is empty"
+                : filter === "all" && !search
                 ? "No agreements yet"
                 : "No matching agreements"}
             </p>
             <p className="text-white/20 text-xs mt-1">
-              {filter === "all" && !search
+              {filter === "trash"
+                ? "Deleted agreements will appear here."
+                : filter === "all" && !search
                 ? "Send a document to a customer to get started."
                 : "Try adjusting your filters or search."}
             </p>
@@ -578,7 +658,9 @@ export default function AgreementTracker() {
                 <div
                   key={deal.key}
                   className={`bg-white/[0.03] rounded-lg overflow-hidden transition-all duration-200 hover:bg-white/[0.05] border-l-[3px] ${
-                    deal.status === "completed"
+                    filter === "trash"
+                      ? "border-l-red-500/50 opacity-70"
+                      : deal.status === "completed"
                       ? "border-l-emerald-500"
                       : "border-l-amber-500"
                   }`}
@@ -796,6 +878,34 @@ export default function AgreementTracker() {
                                       <div className="w-3.5 h-3.5 border border-white/30 border-t-white/70 rounded-full animate-spin" />
                                     ) : (
                                       <Eye size={13} />
+                                    )}
+                                  </button>
+                                )}
+                                {/* Trash / Restore */}
+                                {filter === "trash" ? (
+                                  <button
+                                    onClick={() => handleRestore(agreement.id)}
+                                    disabled={trashingId === agreement.id}
+                                    className="p-1.5 rounded-md text-emerald-400/60 hover:text-emerald-400 hover:bg-white/[0.04] transition-all disabled:opacity-30"
+                                    title="Restore from trash"
+                                  >
+                                    {trashingId === agreement.id ? (
+                                      <div className="w-3.5 h-3.5 border border-emerald-400/30 border-t-emerald-400 rounded-full animate-spin" />
+                                    ) : (
+                                      <Undo2 size={13} />
+                                    )}
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleTrash(agreement.id, agreement.buyer_name)}
+                                    disabled={trashingId === agreement.id}
+                                    className="p-1.5 rounded-md text-red-400/30 hover:text-red-400 hover:bg-red-500/[0.06] transition-all disabled:opacity-30"
+                                    title="Move to trash"
+                                  >
+                                    {trashingId === agreement.id ? (
+                                      <div className="w-3.5 h-3.5 border border-red-400/30 border-t-red-400 rounded-full animate-spin" />
+                                    ) : (
+                                      <Trash2 size={13} />
                                     )}
                                   </button>
                                 )}
