@@ -3,8 +3,8 @@ import { requireAdmin } from '@/lib/admin-auth';
 import { generatePdf } from '@/lib/documents/pdf-generator';
 import { createClient } from '@/lib/supabase/server';
 
-// Allow up to 30s for PDF generation (pdf-lib is fast, but large docs + Supabase fetch)
-export const maxDuration = 30;
+// Allow up to 60s for PDF generation (Puppeteer + Chromium launch + page render)
+export const maxDuration = 60;
 
 // GET /api/documents/agreements/[id]/pdf?copy=BUYER+COPY
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

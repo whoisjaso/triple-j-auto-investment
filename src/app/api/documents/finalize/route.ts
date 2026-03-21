@@ -4,15 +4,15 @@ import { requireAdmin } from '@/lib/admin-auth';
 import { generatePdf } from '@/lib/documents/pdf-generator';
 import { Resend } from 'resend';
 
-// Allow up to 30s for PDF generation (pdf-lib + Supabase fetch + storage upload)
-export const maxDuration = 30;
+// Allow up to 60s for PDF generation (Puppeteer + Chromium + storage upload + email)
+export const maxDuration = 60;
 
 // ============================================================
 // POST /api/documents/finalize
 //
 // FLOW:
 //   1. Validate: agreement exists, is completed, has buyer email
-//   2. Generate BUYER COPY + DEALER COPY PDFs via Puppeteer
+//   2. Generate BUYER COPY + DEALER COPY PDFs via Puppeteer (headless Chromium)
 //   3. Upload both PDFs to Supabase Storage
 //   4. Email BUYER COPY to buyer
 //   5. Update agreement: status=finalized, pdf paths, timestamps
