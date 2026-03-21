@@ -12,9 +12,9 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 
 | Attribute | Value |
 |-----------|-------|
-| Version | 0.2.0-dev |
-| Status | In Development |
-| Last Updated | 2026-03-11 |
+| Version | 0.2.0 |
+| Status | Released |
+| Last Updated | 2026-03-21 |
 
 ## Requirements
 
@@ -53,12 +53,22 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 - Active inventory investment tracker (capital tied up in unsold vehicles) -- Phase 11
 - Analytics query layer with typed Supabase queries + mock fallback -- Phase 11
 - Admin sidebar + dashboard quick action for Analytics navigation -- Phase 11
+- Document system: agreement tracker, customer wizard, signature capture -- Phase 12
+- Step-by-step customer portal with data-driven field groups per document type -- Phase 12
+- On-demand PDF generation via Puppeteer (mobile-friendly download) -- Phase 12
+- Admin re-sign capability for completed agreements missing signatures -- Phase 12
+- Soft delete with trash tab and restore for agreements -- Phase 12
+- Rental renewal flow with pre-fill from existing agreement -- Phase 12
+- Auto-calc sales tax (6.25%), TTL reverse breakdown, vehicle + buyer auto-populate -- Phase 12
+- Signature URL encoding with 200K char limit and warning on drop -- Phase 12
 
-### Out of Scope (v0.1)
-- Rental management, plate tracking, registration workflows -- v0.2+
-- AI chat (Gemini/Divine), AI voice (Retell) -- v0.2+
-- Owner portal, referral system -- v0.2+
-- Behavioral tracking, SOVEREIGN psychological layer -- v0.2+
+### Out of Scope (v0.2)
+- AI chat (Gemini/Divine), AI voice (Retell) -- v0.3+
+- Owner portal, referral system -- v0.3+
+- Behavioral tracking, SOVEREIGN psychological layer -- v0.3+
+- Automated hourly Gmail sync (Vercel Cron) -- v0.3+
+- Supabase Auth (replace middleware password auth) -- v0.3+
+- Photo upload to Supabase Storage -- v0.3+
 
 ## Target Users
 
@@ -141,6 +151,11 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 | Buyer info capture on Sold | Auto-captures lead name/phone as buyer; editable on vehicle edit | 2026-03-12 | Active |
 | Pure CSS analytics visualization | No charting libraries; CSS bars and progress indicators keep bundle lean | 2026-03-14 | Active |
 | Active Inventory Investment | Track capital tied up in unsold vehicles with estimated returns | 2026-03-14 | Active |
+| Puppeteer for PDF generation | pdf-lib couldn't match HTML fidelity; Puppeteer renders exact match | 2026-03-18 | Active |
+| Data-driven customer wizard | Field groups config per document type drives step generation | 2026-03-16 | Active |
+| Signature URL limit 200K | Canvas at 2x DPR produces 40-70K char PNGs; 50K silently dropped | 2026-03-18 | Active |
+| Soft delete for agreements | Preserve customer-signed data; admin can trash + restore | 2026-03-21 | Active |
+| Auto-calc sales tax 6.25% | Texas standard rate; TTL reverse breakdown for total cost transparency | 2026-03-21 | Active |
 
 ## Success Metrics
 
@@ -175,4 +190,4 @@ Every digital touchpoint engineers the neurological conditions under which buyin
 
 ---
 *PROJECT.md -- Updated when requirements or context change*
-*Last updated: 2026-03-14 after Phase 11*
+*Last updated: 2026-03-21 after v0.2 Dealer Intelligence System milestone completion*
