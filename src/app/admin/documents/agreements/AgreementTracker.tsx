@@ -197,6 +197,7 @@ export default function AgreementTracker() {
   const [loadingPhoto, setLoadingPhoto] = useState<string | null>(null);
   const [finalizingId, setFinalizingId] = useState<string | null>(null);
   const [resendingId, setResendingId] = useState<string | null>(null);
+  const [generating130uId, setGenerating130uId] = useState<string | null>(null);
   // Re-sign state
   const [resignId, setResignId] = useState<string | null>(null);
   const [resignSig, setResignSig] = useState("");
@@ -341,6 +342,32 @@ export default function AgreementTracker() {
       alert("Resend failed: " + (e instanceof Error ? e.message : "Unknown error"));
     } finally {
       setResendingId(null);
+    }
+  };
+
+  const handleGenerate130u = async (agreementId: string) => {
+    if (generating130uId) return;
+    setGenerating130uId(agreementId);
+    try {
+      const res = await fetch(`/api/generate-130u?agreement_id=${agreementId}`);
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: 'Unknown error' }));
+        alert(`130-U generation failed: ${err.error || res.statusText}`);
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = res.headers.get('Content-Disposition')?.match(/filename="(.+)"/)?.[1] || '130-U.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      alert('130-U generation failed: ' + (e instanceof Error ? e.message : 'Unknown error'));
+    } finally {
+      setGenerating130uId(null);
     }
   };
 
@@ -834,6 +861,22 @@ export default function AgreementTracker() {
                                   >
                                     <Download size={13} />
                                   </a>
+                                )}
+                                {/* Generate 130-U — for completed/finalized bill of sale or financing */}
+                                {(agreement.status === "completed" || agreement.status === "finalized") &&
+                                  (agreement.document_type === "billOfSale" || agreement.document_type === "financing") && (
+                                  <button
+                                    onClick={() => handleGenerate130u(agreement.id)}
+                                    disabled={!!generating130uId}
+                                    className="p-1.5 rounded-md text-amber-400/60 hover:text-amber-400 hover:bg-white/[0.04] transition-all disabled:opacity-30"
+                                    title="Generate 130-U (Title & Registration)"
+                                  >
+                                    {generating130uId === agreement.id ? (
+                                      <div className="w-3.5 h-3.5 border border-amber-400/30 border-t-amber-400 rounded-full animate-spin" />
+                                    ) : (
+                                      <FileText size={13} className="text-amber-400/60" />
+                                    )}
+                                  </button>
                                 )}
                                 {agreement.status === "completed" && agreement.buyer_email && (
                                   <button

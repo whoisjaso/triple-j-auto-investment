@@ -1,0 +1,1223 @@
+[
+  {
+    "name": "1 Vehicle Identification Number",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.1236,
+      "y": 680.08,
+      "width": 204.3164,
+      "height": 23.923999999999978
+    },
+    "page": 1
+  },
+  {
+    "name": "2 Year",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 225.36,
+      "y": 679.971,
+      "width": 61.079999999999984,
+      "height": 24.033000000000015
+    },
+    "page": 1
+  },
+  {
+    "name": "3 Make",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 288.142,
+      "y": 679.862,
+      "width": 61.298,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "4 Body Style",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 351.142,
+      "y": 679.862,
+      "width": 61.09100000000001,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "5 Model",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 414.393,
+      "y": 680.134,
+      "width": 58.287000000000035,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "6 Major Color",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 475.036,
+      "y": 680.353,
+      "width": 58.31999999999999,
+      "height": 23.760000000000105
+    },
+    "page": 1
+  },
+  {
+    "name": "7 Minor Color",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 534.622,
+      "y": 680.517,
+      "width": 57.960000000000036,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "8 Texas License Plate No",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.3418,
+      "y": 652.207,
+      "width": 92.0942,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "9 Odometer Reading no tenths",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 112.266,
+      "y": 651.989,
+      "width": 110.956,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "11 Empty Weight",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 414.284,
+      "y": 652.262,
+      "width": 83.71600000000001,
+      "height": 23.760000000000105
+    },
+    "page": 1
+  },
+  {
+    "name": "12 Carrying Capacity if any",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 500.138,
+      "y": 651.989,
+      "width": 92.88000000000005,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "14 Applicant Photo ID Number or FEINEIN",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 414.654,
+      "y": 626.393,
+      "width": 178.538,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "16 Applicant First Name or Entity Name Middle Name Last Name Suffix if any",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 18.9054,
+      "y": 559.448,
+      "width": 573.6766,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "17 Additional Applicant First Name if applicable Middle Name Last Name Suffix if any",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.5599,
+      "y": 532.273,
+      "width": 573.6761,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "18 Applicant Mailing Address City State Zip",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 18.6872,
+      "y": 504.771,
+      "width": 460.8768,
+      "height": 23.759999999999934
+    },
+    "page": 1
+  },
+  {
+    "name": "19 Applicant County of Residence",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 481.8,
+      "y": 506.898,
+      "width": 110.99999999999994,
+      "height": 20.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "20 Previous Owner Name or Entity Name City State",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.3418,
+      "y": 477.433,
+      "width": 361.87620000000004,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "23 Renewal Recipient First Name or Entity Name if different Middle Name Last Name Suffix if any",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.1782,
+      "y": 450.411,
+      "width": 573.6758000000001,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "24 Renewal Notice Mailing Address if different City State Zip",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.3418,
+      "y": 423.51,
+      "width": 573.6762,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "25 Applicant Phone Number optional",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.56,
+      "y": 396.608,
+      "width": 127.44,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "26 Email optional",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 148.582,
+      "y": 396.608,
+      "width": 205.2,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "29 Vehicle Location Address if different City State Zip",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.2218,
+      "y": 369.171,
+      "width": 573.4802,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "32 CertifiedeTitle Lienholder ID Number if any",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 243.142,
+      "y": 342.28,
+      "width": 259.08,
+      "height": 23.760000000000048
+    },
+    "page": 1
+  },
+  {
+    "name": "33 First Lien Date if any",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 504.578,
+      "y": 342.225,
+      "width": 88.44000000000005,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "34 First Lienholder Name if any Mailing Address City State Zip",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 19.44,
+      "y": 314.636,
+      "width": 573.4799999999999,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "Title  Registration",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 19.7448,
+      "y": 733.691,
+      "width": 10.799999999999997,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Title Only",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 119.855,
+      "y": 733.636,
+      "width": 10.326999999999984,
+      "height": 10.800000000000068
+    },
+    "page": 1
+  },
+  {
+    "name": "Registration Purposes Only",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 179.837,
+      "y": 733.691,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Vehicle Description",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 19.8,
+      "y": 711.436,
+      "width": 10.8,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "AddRemove Lien",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 109.255,
+      "y": 711.436,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Other",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 193.964,
+      "y": 711.764,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Other Reason For Correction",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 231.039,
+      "y": 708.835,
+      "width": 179.651,
+      "height": 23.85699999999997
+    },
+    "page": 1
+  },
+  {
+    "name": "Nontitle Registration",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 310.855,
+      "y": 734.127,
+      "width": 10.799999999999955,
+      "height": 10.800000000000068
+    },
+    "page": 1
+  },
+  {
+    "name": "Not Actual",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 224.073,
+      "y": 658.709,
+      "width": 10.799999999999983,
+      "height": 10.800000000000068
+    },
+    "page": 1
+  },
+  {
+    "name": "Exceeds Mechanical Limits",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 274.637,
+      "y": 658.764,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Exempt",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 376.31,
+      "y": 658.764,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Business",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 114.273,
+      "y": 632.364,
+      "width": 10.799999999999997,
+      "height": 10.247999999999934
+    },
+    "page": 1
+  },
+  {
+    "name": "Government",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 183,
+      "y": 632.582,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Trust",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 275.509,
+      "y": 632.582,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "NonProfit",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 340.964,
+      "y": 632.363,
+      "width": 10.800000000000011,
+      "height": 10.80099999999993
+    },
+    "page": 1
+  },
+  {
+    "name": "Passport Issued",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 154.663,
+      "y": 600.1,
+      "width": 185.39999999999998,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "NATO ID",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 354.709,
+      "y": 616.436,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "US Military ID",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 354.928,
+      "y": 603.782,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Other Military Status of Forces Photo ID",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 354.928,
+      "y": 590.472,
+      "width": 10.800000000000011,
+      "height": 10.801000000000045
+    },
+    "page": 1
+  },
+  {
+    "name": "US Dept of State ID",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 446.782,
+      "y": 616.436,
+      "width": 10.800000000000011,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "US Dept of Homeland Security ID",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 447,
+      "y": 603.127,
+      "width": 10.800000000000011,
+      "height": 10.800000000000068
+    },
+    "page": 1
+  },
+  {
+    "name": "Permit Number",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 192.644,
+      "y": 293.936,
+      "width": 153.83999999999997,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "GDN or Lessor Number",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 463.064,
+      "y": 283.906,
+      "width": 126.59999999999997,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "Trade-in (if any)",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 29.5637,
+      "y": 262.927,
+      "width": 10.8,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Exemption claimed under the Motor Vehicle Sales and Use Tax Law because",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 309.764,
+      "y": 175.599,
+      "width": 10.800000000000011,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "Seller  Name",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 293.51,
+      "y": 80.028,
+      "width": 221.12699999999995,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "Applicant Owner",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 293.536,
+      "y": 51.9822,
+      "width": 221.127,
+      "height": 23.759999999999998
+    },
+    "page": 1
+  },
+  {
+    "name": "Additional Applicant",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 293.154,
+      "y": 23.8878,
+      "width": 221.12800000000004,
+      "height": 23.759999999999998
+    },
+    "page": 1
+  },
+  {
+    "name": "Date",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 518.083,
+      "y": 80.4968,
+      "width": 67.56000000000006,
+      "height": 23.76020000000001
+    },
+    "page": 1
+  },
+  {
+    "name": "Date_2",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 518.683,
+      "y": 51.8495,
+      "width": 67.56000000000006,
+      "height": 23.759999999999998
+    },
+    "page": 1
+  },
+  {
+    "name": "Date_3",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 518.247,
+      "y": 24.9186,
+      "width": 67.56000000000006,
+      "height": 23.76
+    },
+    "page": 1
+  },
+  {
+    "name": "21 Dealer GDN if applicable",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 382.8,
+      "y": 479.778,
+      "width": 97.19999999999999,
+      "height": 20.432999999999993
+    },
+    "page": 1
+  },
+  {
+    "name": "22. Unit Number (if applicable)",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 481.8,
+      "y": 479.942,
+      "width": 110.99999999999994,
+      "height": 20.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "36 TradeIn if any Year Make Vehicle Identification Number",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 104.879,
+      "y": 257.004,
+      "width": 397.441,
+      "height": 23.75999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "State Taxes Were Paid To",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 88.56,
+      "y": 161.938,
+      "width": 95.16,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "$90 New Resident Tax  Previous State",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 309.982,
+      "y": 239.745,
+      "width": 10.799999999999955,
+      "height": 10.799999999999983
+    },
+    "page": 1
+  },
+  {
+    "name": "$5 Even Trade Tax",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 309.982,
+      "y": 229.054,
+      "width": 10.799999999999955,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "$10 Gift Tax  Attach Comptroller Form 14-317",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 309.982,
+      "y": 218.363,
+      "width": 10.799999999999955,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "$65 Rebuilt Salvage Fee",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 309.982,
+      "y": 207.454,
+      "width": 10.799999999999955,
+      "height": 10.799999999999983
+    },
+    "page": 1
+  },
+  {
+    "name": "2.5% Emissions Fee",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 538.583,
+      "y": 195.463,
+      "width": 50.726999999999975,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "2.5% Emissions Fee Diesel Vehicles 1996 and Older greater than 14000 lbs",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 309.982,
+      "y": 197.287,
+      "width": 10.799999999999955,
+      "height": 10.275999999999982
+    },
+    "page": 1
+  },
+  {
+    "name": "1% Emissions Fee",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 538.801,
+      "y": 182.705,
+      "width": 51.05499999999995,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "Sales Tax Exemption Reason",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 322.217,
+      "y": 162.263,
+      "width": 266.03999999999996,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "U.S. Driver License/ID Card",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 65.8636,
+      "y": 616.355,
+      "width": 10.799999999999997,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "U.S. Citizenship & Immigration Services/DOJ ID",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 66.0273,
+      "y": 590.5,
+      "width": 10.799900000000008,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Passport",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 65.8636,
+      "y": 603.264,
+      "width": 10.799999999999997,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Individual",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 35.5091,
+      "y": 632.309,
+      "width": 10.800000000000004,
+      "height": 10.800000000000068
+    },
+    "page": 1
+  },
+  {
+    "name": "Yes Provide Email in 26",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 356.346,
+      "y": 404.472,
+      "width": 10.800000000000011,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "Yes Attach Form VTR-216",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 482.237,
+      "y": 404.527,
+      "width": 10.799999999999955,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "Yes Attach Form VTR-267",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 28.9201,
+      "y": 349.927,
+      "width": 12.370899999999995,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "Yes Cannot check 30",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 152.018,
+      "y": 349.709,
+      "width": 10.800000000000011,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "Additional Trade ins",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 515.728,
+      "y": 264.618,
+      "width": 10.800000000000068,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "Sales and Use Tax",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 21.4909,
+      "y": 239.109,
+      "width": 10.800099999999997,
+      "height": 10.799999999999983
+    },
+    "page": 1
+  },
+  {
+    "name": "Late Tax Payment Penalty of 5% or",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 134.324,
+      "y": 176.123,
+      "width": 10.799999999999983,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "Late Tax Payment Penalty of 10%",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 167.029,
+      "y": 175.96,
+      "width": 10.800000000000011,
+      "height": 10.799999999999983
+    },
+    "page": 1
+  },
+  {
+    "name": "Resident's previous state",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 457.886,
+      "y": 236.978,
+      "width": 131.36599999999993,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "1% Emissions Fee Diesel Vehicles 1997 and Newer greater than 14000 lbs",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 309.982,
+      "y": 186.508,
+      "width": 11.323999999999955,
+      "height": 10.799999999999983
+    },
+    "page": 1
+  },
+  {
+    "name": "Yes, I am a dealer or lessor that qualifies to take the Fair Market Value Deduction",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 20.8909,
+      "y": 286.654,
+      "width": 10.8001,
+      "height": 10.800000000000011
+    },
+    "page": 1
+  },
+  {
+    "name": "Rebate Amount",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 91.0982,
+      "y": 235.556,
+      "width": 54.094800000000006,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "Sales Price Minus Rebate Amount",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 250.015,
+      "y": 238.736,
+      "width": 51.971000000000004,
+      "height": 15.840000000000003
+    },
+    "page": 1
+  },
+  {
+    "name": "Trade In Amount",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 250.195,
+      "y": 227.475,
+      "width": 51.39300000000003,
+      "height": 15.840000000000003
+    },
+    "page": 1
+  },
+  {
+    "name": "For Dealers/Lessors/Rental Only - Fair Market Value Deduction Described in Box 36",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 250.195,
+      "y": 207.645,
+      "width": 50.738,
+      "height": 15.840000000000003
+    },
+    "page": 1
+  },
+  {
+    "name": "Taxable Amount",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 249.617,
+      "y": 196.3,
+      "width": 51.24000000000004,
+      "height": 15.839999999999975
+    },
+    "page": 1
+  },
+  {
+    "name": "6.25% Tax on Taxable Amount",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 249.398,
+      "y": 184.523,
+      "width": 51.241000000000014,
+      "height": 15.840000000000003
+    },
+    "page": 1
+  },
+  {
+    "name": "Late Tax Payment Penalty Amount",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 249.398,
+      "y": 173.723,
+      "width": 51.241000000000014,
+      "height": 15.839999999999975
+    },
+    "page": 1
+  },
+  {
+    "name": "Amount of Taxes Paid to Previous State",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 249.18,
+      "y": 162.323,
+      "width": 51.240999999999985,
+      "height": 15.840000000000003
+    },
+    "page": 1
+  },
+  {
+    "name": "Amount of Tax and Penalty Due",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 249.398,
+      "y": 143.028,
+      "width": 51.241000000000014,
+      "height": 15.840000000000003
+    },
+    "page": 1
+  },
+  {
+    "name": "I Hold Motor Vehicle Retailer (Rental) Permit Number",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 21.1091,
+      "y": 296.254,
+      "width": 10.799999999999997,
+      "height": 10.799999999999955
+    },
+    "page": 1
+  },
+  {
+    "name": "State of ID/DL",
+    "type": "PDFTextField",
+    "widgetCount": 1,
+    "bbox": {
+      "x": 221.531,
+      "y": 613.246,
+      "width": 118.32,
+      "height": 18
+    },
+    "page": 1
+  },
+  {
+    "name": "$28 or $33 Application Fee for Texas Title - contact your county for the correct fee",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 310.244,
+      "y": 154.436,
+      "width": 10.275999999999954,
+      "height": 10.799999999999983
+    },
+    "page": 1
+  },
+  {
+    "name": "I certify I am applying for a corrected title and the original Texas Certificate of Title is lost or destroyed",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 204.371,
+      "y": 102.484,
+      "width": 10.275999999999982,
+      "height": 10.472999999999999
+    },
+    "page": 1
+  },
+  {
+    "name": "Check if applicable I have physically inspected the vehicle described and verified the vehicle identification number above",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 87.8181,
+      "y": 112.582,
+      "width": 9.818200000000004,
+      "height": 10.037000000000006
+    },
+    "page": 1
+  },
+  {
+    "name": "The vehicle is unrecovered stolen, and I am unable to verify the vehicle identification number above",
+    "type": "PDFCheckBox",
+    "widgetCount": 1,
+    "currentValue": false,
+    "bbox": {
+      "x": 425.127,
+      "y": 112.364,
+      "width": 9.926999999999964,
+      "height": 9.926999999999992
+    },
+    "page": 1
+  }
+]

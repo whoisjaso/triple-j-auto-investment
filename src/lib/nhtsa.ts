@@ -16,6 +16,8 @@ export interface NHTSADecodedVehicle {
   turbo: boolean;
   manufacturer: string | null;
   plantCountry: string | null;
+  curbWeightLbs: number | null;
+  gvwr: string | null;
   errorCode: string;
 }
 
@@ -140,6 +142,8 @@ export async function decodeVin(vin: string): Promise<NHTSADecodedVehicle> {
     turbo: r.Turbo === "Yes",
     manufacturer: valOrNull(r.Manufacturer),
     plantCountry: normalizePlantCountry(r.PlantCountry || ""),
+    curbWeightLbs: numOrNull(r.CurbWeightLB) !== null ? Math.round(numOrNull(r.CurbWeightLB)!) : null,
+    gvwr: valOrNull(r.GVWR),
     errorCode: r.ErrorCode || "0",
   };
 }
