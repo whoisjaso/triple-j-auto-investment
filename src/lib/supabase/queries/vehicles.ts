@@ -41,7 +41,7 @@ export async function getVehicles(
       break;
     case "newest":
     default:
-      query = query.order("date_added", { ascending: false });
+      query = query.order("make", { ascending: true }).order("model", { ascending: true });
       break;
   }
 
@@ -107,7 +107,8 @@ export async function getFeaturedVehicles(
     .from("vehicles")
     .select("*")
     .eq("status", "Available")
-    .order("date_added", { ascending: false })
+    .order("make", { ascending: true })
+    .order("model", { ascending: true })
     .limit(limit);
 
   if (error) throw error;
@@ -126,7 +127,8 @@ export async function getAdminVehicles(
   let query = client
     .from("vehicles")
     .select("*")
-    .order("date_added", { ascending: false });
+    .order("make", { ascending: true })
+    .order("model", { ascending: true });
 
   if (filters.status) {
     query = query.eq("status", filters.status);

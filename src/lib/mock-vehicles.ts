@@ -247,8 +247,7 @@ export function getMockVehicles(
       break;
     case "newest":
     default:
-      // Mock array is ordered by dateAdded ascending, reverse for newest first
-      results.reverse();
+      results.sort((a, b) => a.make.localeCompare(b.make) || a.model.localeCompare(b.model));
       break;
   }
 
