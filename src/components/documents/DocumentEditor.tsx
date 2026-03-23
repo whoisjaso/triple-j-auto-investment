@@ -154,6 +154,8 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
   const [signatures, setSignatures] = useState<SignatureData>(emptySignatures);
   const [renewLoading, setRenewLoading] = useState(!!renewAgreementId);
   const [renewError, setRenewError] = useState<string | null>(null);
+  const [form130UPdfUrl, setForm130UPdfUrl] = useState<string | null>(null);
+  const [form130UPdfLoading, setForm130UPdfLoading] = useState(false);
 
   // Rental renewal: fetch previous agreement and pre-fill
   useEffect(() => {
@@ -270,6 +272,59 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
     setForm130UData((prev) => ({ ...prev, ...prefilled }));
   };
 
+  const generate130UPdf = useCallback(async (): Promise<Blob | null> => {
+    const d = form130UData;
+    const body = {
+      vin: d.vin, year: d.year, make: d.make, model: d.model,
+      body_style: d.bodyStyle, major_color: d.majorColor, minor_color: d.minorColor || undefined,
+      odometer: d.odometerReading, odometer_brand: d.odometerBrand,
+      empty_weight: d.emptyWeight || undefined, carrying_capacity: d.carryingCapacity || undefined,
+      tx_plate_no: d.licensePlateNo || undefined,
+      buyer_first_name: d.applicantFirstName, buyer_middle_name: d.applicantMiddleName || undefined,
+      buyer_last_name: d.applicantLastName, buyer_suffix: d.applicantSuffix || undefined,
+      buyer_address: d.mailingAddress, buyer_city: d.mailingCity, buyer_state: d.mailingState,
+      buyer_zip: d.mailingZip, buyer_county: d.countyOfResidence,
+      buyer_phone: d.applicantPhone || undefined, buyer_email: d.applicantEmail || undefined,
+      buyer_dl_number: d.applicantIdNumber || undefined, buyer_dl_state: d.applicantIdState || undefined,
+      co_buyer_name: d.coApplicantName || undefined,
+      sale_price: d.salesPrice, sale_date: d.saleDate || undefined,
+      trade_in_amount: d.tradeInAllowance || undefined, trade_in_description: d.tradeInDescription || undefined,
+      rebate_amount: d.rebateOrIncentive || undefined,
+      applying_for: d.applicationType === 'titleOnly' ? 'title_only' : d.applicationType === 'registrationOnly' ? 'registration_only' : 'title_and_registration',
+      applicant_type: d.applicantType?.toLowerCase() === 'business' ? 'business' : 'individual',
+    };
+    const res = await fetch('/api/generate-130u', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    if (!res.ok) return null;
+    return res.blob();
+  }, [form130UData]);
+
+  const handle130UPreview = useCallback(async () => {
+    if (form130UPdfLoading) return;
+    // Revoke previous URL
+    if (form130UPdfUrl) { URL.revokeObjectURL(form130UPdfUrl); setForm130UPdfUrl(null); }
+    setForm130UPdfLoading(true);
+    try {
+      const blob = await generate130UPdf();
+      if (blob) setForm130UPdfUrl(URL.createObjectURL(blob));
+    } catch { /* ignore */ }
+    finally { setForm130UPdfLoading(false); }
+  }, [generate130UPdf, form130UPdfLoading, form130UPdfUrl]);
+
+  const handle130UDownload = useCallback(async () => {
+    const blob = await generate130UPdf();
+    if (!blob) { alert('130-U generation failed'); return; }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `130-U_${form130UData.applicantLastName || 'form'}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [generate130UPdf, form130UData.applicantLastName]);
+
   const switchSection = (s: Section) => { setSection(s); setView('edit'); };
 
   const getCurrentData = () => {
@@ -356,7 +411,7 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
           <button onClick={() => setView('edit')} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all flex items-center space-x-1 ${view === 'edit' ? 'bg-white/10 text-tj-gold shadow-md' : 'text-white/40 hover:text-white/70'}`}>
             <Edit3 size={12} /><span>Edit</span>
           </button>
-          <button onClick={() => setView('preview')} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all flex items-center space-x-1 ${view === 'preview' ? 'bg-white/10 text-tj-gold shadow-md' : 'text-white/40 hover:text-white/70'}`}>
+          <button onClick={() => { setView('preview'); if (section === 'form130U') handle130UPreview(); }} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all flex items-center space-x-1 ${view === 'preview' ? 'bg-white/10 text-tj-gold shadow-md' : 'text-white/40 hover:text-white/70'}`}>
             <FileText size={12} /><span>Preview</span>
           </button>
         </div>
@@ -366,8 +421,8 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
           <button onClick={handleSendToCustomer} className="px-3 py-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-emerald-700 transition-all flex items-center space-x-1">
             <Send size={12} /><span className="hidden sm:inline">Send to Customer</span><span className="sm:hidden">Send</span>
           </button>
-          <PrintButton variant="pdf" size="sm" onClick={handlePrint} />
-          <PrintButton variant="print" size="sm" onClick={handlePrint} />
+          <PrintButton variant="pdf" size="sm" onClick={section === 'form130U' ? handle130UDownload : handlePrint} />
+          <PrintButton variant="print" size="sm" onClick={section === 'form130U' ? handle130UDownload : handlePrint} />
         </div>
       </div>
 
@@ -385,7 +440,27 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
           {section === 'financing' && <ContractPreview data={contractData} signatures={signatures} />}
           {section === 'rental' && <RentalPreview data={rentalData} signatures={signatures} />}
           {section === 'billOfSale' && <BillOfSalePreview data={billOfSaleData} signatures={signatures} />}
-          {section === 'form130U' && <Form130UPreview data={form130UData} signatures={signatures} />}
+          {section === 'form130U' && (
+            form130UPdfLoading ? (
+              <div className="flex items-center justify-center py-32">
+                <Loader2 size={32} className="animate-spin text-tj-gold" />
+                <span className="ml-3 text-white/50 text-sm">Generating 130-U PDF...</span>
+              </div>
+            ) : form130UPdfUrl ? (
+              <iframe
+                src={form130UPdfUrl}
+                className="w-full border-0"
+                style={{ height: '80vh', minHeight: '600px' }}
+                title="130-U Preview"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-32 text-white/40">
+                <FileText size={48} className="mb-4 text-white/20" />
+                <p className="text-sm">Click <strong>Preview</strong> to generate the filled 130-U PDF</p>
+                <p className="text-xs mt-1 text-white/25">The official TxDMV form will be filled with your data</p>
+              </div>
+            )
+          )}
         </div>
       )}
 
