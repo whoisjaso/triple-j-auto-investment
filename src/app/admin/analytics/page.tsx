@@ -98,10 +98,10 @@ export default async function AdminAnalyticsPage() {
   const totalLeads = funnel.reduce((sum, s) => sum + s.count, 0);
 
   return (
-    <div className="px-4 py-6 md:p-8 max-w-6xl">
+    <div className="px-3 py-3 md:p-8 max-w-6xl">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="font-serif text-2xl md:text-3xl text-tj-cream/90 tracking-wide">
+      <div className="mb-5 md:mb-8">
+        <h1 className="font-serif text-xl md:text-3xl text-tj-cream/90 tracking-wide">
           Analytics
         </h1>
         <p className="text-xs text-white/25 mt-1 font-accent uppercase tracking-[0.15em]">
@@ -110,7 +110,7 @@ export default async function AdminAnalyticsPage() {
       </div>
 
       {/* ════════ KPI Cards ════════ */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2 md:gap-4 mb-5 md:mb-8">
         <KpiCard
           value={fmtDollar(kpi.totalProfit)}
           label="Total Profit"
@@ -461,7 +461,7 @@ export default async function AdminAnalyticsPage() {
                   className={`w-2 h-2 rounded-full shrink-0 ${s.dotColor}`}
                 />
                 <span
-                  className={`text-[10px] font-accent uppercase tracking-[0.12em] w-20 shrink-0 ${s.color}`}
+                  className={`text-[10px] font-accent uppercase tracking-[0.12em] w-16 md:w-20 shrink-0 ${s.color}`}
                 >
                   {s.label}
                 </span>

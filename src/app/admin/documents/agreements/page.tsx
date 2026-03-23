@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 
 export default function AgreementsPage() {
   return (
-    <div className="px-4 md:px-8 py-6 md:py-10 max-w-7xl mx-auto">
-      <div className="mb-6" data-print-hide>
-        <h1 className="font-serif text-2xl md:text-3xl text-tj-cream tracking-wide">
+    <div className="px-3 md:px-8 py-3 md:py-10 max-w-7xl mx-auto">
+      <div className="mb-4 md:mb-6" data-print-hide>
+        <h1 className="font-serif text-xl md:text-3xl text-tj-cream tracking-wide">
           Agreement Tracker
         </h1>
         <p className="text-white/40 text-sm mt-1">

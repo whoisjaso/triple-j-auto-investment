@@ -147,9 +147,11 @@ export default async function InventoryPage({
         </div>
 
         {vehicles.length > 0 ? (
-          <div className="mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
+          <div className="mt-8 md:mt-10 flex overflow-x-auto snap-x snap-mandatory gap-3 pb-4 -mx-4 px-4 no-scrollbar md:mx-0 md:px-0 md:pb-0 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-6 md:overflow-visible">
             {vehicles.map((vehicle) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+              <div key={vehicle.id} className="min-w-[78%] snap-center flex-shrink-0 md:min-w-0">
+                <VehicleCard vehicle={vehicle} />
+              </div>
             ))}
           </div>
         ) : (

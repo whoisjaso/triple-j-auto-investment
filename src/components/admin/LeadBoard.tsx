@@ -72,7 +72,7 @@ export default function LeadBoard({ leads }: Props) {
               </div>
 
               {/* Cards */}
-              <div className="space-y-2 max-h-[calc(100vh-220px)] overflow-y-auto pr-1 scrollbar-thin">
+              <div className="space-y-2 max-h-[calc(100vh-280px)] md:max-h-[calc(100vh-220px)] overflow-y-auto pr-1 scrollbar-thin">
                 {stageLeads.length === 0 ? (
                   <div className="rounded-lg border border-dashed border-white/[0.04] p-4 text-center">
                     <p className="text-[10px] text-white/10">No leads</p>

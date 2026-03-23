@@ -30,11 +30,11 @@ export default async function AdminInventoryPage() {
   const vehicles = await getInventory();
 
   return (
-    <div className="px-4 py-6 md:p-8 max-w-5xl">
+    <div className="px-3 py-3 md:p-8 max-w-5xl">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4 md:mb-6">
         <div>
-          <h1 className="font-serif text-2xl md:text-3xl text-tj-cream/90 tracking-wide">
+          <h1 className="font-serif text-xl md:text-3xl text-tj-cream/90 tracking-wide">
             Inventory
           </h1>
           <p className="text-xs text-white/25 mt-1 font-accent uppercase tracking-[0.15em]">

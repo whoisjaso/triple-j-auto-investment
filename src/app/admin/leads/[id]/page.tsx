@@ -38,7 +38,7 @@ export default async function LeadDetailPage({ params }: Props) {
 
   if (!lead) {
     return (
-      <div className="px-4 py-6 md:p-8 max-w-3xl">
+      <div className="px-3 py-3 md:p-8 max-w-3xl">
         <Link
           href="/admin/leads"
           className="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-sm transition-colors mb-8"
@@ -59,11 +59,11 @@ export default async function LeadDetailPage({ params }: Props) {
   }
 
   return (
-    <div className="px-4 py-6 md:p-8 max-w-3xl">
+    <div className="px-3 py-3 md:p-8 max-w-3xl">
       {/* Back link */}
       <Link
         href="/admin/leads"
-        className="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-sm transition-colors mb-6"
+        className="inline-flex items-center gap-2 text-white/30 hover:text-white/60 text-sm transition-colors mb-4 md:mb-6"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d="M19 12H5" /><path d="M12 19l-7-7 7-7" />
@@ -72,8 +72,8 @@ export default async function LeadDetailPage({ params }: Props) {
       </Link>
 
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="font-serif text-2xl md:text-3xl text-tj-cream/90 tracking-wide">
+      <div className="mb-4 md:mb-6">
+        <h1 className="font-serif text-xl md:text-3xl text-tj-cream/90 tracking-wide">
           {lead.name}
         </h1>
         <p className="text-xs text-white/25 mt-1 font-accent uppercase tracking-[0.15em]">

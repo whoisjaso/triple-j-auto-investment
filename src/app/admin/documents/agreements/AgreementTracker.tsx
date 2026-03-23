@@ -540,32 +540,32 @@ export default function AgreementTracker() {
       {/* ══════════ SCREEN LAYOUT ══════════ */}
       <div className="space-y-5" data-print-hide>
         {/* ── Stat Cards ── */}
-        <div className="flex gap-4">
-          <div className="flex-1 bg-white/[0.03] border-l-[3px] border-l-amber-500 rounded-lg px-4 py-3">
+        <div className="grid grid-cols-2 md:flex gap-2 md:gap-4">
+          <div className="bg-white/[0.03] border-l-[3px] border-l-amber-500 rounded-lg px-3 md:px-4 py-2.5 md:py-3 md:flex-1">
             <div className="text-[10px] font-semibold tracking-widest uppercase text-white/40">
               Pending
             </div>
-            <div className="text-2xl font-serif text-amber-400 mt-0.5">
+            <div className="text-xl md:text-2xl font-serif text-amber-400 mt-0.5">
               {pendingCount}
             </div>
           </div>
-          <div className="flex-1 bg-white/[0.03] border-l-[3px] border-l-emerald-500 rounded-lg px-4 py-3">
+          <div className="bg-white/[0.03] border-l-[3px] border-l-emerald-500 rounded-lg px-3 md:px-4 py-2.5 md:py-3 md:flex-1">
             <div className="text-[10px] font-semibold tracking-widest uppercase text-white/40">
               Completed
             </div>
-            <div className="text-2xl font-serif text-emerald-400 mt-0.5">
+            <div className="text-xl md:text-2xl font-serif text-emerald-400 mt-0.5">
               {completedCount}
             </div>
           </div>
           {trashCount > 0 && (
             <div
               onClick={() => setFilter("trash")}
-              className="flex-1 bg-white/[0.03] border-l-[3px] border-l-red-500/50 rounded-lg px-4 py-3 cursor-pointer hover:bg-white/[0.05] transition-colors"
+              className="bg-white/[0.03] border-l-[3px] border-l-red-500/50 rounded-lg px-3 md:px-4 py-2.5 md:py-3 md:flex-1 cursor-pointer hover:bg-white/[0.05] transition-colors"
             >
               <div className="text-[10px] font-semibold tracking-widest uppercase text-white/40">
                 Trash
               </div>
-              <div className="text-2xl font-serif text-red-400/60 mt-0.5">
+              <div className="text-xl md:text-2xl font-serif text-red-400/60 mt-0.5">
                 {trashCount}
               </div>
             </div>
@@ -573,31 +573,33 @@ export default function AgreementTracker() {
         </div>
 
         {/* ── Filter Bar ── */}
-        <div className="flex items-center justify-between gap-3 flex-wrap">
-          {/* Segmented tabs */}
-          <div className="bg-white/[0.03] p-1 rounded-lg border border-white/[0.06] flex gap-0.5">
-            {(["all", "pending", "completed", "finalized", "trash"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-1.5 rounded-md text-[11px] font-semibold tracking-wider uppercase transition-all duration-200 ${
-                  filter === f
-                    ? f === "trash"
-                      ? "bg-red-500/20 text-red-400 shadow-sm"
-                      : "bg-tj-green text-white shadow-sm"
-                    : f === "trash"
-                    ? "text-red-400/40 hover:text-red-400/70"
-                    : "text-white/40 hover:text-white/70"
-                }`}
-              >
-                {f}
-              </button>
-            ))}
+        <div className="space-y-2 md:space-y-0 md:flex md:items-center md:justify-between md:gap-3">
+          {/* Segmented tabs — scrollable on mobile */}
+          <div className="overflow-x-auto -mx-3 px-3 md:mx-0 md:px-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            <div className="bg-white/[0.03] p-1 rounded-lg border border-white/[0.06] flex gap-0.5 w-max md:w-auto">
+              {(["all", "pending", "completed", "finalized", "trash"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-3 md:px-4 py-1.5 rounded-md text-[10px] md:text-[11px] font-semibold tracking-wider uppercase transition-all duration-200 whitespace-nowrap ${
+                    filter === f
+                      ? f === "trash"
+                        ? "bg-red-500/20 text-red-400 shadow-sm"
+                        : "bg-tj-green text-white shadow-sm"
+                      : f === "trash"
+                      ? "text-red-400/40 hover:text-red-400/70"
+                      : "text-white/40 hover:text-white/70"
+                  }`}
+                >
+                  {f}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Search + Sort + Actions */}
           <div className="flex items-center gap-2">
-            <div className="relative">
+            <div className="relative flex-1 md:flex-none">
               <Search
                 size={14}
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30"
@@ -607,28 +609,28 @@ export default function AgreementTracker() {
                 placeholder="Search customer..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-8 pr-3 py-1.5 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-tj-cream placeholder:text-white/20 focus:outline-none focus:border-tj-gold/30 w-44 transition-colors"
+                className="pl-8 pr-3 py-1.5 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-tj-cream placeholder:text-white/20 focus:outline-none focus:border-tj-gold/30 w-full md:w-44 transition-colors"
               />
             </div>
             <select
               value={sort}
               onChange={(e) => setSort(e.target.value as typeof sort)}
-              className="px-3 py-1.5 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-white/60 focus:outline-none focus:border-tj-gold/30 cursor-pointer"
+              className="px-2 md:px-3 py-1.5 text-xs bg-white/[0.03] border border-white/[0.06] rounded-lg text-white/60 focus:outline-none focus:border-tj-gold/30 cursor-pointer"
             >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="name">Name A–Z</option>
+              <option value="newest">Newest</option>
+              <option value="oldest">Oldest</option>
+              <option value="name">Name</option>
             </select>
             <button
               onClick={() => window.print()}
-              className="p-2 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/[0.03] transition-all"
+              className="p-2 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/[0.03] transition-all shrink-0 hidden md:block"
               title="Print tracker"
             >
               <Printer size={14} />
             </button>
             <button
               onClick={fetchAgreements}
-              className="p-2 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/[0.03] transition-all"
+              className="p-2 rounded-lg text-white/30 hover:text-white/60 hover:bg-white/[0.03] transition-all shrink-0"
               title="Refresh"
             >
               <RefreshCw
@@ -696,10 +698,10 @@ export default function AgreementTracker() {
                   }}
                 >
                   {/* ── Card Content ── */}
-                  <div className="px-5 py-4">
+                  <div className="px-3 py-3 md:px-5 md:py-4">
                     {/* Row 1: Name + Status Badge */}
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="text-[15px] font-semibold text-tj-cream truncate pr-3">
+                    <div className="flex items-center justify-between mb-1.5 md:mb-2">
+                      <h3 className="text-sm md:text-[15px] font-semibold text-tj-cream truncate pr-3">
                         {deal.customerName}
                       </h3>
                       <span
@@ -782,15 +784,15 @@ export default function AgreementTracker() {
                         return (
                           <div
                             key={agreement.id}
-                            className={`px-5 py-4 ${
+                            className={`px-3 py-3 md:px-5 md:py-4 ${
                               idx < deal.agreements.length - 1
                                 ? "border-b border-white/[0.04]"
                                 : ""
                             }`}
                           >
                             {/* Document header + actions */}
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex items-center gap-2">
+                            <div className="flex items-center justify-between mb-3 gap-2">
+                              <div className="flex items-center gap-2 min-w-0">
                                 <FileText
                                   size={13}
                                   className="text-white/30"
@@ -813,7 +815,7 @@ export default function AgreementTracker() {
                               </div>
 
                               {/* Action buttons */}
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center gap-1 flex-wrap shrink-0">
                                 {agreement.status === "completed" &&
                                   agreement.document_type === "rental" && (
                                     <button
@@ -1011,11 +1013,11 @@ export default function AgreementTracker() {
                         if (!hasAny) return null;
 
                         return (
-                          <div className="px-5 py-4 border-t border-white/[0.06]">
+                          <div className="px-3 py-3 md:px-5 md:py-4 border-t border-white/[0.06]">
                             <div className="text-[9px] font-semibold tracking-widest uppercase text-white/25 mb-3">
                               Customer Details
                             </div>
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 text-xs">
                               {deal.agreements[0]?.buyer_email && (
                                 <div>
                                   <span className="text-white/25 text-[9px] uppercase tracking-wider">

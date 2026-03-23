@@ -68,10 +68,10 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
   ];
 
   return (
-    <div className="px-4 py-6 md:p-8 max-w-5xl">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div className="px-3 py-3 md:p-8 max-w-5xl">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 mb-4 md:mb-6">
         <div>
-          <h1 className="font-serif text-2xl md:text-3xl text-tj-cream/90 tracking-wide">
+          <h1 className="font-serif text-xl md:text-3xl text-tj-cream/90 tracking-wide">
             Leads
           </h1>
           <p className="text-xs text-white/25 mt-1 font-accent uppercase tracking-[0.15em]">
@@ -93,7 +93,7 @@ export default async function AdminLeadsPage({ searchParams }: Props) {
       </div>
 
       {/* Status filter tabs — scrollable on mobile */}
-      <div className="flex gap-1 mb-6 overflow-x-auto pb-px -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none">
+      <div className="flex gap-1 mb-4 md:mb-6 overflow-x-auto pb-px -mx-3 px-3 md:mx-0 md:px-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none', WebkitOverflowScrolling: 'touch' }}>
         {filters.map((f) => {
           const active =
             statusFilter === f.value ||

@@ -244,7 +244,7 @@ export default function LeadDetailClient({ lead, notes, tasks }: Props) {
         <h2 className="font-accent text-[10px] uppercase tracking-[0.2em] text-white/30 mb-4">
           Pipeline Stage
         </h2>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex gap-2 overflow-x-auto max-md:flex-nowrap max-md:pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           {PIPELINE.map((stage) => {
             const isActive = lead.status === stage.status;
             return (
@@ -252,7 +252,7 @@ export default function LeadDetailClient({ lead, notes, tasks }: Props) {
                 key={stage.status}
                 onClick={() => handleStatusChange(stage.status)}
                 disabled={isPending}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-accent uppercase tracking-[0.1em] border transition-all duration-300 disabled:opacity-40 ${
+                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-accent uppercase tracking-[0.1em] border transition-all duration-300 disabled:opacity-40 shrink-0 ${
                   isActive
                     ? `${stage.color} border-current/20 bg-current/[0.08]`
                     : "text-white/20 border-white/[0.04] hover:border-white/[0.08] hover:text-white/40 hover:bg-white/[0.02]"

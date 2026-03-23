@@ -396,33 +396,37 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
       )}
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 mb-6 print-toolbar-hide">
-        {/* Section Tabs */}
-        <div className="bg-white/[0.03] p-1 rounded-full border border-white/[0.06] flex flex-wrap gap-1">
-          {sectionButtons.map((btn) => (
-            <button key={btn.key} onClick={() => switchSection(btn.key)} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all ${section === btn.key ? 'bg-tj-gold text-white shadow-md' : 'text-white/40 hover:text-white/70'}`}>
-              {btn.label}
+      <div className="space-y-2 md:space-y-0 md:flex md:flex-wrap md:items-center md:gap-2 mb-4 md:mb-6 print-toolbar-hide">
+        {/* Section Tabs — scrollable on mobile */}
+        <div className="overflow-x-auto -mx-3 px-3 md:mx-0 md:px-0" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <div className="bg-white/[0.03] p-1 rounded-full border border-white/[0.06] flex gap-1 w-max md:w-auto">
+            {sectionButtons.map((btn) => (
+              <button key={btn.key} onClick={() => switchSection(btn.key)} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all whitespace-nowrap ${section === btn.key ? 'bg-tj-gold text-white shadow-md' : 'text-white/40 hover:text-white/70'}`}>
+                {btn.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* View Toggle + Actions — single row */}
+        <div className="flex items-center gap-2">
+          <div className="bg-white/[0.03] p-1 rounded-full border border-white/[0.06] flex gap-1">
+            <button onClick={() => setView('edit')} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all flex items-center space-x-1 ${view === 'edit' ? 'bg-white/10 text-tj-gold shadow-md' : 'text-white/40 hover:text-white/70'}`}>
+              <Edit3 size={12} /><span>Edit</span>
             </button>
-          ))}
-        </div>
+            <button onClick={() => { setView('preview'); if (section === 'form130U') handle130UPreview(); }} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all flex items-center space-x-1 ${view === 'preview' ? 'bg-white/10 text-tj-gold shadow-md' : 'text-white/40 hover:text-white/70'}`}>
+              <FileText size={12} /><span>Preview</span>
+            </button>
+          </div>
 
-        {/* View Toggle */}
-        <div className="bg-white/[0.03] p-1 rounded-full border border-white/[0.06] flex gap-1">
-          <button onClick={() => setView('edit')} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all flex items-center space-x-1 ${view === 'edit' ? 'bg-white/10 text-tj-gold shadow-md' : 'text-white/40 hover:text-white/70'}`}>
-            <Edit3 size={12} /><span>Edit</span>
-          </button>
-          <button onClick={() => { setView('preview'); if (section === 'form130U') handle130UPreview(); }} className={`px-3 py-1.5 rounded-full text-[10px] font-semibold tracking-wider uppercase transition-all flex items-center space-x-1 ${view === 'preview' ? 'bg-white/10 text-tj-gold shadow-md' : 'text-white/40 hover:text-white/70'}`}>
-            <FileText size={12} /><span>Preview</span>
-          </button>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-2 ml-auto">
-          <button onClick={handleSendToCustomer} className="px-3 py-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-emerald-700 transition-all flex items-center space-x-1">
-            <Send size={12} /><span className="hidden sm:inline">Send to Customer</span><span className="sm:hidden">Send</span>
-          </button>
-          <PrintButton variant="pdf" size="sm" onClick={section === 'form130U' ? handle130UDownload : handlePrint} />
-          <PrintButton variant="print" size="sm" onClick={section === 'form130U' ? handle130UDownload : handlePrint} />
+          {/* Actions */}
+          <div className="flex gap-2 ml-auto">
+            <button onClick={handleSendToCustomer} className="px-3 py-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-semibold tracking-wider uppercase hover:bg-emerald-700 transition-all flex items-center space-x-1">
+              <Send size={12} /><span className="hidden sm:inline">Send to Customer</span><span className="sm:hidden">Send</span>
+            </button>
+            <PrintButton variant="pdf" size="sm" onClick={section === 'form130U' ? handle130UDownload : handlePrint} />
+            <PrintButton variant="print" size="sm" onClick={section === 'form130U' ? handle130UDownload : handlePrint} />
+          </div>
         </div>
       </div>
 

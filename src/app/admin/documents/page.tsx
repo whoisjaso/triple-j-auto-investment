@@ -58,9 +58,9 @@ const documentTypes = [
 
 export default function DocumentsPage() {
   return (
-    <div className="px-4 md:px-8 py-6 md:py-10 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="font-serif text-2xl md:text-3xl text-tj-cream tracking-wide">
+    <div className="px-3 md:px-8 py-3 md:py-10 max-w-6xl mx-auto">
+      <div className="mb-5 md:mb-8">
+        <h1 className="font-serif text-xl md:text-3xl text-tj-cream tracking-wide">
           Documents
         </h1>
         <p className="text-white/40 text-sm mt-2">
@@ -73,10 +73,10 @@ export default function DocumentsPage() {
           <Link
             key={doc.href}
             href={doc.href}
-            className="group bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6 hover:bg-white/[0.04] hover:border-tj-gold/20 transition-all duration-300"
+            className="group bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 md:p-6 hover:bg-white/[0.04] hover:border-tj-gold/20 transition-all duration-300"
           >
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 rounded-xl bg-tj-gold/10 flex items-center justify-center text-tj-gold shrink-0 group-hover:bg-tj-gold/20 transition-colors">
+              <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl bg-tj-gold/10 flex items-center justify-center text-tj-gold shrink-0 group-hover:bg-tj-gold/20 transition-colors [&>svg]:w-6 [&>svg]:h-6 md:[&>svg]:w-8 md:[&>svg]:h-8">
                 {doc.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -107,10 +107,10 @@ export default function DocumentsPage() {
       <div className="mt-6">
         <Link
           href="/admin/documents/agreements"
-          className="group bg-emerald-500/[0.05] border border-emerald-500/10 rounded-2xl p-6 flex items-center justify-between hover:bg-emerald-500/[0.08] hover:border-emerald-500/20 transition-all duration-300"
+          className="group bg-emerald-500/[0.05] border border-emerald-500/10 rounded-2xl p-4 md:p-6 flex items-center justify-between hover:bg-emerald-500/[0.08] hover:border-emerald-500/20 transition-all duration-300"
         >
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/20 transition-colors">
+            <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0 group-hover:bg-emerald-500/20 transition-colors [&>svg]:w-6 [&>svg]:h-6 md:[&>svg]:w-8 md:[&>svg]:h-8">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
                 <polyline points="22 4 12 14.01 9 11.01" />
@@ -132,7 +132,7 @@ export default function DocumentsPage() {
       </div>
 
       {/* Quick Tips */}
-      <div className="mt-10 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-6">
+      <div className="mt-6 md:mt-10 bg-white/[0.02] border border-white/[0.06] rounded-2xl p-4 md:p-6">
         <h3 className="text-sm font-semibold text-white/60 uppercase tracking-wider mb-3">How it works</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-white/40">
           <div className="flex gap-3">

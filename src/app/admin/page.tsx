@@ -88,7 +88,7 @@ export default async function AdminDashboardPage() {
         <h1 className="font-serif text-lg md:text-3xl text-tj-cream/90 tracking-wide leading-tight">
           Dashboard
         </h1>
-        <p className="text-[8px] md:text-xs text-white/25 font-accent uppercase tracking-[0.15em]">
+        <p className="text-[9px] md:text-xs text-white/25 font-accent uppercase tracking-[0.15em]">
           Triple J Auto Investment
         </p>
       </div>
@@ -100,7 +100,7 @@ export default async function AdminDashboardPage() {
             <rect x="1" y="3" width="15" height="13" rx="2" /><path d="M16 8h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-1" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /><path d="M8 18.5h8" />
           </svg>
           <p className="font-serif text-base md:text-4xl text-tj-cream/90 leading-tight">{stats.totalVehicles}</p>
-          <p className="text-[7px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Vehicles</p>
+          <p className="text-[9px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Vehicles</p>
         </div>
 
         <Link href="/admin/pipeline" className="rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] px-2 py-1.5 md:p-6 hover:bg-white/[0.03] hover:border-purple-400/10 transition-all duration-300">
@@ -108,7 +108,7 @@ export default async function AdminDashboardPage() {
             <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
           </svg>
           <p className="font-serif text-base md:text-4xl text-tj-cream/90 leading-tight">{pipelineCount}</p>
-          <p className="text-[7px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Pipeline</p>
+          <p className="text-[9px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Pipeline</p>
         </Link>
 
         <div className="rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] px-2 py-1.5 md:p-6">
@@ -116,7 +116,7 @@ export default async function AdminDashboardPage() {
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" />
           </svg>
           <p className="font-serif text-base md:text-4xl text-tj-cream/90 leading-tight">{stats.totalLeads}</p>
-          <p className="text-[7px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Leads</p>
+          <p className="text-[9px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">Leads</p>
         </div>
 
         <div className="rounded-lg md:rounded-xl border border-white/[0.04] bg-white/[0.02] px-2 py-1.5 md:p-6">
@@ -124,15 +124,15 @@ export default async function AdminDashboardPage() {
             <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
           </svg>
           <p className="font-serif text-base md:text-4xl text-tj-cream/90 leading-tight">{stats.newLeads}</p>
-          <p className="text-[7px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">New</p>
+          <p className="text-[9px] md:text-xs text-white/25 uppercase tracking-[0.08em] md:tracking-[0.15em] font-accent">New</p>
         </div>
       </div>
 
       {/* Lead Pipeline — single scrollable row on mobile */}
       <div className="md:mb-8">
         <div className="flex items-center justify-between mb-1 md:mb-4">
-          <h2 className="font-accent text-[8px] md:text-xs uppercase tracking-[0.2em] text-white/30">Lead Pipeline</h2>
-          <Link href="/admin/leads/board" className="font-accent text-[8px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors">
+          <h2 className="font-accent text-[9px] md:text-xs uppercase tracking-[0.2em] text-white/30">Lead Pipeline</h2>
+          <Link href="/admin/leads/board" className="font-accent text-[9px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors">
             Board &rarr;
           </Link>
         </div>
@@ -152,7 +152,7 @@ export default async function AdminDashboardPage() {
               className={`inline-flex items-center gap-1 md:gap-2 px-1.5 md:px-3 py-0.5 md:py-2 rounded md:rounded-lg border ${bg} hover:opacity-80 transition-opacity shrink-0`}
             >
               <span className={`text-xs md:text-lg font-serif ${color}`}>{leadCounts[status]}</span>
-              <span className={`text-[7px] md:text-[10px] font-accent uppercase tracking-[0.08em] ${color} opacity-70`}>{status}</span>
+              <span className={`text-[9px] md:text-[10px] font-accent uppercase tracking-[0.08em] ${color} opacity-70`}>{status}</span>
             </Link>
           ))}
         </div>
@@ -162,8 +162,8 @@ export default async function AdminDashboardPage() {
       {recentLeads.length > 0 && (
         <div className="md:mb-8">
           <div className="flex items-center justify-between mb-1 md:mb-4">
-            <h2 className="font-accent text-[8px] md:text-xs uppercase tracking-[0.2em] text-white/30">Recent Leads</h2>
-            <Link href="/admin/leads" className="font-accent text-[8px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors">
+            <h2 className="font-accent text-[9px] md:text-xs uppercase tracking-[0.2em] text-white/30">Recent Leads</h2>
+            <Link href="/admin/leads" className="font-accent text-[9px] md:text-[10px] uppercase tracking-[0.15em] text-tj-gold/50 hover:text-tj-gold/80 transition-colors">
               All &rarr;
             </Link>
           </div>
@@ -178,7 +178,7 @@ export default async function AdminDashboardPage() {
                   <p className="text-[11px] md:text-sm text-tj-cream/80 font-medium truncate leading-tight">{lead.name}</p>
                   <p className="text-[9px] md:text-xs text-white/25">{formatPhone(lead.phone)}</p>
                 </div>
-                <span className={`inline-flex items-center px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full text-[8px] md:text-[10px] font-medium border shrink-0 ml-2 ${STATUS_COLORS[lead.status] ?? ""}`}>
+                <span className={`inline-flex items-center px-1.5 md:px-2.5 py-0.5 md:py-1 rounded-full text-[9px] md:text-[10px] font-medium border shrink-0 ml-2 ${STATUS_COLORS[lead.status] ?? ""}`}>
                   {lead.status}
                 </span>
               </Link>

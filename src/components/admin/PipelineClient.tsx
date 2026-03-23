@@ -108,7 +108,7 @@ export default function PipelineClient({ groupedVehicles, totalCount }: Props) {
   return (
     <div>
       {/* Sync Button + Results */}
-      <div className="mb-8">
+      <div className="mb-4 md:mb-8">
         <button
           onClick={handleSync}
           disabled={syncing}
@@ -191,7 +191,7 @@ export default function PipelineClient({ groupedVehicles, totalCount }: Props) {
         if (vehicles.length === 0 && totalCount === 0) return null;
 
         return (
-          <div key={stage.status} className="mb-8">
+          <div key={stage.status} className="mb-5 md:mb-8">
             {/* Stage Header */}
             <div className="flex items-center gap-3 mb-3">
               <span className={`w-2.5 h-2.5 rounded-full ${stage.dotColor}`} />
@@ -214,7 +214,7 @@ export default function PipelineClient({ groupedVehicles, totalCount }: Props) {
                   return (
                     <div
                       key={v.id}
-                      className="group rounded-xl border border-white/[0.04] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300 p-4"
+                      className="group rounded-xl border border-white/[0.04] bg-white/[0.015] hover:bg-white/[0.03] hover:border-white/[0.08] transition-all duration-300 p-3 md:p-4"
                     >
                       <div className="flex items-start justify-between gap-4">
                         {/* Vehicle Info */}

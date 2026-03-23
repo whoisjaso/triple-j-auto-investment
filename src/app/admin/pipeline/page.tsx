@@ -36,10 +36,10 @@ export default async function AdminPipelinePage() {
   }
 
   return (
-    <div className="px-4 py-6 md:p-8 max-w-5xl">
+    <div className="px-3 py-3 md:p-8 max-w-5xl">
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="font-serif text-2xl md:text-3xl text-tj-cream/90 tracking-wide">
+      <div className="mb-4 md:mb-6">
+        <h1 className="font-serif text-xl md:text-3xl text-tj-cream/90 tracking-wide">
           Pipeline
         </h1>
         <p className="text-xs text-white/25 mt-1 font-accent uppercase tracking-[0.15em]">
