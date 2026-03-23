@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/admin-auth';
-import { generatePdf } from '@/lib/documents/pdf-generator';
+import { buildPdfFromAgreement } from '@/lib/documents/pdf-builder';
+import { decodeCompletedLinkFromUrl } from '@/lib/documents/customerPortal';
 import { Resend } from 'resend';
-
-// Allow up to 60s for PDF generation (Puppeteer + Chromium + storage upload + email)
-export const maxDuration = 60;
 
 // ============================================================
 // POST /api/documents/finalize
 //
 // FLOW:
 //   1. Validate: agreement exists, is completed, has buyer email
-//   2. Generate BUYER COPY + DEALER COPY PDFs via Puppeteer (headless Chromium)
+//   2. Generate BUYER COPY + DEALER COPY PDFs via pdf-lib (pure JS)
 //   3. Upload both PDFs to Supabase Storage
 //   4. Email BUYER COPY to buyer
 //   5. Update agreement: status=finalized, pdf paths, timestamps
@@ -59,13 +57,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No completed document data found' }, { status: 400 });
   }
 
-  // 2. Generate PDFs
-  let buyerPdf: Buffer;
-  let dealerPdf: Buffer;
+  // Decode completed link data
+  const decoded = decodeCompletedLinkFromUrl(agreement.completed_link);
+  if (!decoded) {
+    return NextResponse.json({ error: 'Failed to decode document data' }, { status: 400 });
+  }
+
+  // 2. Generate PDFs using pdf-lib (pure JS, works on Vercel)
+  let buyerPdf: Uint8Array;
+  let dealerPdf: Uint8Array;
   try {
     [buyerPdf, dealerPdf] = await Promise.all([
-      generatePdf({ agreementId, copyLabel: 'BUYER COPY' }),
-      generatePdf({ agreementId, copyLabel: 'DEALER COPY' }),
+      buildPdfFromAgreement(decoded, 'BUYER COPY'),
+      buildPdfFromAgreement(decoded, 'DEALER COPY'),
     ]);
   } catch (e) {
     console.error('[finalize] PDF generation failed:', e);
@@ -131,6 +135,9 @@ export async function POST(req: NextRequest) {
 
       const fromEmail = process.env.RESEND_FROM_EMAIL || 'documents@thetriplejauto.com';
 
+      // Convert Uint8Array to base64 for email attachment
+      const buyerPdfBase64 = Buffer.from(buyerPdf).toString('base64');
+
       await resend.emails.send({
         from: `Triple J Auto Investment <${fromEmail}>`,
         to: agreement.buyer_email,
@@ -164,7 +171,7 @@ export async function POST(req: NextRequest) {
         attachments: [
           {
             filename: `${docTypeLabel.replace(/\s+/g, '-')}-${agreement.vehicle_description || 'document'}.pdf`,
-            content: buyerPdf.toString('base64'),
+            content: buyerPdfBase64,
           },
         ],
       });

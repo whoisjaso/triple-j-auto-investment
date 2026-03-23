@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireAdmin } from '@/lib/admin-auth';
-import { generatePdf } from '@/lib/documents/pdf-generator';
+import { buildPdfFromAgreement } from '@/lib/documents/pdf-builder';
+import { decodeCompletedLinkFromUrl } from '@/lib/documents/customerPortal';
 import { createClient } from '@/lib/supabase/server';
-
-// Allow up to 60s for PDF generation (Puppeteer + Chromium launch + page render)
-export const maxDuration = 60;
 
 // GET /api/documents/agreements/[id]/pdf?copy=BUYER+COPY
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -16,7 +14,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const copy = url.searchParams.get('copy') || 'BUYER COPY';
   const inline = url.searchParams.get('inline') === 'true';
 
-  // Verify agreement exists and has completed data
+  // Fetch agreement with completed_link
   const supabase = await createClient();
   const { data: agreement, error } = await supabase
     .from('document_agreements')
@@ -32,8 +30,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'No completed document data' }, { status: 400 });
   }
 
+  // Decode the completed link data
+  const decoded = decodeCompletedLinkFromUrl(agreement.completed_link);
+  if (!decoded) {
+    return NextResponse.json({ error: 'Failed to decode document data' }, { status: 400 });
+  }
+
   try {
-    const pdfBuffer = await generatePdf({ agreementId: id, copyLabel: copy });
+    // Generate PDF using pdf-lib (pure JS, no browser needed — works on Vercel)
+    const pdfBytes = await buildPdfFromAgreement(decoded, copy);
 
     const docTypeLabels: Record<string, string> = {
       billOfSale: 'BillOfSale',
@@ -49,7 +54,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const filename = `TripleJ_${docLabel}_${safeName}_${dateStr}.pdf`;
 
     const disposition = inline ? 'inline' : 'attachment';
-    return new NextResponse(new Uint8Array(pdfBuffer), {
+    return new NextResponse(Buffer.from(pdfBytes), {
       headers: {
         'Content-Type': 'application/pdf',
         'Content-Disposition': `${disposition}; filename="${filename}"`,
