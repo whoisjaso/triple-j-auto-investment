@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
       has_dealer_signature: body.has_dealer_signature || false,
       has_buyer_id: body.has_buyer_id || false,
       completed_link: body.completed_link || null,
+      portal_data: body.portal_data || null,
     })
     .select()
     .single();

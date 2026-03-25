@@ -81,6 +81,38 @@ export default function CustomerPortalClient() {
   const [completedData, setCompletedData] = useState<CompletedLinkData | null>(null);
 
   useEffect(() => {
+    // Priority: ?id= query param (short link) > hash fragment (legacy link)
+    const params = new URLSearchParams(window.location.search);
+    const agreementId = params.get('id');
+    const viewCompleted = params.get('view') === 'completed';
+
+    if (agreementId) {
+      // Short link: fetch portal data from API
+      const endpoint = viewCompleted
+        ? `/api/documents/portal/${agreementId}?view=completed`
+        : `/api/documents/portal/${agreementId}`;
+
+      fetch(endpoint)
+        .then(res => {
+          if (!res.ok) throw new Error('Not found');
+          return res.json();
+        })
+        .then(result => {
+          if (result.type === 'completed') {
+            setCompletedData(result.data as CompletedLinkData);
+            setMode('completed');
+          } else if (result.type === 'customer') {
+            setCustomerData(result.data as ReturnType<typeof decodeCustomerLink>);
+            setMode('customer');
+          } else {
+            setMode('error');
+          }
+        })
+        .catch(() => setMode('error'));
+      return;
+    }
+
+    // Legacy fallback: decode from hash fragment
     const hash = window.location.hash;
     if (hash.startsWith('#customer/')) {
       const data = decodeCustomerLink(hash);

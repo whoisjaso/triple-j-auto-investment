@@ -8,7 +8,7 @@ import { RentalData } from '@/lib/documents/rental';
 import { BillOfSaleData } from '@/lib/documents/billOfSale';
 import { Form130UData, prefillFromBillOfSale } from '@/lib/documents/form130U';
 import { SignatureData, emptySignatures } from '@/lib/documents/shared';
-import { encodeCustomerLink, saveAgreement, decodeCompletedLinkFromUrl, type CustomerSection } from '@/lib/documents/customerPortal';
+import { encodeCustomerLink, buildCustomerLinkPayload, saveAgreement, decodeCompletedLinkFromUrl, generatePortalLink, type CustomerSection, type CustomerLinkData } from '@/lib/documents/customerPortal';
 import ContractForm from './ContractForm';
 import ContractPreview from './ContractPreview';
 import RentalForm from './RentalForm';
@@ -339,23 +339,34 @@ export default function DocumentEditor({ initialSection = 'billOfSale', vehicleP
     const dataRecord = data as unknown as Record<string, unknown>;
     const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
-    // Save pending agreement first to get the ID
+    // Extract admin buyer name (if admin filled it in)
+    const adminBuyerName = (dataRecord.buyerName || dataRecord.renterName || '') as string;
+
+    // Build portal data payload (stored in DB for short links)
+    const portalPayload: CustomerLinkData = buildCustomerLinkPayload(
+      section as CustomerSection, data,
+      signatures.dealerSignature, signatures.dealerSignatureDate,
+      undefined, // aid injected by API endpoint
+      adminBuyerName || undefined,
+    );
+
+    // Save pending agreement with portal_data to get the ID
     const result = await saveAgreement({
       documentType: section as CustomerSection,
       data: dataRecord,
       status: 'pending',
       dealerSignature: !!signatures.dealerSignature,
+      portalData: portalPayload,
     });
 
-    // Extract admin buyer name (if admin filled it in)
-    const adminBuyerName = (dataRecord.buyerName || dataRecord.renterName || '') as string;
-
-    const link = encodeCustomerLink(
-      section as CustomerSection, data, baseUrl,
-      signatures.dealerSignature, signatures.dealerSignatureDate,
-      result.id || undefined,
-      adminBuyerName || undefined,
-    );
+    // Generate clean short link instead of massive hash URL
+    const link = result.id
+      ? generatePortalLink(baseUrl, result.id)
+      : encodeCustomerLink(
+          section as CustomerSection, data, baseUrl,
+          signatures.dealerSignature, signatures.dealerSignatureDate,
+          undefined, adminBuyerName || undefined,
+        );
     setShareLink(link);
     setShowShareModal(true);
     setCopied(false);

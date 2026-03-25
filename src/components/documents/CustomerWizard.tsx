@@ -4,6 +4,7 @@ import { useState, useMemo, Component, type ReactNode } from 'react';
 import { ChevronRight, ChevronLeft, Check, Share2, Copy, Send, AlertCircle } from 'lucide-react';
 import {
   encodeCompletedLink, saveAgreement, compressIdPhoto, compressIdPhotoForUrl,
+  generateCompletedPortalLink,
   type CustomerLinkData, type CustomerSection,
 } from '@/lib/documents/customerPortal';
 import { ContractData } from '@/lib/documents/finance';
@@ -310,7 +311,9 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
       if (adminBuyerName) finalCustomerData[nameField] = adminBuyerName;
 
       const baseUrl = window.location.origin;
-      const link = encodeCompletedLink(
+
+      // Still generate hash-based completed_link for DB storage (used by admin renewal flow)
+      const hashLink = encodeCompletedLink(
         linkData.s, linkData.d, finalCustomerData, baseUrl,
         dealerSig, dealerSigDate,
         signatures.buyerSignature, signatures.buyerSignatureDate,
@@ -318,7 +321,6 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
         urlPhoto || signatures.buyerIdPhoto,
         acknowledgments as unknown as Record<string, boolean>,
       );
-      setReturnLink(link);
 
       const result = await saveAgreement({
         documentType: linkData.s,
@@ -330,9 +332,16 @@ export default function CustomerWizard({ linkData }: CustomerWizardProps) {
         dealerSignature: !!dealerSig,
         buyerIdPhoto: !!signatures.buyerIdPhoto,
         buyerIdPhotoData: compressedPhoto || undefined,
-        completedLink: link,
+        completedLink: hashLink,
         agreementId: linkData.aid,
       });
+
+      // Generate clean short link for customer to share back with dealer
+      const returnId = result.id || linkData.aid;
+      const shortLink = returnId
+        ? generateCompletedPortalLink(baseUrl, returnId)
+        : hashLink;
+      setReturnLink(shortLink);
 
       if (!result.success) {
         setSubmitError(result.error || 'Failed to save. Your document link is still valid.');

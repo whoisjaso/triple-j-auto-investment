@@ -58,6 +58,31 @@ export const customerFields: Record<CustomerSection, string[]> = {
   form130U: ['applicantType', 'applicantIdNumber', 'applicantIdType', 'applicantIdState', 'applicantFirstName', 'applicantMiddleName', 'applicantLastName', 'applicantSuffix', 'applicantEntityName', 'coApplicantName', 'mailingAddress', 'mailingCity', 'mailingState', 'mailingZip', 'countyOfResidence', 'applicantDob', 'applicantPhone', 'applicantEmail', 'vehicleLocationAddress', 'vehicleLocationCity', 'vehicleLocationState', 'vehicleLocationZip', 'vehicleLocationCounty', 'vehicleLocationSameAsMailing', 'hasLien', 'lienholderName', 'lienholderAddress', 'lienholderCity', 'lienholderState', 'lienholderZip'],
 };
 
+// Build the CustomerLinkData payload without encoding it (used for portal_data storage)
+export function buildCustomerLinkPayload(
+  section: CustomerSection,
+  data: ContractData | RentalData | BillOfSaleData | Form130UData,
+  dealerSignature?: string,
+  dealerSignatureDate?: string,
+  agreementId?: string,
+  adminBuyerName?: string,
+): CustomerLinkData {
+  const fields = dealerFields[section];
+  const dealerData: Record<string, unknown> = {};
+  for (const key of fields) {
+    dealerData[key] = (data as unknown as Record<string, unknown>)[key];
+  }
+  const payload: CustomerLinkData = { s: section, d: dealerData };
+  if (dealerSignature) {
+    // For DB storage, no size limit — only limit for URL encoding
+    payload.ds = dealerSignature;
+    payload.dd = dealerSignatureDate;
+  }
+  if (agreementId) payload.aid = agreementId;
+  if (adminBuyerName) payload.abn = adminBuyerName;
+  return payload;
+}
+
 export function encodeCustomerLink(
   section: CustomerSection,
   data: ContractData | RentalData | BillOfSaleData | Form130UData,
@@ -67,22 +92,13 @@ export function encodeCustomerLink(
   agreementId?: string,
   adminBuyerName?: string,
 ): string {
-  const fields = dealerFields[section];
-  const dealerData: Record<string, unknown> = {};
-  for (const key of fields) {
-    dealerData[key] = (data as unknown as Record<string, unknown>)[key];
+  const payload = buildCustomerLinkPayload(section, data, dealerSignature, dealerSignatureDate, agreementId, adminBuyerName);
+  // For URL encoding, enforce signature size limit
+  if (payload.ds && payload.ds.length >= SIG_URL_LIMIT) {
+    console.warn(`[customerPortal] Dealer signature too large for URL (${payload.ds.length} chars > ${SIG_URL_LIMIT}). Signature omitted from link.`);
+    delete payload.ds;
+    delete payload.dd;
   }
-  const payload: CustomerLinkData = { s: section, d: dealerData };
-  if (dealerSignature) {
-    if (dealerSignature.length < SIG_URL_LIMIT) {
-      payload.ds = dealerSignature;
-      payload.dd = dealerSignatureDate;
-    } else {
-      console.warn(`[customerPortal] Dealer signature too large for URL (${dealerSignature.length} chars > ${SIG_URL_LIMIT}). Signature omitted from link.`);
-    }
-  }
-  if (agreementId) payload.aid = agreementId;
-  if (adminBuyerName) payload.abn = adminBuyerName;
   const json = JSON.stringify(payload);
   const compressed = compressToEncodedURIComponent(json);
   return `${baseUrl}/documents/portal#customer/${compressed}`;
@@ -186,6 +202,7 @@ export interface SaveAgreementParams {
   acknowledgments?: Record<string, boolean>;
   completedLink?: string;
   agreementId?: string;  // for updating existing record
+  portalData?: CustomerLinkData;  // stored in DB for short portal links
 }
 
 export interface SaveAgreementResult {
@@ -241,6 +258,7 @@ export async function saveAgreement(params: SaveAgreementParams): Promise<SaveAg
         has_dealer_signature: params.dealerSignature || false,
         has_buyer_id: params.buyerIdPhoto || false,
         completed_link: params.completedLink || null,
+        portal_data: params.portalData || null,
       }),
     });
     if (!res.ok) return { success: false, error: `Server error: ${res.status}` };
@@ -249,6 +267,18 @@ export async function saveAgreement(params: SaveAgreementParams): Promise<SaveAg
   } catch (e) {
     return { success: false, error: e instanceof Error ? e.message : 'Unknown error' };
   }
+}
+
+// ============================================================
+// Short portal link generators
+// ============================================================
+
+export function generatePortalLink(baseUrl: string, agreementId: string): string {
+  return `${baseUrl}/documents/portal?id=${agreementId}`;
+}
+
+export function generateCompletedPortalLink(baseUrl: string, agreementId: string): string {
+  return `${baseUrl}/documents/portal?id=${agreementId}&view=completed`;
 }
 
 // Compress image client-side before storing in DB (full resolution)
