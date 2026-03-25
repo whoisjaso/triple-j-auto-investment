@@ -72,7 +72,8 @@ export async function POST(req: NextRequest) {
       buildPdfFromAgreement(decoded, 'DEALER COPY'),
     ]);
   } catch (e) {
-    console.error('[finalize] PDF generation failed:', e);
+    const errMsg = e instanceof Error ? `${e.message}\n${e.stack}` : String(e);
+    console.error('[finalize] PDF generation failed:', errMsg);
     return NextResponse.json(
       { error: 'PDF generation failed', details: e instanceof Error ? e.message : 'Unknown error' },
       { status: 500 },

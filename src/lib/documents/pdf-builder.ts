@@ -23,6 +23,29 @@ const GRAY = rgb(0.4, 0.4, 0.4);
 const LIGHT_GRAY = rgb(0.85, 0.85, 0.85);
 const WHITE = rgb(1, 1, 1);
 
+// Sanitize text for pdf-lib StandardFonts (WinAnsi / Latin-1 only).
+// Replaces common Unicode chars with ASCII equivalents and strips the rest.
+function sanitize(text: string): string {
+  if (!text) return '';
+  return String(text)
+    // Smart quotes → straight
+    .replace(/[\u2018\u2019\u201A]/g, "'")
+    .replace(/[\u201C\u201D\u201E]/g, '"')
+    // Dashes
+    .replace(/[\u2013\u2014]/g, '-')
+    // Ellipsis
+    .replace(/\u2026/g, '...')
+    // Bullets
+    .replace(/\u2022/g, '*')
+    // Non-breaking space
+    .replace(/\u00A0/g, ' ')
+    // Check/cross marks
+    .replace(/[\u2713\u2714\u2611]/g, '[x]')
+    .replace(/[\u2717\u2718\u2610]/g, '[ ]')
+    // Strip any remaining non-Latin-1 (keep 0x20-0x7E and 0xA0-0xFF)
+    .replace(/[^\x20-\x7E\xA0-\xFF\n\r\t]/g, '');
+}
+
 const PAGE_W = 612; // Letter width in points
 const PAGE_H = 792; // Letter height in points
 const MARGIN = 50;
@@ -52,7 +75,7 @@ function drawText(ctx: Ctx, text: string, opts: {
   x?: number; size?: number; color?: typeof BLACK; font?: PDFFont; maxWidth?: number;
 } = {}): void {
   const { x = MARGIN, size = 10, color = BLACK, font = ctx.font, maxWidth } = opts;
-  const safeText = String(text || '');
+  const safeText = sanitize(String(text || ''));
   if (!safeText) return;
 
   if (maxWidth) {
@@ -105,7 +128,7 @@ function drawSectionHeader(ctx: Ctx, title: string): void {
     height: 18,
     color: rgb(0.95, 0.95, 0.95),
   });
-  ctx.page.drawText(title.toUpperCase(), {
+  ctx.page.drawText(sanitize(title.toUpperCase()), {
     x: MARGIN + 8,
     y: ctx.y,
     size: 9,
@@ -121,10 +144,10 @@ function drawField(ctx: Ctx, label: string, value: string | number | undefined |
   const { halfWidth = false, xOffset = 0 } = opts;
   const x = MARGIN + xOffset;
   const maxW = halfWidth ? CONTENT_W / 2 - 10 : CONTENT_W;
-  const val = value != null && value !== '' ? String(value) : '—';
+  const val = value != null && value !== '' ? sanitize(String(value)) : '-';
 
   ensureSpace(ctx, 24);
-  ctx.page.drawText(label, { x, y: ctx.y, size: 7, color: GRAY, font: ctx.font });
+  ctx.page.drawText(sanitize(label), { x, y: ctx.y, size: 7, color: GRAY, font: ctx.font });
   ctx.y -= 11;
   ctx.page.drawText(val, { x, y: ctx.y, size: 10, color: BLACK, font: ctx.fontBold, maxWidth: maxW });
   ctx.y -= 14;
@@ -138,8 +161,8 @@ function drawFieldRow(ctx: Ctx, fields: [string, string | number | undefined | n
   for (let i = 0; i < fields.length; i++) {
     const [label, value] = fields[i];
     const x = MARGIN + i * colW;
-    const val = value != null && value !== '' ? String(value) : '—';
-    ctx.page.drawText(label, { x, y: startY, size: 7, color: GRAY, font: ctx.font });
+    const val = value != null && value !== '' ? sanitize(String(value)) : '-';
+    ctx.page.drawText(sanitize(label), { x, y: startY, size: 7, color: GRAY, font: ctx.font });
     ctx.page.drawText(val, { x, y: startY - 11, size: 10, color: BLACK, font: ctx.fontBold, maxWidth: colW - 10 });
   }
   ctx.y = startY - 26;
@@ -171,8 +194,9 @@ async function embedSignature(ctx: Ctx, dataUrl: string, x: number, maxW: number
 function drawDocHeader(ctx: Ctx, title: string, subtitle: string, copyLabel?: string): void {
   // Copy label
   if (copyLabel) {
-    ctx.page.drawText(`— ${copyLabel} —`, {
-      x: PAGE_W / 2 - ctx.font.widthOfTextAtSize(`— ${copyLabel} —`, 8) / 2,
+    const copyStr = `-- ${copyLabel} --`;
+    ctx.page.drawText(copyStr, {
+      x: PAGE_W / 2 - ctx.font.widthOfTextAtSize(copyStr, 8) / 2,
       y: ctx.y,
       size: 8,
       color: GRAY,
@@ -209,7 +233,7 @@ function drawDocHeader(ctx: Ctx, title: string, subtitle: string, copyLabel?: st
 
   // Title
   drawLine(ctx);
-  ctx.page.drawText(title.toUpperCase(), {
+  ctx.page.drawText(sanitize(title.toUpperCase()), {
     x: MARGIN,
     y: ctx.y,
     size: 18,
@@ -217,7 +241,7 @@ function drawDocHeader(ctx: Ctx, title: string, subtitle: string, copyLabel?: st
     font: ctx.fontBold,
   });
   ctx.y -= 14;
-  ctx.page.drawText(subtitle, {
+  ctx.page.drawText(sanitize(subtitle), {
     x: MARGIN,
     y: ctx.y,
     size: 9,
@@ -377,7 +401,7 @@ async function buildBillOfSale(ctx: Ctx, data: Record<string, unknown>, copyLabe
   drawSectionHeader(ctx, 'Vehicle Condition');
   const condType = str(data.conditionType);
   if (condType === 'as_is') {
-    drawText(ctx, 'AS-IS — NO WARRANTY', { size: 11, font: ctx.fontBold });
+    drawText(ctx, 'AS-IS - NO WARRANTY', { size: 11, font: ctx.fontBold });
     drawText(ctx, 'This vehicle is sold "AS IS" without any warranties, express or implied. The buyer acknowledges that they accept full responsibility for any and all repairs.', {
       size: 8, color: GRAY, maxWidth: CONTENT_W,
     });
@@ -401,7 +425,7 @@ async function buildBillOfSale(ctx: Ctx, data: Record<string, unknown>, copyLabe
 // Financing Agreement PDF
 // ============================================================
 async function buildFinancing(ctx: Ctx, data: Record<string, unknown>, copyLabel?: string): Promise<void> {
-  drawDocHeader(ctx, 'Financing Agreement', 'Buy Here Pay Here — Retail Installment Contract', copyLabel);
+  drawDocHeader(ctx, 'Financing Agreement', 'Buy Here Pay Here - Retail Installment Contract', copyLabel);
 
   // Buyer
   drawSectionHeader(ctx, 'Buyer');
@@ -620,7 +644,7 @@ async function drawSignatures(
     };
     for (const [key, val] of Object.entries(decoded.ack)) {
       const label = ackLabels[key] || key;
-      const check = val ? '☑' : '☐';
+      const check = val ? '[X]' : '[ ]';
       drawText(ctx, `${check}  ${label}`, { size: 9 });
     }
   }
@@ -666,7 +690,7 @@ export async function buildPdfFromAgreement(
   const pages = doc.getPages();
   for (let i = 0; i < pages.length; i++) {
     const p = pages[i];
-    const footerText = `${DEALER_NAME} — Page ${i + 1} of ${pages.length}`;
+    const footerText = `${DEALER_NAME} - Page ${i + 1} of ${pages.length}`;
     const footerW = font.widthOfTextAtSize(footerText, 7);
     p.drawText(footerText, {
       x: PAGE_W / 2 - footerW / 2,

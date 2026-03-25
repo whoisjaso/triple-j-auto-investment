@@ -61,7 +61,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       },
     });
   } catch (e) {
-    console.error('[pdf] Generation failed:', e);
+    const errMsg = e instanceof Error ? `${e.message}\n${e.stack}` : String(e);
+    console.error('[pdf] Generation failed:', errMsg);
     return NextResponse.json(
       { error: 'PDF generation failed', details: e instanceof Error ? e.message : 'Unknown' },
       { status: 500 },
